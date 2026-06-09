@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spapp/models/motorcycle.dart';
+import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/screens/motorcycle_detail_screen.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
@@ -7,10 +8,12 @@ import 'package:spapp/widgets/motorcycle_pricing_display.dart';
 class NoCreditHomeScreen extends StatelessWidget {
   const NoCreditHomeScreen({
     super.key,
+    required this.userId,
     this.username,
     this.onLogout,
   });
 
+  final int userId;
   final String? username;
   final VoidCallback? onLogout;
 
@@ -36,18 +39,9 @@ class NoCreditHomeScreen extends StatelessWidget {
   ];
 
   void _onRequestCredit(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Próximamente: solicitud de crédito',
-          style: AppTypography.bodySm.copyWith(color: AppColors.onPrimary),
-        ),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(AppSpacing.lg),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.full),
-        ),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => IdentityVerificationScreen(userId: userId),
       ),
     );
   }
@@ -68,7 +62,10 @@ class NoCreditHomeScreen extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: _ModelsSection(models: MotorcycleCatalog.bikes),
+            child: _ModelsSection(
+              models: MotorcycleCatalog.bikes,
+              userId: userId,
+            ),
           ),
           SliverToBoxAdapter(child: _StepsSection(steps: _steps)),
         ],
@@ -251,14 +248,21 @@ class _CtaButtonState extends State<_CtaButton> {
 }
 
 class _ModelsSection extends StatelessWidget {
-  const _ModelsSection({required this.models});
+  const _ModelsSection({
+    required this.models,
+    required this.userId,
+  });
 
   final List<Motorcycle> models;
+  final int userId;
 
   void _openDetail(BuildContext context, Motorcycle motorcycle) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => MotorcycleDetailScreen(motorcycle: motorcycle),
+        builder: (_) => MotorcycleDetailScreen(
+          motorcycle: motorcycle,
+          userId: userId,
+        ),
       ),
     );
   }

@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (_creditCount == 0) {
       return NoCreditHomeScreen(
+        userId: widget.userId,
         username: widget.username,
         onLogout: widget.onLogout,
       );

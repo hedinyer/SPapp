@@ -2,13 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:spapp/models/motorcycle.dart';
+import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
 
 class MotorcycleDetailScreen extends StatefulWidget {
-  const MotorcycleDetailScreen({super.key, required this.motorcycle});
+  const MotorcycleDetailScreen({
+    super.key,
+    required this.motorcycle,
+    required this.userId,
+  });
 
   final Motorcycle motorcycle;
+  final int userId;
 
   @override
   State<MotorcycleDetailScreen> createState() => _MotorcycleDetailScreenState();
@@ -61,17 +67,11 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
   }
 
   void _onRequestCredit() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Próximamente: solicitud de crédito para ${widget.motorcycle.name}',
-          style: AppTypography.bodySm.copyWith(color: AppColors.onPrimary),
-        ),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(AppSpacing.lg),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.full),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => IdentityVerificationScreen(
+          userId: widget.userId,
+          motorcycleName: widget.motorcycle.name,
         ),
       ),
     );
