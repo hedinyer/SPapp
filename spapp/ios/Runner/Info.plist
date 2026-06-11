@@ -49,6 +49,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Necesitamos acceso a la cámara para capturar tu documento de identidad y selfie de verificación.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Necesitamos acceso a tu ubicación para validar tu solicitud de crédito y ofrecerte servicios cercanos.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Necesitamos acceso a tu galería para seleccionar fotos de tu documento de identidad.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

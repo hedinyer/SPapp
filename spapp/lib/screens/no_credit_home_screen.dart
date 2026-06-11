@@ -3,6 +3,7 @@ import 'package:spapp/models/motorcycle.dart';
 import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/screens/motorcycle_detail_screen.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
 
 class NoCreditHomeScreen extends StatelessWidget {
@@ -81,20 +82,21 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.sizeOf(context).width >= 768;
+    final width = Responsive.width(context);
+    final isWide = Responsive.isTablet(context);
 
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.horizontalPadding(context),
           vertical: AppSpacing.sm,
         ),
         child: Row(
           children: [
             Image.asset(
               'public/logos_login.jpeg',
-              height: 36,
+              height: Responsive.logoHeight(context),
               fit: BoxFit.contain,
             ),
             const Spacer(),
@@ -110,14 +112,18 @@ class _TopBar extends StatelessWidget {
               IconButton(
                 onPressed: onLogout,
                 tooltip: 'Cerrar sesión',
-                icon: const Icon(
+                icon: Icon(
                   Icons.logout_rounded,
                   color: AppColors.onSurface,
-                  size: 22,
+                  size: width < Breakpoints.compact ? 20 : 22,
                 ),
                 style: IconButton.styleFrom(
                   foregroundColor: AppColors.onSurface,
                   padding: const EdgeInsets.all(AppSpacing.sm),
+                  minimumSize: Size(
+                    width < Breakpoints.compact ? 40 : 44,
+                    width < Breakpoints.compact ? 40 : 44,
+                  ),
                 ),
               ),
           ],
@@ -151,17 +157,17 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final horizontalPad = size.width >= 768 ? AppSpacing.xxl : AppSpacing.md;
+    final width = Responsive.width(context);
+    final horizontalPad = Responsive.horizontalPadding(context);
 
     return ColoredBox(
       color: AppColors.background,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalPad,
-          AppSpacing.lg,
+          Responsive.lerp(context, min: AppSpacing.md, max: AppSpacing.lg),
           horizontalPad,
-          AppSpacing.xxxl,
+          Responsive.lerp(context, min: AppSpacing.xl, max: AppSpacing.xxxl),
         ),
         child: _ContentWidth(
           child: ConstrainedBox(
@@ -171,17 +177,24 @@ class _HeroSection extends StatelessWidget {
               children: [
                 Text(
                   'Tu próxima moto está a un clic',
-                  style: AppTypography.displayResponsive(size.width).copyWith(
+                  style: AppTypography.displayResponsive(width).copyWith(
                     color: AppColors.onSurface,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  height: Responsive.lerp(context, min: AppSpacing.sm, max: AppSpacing.md),
+                ),
                 Text(
                   'Obtén el crédito que necesitas para estrenar tu Bera o AKT hoy mismo. Proceso 100% digital, sin papeleos innecesarios.',
-                  style: AppTypography.bodyLg,
+                  style: AppTypography.bodyLgResponsive(width),
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                _CtaButton(onPressed: onRequestCredit),
+                SizedBox(
+                  height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
+                ),
+                _CtaButton(
+                  onPressed: onRequestCredit,
+                  fullWidth: width < Breakpoints.large,
+                ),
               ],
             ),
           ),
@@ -192,9 +205,13 @@ class _HeroSection extends StatelessWidget {
 }
 
 class _CtaButton extends StatefulWidget {
-  const _CtaButton({required this.onPressed});
+  const _CtaButton({
+    required this.onPressed,
+    this.fullWidth = false,
+  });
 
   final VoidCallback onPressed;
+  final bool fullWidth;
 
   @override
   State<_CtaButton> createState() => _CtaButtonState();
@@ -205,6 +222,9 @@ class _CtaButtonState extends State<_CtaButton> {
 
   @override
   Widget build(BuildContext context) {
+    final verticalPad = Responsive.lerp(context, min: 12.0, max: 16.0);
+    final horizontalPad = Responsive.lerp(context, min: 20.0, max: 32.0);
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
@@ -214,9 +234,10 @@ class _CtaButtonState extends State<_CtaButton> {
         scale: _pressed ? 0.95 : 1,
         duration: const Duration(milliseconds: 120),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.md,
+          width: widget.fullWidth ? double.infinity : null,
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPad,
+            vertical: verticalPad,
           ),
           decoration: BoxDecoration(
             color: AppColors.primary,
@@ -224,13 +245,16 @@ class _CtaButtonState extends State<_CtaButton> {
             boxShadow: AppShadows.subtle,
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: widget.fullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment:
+                widget.fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
             children: [
               Text(
                 'SOLICITAR AHORA',
                 style: AppTypography.labelMd.copyWith(
                   color: AppColors.onPrimary,
                   fontWeight: FontWeight.w500,
+                  fontSize: Responsive.isCompact(context) ? 13 : 14,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -269,18 +293,18 @@ class _ModelsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final isWide = width >= 768;
-    final horizontalPad = isWide ? AppSpacing.xxl : AppSpacing.md;
+    final width = Responsive.width(context);
+    final isWide = Responsive.isTablet(context);
+    final horizontalPad = Responsive.horizontalPadding(context);
 
     return ColoredBox(
       color: AppColors.surfaceContainerLowest,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalPad,
-          AppSpacing.xxxl,
+          Responsive.lerp(context, min: AppSpacing.xl, max: AppSpacing.xxxl),
           horizontalPad,
-          AppSpacing.xxxl,
+          Responsive.lerp(context, min: AppSpacing.xl, max: AppSpacing.xxxl),
         ),
         child: _ContentWidth(
           child: Column(
@@ -318,26 +342,62 @@ class _ModelsSection extends StatelessWidget {
                   'Seleccionados para tu estilo de vida, con las mejores condiciones de financiamiento.',
                   style: AppTypography.bodySm.copyWith(
                     color: AppColors.secondary,
+                    fontSize: width < Breakpoints.compact ? 13 : 14,
                   ),
                 ),
               ],
-              SizedBox(height: isWide ? AppSpacing.xxl : AppSpacing.xl),
+              SizedBox(
+                height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xxl),
+              ),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final crossCount = constraints.maxWidth >= 640 ? 2 : 1;
+                  final crossCount = Responsive.gridColumns(context);
+                  final spacing = Responsive.lerp(
+                    context,
+                    min: AppSpacing.md,
+                    max: AppSpacing.xl,
+                  );
+                  final cardWidth = Responsive.gridItemWidth(
+                    context,
+                    maxWidth: constraints.maxWidth,
+                    columns: crossCount,
+                    spacing: spacing,
+                  );
+
+                  if (crossCount == 1) {
+                    return Column(
+                      children: [
+                        for (var i = 0; i < models.length; i++) ...[
+                          _ModelCard(
+                            model: models[i],
+                            cardWidth: cardWidth,
+                            onTap: () => _openDetail(context, models[i]),
+                          ),
+                          if (i < models.length - 1) SizedBox(height: spacing),
+                        ],
+                      ],
+                    );
+                  }
+
+                  final cardExtent = Responsive.modelCardExtent(
+                    context,
+                    constraints.maxWidth,
+                  );
+
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: models.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossCount,
-                      mainAxisSpacing: AppSpacing.xl,
-                      crossAxisSpacing: AppSpacing.xl,
-                      mainAxisExtent: crossCount == 2 ? 440 : 480,
+                      mainAxisSpacing: spacing,
+                      crossAxisSpacing: spacing,
+                      mainAxisExtent: cardExtent,
                     ),
                     itemBuilder: (context, index) {
                       return _ModelCard(
                         model: models[index],
+                        cardWidth: cardWidth,
                         onTap: () => _openDetail(context, models[index]),
                       );
                     },
@@ -353,35 +413,47 @@ class _ModelsSection extends StatelessWidget {
 }
 
 class _ModelCard extends StatelessWidget {
-  const _ModelCard({required this.model, required this.onTap});
+  const _ModelCard({
+    required this.model,
+    required this.cardWidth,
+    required this.onTap,
+  });
 
   final Motorcycle model;
+  final double cardWidth;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final imageHeight = Responsive.modelCardImageHeight(context, cardWidth);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(AppRadius.xxl),
+          borderRadius: BorderRadius.circular(
+            Responsive.lerp(context, min: AppRadius.xl, max: AppRadius.xxl),
+          ),
           boxShadow: AppShadows.card,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
+            SizedBox(
+              height: imageHeight,
               child: ColoredBox(
                 color: AppColors.surfaceContainer,
                 child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: EdgeInsets.all(
+                    Responsive.lerp(context, min: AppSpacing.sm, max: AppSpacing.md),
+                  ),
                   child: Image.asset(
                     model.coverImage,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Center(
+                    errorBuilder: (context, error, stackTrace) => const Center(
                       child: Icon(
                         Icons.two_wheeler_outlined,
                         size: 48,
@@ -408,8 +480,15 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = Responsive.isCompact(context);
+    final cardPad = Responsive.lerp(
+      context,
+      min: AppSpacing.md,
+      max: AppSpacing.lg,
+    );
+
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(cardPad),
       decoration: const BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         border: Border(
@@ -418,27 +497,37 @@ class _InfoCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(model.name, style: AppTypography.headlineMd),
+                child: Text(
+                  model.name,
+                  style: AppTypography.headlineMdResponsive(
+                    Responsive.width(context),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               _Tag(label: model.tag),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: compact ? AppSpacing.xs : AppSpacing.sm),
           Text(
             model.description,
-            style: AppTypography.bodySm,
-            maxLines: 2,
+            style: AppTypography.bodySm.copyWith(
+              fontSize: compact ? 12 : 14,
+            ),
+            maxLines: compact ? 2 : 3,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
           const Divider(color: AppColors.outlineVariant, height: 1),
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: compact ? AppSpacing.xs : AppSpacing.sm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -450,12 +539,12 @@ class _InfoCard extends StatelessWidget {
                 child: InkWell(
                   onTap: onTap,
                   customBorder: const CircleBorder(),
-                  child: const SizedBox(
-                    width: 40,
-                    height: 40,
+                  child: SizedBox(
+                    width: compact ? 36 : 40,
+                    height: compact ? 36 : 40,
                     child: Icon(
                       Icons.north_east_rounded,
-                      size: 20,
+                      size: compact ? 18 : 20,
                       color: AppColors.onPrimary,
                     ),
                   ),
@@ -476,8 +565,13 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = Responsive.isCompact(context);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 3 : 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(AppRadius.full),
@@ -485,8 +579,8 @@ class _Tag extends StatelessWidget {
       child: Text(
         label.toUpperCase(),
         style: AppTypography.labelSm.copyWith(
-          fontSize: 10,
-          letterSpacing: 1.6,
+          fontSize: compact ? 9 : 10,
+          letterSpacing: compact ? 1.2 : 1.6,
           color: AppColors.onPrimary,
           fontFeatures: const [FontFeature.tabularFigures()],
         ),
@@ -502,18 +596,18 @@ class _StepsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final isWide = width >= 768;
-    final horizontalPad = isWide ? AppSpacing.xxl : AppSpacing.md;
+    final width = Responsive.width(context);
+    final isWide = Responsive.isTablet(context);
+    final horizontalPad = Responsive.horizontalPadding(context);
 
     return ColoredBox(
       color: AppColors.surfaceContainer,
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalPad,
-          AppSpacing.xxxl,
+          Responsive.lerp(context, min: AppSpacing.xl, max: AppSpacing.xxxl),
           horizontalPad,
-          AppSpacing.xxxl,
+          Responsive.lerp(context, min: AppSpacing.xl, max: AppSpacing.xxxl),
         ),
         child: _ContentWidth(
           child: Column(
@@ -528,15 +622,19 @@ class _StepsSection extends StatelessWidget {
                       'Aprobación\nen 3 pasos',
                       style: AppTypography.headlineLgResponsive(width),
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(
+                      height: Responsive.lerp(context, min: AppSpacing.sm, max: AppSpacing.md),
+                    ),
                     Text(
                       'Diseñado para la velocidad. Sin papeleo complejo, todo desde tu dispositivo.',
-                      style: AppTypography.bodyLg,
+                      style: AppTypography.bodyLgResponsive(width),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: isWide ? AppSpacing.xxl : AppSpacing.xl),
+              SizedBox(
+                height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xxl),
+              ),
               if (isWide)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,7 +656,13 @@ class _StepsSection extends StatelessWidget {
                     for (var i = 0; i < steps.length; i++) ...[
                       _StepColumn(step: steps[i], offset: 0),
                       if (i < steps.length - 1)
-                        const SizedBox(height: AppSpacing.xl),
+                        SizedBox(
+                          height: Responsive.lerp(
+                            context,
+                            min: AppSpacing.lg,
+                            max: AppSpacing.xl,
+                          ),
+                        ),
                     ],
                   ],
                 ),
@@ -611,9 +715,19 @@ class _StepColumn extends StatelessWidget {
               children: [
                 Text(step.label, style: AppTypography.stepLabel),
                 const SizedBox(height: AppSpacing.sm),
-                Text(step.title, style: AppTypography.headlineSm),
+                Text(
+                  step.title,
+                  style: AppTypography.headlineSm.copyWith(
+                    fontSize: Responsive.isCompact(context) ? 16 : 17,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.xs),
-                Text(step.description, style: AppTypography.bodySm),
+                Text(
+                  step.description,
+                  style: AppTypography.bodySm.copyWith(
+                    fontSize: Responsive.isCompact(context) ? 13 : 14,
+                  ),
+                ),
               ],
             ),
           ),
@@ -633,7 +747,7 @@ class _ContentWidth extends StatelessWidget {
     return Align(
       alignment: Alignment.center,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppSpacing.containerMax),
+        constraints: BoxConstraints(maxWidth: Responsive.contentMaxWidth(context)),
         child: child,
       ),
     );

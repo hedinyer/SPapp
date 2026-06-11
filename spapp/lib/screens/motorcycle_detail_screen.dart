@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:spapp/models/motorcycle.dart';
 import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
 
 class MotorcycleDetailScreen extends StatefulWidget {
@@ -80,6 +81,10 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final bike = widget.motorcycle;
+    final width = Responsive.width(context);
+    final compact = Responsive.isCompact(context);
+    final horizontalPad = Responsive.horizontalPadding(context);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: AppColors.surfaceContainerLowest,
@@ -88,41 +93,63 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
-          SliverToBoxAdapter(child: _GalleryHeader(
-            motorcycle: bike,
-            pageController: _pageController,
-            currentPage: _currentPage,
-            onPageChanged: _onPageChanged,
-          )),
+          SliverToBoxAdapter(
+            child: _GalleryHeader(
+              motorcycle: bike,
+              pageController: _pageController,
+              currentPage: _currentPage,
+              onPageChanged: _onPageChanged,
+            ),
+          ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.xl,
-                AppSpacing.lg,
-                AppSpacing.xxxl,
+              padding: EdgeInsets.fromLTRB(
+                horizontalPad,
+                Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
+                horizontalPad,
+                100 + bottomInset,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(bike.name, style: AppTypography.headlineLg),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(bike.longDescription, style: AppTypography.bodyMd),
-                          ],
+                  if (compact)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          bike.name,
+                          style: AppTypography.headlineMdResponsive(width),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      _Tag(label: bike.tag),
-                    ],
+                        const SizedBox(height: AppSpacing.sm),
+                        _Tag(label: bike.tag),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(bike.longDescription, style: AppTypography.bodyMd),
+                      ],
+                    )
+                  else
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                bike.name,
+                                style: AppTypography.headlineMdResponsive(width),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(bike.longDescription, style: AppTypography.bodyMd),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        _Tag(label: bike.tag),
+                      ],
+                    ),
+                  SizedBox(
+                    height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
                   ),
-                  const SizedBox(height: AppSpacing.xl),
                   Text('DESTACADOS', style: AppTypography.eyebrow),
                   const SizedBox(height: AppSpacing.md),
                   Wrap(
@@ -130,20 +157,53 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
                     runSpacing: AppSpacing.sm,
                     children: [
                       for (final highlight in bike.highlights)
-                        _HighlightChip(label: highlight),
+                        _HighlightChip(
+                          label: highlight,
+                          compact: compact,
+                        ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(
+                    height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
+                  ),
                   Text('FICHA TÉCNICA', style: AppTypography.eyebrow),
                   const SizedBox(height: AppSpacing.md),
                   _SpecsGrid(specs: bike.specs),
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(
+                    height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
+                  ),
                   MotorcyclePricingExpanded(onRequest: _onRequestCredit),
                 ],
               ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPad,
+            AppSpacing.sm,
+            horizontalPad,
+            AppSpacing.sm,
+          ),
+          child: FilledButton(
+            onPressed: _onRequestCredit,
+            style: FilledButton.styleFrom(
+              minimumSize: Size(double.infinity, compact ? 44 : 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.full),
+              ),
+            ),
+            child: Text(
+              'Solicitar crédito',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.onPrimary,
+                fontSize: compact ? 13 : 14,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -164,11 +224,11 @@ class _GalleryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final topInset = MediaQuery.paddingOf(context).top;
     final gallery = motorcycle.gallery;
+    final galleryHeight = Responsive.galleryHeight(context);
 
     return SizedBox(
-      height: 380 + topInset,
+      height: galleryHeight,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -207,11 +267,12 @@ class _GalleryHeader extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: topInset + AppSpacing.sm,
-            left: AppSpacing.md,
+            top: MediaQuery.paddingOf(context).top + AppSpacing.sm,
+            left: Responsive.horizontalPadding(context),
             child: _CircleButton(
               icon: Icons.arrow_back_rounded,
               onPressed: () => Navigator.of(context).pop(),
+              compact: Responsive.isCompact(context),
             ),
           ),
           Positioned(
@@ -244,13 +305,20 @@ class _GalleryHeader extends StatelessWidget {
 }
 
 class _CircleButton extends StatelessWidget {
-  const _CircleButton({required this.icon, required this.onPressed});
+  const _CircleButton({
+    required this.icon,
+    required this.onPressed,
+    this.compact = false,
+  });
 
   final IconData icon;
   final VoidCallback onPressed;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final size = compact ? 36.0 : 40.0;
+
     return Material(
       color: Colors.black.withValues(alpha: 0.35),
       shape: const CircleBorder(),
@@ -258,9 +326,9 @@ class _CircleButton extends StatelessWidget {
         onTap: onPressed,
         customBorder: const CircleBorder(),
         child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Icon(icon, color: Colors.white, size: 20),
+          width: size,
+          height: size,
+          child: Icon(icon, color: Colors.white, size: compact ? 18 : 20),
         ),
       ),
     );
@@ -274,8 +342,13 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = Responsive.isCompact(context);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 10 : 12,
+        vertical: compact ? 3 : 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(AppRadius.full),
@@ -283,7 +356,7 @@ class _Tag extends StatelessWidget {
       child: Text(
         label.toUpperCase(),
         style: AppTypography.labelSm.copyWith(
-          fontSize: 10,
+          fontSize: compact ? 9 : 10,
           letterSpacing: 1.6,
           color: AppColors.onPrimary,
         ),
@@ -293,23 +366,32 @@ class _Tag extends StatelessWidget {
 }
 
 class _HighlightChip extends StatelessWidget {
-  const _HighlightChip({required this.label});
+  const _HighlightChip({
+    required this.label,
+    this.compact = false,
+  });
 
   final String label;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? AppSpacing.sm + 4 : AppSpacing.md,
+        vertical: compact ? AppSpacing.xs + 2 : AppSpacing.sm,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(AppRadius.full),
         border: Border.all(color: AppColors.outlineVariant),
       ),
-      child: Text(label, style: AppTypography.bodySm),
+      child: Text(
+        label,
+        style: AppTypography.bodySm.copyWith(
+          fontSize: compact ? 12 : 14,
+        ),
+      ),
     );
   }
 }
@@ -323,54 +405,75 @@ class _SpecsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossCount = constraints.maxWidth >= 480 ? 2 : 1;
+        const spacing = AppSpacing.sm;
+        final columns = Responsive.specGridColumns(constraints.maxWidth);
+        final itemWidth = Responsive.gridItemWidth(
+          context,
+          maxWidth: constraints.maxWidth,
+          columns: columns,
+          spacing: spacing,
+        );
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: specs.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossCount,
-            mainAxisSpacing: AppSpacing.sm,
-            crossAxisSpacing: AppSpacing.sm,
-            childAspectRatio: crossCount == 2 ? 3.2 : 4.5,
-          ),
-          itemBuilder: (context, index) {
-            final spec = specs[index];
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm + 2,
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final spec in specs)
+              SizedBox(
+                width: itemWidth,
+                child: _SpecTile(spec: spec),
               ),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainer,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    spec.label.toUpperCase(),
-                    style: AppTypography.labelSm.copyWith(
-                      fontSize: 10,
-                      letterSpacing: 1.2,
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    spec.value,
-                    style: AppTypography.labelMd.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+          ],
         );
       },
+    );
+  }
+}
+
+class _SpecTile extends StatelessWidget {
+  const _SpecTile({required this.spec});
+
+  final MotorcycleSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = Responsive.isCompact(context);
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? AppSpacing.sm + 4 : AppSpacing.md,
+        vertical: compact ? AppSpacing.sm : AppSpacing.sm + 2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            spec.label.toUpperCase(),
+            style: AppTypography.labelSm.copyWith(
+              fontSize: compact ? 9 : 10,
+              letterSpacing: 1.2,
+              color: AppColors.secondary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            spec.value,
+            style: AppTypography.labelMd.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: compact ? 13 : 14,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }

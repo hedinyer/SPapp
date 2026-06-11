@@ -120,21 +120,74 @@ abstract final class AppTypography {
         color: AppColors.onPrimary,
       );
 
-  static TextStyle displayResponsive(double width) => _geist(
-        size: width >= 768 ? 64 : 40,
-        height: width >= 768 ? 64 : 40,
-        weight: FontWeight.w700,
-        letterSpacing: width >= 768 ? -2.56 : -1.6,
-        color: AppColors.onPrimary,
-      );
+  static TextStyle displayResponsive(double width) {
+    final size = width >= 768
+        ? 64.0
+        : width >= 428
+            ? 42.0
+            : width >= 390
+                ? 38.0
+                : width >= 360
+                    ? 34.0
+                    : 30.0;
+    return _geist(
+      size: size,
+      height: size,
+      weight: FontWeight.w700,
+      letterSpacing: size * -0.04,
+      color: AppColors.onPrimary,
+    );
+  }
 
-  static TextStyle headlineLgResponsive(double width) => _geist(
-        size: width >= 768 ? 48 : 36,
-        height: width >= 768 ? 48 : 40,
-        weight: FontWeight.w600,
-        letterSpacing: width >= 768 ? -0.96 : -0.72,
-        color: AppColors.onSurface,
-      );
+  static TextStyle headlineLgResponsive(double width) {
+    final size = width >= 768
+        ? 48.0
+        : width >= 428
+            ? 36.0
+            : width >= 390
+                ? 32.0
+                : width >= 360
+                    ? 28.0
+                    : 26.0;
+    return _geist(
+      size: size,
+      height: size * 1.1,
+      weight: FontWeight.w600,
+      letterSpacing: size * -0.02,
+      color: AppColors.onSurface,
+    );
+  }
+
+  static TextStyle headlineMdResponsive(double width) {
+    final size = width >= 428 ? 28.0 : width >= 360 ? 24.0 : 22.0;
+    return _geist(
+      size: size,
+      height: size * 1.25,
+      weight: FontWeight.w600,
+      letterSpacing: -0.28,
+      color: AppColors.onSurface,
+    );
+  }
+
+  static TextStyle headlineLgMobileResponsive(double width) {
+    final size = width >= 428 ? 26.0 : width >= 360 ? 24.0 : 22.0;
+    return _geist(
+      size: size,
+      height: size * 1.3,
+      weight: FontWeight.w600,
+      color: AppColors.onSurface,
+    );
+  }
+
+  static TextStyle bodyLgResponsive(double width) {
+    final size = width >= 390 ? 18.0 : 16.0;
+    return _geist(
+      size: size,
+      height: size * 1.55,
+      weight: FontWeight.w400,
+      color: AppColors.secondary,
+    );
+  }
 
   static TextStyle get headlineLg => _geist(
         size: 36,

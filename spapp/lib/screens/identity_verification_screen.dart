@@ -1,11 +1,11 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:spapp/models/document_photo_type.dart';
 import 'package:spapp/services/document_service.dart';
 import 'package:spapp/services/media_permission_service.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/widgets/live_camera_frame.dart';
 
 class IdentityVerificationScreen extends StatefulWidget {
   const IdentityVerificationScreen({
@@ -31,13 +31,15 @@ class _IdentityVerificationScreenState
   ];
 
   final _picker = ImagePicker();
+  final _cameraKey = GlobalKey<LiveCameraFrameState>();
   final _photos = <DocumentPhotoType, Uint8List>{};
   final _mimeTypes = <DocumentPhotoType, String>{};
 
   int _currentStep = 0;
   bool _isSubmitting = false;
 
-  DocumentPhotoType get _activeType => _steps[_currentStep];
+  DocumentPhotoType? get _activeType =>
+      _currentStep < _steps.length ? _steps[_currentStep] : null;
 
   bool get _allPhotosCaptured =>
       _photos.containsKey(DocumentPhotoType.front) &&
@@ -46,24 +48,35 @@ class _IdentityVerificationScreenState
 
   bool get _isReviewStep => _currentStep >= _steps.length;
 
-  Future<void> _pickPhoto(ImageSource source) async {
-    final accessType = source == ImageSource.camera
-        ? MediaAccessType.camera
-        : MediaAccessType.gallery;
+  void _onPhotoCaptured(Uint8List bytes) {
+    final type = _activeType;
+    if (type == null) return;
 
+    setState(() {
+      _photos[type] = bytes;
+      _mimeTypes[type] = 'image/jpeg';
+    });
+  }
+
+  Future<void> _captureFromCamera() async {
+    await _cameraKey.currentState?.capture();
+  }
+
+  Future<void> _pickFromGallery() async {
     final granted = await MediaPermissionService.ensureAccess(
-      accessType,
+      MediaAccessType.gallery,
       context: context,
     );
     if (!granted || !mounted) return;
 
-    final isSelfie = _activeType == DocumentPhotoType.selfie;
+    final type = _activeType;
+    if (type == null) return;
+
+    final isSelfie = type == DocumentPhotoType.selfie;
 
     try {
       final file = await _picker.pickImage(
-        source: source,
-        preferredCameraDevice:
-            isSelfie ? CameraDevice.front : CameraDevice.rear,
+        source: ImageSource.gallery,
         imageQuality: 85,
         maxWidth: isSelfie ? 1200 : 2000,
       );
@@ -74,15 +87,15 @@ class _IdentityVerificationScreenState
       final mime = _mimeFromPath(file.path);
 
       setState(() {
-        _photos[_activeType] = bytes;
-        _mimeTypes[_activeType] = mime;
+        _photos[type] = bytes;
+        _mimeTypes[type] = mime;
       });
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
-      final message = source == ImageSource.camera
-          ? 'No se pudo abrir la cámara. Revisa los permisos e intenta de nuevo.'
-          : 'No se pudo abrir la galería. Revisa los permisos e intenta de nuevo.';
-      _showMessage(message);
+      if (kDebugMode) debugPrint('Gallery pick error: $error');
+      _showMessage(
+        'No se pudo abrir la galería. Revisa los permisos e intenta de nuevo.',
+      );
     }
   }
 
@@ -112,8 +125,11 @@ class _IdentityVerificationScreenState
   }
 
   void _goNext() {
-    if (!_photos.containsKey(_activeType)) {
-      _showMessage('Primero captura la foto de ${_activeType.captureLabel}.');
+    final type = _activeType;
+    if (type == null) return;
+
+    if (!_photos.containsKey(type)) {
+      _showMessage('Primero captura la foto de ${type.captureLabel}.');
       return;
     }
 
@@ -132,6 +148,13 @@ class _IdentityVerificationScreenState
 
   Future<void> _submit() async {
     if (!_allPhotosCaptured || _isSubmitting) return;
+
+    if (widget.userId <= 0) {
+      _showMessage(
+        'No se pudo identificar tu usuario. Cierra sesión e inicia de nuevo.',
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
 
@@ -177,7 +200,11 @@ class _IdentityVerificationScreenState
       if (mounted) Navigator.of(context).pop(true);
     } on DocumentUploadException catch (error) {
       if (mounted) _showMessage(error.message);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('Document submit error: $error');
+        debugPrint('$stackTrace');
+      }
       if (mounted) {
         _showMessage('No se pudieron guardar los documentos. Intenta de nuevo.');
       }
@@ -201,7 +228,7 @@ class _IdentityVerificationScreenState
         ),
         title: Text(
           'Verificación de identidad',
-          style: AppTypography.headlineLgMobile.copyWith(fontSize: 18),
+          style: AppTypography.headlineSm,
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(28),
@@ -223,7 +250,7 @@ class _IdentityVerificationScreenState
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   AppSpacing.sm,
@@ -231,16 +258,24 @@ class _IdentityVerificationScreenState
                   AppSpacing.lg,
                 ),
                 child: _isReviewStep
-                    ? _ReviewSection(photos: _photos)
+                    ? SingleChildScrollView(
+                        child: _ReviewSection(photos: _photos),
+                      )
                     : _CaptureSection(
-                        type: _activeType,
+                        type: _activeType!,
                         photo: _photos[_activeType],
-                        onPickCamera: () => _pickPhoto(ImageSource.camera),
-                        onPickGallery: () => _pickPhoto(ImageSource.gallery),
+                        cameraKey: _cameraKey,
+                        fitToScreen:
+                            _activeType == DocumentPhotoType.selfie,
+                        onCapture: _captureFromCamera,
+                        onPickGallery: _pickFromGallery,
+                        onPhotoCaptured: _onPhotoCaptured,
                         onRetake: () {
+                          final type = _activeType;
+                          if (type == null) return;
                           setState(() {
-                            _photos.remove(_activeType);
-                            _mimeTypes.remove(_activeType);
+                            _photos.remove(type);
+                            _mimeTypes.remove(type);
                           });
                         },
                       ),
@@ -249,7 +284,9 @@ class _IdentityVerificationScreenState
             _BottomActions(
               isReview: _isReviewStep,
               isSubmitting: _isSubmitting,
-              canContinue: _photos.containsKey(_activeType),
+              canContinue: _isReviewStep
+                  ? _allPhotosCaptured
+                  : _photos.containsKey(_activeType),
               onPrimary: _isReviewStep ? _submit : _goNext,
               primaryLabel: _isReviewStep ? 'Enviar documentos' : 'Continuar',
             ),
@@ -306,111 +343,197 @@ class _CaptureSection extends StatelessWidget {
   const _CaptureSection({
     required this.type,
     required this.photo,
-    required this.onPickCamera,
+    required this.cameraKey,
+    required this.fitToScreen,
+    required this.onCapture,
     required this.onPickGallery,
+    required this.onPhotoCaptured,
     required this.onRetake,
   });
 
   final DocumentPhotoType type;
   final Uint8List? photo;
-  final VoidCallback onPickCamera;
+  final GlobalKey<LiveCameraFrameState> cameraKey;
+  final bool fitToScreen;
+  final Future<void> Function() onCapture;
   final VoidCallback onPickGallery;
+  final void Function(Uint8List bytes) onPhotoCaptured;
   final VoidCallback onRetake;
 
   @override
   Widget build(BuildContext context) {
     final isSelfie = type == DocumentPhotoType.selfie;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceContainer,
-            borderRadius: BorderRadius.circular(AppRadius.full),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+    final photoFrame = _PhotoFrame(
+      isSelfie: isSelfie,
+      photo: photo,
+      cameraKey: cameraKey,
+      onPhotoCaptured: onPhotoCaptured,
+      emptyLabel: isSelfie
+          ? 'Centra tu rostro aquí'
+          : 'Alinea tu documento aquí',
+    );
+
+    final actionButtons = _buildActionButtons(isSelfie);
+
+    if (fitToScreen) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Icon(
-                _iconForType(type),
-                size: 16,
-                color: AppColors.primary,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceContainer,
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _iconForType(type),
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      type.captureLabel.toUpperCase(),
+                      style: AppTypography.labelSm.copyWith(
+                        fontSize: 10,
+                        letterSpacing: 1.2,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                type.captureLabel.toUpperCase(),
-                style: AppTypography.labelSm.copyWith(
-                  letterSpacing: 1.4,
-                  color: AppColors.primary,
+              Expanded(
+                child: Text(
+                  type.title,
+                  style: AppTypography.headlineSm.copyWith(fontSize: 15),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(type.title, style: AppTypography.headlineLg),
-        const SizedBox(height: AppSpacing.sm),
-        Text(type.instruction, style: AppTypography.bodyMd),
-        const SizedBox(height: AppSpacing.xl),
-        AspectRatio(
-          aspectRatio: isSelfie ? 0.82 : 1.55,
-          child: _PhotoFrame(
-            isSelfie: isSelfie,
-            photo: photo,
-            emptyLabel: isSelfie
-                ? 'Centra tu rostro aquí'
-                : 'Alinea tu documento aquí',
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        if (photo != null)
-          OutlinedButton.icon(
-            onPressed: onRetake,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text('Tomar otra foto'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.onSurface,
-              side: const BorderSide(color: AppColors.outlineVariant),
-              minimumSize: const Size.fromHeight(44),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.full),
-              ),
-            ),
-          )
-        else ...[
-          FilledButton.icon(
-            onPressed: onPickCamera,
-            icon: const Icon(Icons.camera_alt_rounded, size: 20),
-            label: Text(isSelfie ? 'Tomar selfie' : 'Tomar foto'),
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.full),
-              ),
-            ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            type.instruction,
+            style: AppTypography.bodySm,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: AppSpacing.sm),
-          OutlinedButton.icon(
-            onPressed: onPickGallery,
-            icon: const Icon(Icons.photo_library_outlined, size: 20),
-            label: const Text('Elegir de galería'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.onSurface,
-              side: const BorderSide(color: AppColors.outlineVariant),
-              minimumSize: const Size.fromHeight(52),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.full),
-              ),
+          Expanded(child: photoFrame),
+          const SizedBox(height: AppSpacing.sm),
+          actionButtons,
+        ],
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer,
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  _iconForType(type),
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  type.captureLabel.toUpperCase(),
+                  style: AppTypography.labelSm.copyWith(
+                    letterSpacing: 1.4,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
+          Text(type.title, style: AppTypography.headlineSm),
+          const SizedBox(height: AppSpacing.sm),
+          Text(type.instruction, style: AppTypography.bodyMd),
+          const SizedBox(height: AppSpacing.xl),
+          AspectRatio(
+            aspectRatio: isSelfie ? 0.82 : 1.55,
+            child: photoFrame,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          actionButtons,
         ],
-        const SizedBox(height: AppSpacing.lg),
-        _TipsCard(type: type),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(bool isSelfie) {
+    final buttonHeight = fitToScreen ? 44.0 : 52.0;
+
+    if (photo != null) {
+      return OutlinedButton.icon(
+        onPressed: onRetake,
+        icon: const Icon(Icons.refresh_rounded, size: 18),
+        label: const Text('Tomar otra foto'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.onSurface,
+          side: const BorderSide(color: AppColors.outlineVariant),
+          minimumSize: Size.fromHeight(buttonHeight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.full),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        FilledButton.icon(
+          onPressed: onCapture,
+          icon: const Icon(Icons.camera_alt_rounded, size: 20),
+          label: Text(isSelfie ? 'Capturar selfie' : 'Capturar'),
+          style: FilledButton.styleFrom(
+            minimumSize: Size.fromHeight(buttonHeight),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: fitToScreen ? AppSpacing.xs : AppSpacing.sm,
+        ),
+        OutlinedButton.icon(
+          onPressed: onPickGallery,
+          icon: const Icon(Icons.photo_library_outlined, size: 20),
+          label: const Text('Elegir de galería'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.onSurface,
+            side: const BorderSide(color: AppColors.outlineVariant),
+            minimumSize: Size.fromHeight(buttonHeight),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.full),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -431,11 +554,15 @@ class _PhotoFrame extends StatelessWidget {
   const _PhotoFrame({
     required this.isSelfie,
     required this.photo,
+    required this.cameraKey,
+    required this.onPhotoCaptured,
     required this.emptyLabel,
   });
 
   final bool isSelfie;
   final Uint8List? photo;
+  final GlobalKey<LiveCameraFrameState> cameraKey;
+  final void Function(Uint8List bytes) onPhotoCaptured;
   final String emptyLabel;
 
   @override
@@ -457,30 +584,11 @@ class _PhotoFrame extends StatelessWidget {
           if (photo != null)
             Image.memory(photo!, fit: BoxFit.cover)
           else
-            Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isSelfie
-                        ? Icons.face_outlined
-                        : Icons.credit_card_outlined,
-                    size: 48,
-                    color: AppColors.outline,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    emptyLabel,
-                    style: AppTypography.bodySm.copyWith(
-                      color: AppColors.secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          if (photo == null)
-            CustomPaint(
-              painter: _FrameOverlayPainter(isSelfie: isSelfie),
+            LiveCameraFrame(
+              key: cameraKey,
+              isSelfie: isSelfie,
+              emptyLabel: emptyLabel,
+              onCapture: onPhotoCaptured,
             ),
           if (photo != null)
             Positioned(
@@ -521,133 +629,6 @@ class _PhotoFrame extends StatelessWidget {
   }
 }
 
-class _FrameOverlayPainter extends CustomPainter {
-  _FrameOverlayPainter({required this.isSelfie});
-
-  final bool isSelfie;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.35)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    final corner = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    final rect = isSelfie
-        ? Rect.fromCenter(
-            center: Offset(size.width / 2, size.height / 2),
-            width: size.width * 0.55,
-            height: size.height * 0.7,
-          )
-        : Rect.fromLTWH(
-            size.width * 0.08,
-            size.height * 0.18,
-            size.width * 0.84,
-            size.height * 0.64,
-          );
-
-    if (isSelfie) {
-      canvas.drawOval(rect, paint);
-    } else {
-      final rrect = RRect.fromRectAndRadius(
-        rect,
-        const Radius.circular(12),
-      );
-      canvas.drawRRect(rrect, paint);
-    }
-
-    const cornerLen = 22.0;
-    final corners = [
-      Offset(rect.left, rect.top),
-      Offset(rect.right, rect.top),
-      Offset(rect.left, rect.bottom),
-      Offset(rect.right, rect.bottom),
-    ];
-
-    for (final origin in corners) {
-      final isLeft = origin.dx == rect.left;
-      final isTop = origin.dy == rect.top;
-      canvas.drawLine(
-        origin,
-        origin + Offset(isLeft ? cornerLen : -cornerLen, 0),
-        corner,
-      );
-      canvas.drawLine(
-        origin,
-        origin + Offset(0, isTop ? cornerLen : -cornerLen),
-        corner,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _TipsCard extends StatelessWidget {
-  const _TipsCard({required this.type});
-
-  final DocumentPhotoType type;
-
-  @override
-  Widget build(BuildContext context) {
-    final tips = switch (type) {
-      DocumentPhotoType.front => [
-        'Usa buena iluminación natural',
-        'Evita reflejos sobre el plástico',
-        'No recortes los bordes del documento',
-      ],
-      DocumentPhotoType.back => [
-        'Captura el código de barras completo',
-        'Mantén el documento plano',
-        'Verifica que el texto sea legible',
-      ],
-      DocumentPhotoType.selfie => [
-        'Quita lentes y gorras',
-        'Mira directamente a la cámara',
-        'Usa un fondo claro y uniforme',
-      ],
-    };
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: AppColors.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('CONSEJOS', style: AppTypography.eyebrow),
-          const SizedBox(height: AppSpacing.sm),
-          for (final tip in tips) ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  Icons.check_rounded,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(tip, style: AppTypography.bodySm)),
-              ],
-            ),
-            if (tip != tips.last) const SizedBox(height: AppSpacing.xs),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 class _ReviewSection extends StatelessWidget {
   const _ReviewSection({required this.photos});
 
@@ -658,7 +639,7 @@ class _ReviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Revisa tus fotos', style: AppTypography.headlineLg),
+        Text('Revisa tus fotos', style: AppTypography.headlineSm),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Confirma que cada imagen corresponde al tipo correcto antes de enviar.',

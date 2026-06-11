@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:spapp/config/supabase_config.dart';
 import 'package:spapp/screens/auth_gate.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/theme/responsive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -18,6 +20,7 @@ Future<void> main() async {
   await Supabase.initialize(
     url: SupabaseConfig.url,
     publishableKey: SupabaseConfig.publishableKey,
+    debug: kDebugMode,
   );
 
   runApp(const SpApp());
@@ -32,6 +35,10 @@ class SpApp extends StatelessWidget {
       title: 'SP App',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
+      builder: (context, child) => ResponsiveScope(
+        maxScale: 1.1,
+        child: child ?? const SizedBox(),
+      ),
       home: const AuthGate(),
     );
   }

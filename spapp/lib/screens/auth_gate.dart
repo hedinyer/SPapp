@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spapp/screens/home_screen.dart';
 import 'package:spapp/screens/login_screen.dart';
 import 'package:spapp/services/auth_service.dart';
+import 'package:spapp/services/media_permission_service.dart';
 import 'package:spapp/theme/app_theme.dart';
 
 class AuthGate extends StatefulWidget {
@@ -19,9 +20,12 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     _loadSession();
+    MediaPermissionService.requestStartupPermissions();
   }
 
   Future<void> _loadSession() async {
+    setState(() => _isLoading = true);
+
     final session = await AuthService.getStoredSession();
     if (!mounted) return;
 

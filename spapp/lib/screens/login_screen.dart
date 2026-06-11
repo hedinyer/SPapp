@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:spapp/screens/home_screen.dart';
 import 'package:spapp/services/auth_service.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/theme/responsive.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, this.onLoginSuccess});
 
-  final VoidCallback? onLoginSuccess;
+  final Future<void> Function()? onLoginSuccess;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -45,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (widget.onLoginSuccess != null) {
-        widget.onLoginSuccess!();
+        await widget.onLoginSuccess!();
       } else {
         final userId = user['id'];
         Navigator.of(context).pushReplacement(
@@ -72,31 +73,56 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final width = Responsive.width(context);
+    final horizontalPad = Responsive.horizontalPadding(context);
+    final maxFormWidth = width >= Breakpoints.tablet ? 400.0 : width - horizontalPad * 2;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.surfaceContainerLowest,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 360),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const _LoginHeader(),
-                  const SizedBox(height: AppSpacing.xxl),
-                  _LoginForm(
-                    formKey: _formKey,
-                    usernameController: _usernameController,
-                    passwordController: _passwordController,
-                    isLoading: _isLoading,
-                    errorMessage: _errorMessage,
-                    onSubmit: _handleLogin,
-                  ),
-                ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(
+                horizontalPad,
+                Responsive.lerp(context, min: AppSpacing.md, max: AppSpacing.xl),
+                horizontalPad,
+                AppSpacing.lg + MediaQuery.viewInsetsOf(context).bottom,
               ),
-            ),
-          ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxFormWidth),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _LoginHeader(width: width),
+                        SizedBox(
+                          height: Responsive.lerp(
+                            context,
+                            min: AppSpacing.xl,
+                            max: AppSpacing.xxl,
+                          ),
+                        ),
+                        _LoginForm(
+                          formKey: _formKey,
+                          usernameController: _usernameController,
+                          passwordController: _passwordController,
+                          isLoading: _isLoading,
+                          errorMessage: _errorMessage,
+                          onSubmit: _handleLogin,
+                          fullWidthButton: width < Breakpoints.large,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -104,7 +130,9 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _LoginHeader extends StatelessWidget {
-  const _LoginHeader();
+  const _LoginHeader({required this.width});
+
+  final double width;
 
   @override
   Widget build(BuildContext context) {
@@ -114,21 +142,25 @@ class _LoginHeader extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
           child: Image.asset(
             'public/logos_login.jpeg',
-            height: 80,
+            height: Responsive.loginLogoHeight(context),
             fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          height: Responsive.lerp(context, min: AppSpacing.sm, max: AppSpacing.md),
+        ),
         Text(
           'Bienvenido de nuevo',
           textAlign: TextAlign.center,
-          style: AppTypography.headlineLgMobile,
+          style: AppTypography.headlineLgMobileResponsive(width),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           'Ingresa tus credenciales para acceder a tu cuenta',
           textAlign: TextAlign.center,
-          style: AppTypography.bodySm,
+          style: AppTypography.bodySm.copyWith(
+            fontSize: width < Breakpoints.compact ? 13 : 14,
+          ),
         ),
       ],
     );
@@ -143,6 +175,7 @@ class _LoginForm extends StatelessWidget {
     required this.isLoading,
     required this.errorMessage,
     required this.onSubmit,
+    required this.fullWidthButton,
   });
 
   final GlobalKey<FormState> formKey;
@@ -151,9 +184,16 @@ class _LoginForm extends StatelessWidget {
   final bool isLoading;
   final String? errorMessage;
   final VoidCallback onSubmit;
+  final bool fullWidthButton;
 
   @override
   Widget build(BuildContext context) {
+    final fieldSpacing = Responsive.lerp(
+      context,
+      min: AppSpacing.md,
+      max: AppSpacing.lg,
+    );
+
     return Form(
       key: formKey,
       child: Column(
@@ -161,7 +201,7 @@ class _LoginForm extends StatelessWidget {
         children: [
           if (errorMessage != null) ...[
             _ErrorBanner(message: errorMessage!),
-            const SizedBox(height: AppSpacing.lg),
+            SizedBox(height: fieldSpacing),
           ],
           _LoginField(
             label: 'Usuario',
@@ -176,7 +216,7 @@ class _LoginForm extends StatelessWidget {
               return null;
             },
           ),
-          const SizedBox(height: AppSpacing.lg),
+          SizedBox(height: fieldSpacing),
           _LoginField(
             label: 'Contraseña',
             controller: passwordController,
@@ -193,7 +233,11 @@ class _LoginForm extends StatelessWidget {
             },
           ),
           const SizedBox(height: AppSpacing.sm),
-          _SignInButton(isLoading: isLoading, onPressed: onSubmit),
+          _SignInButton(
+            isLoading: isLoading,
+            onPressed: onSubmit,
+            fullWidth: fullWidthButton,
+          ),
         ],
       ),
     );
@@ -223,6 +267,8 @@ class _LoginField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fieldHeight = Responsive.lerp(context, min: 44.0, max: 48.0);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -239,16 +285,23 @@ class _LoginField extends StatelessWidget {
               ),
             ],
           ),
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscureText,
-            textInputAction: textInputAction,
-            enabled: enabled,
-            validator: validator,
-            onFieldSubmitted: onFieldSubmitted,
-            style: AppTypography.bodyMd,
-            decoration: InputDecoration(
-              hintText: hint,
+          child: SizedBox(
+            height: fieldHeight,
+            child: TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              textInputAction: textInputAction,
+              enabled: enabled,
+              validator: validator,
+              onFieldSubmitted: onFieldSubmitted,
+              style: AppTypography.bodyMd,
+              decoration: InputDecoration(
+                hintText: hint,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: Responsive.isCompact(context) ? 10 : 12,
+                ),
+              ),
             ),
           ),
         ),
@@ -261,10 +314,12 @@ class _SignInButton extends StatefulWidget {
   const _SignInButton({
     required this.isLoading,
     required this.onPressed,
+    this.fullWidth = true,
   });
 
   final bool isLoading;
   final VoidCallback onPressed;
+  final bool fullWidth;
 
   @override
   State<_SignInButton> createState() => _SignInButtonState();
@@ -275,6 +330,8 @@ class _SignInButtonState extends State<_SignInButton> {
 
   @override
   Widget build(BuildContext context) {
+    final buttonHeight = Responsive.lerp(context, min: 44.0, max: 48.0);
+
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.sm),
       child: AnimatedScale(
@@ -301,6 +358,7 @@ class _SignInButtonState extends State<_SignInButton> {
                 backgroundColor: widget.isLoading
                     ? AppColors.primary.withValues(alpha: 0.85)
                     : AppColors.primary,
+                minimumSize: Size(widget.fullWidth ? double.infinity : 200, buttonHeight),
               ).copyWith(
                 overlayColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.hovered) ||
@@ -311,7 +369,7 @@ class _SignInButtonState extends State<_SignInButton> {
                 }),
               ),
               child: widget.isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(

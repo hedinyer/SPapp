@@ -4,9 +4,17 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-enum MediaAccessType { camera, gallery }
+enum MediaAccessType { camera, gallery, location }
 
 class MediaPermissionService {
+  /// Solicita cámara y ubicación al abrir la app (diálogos nativos del sistema).
+  static Future<void> requestStartupPermissions() async {
+    await [
+      Permission.camera,
+      Permission.locationWhenInUse,
+    ].request();
+  }
+
   static Future<bool> ensureAccess(
     MediaAccessType type, {
     required BuildContext context,
@@ -42,26 +50,50 @@ class MediaPermissionService {
   }
 
   static Future<Permission> _permissionFor(MediaAccessType type) async {
-    if (type == MediaAccessType.camera) {
-      return Permission.camera;
-    }
-
-    if (Platform.isAndroid) {
-      final sdk = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
-      if (sdk >= 33) {
+    switch (type) {
+      case MediaAccessType.camera:
+        return Permission.camera;
+      case MediaAccessType.location:
+        return Permission.locationWhenInUse;
+      case MediaAccessType.gallery:
+        if (Platform.isAndroid) {
+          final sdk = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+          if (sdk >= 33) {
+            return Permission.photos;
+          }
+          return Permission.storage;
+        }
         return Permission.photos;
-      }
-      return Permission.storage;
     }
+  }
 
-    return Permission.photos;
+  static String _labelFor(MediaAccessType type) {
+    switch (type) {
+      case MediaAccessType.camera:
+        return 'la cámara';
+      case MediaAccessType.gallery:
+        return 'tus fotos';
+      case MediaAccessType.location:
+        return 'tu ubicación';
+    }
+  }
+
+  static String _settingsLabelFor(MediaAccessType type) {
+    switch (type) {
+      case MediaAccessType.camera:
+        return 'Cámara';
+      case MediaAccessType.gallery:
+        return 'Fotos';
+      case MediaAccessType.location:
+        return 'Ubicación';
+    }
   }
 
   static Future<void> _showDeniedDialog(
     BuildContext context,
     MediaAccessType type,
   ) {
-    final label = type == MediaAccessType.camera ? 'la cámara' : 'tus fotos';
+    final label = _labelFor(type);
 
     return showDialog<void>(
       context: context,
@@ -85,7 +117,10 @@ class MediaPermissionService {
     BuildContext context,
     MediaAccessType type,
   ) {
-    final label = type == MediaAccessType.camera ? 'Cámara' : 'Fotos';
+    final label = _settingsLabelFor(type);
+    final action = type == MediaAccessType.location
+        ? 'usar funciones basadas en tu ubicación'
+        : 'tomar o elegir fotos';
 
     return showDialog<void>(
       context: context,
@@ -93,7 +128,7 @@ class MediaPermissionService {
         title: Text('Activa $label en Ajustes'),
         content: Text(
           'El permiso de $label está desactivado. '
-          'Ábrelo en los ajustes del teléfono para tomar o elegir fotos.',
+          'Ábrelo en los ajustes del teléfono para $action.',
         ),
         actions: [
           TextButton(

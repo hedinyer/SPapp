@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:spapp/models/document_photo_type.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,19 +13,37 @@ class DocumentService {
     required Uint8List bytes,
     required String mimeType,
   }) async {
+    if (bytes.isEmpty) {
+      throw DocumentUploadException(
+        'La foto de ${type.captureLabel} está vacía. Vuelve a capturarla.',
+      );
+    }
+
     final extension = _extensionForMime(mimeType);
-    final path = '$userId/${type.storageKey}_${DateTime.now().millisecondsSinceEpoch}.$extension';
+    final path =
+        '$userId/${type.storageKey}_${DateTime.now().millisecondsSinceEpoch}.$extension';
 
-    await _client.storage.from(_bucket).uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(
-            contentType: mimeType,
-            upsert: true,
-          ),
+    try {
+      await _client.storage.from(_bucket).uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(
+              contentType: mimeType,
+              upsert: true,
+            ),
+          );
+
+      return _client.storage.from(_bucket).getPublicUrl(path);
+    } on StorageException catch (error) {
+      if (kDebugMode) {
+        debugPrint(
+          'Storage upload failed (${type.storageKey}): ${error.message}',
         );
-
-    return _client.storage.from(_bucket).getPublicUrl(path);
+      }
+      throw DocumentUploadException(
+        'No se pudo subir ${type.captureLabel}. ${error.message}',
+      );
+    }
   }
 
   static Future<void> saveUserDocuments({
@@ -35,12 +52,23 @@ class DocumentService {
     required String documentBackUrl,
     required String selfieUrl,
   }) async {
-    await _client.from('users_documents').insert({
-      'user_id': userId,
-      'document_front_url': documentFrontUrl,
-      'document_back_url': documentBackUrl,
-      'selfie_url': selfieUrl,
-    });
+    try {
+      await _client.from('users_documents').insert({
+        'user_id': userId,
+        'document_front_url': documentFrontUrl,
+        'document_back_url': documentBackUrl,
+        'selfie_url': selfieUrl,
+      });
+    } on PostgrestException catch (error) {
+      if (kDebugMode) {
+        debugPrint('users_documents insert failed: ${error.message}');
+      }
+      throw DocumentUploadException(
+        error.message.isNotEmpty
+            ? error.message
+            : 'No se pudieron registrar los documentos en la base de datos.',
+      );
+    }
   }
 
   static String _extensionForMime(String mimeType) {
