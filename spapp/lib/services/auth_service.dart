@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spapp/services/user_tracking_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -34,8 +35,10 @@ class AuthService {
   }
 
   static Future<void> logout() async {
+    await UserTrackingService.stop();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_sessionKey);
+    await prefs.remove(UserTrackingService.prefsUserIdKey);
   }
 
   static Future<Map<String, dynamic>> login({

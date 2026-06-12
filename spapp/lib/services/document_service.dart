@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:spapp/models/document_photo_type.dart';
+import 'package:spapp/models/user_document.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DocumentService {
@@ -58,6 +59,8 @@ class DocumentService {
         'document_front_url': documentFrontUrl,
         'document_back_url': documentBackUrl,
         'selfie_url': selfieUrl,
+        'estado_solicitud': SolicitudEstado.pendiente.name,
+        'betado': false,
       });
     } on PostgrestException catch (error) {
       if (kDebugMode) {
@@ -68,6 +71,63 @@ class DocumentService {
             ? error.message
             : 'No se pudieron registrar los documentos en la base de datos.',
       );
+    }
+  }
+
+  static RealtimeChannel subscribeToUserDocuments({
+    required int userId,
+    required VoidCallback onChanged,
+  }) {
+    return _client
+        .channel('user_documents_$userId')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'users_documents',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId.toString(),
+          ),
+          callback: (payload) {
+            if (kDebugMode) {
+              debugPrint(
+                'users_documents realtime (${payload.eventType.name}): '
+                '${payload.newRecord}',
+              );
+            }
+            onChanged();
+          },
+        )
+        .subscribe();
+  }
+
+  static Future<void> unsubscribe(RealtimeChannel? channel) async {
+    if (channel != null) {
+      await _client.removeChannel(channel);
+    }
+  }
+
+  static Future<UserDocument?> getLatestUserDocument(int userId) async {
+    try {
+      final response = await _client
+          .from('users_documents')
+          .select(
+            'id, user_id, estado_solicitud, betado, motivo_rechazo, '
+            'hora_actualizacion, created_at',
+          )
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(1)
+          .maybeSingle();
+
+      if (response == null) return null;
+      return UserDocument.fromJson(response);
+    } on PostgrestException catch (error) {
+      if (kDebugMode) {
+        debugPrint('users_documents select failed: ${error.message}');
+      }
+      return null;
     }
   }
 

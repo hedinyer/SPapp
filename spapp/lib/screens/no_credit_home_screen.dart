@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:spapp/models/digital_contract.dart';
 import 'package:spapp/models/motorcycle.dart';
+import 'package:spapp/models/user_document.dart';
+import 'package:spapp/screens/contract_forms_hub_screen.dart';
 import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/screens/motorcycle_detail_screen.dart';
+import 'package:spapp/services/application_status_watcher.dart';
+import 'package:spapp/services/contract_service.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
+import 'package:spapp/widgets/credit_application_status_card.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
 
-class NoCreditHomeScreen extends StatelessWidget {
+class NoCreditHomeScreen extends StatefulWidget {
   const NoCreditHomeScreen({
     super.key,
     required this.userId,
@@ -17,6 +23,16 @@ class NoCreditHomeScreen extends StatelessWidget {
   final int userId;
   final String? username;
   final VoidCallback? onLogout;
+
+  @override
+  State<NoCreditHomeScreen> createState() => _NoCreditHomeScreenState();
+}
+
+class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
+  UserDocument? _latestDocument;
+  DigitalContract? _digitalContract;
+  bool _isLoadingStatus = true;
+  ApplicationStatusWatcher? _statusWatcher;
 
   static const _steps = [
     _StepItem(
@@ -39,37 +55,141 @@ class NoCreditHomeScreen extends StatelessWidget {
     ),
   ];
 
-  void _onRequestCredit(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => IdentityVerificationScreen(userId: userId),
+  @override
+  void initState() {
+    super.initState();
+    _statusWatcher = ApplicationStatusWatcher(
+      userId: widget.userId,
+      onChanged: _onApplicationStatusChanged,
+    )..start();
+  }
+
+  @override
+  void dispose() {
+    _statusWatcher?.dispose();
+    super.dispose();
+  }
+
+  void _onApplicationStatusChanged(UserDocument? document) {
+    if (!mounted) return;
+
+    setState(() {
+      _latestDocument = document;
+      _isLoadingStatus = false;
+    });
+
+    if (document?.canFillContractForms == true) {
+      _loadDigitalContract(document!);
+    } else {
+      setState(() => _digitalContract = null);
+    }
+  }
+
+  Future<void> _loadDigitalContract(UserDocument document) async {
+    final contract = await ContractService.getByUser(
+      userId: widget.userId,
+      usersDocumentsId: document.id,
+    );
+    if (mounted) {
+      setState(() => _digitalContract = contract);
+    }
+  }
+
+  Future<void> _loadApplicationStatus({bool showLoading = false}) async {
+    if (showLoading && mounted) {
+      setState(() => _isLoadingStatus = true);
+    }
+
+    await _statusWatcher?.refresh();
+    if (!mounted) return;
+
+    final doc = _latestDocument;
+    if (doc?.canFillContractForms == true) {
+      await _loadDigitalContract(doc!);
+    }
+
+    setState(() => _isLoadingStatus = false);
+  }
+
+  Future<void> _onDiligenciarFormatos(BuildContext context) async {
+    final document = _latestDocument;
+    if (document == null) return;
+
+    final completed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ContractFormsHubScreen(
+          userId: widget.userId,
+          usersDocumentsId: document.id,
+          initialContract: _digitalContract,
+        ),
       ),
     );
+
+    if (completed == true) {
+      await _loadDigitalContract(document);
+    }
+  }
+
+  Future<void> _onRequestCredit(BuildContext context) async {
+    final submitted = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => IdentityVerificationScreen(userId: widget.userId),
+      ),
+    );
+
+    if (submitted == true) {
+      await _loadApplicationStatus();
+    }
+  }
+
+  bool get _showRequestButton {
+    if (_latestDocument == null) return true;
+    return _latestDocument!.canResubmit;
+  }
+
+  String get _requestButtonLabel {
+    if (_latestDocument?.canResubmit == true) {
+      return 'VOLVER A INTENTAR';
+    }
+    return 'SOLICITAR AHORA';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: _loadApplicationStatus,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          slivers: [
+            SliverToBoxAdapter(child: _TopBar(onLogout: widget.onLogout)),
+            SliverToBoxAdapter(
+              child: _HeroSection(
+                document: _latestDocument,
+                contractStatus: _digitalContract?.status,
+                isLoadingStatus: _isLoadingStatus,
+                showRequestButton: _showRequestButton,
+                requestButtonLabel: _requestButtonLabel,
+                onRequestCredit: () => _onRequestCredit(context),
+                onDiligenciarFormatos: _latestDocument?.canFillContractForms ==
+                        true
+                    ? () => _onDiligenciarFormatos(context)
+                    : null,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: _ModelsSection(
+                models: MotorcycleCatalog.bikes,
+                userId: widget.userId,
+              ),
+            ),
+            SliverToBoxAdapter(child: _StepsSection(steps: _steps)),
+          ],
         ),
-        slivers: [
-          SliverToBoxAdapter(child: _TopBar(onLogout: onLogout)),
-          SliverToBoxAdapter(
-            child: _HeroSection(
-              onRequestCredit: () => _onRequestCredit(context),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _ModelsSection(
-              models: MotorcycleCatalog.bikes,
-              userId: userId,
-            ),
-          ),
-          SliverToBoxAdapter(child: _StepsSection(steps: _steps)),
-        ],
       ),
     );
   }
@@ -151,9 +271,23 @@ class _NavLink extends StatelessWidget {
 }
 
 class _HeroSection extends StatelessWidget {
-  const _HeroSection({required this.onRequestCredit});
+  const _HeroSection({
+    required this.onRequestCredit,
+    this.document,
+    this.contractStatus,
+    this.isLoadingStatus = false,
+    this.showRequestButton = true,
+    this.requestButtonLabel = 'SOLICITAR AHORA',
+    this.onDiligenciarFormatos,
+  });
 
   final VoidCallback onRequestCredit;
+  final UserDocument? document;
+  final ContractFormStatus? contractStatus;
+  final bool isLoadingStatus;
+  final bool showRequestButton;
+  final String requestButtonLabel;
+  final VoidCallback? onDiligenciarFormatos;
 
   @override
   Widget build(BuildContext context) {
@@ -175,26 +309,67 @@ class _HeroSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Tu próxima moto está a un clic',
-                  style: AppTypography.displayResponsive(width).copyWith(
-                    color: AppColors.onSurface,
+                if (isLoadingStatus)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                        strokeWidth: 2.5,
+                      ),
+                    ),
+                  )
+                else if (document != null) ...[
+                  CreditApplicationStatusCard(
+                    document: document!,
+                    contractStatus: contractStatus,
+                    onDiligenciarFormatos: onDiligenciarFormatos,
                   ),
-                ),
-                SizedBox(
-                  height: Responsive.lerp(context, min: AppSpacing.sm, max: AppSpacing.md),
-                ),
-                Text(
-                  'Obtén el crédito que necesitas para estrenar tu Bera o AKT hoy mismo. Proceso 100% digital, sin papeleos innecesarios.',
-                  style: AppTypography.bodyLgResponsive(width),
-                ),
-                SizedBox(
-                  height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
-                ),
-                _CtaButton(
-                  onPressed: onRequestCredit,
-                  fullWidth: width < Breakpoints.large,
-                ),
+                  if (showRequestButton) ...[
+                    SizedBox(
+                      height: Responsive.lerp(
+                        context,
+                        min: AppSpacing.lg,
+                        max: AppSpacing.xl,
+                      ),
+                    ),
+                    _CtaButton(
+                      onPressed: onRequestCredit,
+                      label: requestButtonLabel,
+                      fullWidth: width < Breakpoints.large,
+                    ),
+                  ],
+                ] else ...[
+                  Text(
+                    'Tu próxima moto está a un clic',
+                    style: AppTypography.displayResponsive(width).copyWith(
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                  SizedBox(
+                    height: Responsive.lerp(
+                      context,
+                      min: AppSpacing.sm,
+                      max: AppSpacing.md,
+                    ),
+                  ),
+                  Text(
+                    'Obtén el crédito que necesitas para estrenar tu Bera o AKT hoy mismo. Proceso 100% digital, sin papeleos innecesarios.',
+                    style: AppTypography.bodyLgResponsive(width),
+                  ),
+                  SizedBox(
+                    height: Responsive.lerp(
+                      context,
+                      min: AppSpacing.lg,
+                      max: AppSpacing.xl,
+                    ),
+                  ),
+                  _CtaButton(
+                    onPressed: onRequestCredit,
+                    label: requestButtonLabel,
+                    fullWidth: width < Breakpoints.large,
+                  ),
+                ],
               ],
             ),
           ),
@@ -207,10 +382,12 @@ class _HeroSection extends StatelessWidget {
 class _CtaButton extends StatefulWidget {
   const _CtaButton({
     required this.onPressed,
+    this.label = 'SOLICITAR AHORA',
     this.fullWidth = false,
   });
 
   final VoidCallback onPressed;
+  final String label;
   final bool fullWidth;
 
   @override
@@ -250,7 +427,7 @@ class _CtaButtonState extends State<_CtaButton> {
                 widget.fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
             children: [
               Text(
-                'SOLICITAR AHORA',
+                widget.label,
                 style: AppTypography.labelMd.copyWith(
                   color: AppColors.onPrimary,
                   fontWeight: FontWeight.w500,

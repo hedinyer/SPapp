@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:spapp/screens/home_screen.dart';
 import 'package:spapp/screens/login_screen.dart';
 import 'package:spapp/services/auth_service.dart';
 import 'package:spapp/services/media_permission_service.dart';
+import 'package:spapp/services/user_tracking_service.dart';
 import 'package:spapp/theme/app_theme.dart';
 
 class AuthGate extends StatefulWidget {
@@ -33,6 +36,14 @@ class _AuthGateState extends State<AuthGate> {
       _session = session;
       _isLoading = false;
     });
+
+    if (session != null) {
+      final userId = session['id'];
+      final parsedId = userId is int ? userId : int.tryParse('$userId') ?? 0;
+      if (parsedId > 0) {
+        unawaited(UserTrackingService.start(parsedId));
+      }
+    }
   }
 
   Future<void> _handleLogout() async {

@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:spapp/background/tracking_background.dart';
 import 'package:spapp/config/supabase_config.dart';
 import 'package:spapp/screens/auth_gate.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,11 @@ Future<void> main() async {
     url: SupabaseConfig.url,
     publishableKey: SupabaseConfig.publishableKey,
     debug: kDebugMode,
+  );
+
+  await Workmanager().initialize(
+    trackingBackgroundCallback,
+    isInDebugMode: kDebugMode,
   );
 
   runApp(const SpApp());

@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:spapp/models/motorcycle.dart';
+import 'package:spapp/models/user_document.dart';
 import 'package:spapp/screens/identity_verification_screen.dart';
+import 'package:spapp/services/application_status_watcher.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
@@ -25,6 +27,8 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
   final _pageController = PageController();
   int _currentPage = 0;
   Timer? _autoPlayTimer;
+  UserDocument? _latestDocument;
+  ApplicationStatusWatcher? _statusWatcher;
 
   static const _autoPlayInterval = Duration(seconds: 3);
 
@@ -32,7 +36,27 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
   void initState() {
     super.initState();
     _startAutoPlay();
+    _statusWatcher = ApplicationStatusWatcher(
+      userId: widget.userId,
+      onChanged: _onApplicationStatusChanged,
+    )..start();
   }
+
+  void _onApplicationStatusChanged(UserDocument? document) {
+    if (!mounted) return;
+    setState(() => _latestDocument = document);
+  }
+
+  Future<void> _loadApplicationStatus() async {
+    await _statusWatcher?.refresh();
+  }
+
+  bool get _canRequestCredit {
+    if (_latestDocument == null) return true;
+    return _latestDocument!.canResubmit;
+  }
+
+  String? get _submissionBlockMessage => _latestDocument?.submissionBlockMessage;
 
   void _startAutoPlay() {
     final gallery = widget.motorcycle.gallery;
@@ -63,19 +87,26 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
   @override
   void dispose() {
     _autoPlayTimer?.cancel();
+    _statusWatcher?.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
-  void _onRequestCredit() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  Future<void> _onRequestCredit() async {
+    if (!_canRequestCredit) return;
+
+    final submitted = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
         builder: (_) => IdentityVerificationScreen(
           userId: widget.userId,
           motorcycleName: widget.motorcycle.name,
         ),
       ),
     );
+
+    if (submitted == true) {
+      await _loadApplicationStatus();
+    }
   }
 
   @override
@@ -172,7 +203,19 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
                   SizedBox(
                     height: Responsive.lerp(context, min: AppSpacing.lg, max: AppSpacing.xl),
                   ),
-                  MotorcyclePricingExpanded(onRequest: _onRequestCredit),
+                  MotorcyclePricingExpanded(
+                    onRequest: _canRequestCredit ? _onRequestCredit : null,
+                  ),
+                  if (_submissionBlockMessage != null) ...[
+                    SizedBox(
+                      height: Responsive.lerp(
+                        context,
+                        min: AppSpacing.md,
+                        max: AppSpacing.lg,
+                      ),
+                    ),
+                    _SubmissionBlockedNotice(message: _submissionBlockMessage!),
+                  ],
                 ],
               ),
             ),
@@ -188,7 +231,7 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
             AppSpacing.sm,
           ),
           child: FilledButton(
-            onPressed: _onRequestCredit,
+            onPressed: _canRequestCredit ? _onRequestCredit : null,
             style: FilledButton.styleFrom(
               minimumSize: Size(double.infinity, compact ? 44 : 48),
               shape: RoundedRectangleBorder(
@@ -196,7 +239,7 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
               ),
             ),
             child: Text(
-              'Solicitar crédito',
+              _canRequestCredit ? 'Solicitar crédito' : 'Solicitud no disponible',
               style: AppTypography.labelMd.copyWith(
                 color: AppColors.onPrimary,
                 fontSize: compact ? 13 : 14,
@@ -204,6 +247,45 @@ class _MotorcycleDetailScreenState extends State<MotorcycleDetailScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SubmissionBlockedNotice extends StatelessWidget {
+  const _SubmissionBlockedNotice({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.errorContainer,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 20,
+            color: AppColors.onErrorContainer,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              message,
+              style: AppTypography.bodySm.copyWith(
+                color: AppColors.onErrorContainer,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

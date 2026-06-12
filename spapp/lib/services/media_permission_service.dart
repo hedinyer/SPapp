@@ -15,6 +15,21 @@ class MediaPermissionService {
     ].request();
   }
 
+  /// Ubicación en segundo plano para rastreo silencioso (usuarios con contrato firmado).
+  static Future<void> requestTrackingPermissions() async {
+    var whenInUse = await Permission.locationWhenInUse.status;
+    if (!whenInUse.isGranted && !whenInUse.isLimited) {
+      whenInUse = await Permission.locationWhenInUse.request();
+    }
+
+    if (!whenInUse.isGranted && !whenInUse.isLimited) return;
+
+    final always = await Permission.locationAlways.status;
+    if (!always.isGranted) {
+      await Permission.locationAlways.request();
+    }
+  }
+
   static Future<bool> ensureAccess(
     MediaAccessType type, {
     required BuildContext context,
