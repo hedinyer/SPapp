@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:spapp/models/digital_contract.dart';
 import 'package:spapp/models/motorcycle.dart';
 import 'package:spapp/models/user_document.dart';
+import 'package:spapp/models/user_moto_compra.dart';
 import 'package:spapp/screens/contract_forms_hub_screen.dart';
 import 'package:spapp/screens/identity_verification_screen.dart';
 import 'package:spapp/screens/motorcycle_detail_screen.dart';
 import 'package:spapp/services/application_status_watcher.dart';
 import 'package:spapp/services/contract_service.dart';
+import 'package:spapp/services/moto_compra_service.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/credit_application_status_card.dart';
 import 'package:spapp/widgets/motorcycle_pricing_display.dart';
+import 'package:spapp/widgets/owner_services_section.dart';
+import 'package:spapp/widgets/post_visit_flow_section.dart';
 
 class NoCreditHomeScreen extends StatefulWidget {
   const NoCreditHomeScreen({
@@ -32,6 +36,8 @@ class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
   UserDocument? _latestDocument;
   DigitalContract? _digitalContract;
   bool _isLoadingStatus = true;
+  bool _motoEntregada = false;
+  UserMotoCompra? _compraEntregada;
   ApplicationStatusWatcher? _statusWatcher;
 
   static const _steps = [
@@ -62,6 +68,18 @@ class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
       userId: widget.userId,
       onChanged: _onApplicationStatusChanged,
     )..start();
+    _checkMotoEntregada();
+  }
+
+  Future<void> _checkMotoEntregada() async {
+    final compra = await MotoCompraService.getLatestCompra(widget.userId);
+    if (!mounted) return;
+    if (compra?.isDelivered == true) {
+      setState(() {
+        _motoEntregada = true;
+        _compraEntregada = compra;
+      });
+    }
   }
 
   @override
@@ -171,6 +189,9 @@ class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
               child: _HeroSection(
                 document: _latestDocument,
                 contractStatus: _digitalContract?.status,
+                digitalContractId: _digitalContract?.id,
+                userId: widget.userId,
+                username: widget.username,
                 isLoadingStatus: _isLoadingStatus,
                 showRequestButton: _showRequestButton,
                 requestButtonLabel: _requestButtonLabel,
@@ -179,15 +200,33 @@ class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
                         true
                     ? () => _onDiligenciarFormatos(context)
                     : null,
+                motoEntregada: _motoEntregada,
+                onCompraChanged: (compra) {
+                  if (!mounted) return;
+                  setState(() {
+                    _motoEntregada = compra?.isDelivered ?? false;
+                    _compraEntregada =
+                        compra?.isDelivered == true ? compra : null;
+                  });
+                },
               ),
             ),
-            SliverToBoxAdapter(
-              child: _ModelsSection(
-                models: MotorcycleCatalog.bikes,
-                userId: widget.userId,
+            if (_motoEntregada && _compraEntregada != null)
+              SliverToBoxAdapter(
+                child: OwnerServicesSection(
+                  userId: widget.userId,
+                  compra: _compraEntregada!,
+                ),
               ),
-            ),
-            SliverToBoxAdapter(child: _StepsSection(steps: _steps)),
+            if (!_motoEntregada)
+              SliverToBoxAdapter(
+                child: _ModelsSection(
+                  models: MotorcycleCatalog.bikes,
+                  userId: widget.userId,
+                ),
+              ),
+            if (!_motoEntregada)
+              SliverToBoxAdapter(child: _StepsSection(steps: _steps)),
           ],
         ),
       ),
@@ -275,19 +314,33 @@ class _HeroSection extends StatelessWidget {
     required this.onRequestCredit,
     this.document,
     this.contractStatus,
+    this.digitalContractId,
+    this.userId,
+    this.username,
     this.isLoadingStatus = false,
     this.showRequestButton = true,
     this.requestButtonLabel = 'SOLICITAR AHORA',
     this.onDiligenciarFormatos,
+    this.onCompraChanged,
+    this.motoEntregada = false,
   });
 
   final VoidCallback onRequestCredit;
   final UserDocument? document;
   final ContractFormStatus? contractStatus;
+  final String? digitalContractId;
+  final int? userId;
+  final String? username;
   final bool isLoadingStatus;
   final bool showRequestButton;
   final String requestButtonLabel;
   final VoidCallback? onDiligenciarFormatos;
+  final ValueChanged<UserMotoCompra?>? onCompraChanged;
+  final bool motoEntregada;
+
+  bool get _showVisitCard =>
+      document?.estadoSolicitud == SolicitudEstado.aceptada &&
+      contractStatus == ContractFormStatus.firmado;
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +362,16 @@ class _HeroSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (isLoadingStatus)
+                if (motoEntregada && userId != null) ...[
+                  PostVisitFlowSection(
+                    userId: userId!,
+                    digitalContractId: digitalContractId,
+                    username: username,
+                    onCompraChanged: onCompraChanged,
+                    motoEntregada: true,
+                  ),
+                ]
+                else if (isLoadingStatus)
                   const Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
@@ -325,6 +387,22 @@ class _HeroSection extends StatelessWidget {
                     contractStatus: contractStatus,
                     onDiligenciarFormatos: onDiligenciarFormatos,
                   ),
+                  if (_showVisitCard && userId != null) ...[
+                    SizedBox(
+                      height: Responsive.lerp(
+                        context,
+                        min: AppSpacing.lg,
+                        max: AppSpacing.xl,
+                      ),
+                    ),
+                    PostVisitFlowSection(
+                      userId: userId!,
+                      digitalContractId: digitalContractId,
+                      username: username,
+                      onCompraChanged: onCompraChanged,
+                      motoEntregada: false,
+                    ),
+                  ],
                   if (showRequestButton) ...[
                     SizedBox(
                       height: Responsive.lerp(

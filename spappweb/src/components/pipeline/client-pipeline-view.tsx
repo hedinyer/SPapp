@@ -1,0 +1,107 @@
+import type { ClientPipeline, VisitadorRow } from "@/lib/pipeline/types";
+import { ClientStepper } from "@/components/pipeline/client-stepper";
+import { CreditReviewPanel } from "@/components/pipeline/credit-review-panel";
+import { ContractReadonlyPanel } from "@/components/pipeline/contract-readonly-panel";
+import { VisitActionPanel } from "@/components/pipeline/visit-action-panel";
+import { MotoSelectionPanel } from "@/components/pipeline/moto-selection-panel";
+import { PaymentConfirmPanel } from "@/components/pipeline/payment-confirm-panel";
+import { DeliveryPanel } from "@/components/pipeline/delivery-panel";
+import { RentingPanel } from "@/components/pipeline/renting-panel";
+import { TrackingPanel } from "@/components/pipeline/tracking-panel";
+
+interface ClientPipelineViewProps {
+  pipeline: ClientPipeline;
+  visitadores: VisitadorRow[];
+}
+
+export function ClientPipelineView({
+  pipeline,
+  visitadores,
+}: ClientPipelineViewProps) {
+  const { userId } = { userId: pipeline.user.id };
+  const adminStep = pipeline.currentAdminStep;
+
+  return (
+    <div className="space-y-8">
+      <ClientStepper steps={pipeline.steps} />
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          {adminStep === "credito" && pipeline.document && (
+            <CreditReviewPanel
+              document={pipeline.document}
+              userId={userId}
+            />
+          )}
+          {adminStep === "visita" && (
+            <VisitActionPanel
+              visita={pipeline.visita}
+              visitadores={visitadores}
+              userId={userId}
+            />
+          )}
+          {adminStep === "pago" && (
+            <PaymentConfirmPanel compra={pipeline.compra} userId={userId} />
+          )}
+          {adminStep === "entrega" && (
+            <DeliveryPanel compra={pipeline.compra} userId={userId} />
+          )}
+          {pipeline.compra?.estado === "entregada" && (
+            <RentingPanel pipeline={pipeline} userId={userId} />
+          )}
+
+          {!adminStep && pipeline.compra?.estado !== "entregada" && (
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-10 text-center text-sm text-neutral-600">
+              No hay acciones pendientes de tu parte. El cliente continúa en
+              la app.
+            </div>
+          )}
+
+          <details className="rounded-lg border border-neutral-200">
+            <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+              Ver historial del proceso
+            </summary>
+            <div className="space-y-4 border-t border-neutral-200 p-4">
+              {pipeline.document && adminStep !== "credito" && (
+                <CreditReviewPanel
+                  document={pipeline.document}
+                  userId={userId}
+                />
+              )}
+              <ContractReadonlyPanel contract={pipeline.contract} />
+              {adminStep !== "visita" && (
+                <VisitActionPanel
+                  visita={pipeline.visita}
+                  visitadores={visitadores}
+                  userId={userId}
+                />
+              )}
+              <MotoSelectionPanel
+                visita={pipeline.visita}
+                compra={pipeline.compra}
+              />
+              {adminStep !== "pago" && (
+                <PaymentConfirmPanel
+                  compra={pipeline.compra}
+                  userId={userId}
+                />
+              )}
+              {adminStep !== "entrega" && (
+                <DeliveryPanel compra={pipeline.compra} userId={userId} />
+              )}
+            </div>
+          </details>
+        </div>
+
+        <div className="space-y-6">
+          <TrackingPanel
+            tracking={pipeline.tracking}
+            userId={userId}
+            moroso={pipeline.moroso}
+            recoger={pipeline.recoger}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

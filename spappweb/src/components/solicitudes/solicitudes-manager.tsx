@@ -1,0 +1,337 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { usePollingRefresh } from "@/hooks/use-polling-refresh";
+import { updateSolicitudEstado } from "@/lib/actions/admin-actions";
+import {
+  SOLICITUD_ESTADO_LABELS,
+  SOLICITUD_TIPO_LABELS,
+  type SolicitudTallerEstado,
+  type SolicitudTallerRow,
+  type SolicitudTallerTipo,
+} from "@/lib/pipeline/types";
+import { formatCop, formatDateOnly } from "@/lib/utils/format";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
+
+export function SolicitudesManager({
+  solicitudes,
+}: {
+  solicitudes: SolicitudTallerRow[];
+}) {
+  const [tipoFilter, setTipoFilter] = useState<string>("all");
+  const [estadoFilter, setEstadoFilter] = useState<string>("all");
+  const [selectedId, setSelectedId] = useState<string | null>(
+    solicitudes[0]?.id ?? null,
+  );
+  const [notasAdmin, setNotasAdmin] = useState("");
+  const [notasDirty, setNotasDirty] = useState(false);
+  const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
+  const [pending, startTransition] = useTransition();
+  const knownIdsRef = useRef<Set<string> | null>(null);
+
+  usePollingRefresh({ intervalMs: 30_000, enabled: !pending });
+
+  useEffect(() => {
+    const currentIds = new Set(solicitudes.map((s) => s.id));
+
+    if (knownIdsRef.current !== null) {
+      const newOnes = solicitudes.filter((s) => !knownIdsRef.current!.has(s.id));
+      if (newOnes.length > 0) {
+        for (const solicitud of newOnes) {
+          const cliente =
+            solicitud.users?.user ?? `Cliente ${solicitud.user_id}`;
+          toast.info(
+            `Nueva solicitud de ${SOLICITUD_TIPO_LABELS[solicitud.tipo].toLowerCase()} de ${cliente}`,
+          );
+        }
+        setHighlightedIds((prev) => {
+          const next = new Set(prev);
+          for (const solicitud of newOnes) {
+            next.add(solicitud.id);
+          }
+          return next;
+        });
+      }
+    }
+
+    knownIdsRef.current = currentIds;
+  }, [solicitudes]);
+
+  const filtered = useMemo(() => {
+    return solicitudes.filter((s) => {
+      if (tipoFilter !== "all" && s.tipo !== tipoFilter) return false;
+      if (estadoFilter !== "all" && s.estado !== estadoFilter) return false;
+      return true;
+    });
+  }, [solicitudes, tipoFilter, estadoFilter]);
+
+  const selected =
+    filtered.find((s) => s.id === selectedId) ?? filtered[0] ?? null;
+
+  useEffect(() => {
+    if (!selected || notasDirty) return;
+    setNotasAdmin(selected.notas_admin ?? "");
+  }, [selected?.id, selected?.notas_admin, notasDirty]);
+
+  function selectSolicitud(solicitud: SolicitudTallerRow) {
+    setSelectedId(solicitud.id);
+    setNotasAdmin(solicitud.notas_admin ?? "");
+    setNotasDirty(false);
+    setHighlightedIds((prev) => {
+      if (!prev.has(solicitud.id)) return prev;
+      const next = new Set(prev);
+      next.delete(solicitud.id);
+      return next;
+    });
+  }
+
+  function updateEstado(estado: SolicitudTallerEstado) {
+    if (!selected) return;
+    startTransition(async () => {
+      try {
+        await updateSolicitudEstado({
+          solicitudId: selected.id,
+          estado,
+          notasAdmin,
+        });
+        setNotasDirty(false);
+        toast.success(`Solicitud marcada como ${SOLICITUD_ESTADO_LABELS[estado].toLowerCase()}.`);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Error al actualizar.");
+      }
+    });
+  }
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-5">
+      <div className="space-y-4 lg:col-span-2">
+        <div className="flex flex-wrap gap-2">
+          <Select value={tipoFilter} onValueChange={setTipoFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los tipos</SelectItem>
+              {(Object.keys(SOLICITUD_TIPO_LABELS) as SolicitudTallerTipo[]).map(
+                (t) => (
+                  <SelectItem key={t} value={t}>
+                    {SOLICITUD_TIPO_LABELS[t]}
+                  </SelectItem>
+                ),
+              )}
+            </SelectContent>
+          </Select>
+          <Select value={estadoFilter} onValueChange={setEstadoFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {(Object.keys(SOLICITUD_ESTADO_LABELS) as SolicitudTallerEstado[]).map(
+                (e) => (
+                  <SelectItem key={e} value={e}>
+                    {SOLICITUD_ESTADO_LABELS[e]}
+                  </SelectItem>
+                ),
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          {filtered.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => selectSolicitud(s)}
+              className={`w-full rounded-lg border px-4 py-3 text-left transition-colors ${
+                selected?.id === s.id
+                  ? "border-black bg-neutral-50"
+                  : highlightedIds.has(s.id)
+                    ? "border-blue-400 bg-blue-50 hover:border-blue-500"
+                    : "border-neutral-200 hover:border-neutral-400"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">
+                  {s.users?.user ?? `Cliente ${s.user_id}`}
+                </span>
+                <div className="flex items-center gap-2">
+                  {highlightedIds.has(s.id) && (
+                    <Badge className="bg-blue-600 text-white hover:bg-blue-600">
+                      Nueva
+                    </Badge>
+                  )}
+                  <Badge variant="outline">{SOLICITUD_TIPO_LABELS[s.tipo]}</Badge>
+                </div>
+              </div>
+              <p className="mt-1 text-sm text-neutral-500">
+                {formatDateOnly(s.created_at)} ·{" "}
+                {SOLICITUD_ESTADO_LABELS[s.estado]}
+              </p>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-sm text-neutral-500">No hay solicitudes con estos filtros.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="lg:col-span-3">
+        {selected ? (
+          <Card className="border-neutral-200 shadow-none">
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {SOLICITUD_TIPO_LABELS[selected.tipo]}
+              </CardTitle>
+              <p className="text-sm text-neutral-500">
+                Cliente: {selected.users?.user ?? selected.user_id}
+                {selected.user_moto_compra?.modelo
+                  ? ` · ${selected.user_moto_compra.modelo}`
+                  : ""}
+                {selected.user_moto_compra?.placa
+                  ? ` · Placa ${selected.user_moto_compra.placa}`
+                  : ""}
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2 text-sm sm:grid-cols-2">
+                <p>
+                  <span className="text-neutral-500">Estado: </span>
+                  {SOLICITUD_ESTADO_LABELS[selected.estado]}
+                </p>
+                <p>
+                  <span className="text-neutral-500">Creada: </span>
+                  {formatDateOnly(selected.created_at)}
+                </p>
+                {selected.tipo === "repuestos" && (
+                  <p>
+                    <span className="text-neutral-500">Total: </span>
+                    {formatCop(selected.total_estimado)}
+                  </p>
+                )}
+                {selected.fecha_preferida && (
+                  <p>
+                    <span className="text-neutral-500">Fecha preferida: </span>
+                    {formatDateOnly(selected.fecha_preferida)}
+                  </p>
+                )}
+              </div>
+
+              {selected.notas_cliente && (
+                <div className="rounded-lg bg-neutral-50 p-3 text-sm">
+                  <p className="font-medium">Notas del cliente</p>
+                  <p className="mt-1 text-neutral-700">{selected.notas_cliente}</p>
+                </div>
+              )}
+
+              {selected.descripcion_falla && (
+                <div className="rounded-lg bg-neutral-50 p-3 text-sm">
+                  <p className="font-medium">Descripción de la falla</p>
+                  <p className="mt-1 text-neutral-700">
+                    {selected.descripcion_falla}
+                  </p>
+                </div>
+              )}
+
+              {selected.tipo === "repuestos" &&
+                (selected.solicitud_repuesto_items?.length ?? 0) > 0 && (
+                  <div className="overflow-x-auto rounded-lg border border-neutral-200">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Producto</TableHead>
+                          <TableHead>Cant.</TableHead>
+                          <TableHead>Precio</TableHead>
+                          <TableHead>Subtotal</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selected.solicitud_repuesto_items!.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              {item.inventario_productos?.nombre ?? item.producto_id}
+                            </TableCell>
+                            <TableCell>{item.cantidad}</TableCell>
+                            <TableCell>{formatCop(item.precio_unitario)}</TableCell>
+                            <TableCell>{formatCop(item.subtotal)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Notas internas</p>
+                <Textarea
+                  value={notasAdmin}
+                  onChange={(e) => {
+                    setNotasAdmin(e.target.value);
+                    setNotasDirty(true);
+                  }}
+                  placeholder="Notas para el equipo de taller..."
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {selected.estado === "pendiente" && (
+                  <Button
+                    disabled={pending}
+                    onClick={() => updateEstado("en_proceso")}
+                  >
+                    Marcar en proceso
+                  </Button>
+                )}
+                {(selected.estado === "pendiente" ||
+                  selected.estado === "en_proceso") && (
+                  <Button
+                    disabled={pending}
+                    onClick={() => updateEstado("completada")}
+                  >
+                    Completar
+                  </Button>
+                )}
+                {selected.estado !== "cancelada" &&
+                  selected.estado !== "completada" && (
+                    <Button
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => updateEstado("cancelada")}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-neutral-200 shadow-none">
+            <CardContent className="py-12 text-center text-sm text-neutral-500">
+              Selecciona una solicitud para ver el detalle.
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

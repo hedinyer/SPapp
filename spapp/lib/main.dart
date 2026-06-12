@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:spapp/background/tracking_background.dart';
 import 'package:spapp/config/supabase_config.dart';
 import 'package:spapp/screens/auth_gate.dart';
@@ -42,6 +43,17 @@ class SpApp extends StatelessWidget {
       title: 'SP App',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
+      locale: const Locale('es', 'CO'),
+      supportedLocales: const [
+        Locale('es', 'CO'),
+        Locale('es'),
+        Locale('en'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       builder: (context, child) => ResponsiveScope(
         maxScale: 1.1,
         child: child ?? const SizedBox(),
