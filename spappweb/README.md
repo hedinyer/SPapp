@@ -12,11 +12,11 @@ Panel administrativo Next.js para gestionar el pipeline de crédito, visitas y m
 
 ```bash
 cd spappweb
-cp .env.local.example .env.local
-# Editar .env.local con tus credenciales Supabase
 npm install
 npm run dev
 ```
+
+Las credenciales Supabase y `SESSION_SECRET` están embebidas en `src/lib/supabase/env.ts` (no hace falta `.env.local`).
 
 Abre [http://localhost:3000](http://localhost:3000) — redirige a login o bandeja.
 
@@ -32,16 +32,7 @@ UPDATE public.users SET status = 'admin' WHERE "user" = 'tu_usuario_admin';
 
 1. Importa el repositorio en Vercel.
 2. **Root Directory:** `spappweb`
-3. Variables de entorno (Production + Preview):
-
-| Variable | Tipo |
-|----------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Plain |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Plain |
-| `SUPABASE_SERVICE_ROLE_KEY` | Secret (opcional en local) | Mutaciones admin; si falta, usa anon key |
-| `SESSION_SECRET` | Secret |
-
-4. Deploy.
+3. Deploy (sin variables de entorno; las keys están en `src/lib/supabase/env.ts`).
 
 ## Estructura
 

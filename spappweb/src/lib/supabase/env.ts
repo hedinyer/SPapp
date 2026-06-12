@@ -1,39 +1,29 @@
-function required(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-  return value;
-}
+/** Credenciales embebidas para deploy sin variables en Vercel. */
+const SUPABASE_URL = "https://iilgrapnrkwdcouielwz.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbGdyYXBucmt3ZGNvdWllbHd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5NDEyODEsImV4cCI6MjA5NjUxNzI4MX0.82GJcFxinFQqxI8OSh40JdivYWK9hr1GRw6lyiqW_3E";
+const SUPABASE_SERVICE_ROLE_KEY = "";
+export const SESSION_SECRET = "spapp-admin-local-dev-secret-32chars-min";
 
 export function getSupabaseUrl(): string {
-  return required("NEXT_PUBLIC_SUPABASE_URL");
+  return SUPABASE_URL;
 }
 
 export function getSupabaseAnonKey(): string {
-  return required("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  return SUPABASE_ANON_KEY;
 }
 
 export function hasServiceRoleKey(): boolean {
-  return Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+  return Boolean(SUPABASE_SERVICE_ROLE_KEY.trim());
 }
 
 export function getSupabaseServiceRoleKey(): string {
-  return required("SUPABASE_SERVICE_ROLE_KEY");
+  if (!hasServiceRoleKey()) {
+    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+  }
+  return SUPABASE_SERVICE_ROLE_KEY;
 }
 
-/** Mensaje claro para login cuando faltan variables de entorno locales. */
 export function getConfigErrorMessage(): string | null {
-  const missing: string[] = [];
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    missing.push("NEXT_PUBLIC_SUPABASE_URL");
-  }
-  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  }
-  if (!process.env.SESSION_SECRET) {
-    missing.push("SESSION_SECRET");
-  }
-  if (missing.length === 0) return null;
-  return `Falta configurar ${missing.join(", ")} en spappweb/.env.local (copia .env.local.example).`;
+  return null;
 }

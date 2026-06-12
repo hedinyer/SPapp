@@ -1,6 +1,7 @@
 import { getIronSession, SessionOptions } from "iron-session";
 import { cookies } from "next/headers";
 import { isAdminStatus, type UserStatus } from "@/lib/auth/user-status";
+import { SESSION_SECRET } from "@/lib/supabase/env";
 
 export interface SessionData {
   userId?: number;
@@ -14,7 +15,7 @@ export const defaultSession: SessionData = {
 };
 
 export const sessionOptions: SessionOptions = {
-  password: process.env.SESSION_SECRET ?? "dev-only-secret-min-32-chars-long!!",
+  password: SESSION_SECRET,
   cookieName: "spapp_admin_session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
