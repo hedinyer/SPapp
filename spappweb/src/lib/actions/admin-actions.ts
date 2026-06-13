@@ -270,6 +270,8 @@ const visitadorSchema = z.object({
   telefono: z.string().optional(),
   fotoUrl: z.string().optional(),
   activo: z.boolean(),
+  username: z.string().min(3).optional(),
+  password: z.string().min(4).optional(),
 });
 
 export async function saveVisitador(input: z.infer<typeof visitadorSchema>) {
@@ -284,13 +286,60 @@ export async function saveVisitador(input: z.infer<typeof visitadorSchema>) {
   };
 
   if (parsed.id) {
+    const { data: existing, error: fetchError } = await supabase
+      .from("visitadores")
+      .select("user_id")
+      .eq("id", parsed.id)
+      .maybeSingle();
+
+    if (fetchError) throw new Error(fetchError.message);
+
+    if (parsed.password?.trim() && existing?.user_id) {
+      const { error: pwdError } = await supabase
+        .from("users")
+        .update({ password: parsed.password.trim() })
+        .eq("id", existing.user_id);
+      if (pwdError) throw new Error(pwdError.message);
+    }
+
     const { error } = await supabase
       .from("visitadores")
       .update(payload)
       .eq("id", parsed.id);
     if (error) throw new Error(error.message);
   } else {
-    const { error } = await supabase.from("visitadores").insert(payload);
+    const username = parsed.username?.trim();
+    const password = parsed.password?.trim();
+    if (!username || !password) {
+      throw new Error("Usuario y contraseña son obligatorios al crear visitador.");
+    }
+
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("user", username)
+      .maybeSingle();
+
+    if (existingUser) {
+      throw new Error("Ese nombre de usuario ya existe.");
+    }
+
+    const { data: newUser, error: userError } = await supabase
+      .from("users")
+      .insert({
+        user: username,
+        password,
+        status: "visitador",
+      })
+      .select("id")
+      .single();
+
+    if (userError) throw new Error(userError.message);
+
+    const { error } = await supabase.from("visitadores").insert({
+      ...payload,
+      user_id: newUser.id,
+    });
     if (error) throw new Error(error.message);
   }
 
@@ -302,11 +351,25 @@ export async function saveVisitador(input: z.infer<typeof visitadorSchema>) {
 export async function deleteVisitador(id: number) {
   const parsed = z.number().int().positive().parse(id);
   const supabase = await assertAdmin();
+
+  const { data: visitador, error: fetchError } = await supabase
+    .from("visitadores")
+    .select("user_id")
+    .eq("id", parsed)
+    .maybeSingle();
+
+  if (fetchError) throw new Error(fetchError.message);
+
   const { error } = await supabase
     .from("visitadores")
     .delete()
     .eq("id", parsed);
   if (error) throw new Error(error.message);
+
+  if (visitador?.user_id) {
+    await supabase.from("users").delete().eq("id", visitador.user_id);
+  }
+
   revalidatePath("/visitadores");
   revalidatePath("/inbox");
   return { ok: true };

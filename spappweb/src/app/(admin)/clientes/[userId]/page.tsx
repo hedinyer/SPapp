@@ -6,6 +6,7 @@ import {
   getClientPipeline,
 } from "@/lib/pipeline/queries";
 import { ClientPipelineView } from "@/components/pipeline/client-pipeline-view";
+import { ClientInfoSummary } from "@/components/clientes/client-info-summary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -28,9 +29,9 @@ export default async function ClientPage({
   return (
     <div className="space-y-6">
       <Button variant="ghost" asChild className="gap-2 px-0">
-        <Link href="/inbox">
+        <Link href="/clientes">
           <ChevronLeft className="h-4 w-4" />
-          Volver a bandeja
+          Volver a clientes
         </Link>
       </Button>
 
@@ -47,6 +48,8 @@ export default async function ClientPage({
           </Badge>
         )}
       </div>
+
+      <ClientInfoSummary pipeline={pipeline} />
 
       <ClientPipelineView pipeline={pipeline} visitadores={visitadores} />
     </div>

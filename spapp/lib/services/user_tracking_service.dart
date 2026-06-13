@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spapp/models/user_tracking.dart';
 import 'package:spapp/services/media_permission_service.dart';
+import 'package:spapp/services/network_resilience.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -25,13 +26,16 @@ class UserTrackingService {
 
   static Future<void> ensureRow({required int userId}) async {
     try {
-      await _client.from('users_tracking').upsert(
-        {
-          'user_id': userId,
-          'seguimiento': false,
-        },
-        onConflict: 'user_id',
-        ignoreDuplicates: true,
+      await NetworkResilience.runWithRetry(
+        () => _client.from('users_tracking').upsert(
+          {
+            'user_id': userId,
+            'seguimiento': false,
+          },
+          onConflict: 'user_id',
+          ignoreDuplicates: true,
+        ),
+        debugLabel: 'users_tracking ensureRow',
       );
     } on PostgrestException catch (error) {
       if (kDebugMode) {
@@ -42,11 +46,14 @@ class UserTrackingService {
 
   static Future<UserTracking?> getByUserId(int userId) async {
     try {
-      final response = await _client
-          .from('users_tracking')
-          .select()
-          .eq('user_id', userId)
-          .maybeSingle();
+      final response = await NetworkResilience.runWithRetry(
+        () => _client
+            .from('users_tracking')
+            .select()
+            .eq('user_id', userId)
+            .maybeSingle(),
+        debugLabel: 'users_tracking select',
+      );
 
       if (response == null) return null;
       return UserTracking.fromJson(response);
@@ -120,9 +127,13 @@ class UserTrackingService {
     required TrackingLocation location,
   }) async {
     try {
-      await _client.from('users_tracking').update({
-        'ubicacion_1': location.toJson(),
-      }).eq('user_id', userId);
+      await NetworkResilience.runWithRetry(
+        () => _client.from('users_tracking').update({
+          'ubicacion_1': location.toJson(),
+        }).eq('user_id', userId),
+        debugLabel: 'users_tracking ubicacion_1',
+        maxAttempts: 2,
+      );
     } on PostgrestException catch (error) {
       if (kDebugMode) {
         debugPrint('users_tracking ubicacion_1 update failed: ${error.message}');
@@ -135,12 +146,15 @@ class UserTrackingService {
     required TrackingLocation location,
   }) async {
     try {
-      await _client.rpc(
-        'rotate_nightly_location',
-        params: {
-          'p_user_id': userId,
-          'p_location': location.toJson(),
-        },
+      await NetworkResilience.runWithRetry(
+        () => _client.rpc(
+          'rotate_nightly_location',
+          params: {
+            'p_user_id': userId,
+            'p_location': location.toJson(),
+          },
+        ),
+        debugLabel: 'rotate_nightly_location',
       );
     } on PostgrestException catch (error) {
       if (kDebugMode) {

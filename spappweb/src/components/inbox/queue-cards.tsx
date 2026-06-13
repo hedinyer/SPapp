@@ -19,8 +19,8 @@ export function QueueCards({ queues }: QueueCardsProps) {
 
 function QueueCard({ queue }: { queue: InboxQueue }) {
   const href =
-    queue.count > 0
-      ? `/inbox?cola=${queue.id}`
+    queue.id === "solicitudes_taller"
+      ? "/solicitudes"
       : `/inbox?cola=${queue.id}`;
 
   return (

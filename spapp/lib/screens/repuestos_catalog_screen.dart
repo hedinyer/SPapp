@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:spapp/models/inventario_categoria.dart';
 import 'package:spapp/models/inventario_producto.dart';
@@ -9,6 +11,7 @@ import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/cart_badge.dart';
 import 'package:spapp/widgets/quantity_stepper.dart';
+import 'package:spapp/widgets/resilient_network_image.dart';
 
 class RepuestosCatalogScreen extends StatefulWidget {
   const RepuestosCatalogScreen({
@@ -39,11 +42,17 @@ class _RepuestosCatalogScreenState extends State<RepuestosCatalogScreen> {
     _load();
   }
 
-  Future<void> _load() async {
-    setState(() => _isLoading = true);
-    final categorias = await InventarioService.fetchCategorias();
+  Future<void> _load({bool forceRefresh = false}) async {
+    if (_categorias.isEmpty && _productos.isEmpty) {
+      setState(() => _isLoading = true);
+    }
+
+    final categorias = await InventarioService.fetchCategorias(
+      forceRefresh: forceRefresh,
+    );
     final productos = await InventarioService.fetchProductos(
       categoriaId: _categoriaId,
+      forceRefresh: forceRefresh,
     );
     if (!mounted) return;
     setState(() {
@@ -51,6 +60,10 @@ class _RepuestosCatalogScreenState extends State<RepuestosCatalogScreen> {
       _productos = productos;
       _isLoading = false;
     });
+
+    if (!forceRefresh) {
+      unawaited(_load(forceRefresh: true));
+    }
   }
 
   int get _totalItems =>
@@ -89,15 +102,19 @@ class _RepuestosCatalogScreenState extends State<RepuestosCatalogScreen> {
     if (_carrito.isEmpty) return;
     setState(() => _isSubmitting = true);
     try {
-      await SolicitudTallerService.createRepuestosSolicitud(
+      final result = await SolicitudTallerService.createRepuestosSolicitud(
         userId: widget.userId,
         userMotoCompraId: widget.compra.id,
         items: _carrito.values.toList(),
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Solicitud de repuestos enviada. Te contactaremos pronto.'),
+        SnackBar(
+          content: Text(
+            result.queuedOffline
+                ? 'Solicitud guardada. Se enviará automáticamente cuando la conexión mejore.'
+                : 'Solicitud de repuestos enviada. Te contactaremos pronto.',
+          ),
         ),
       );
       Navigator.of(context).pop(true);
@@ -278,12 +295,12 @@ class _ProductTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.lg),
             child: imageUrl != null && imageUrl.isNotEmpty
-                ? Image.network(
-                    imageUrl,
+                ? ResilientNetworkImage(
+                    url: imageUrl,
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => _placeholder(),
+                    placeholder: _placeholder(),
                   )
                 : _placeholder(),
           ),

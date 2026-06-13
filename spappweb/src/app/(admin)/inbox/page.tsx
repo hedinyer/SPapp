@@ -17,6 +17,9 @@ const VALID_QUEUES: InboxQueueId[] = [
   "pagos",
   "retiro",
   "entrega",
+  "morosos",
+  "recoger",
+  "solicitudes_taller",
 ];
 
 function parseQueue(value: string | undefined): InboxQueueId | null {

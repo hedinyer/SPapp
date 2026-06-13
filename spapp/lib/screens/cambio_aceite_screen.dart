@@ -50,7 +50,7 @@ class _CambioAceiteScreenState extends State<CambioAceiteScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      await SolicitudTallerService.createCambioAceite(
+      final result = await SolicitudTallerService.createCambioAceite(
         userId: widget.userId,
         userMotoCompraId: widget.compra.id,
         fechaPreferida: _fechaPreferida!,
@@ -58,7 +58,13 @@ class _CambioAceiteScreenState extends State<CambioAceiteScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cambio de aceite agendado.')),
+        SnackBar(
+          content: Text(
+            result.queuedOffline
+                ? 'Solicitud guardada. Se enviará cuando la conexión mejore.'
+                : 'Cambio de aceite agendado.',
+          ),
+        ),
       );
       Navigator.of(context).pop(true);
     } on SolicitudTallerException catch (e) {

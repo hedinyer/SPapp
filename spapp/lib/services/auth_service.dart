@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spapp/services/network_resilience.dart';
 import 'package:spapp/services/user_tracking_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,6 +31,8 @@ class AuthService {
       jsonEncode({
         'id': user['id'],
         'user': user['user'],
+        if (user['status'] != null) 'status': user['status'],
+        if (user['visitador_id'] != null) 'visitador_id': user['visitador_id'],
       }),
     );
   }
@@ -52,17 +55,37 @@ class AuthService {
     }
 
     try {
-      final result = await _client.rpc(
-        'verify_login',
-        params: {
-          'p_user': trimmedUsername,
-          'p_password': trimmedPassword,
-        },
+      final result = await NetworkResilience.runWithRetry(
+        () => _client.rpc(
+          'verify_login',
+          params: {
+            'p_user': trimmedUsername,
+            'p_password': trimmedPassword,
+          },
+        ),
+        debugLabel: 'verify_login',
       );
 
       final user = _normalizeUser(result);
       if (user == null) {
         throw const LoginException('Usuario o contraseña incorrectos.');
+      }
+
+      final status = user['status'] as String? ?? 'normal';
+      if (status == 'admin') {
+        throw const LoginException(
+          'Esta cuenta es de administrador. Usa el panel web.',
+        );
+      }
+
+      if (status == 'visitador') {
+        final visitadorId = await _resolveVisitadorId(user['id']);
+        if (visitadorId == null) {
+          throw const LoginException(
+            'Tu cuenta de visitador no está vinculada. Contacta al administrador.',
+          );
+        }
+        user['visitador_id'] = visitadorId;
       }
 
       await saveSession(user);
@@ -83,21 +106,6 @@ class AuthService {
     }
   }
 
-  static String _networkErrorMessage(Object error) {
-    final message = error.toString().toLowerCase();
-    if (message.contains('socket') ||
-        message.contains('network') ||
-        message.contains('connection') ||
-        message.contains('host lookup') ||
-        message.contains('failed host') ||
-        message.contains('timed out') ||
-        message.contains('internet')) {
-      return 'Sin conexión a internet. Verifica tu red e intenta de nuevo.';
-    }
-
-    return 'No se pudo iniciar sesión. Intenta de nuevo.';
-  }
-
   static Map<String, dynamic>? _normalizeUser(dynamic result) {
     if (result == null) return null;
 
@@ -112,6 +120,39 @@ class AuthService {
     }
 
     return null;
+  }
+
+  static Future<int?> _resolveVisitadorId(dynamic userId) async {
+    final parsedId = userId is int ? userId : int.tryParse('$userId');
+    if (parsedId == null || parsedId <= 0) return null;
+
+    try {
+      final row = await _client
+          .from('visitadores')
+          .select('id')
+          .eq('user_id', parsedId)
+          .eq('activo', true)
+          .maybeSingle();
+      if (row == null) return null;
+      return row['id'] as int?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String _networkErrorMessage(Object error) {
+    final message = error.toString().toLowerCase();
+    if (message.contains('socket') ||
+        message.contains('network') ||
+        message.contains('connection') ||
+        message.contains('host lookup') ||
+        message.contains('failed host') ||
+        message.contains('timed out') ||
+        message.contains('internet')) {
+      return 'Sin conexión a internet. Verifica tu red e intenta de nuevo.';
+    }
+
+    return 'No se pudo iniciar sesión. Intenta de nuevo.';
   }
 }
 

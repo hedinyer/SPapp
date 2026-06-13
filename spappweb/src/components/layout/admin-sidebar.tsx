@@ -7,6 +7,7 @@ import {
   ClipboardList,
   LogOut,
   Package,
+  UserSearch,
   Users,
   Wrench,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/inbox", label: "Bandeja", icon: ClipboardList },
+  { href: "/clientes", label: "Clientes", icon: UserSearch },
   { href: "/visitadores", label: "Visitadores", icon: Users },
   { href: "/catalogo", label: "Catálogo", icon: Bike },
   { href: "/inventario", label: "Inventario", icon: Package },

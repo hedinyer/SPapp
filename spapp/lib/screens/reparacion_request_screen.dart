@@ -34,7 +34,7 @@ class _ReparacionRequestScreenState extends State<ReparacionRequestScreen> {
   Future<void> _submit() async {
     setState(() => _isSubmitting = true);
     try {
-      await SolicitudTallerService.createReparacion(
+      final result = await SolicitudTallerService.createReparacion(
         userId: widget.userId,
         userMotoCompraId: widget.compra.id,
         descripcionFalla: _fallaController.text,
@@ -42,7 +42,13 @@ class _ReparacionRequestScreenState extends State<ReparacionRequestScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Solicitud de reparación enviada.')),
+        SnackBar(
+          content: Text(
+            result.queuedOffline
+                ? 'Solicitud guardada. Se enviará cuando la conexión mejore.'
+                : 'Solicitud de reparación enviada.',
+          ),
+        ),
       );
       Navigator.of(context).pop(true);
     } on SolicitudTallerException catch (e) {

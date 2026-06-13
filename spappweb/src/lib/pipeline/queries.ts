@@ -5,6 +5,7 @@ import { buildClientPipeline } from "@/lib/pipeline/step-logic";
 import type {
   BikeRow,
   ClientPipeline,
+  ClientSearchResult,
   DigitalContractRow,
   InboxListItem,
   InboxQueue,
@@ -23,6 +24,19 @@ import type {
   VisitaRow,
   VisitadorRow,
 } from "@/lib/pipeline/types";
+
+function normalizeVisita(raw: unknown): VisitaRow | null {
+  if (!raw) return null;
+  const v = raw as VisitaRow;
+  return {
+    ...v,
+    evidencia_fotos: v.evidencia_fotos ?? [],
+    evidencia_videos: v.evidencia_videos ?? [],
+    ubicacion_verificada: v.ubicacion_verificada ?? null,
+    fecha_completada: v.fecha_completada ?? null,
+    notas_visita: v.notas_visita ?? null,
+  };
+}
 
 function joinUser(raw: unknown): UserRow | null {
   if (!raw) return null;
@@ -71,7 +85,7 @@ export async function getClientPipeline(
   const { data: visita } = await supabase
     .from("visitas")
     .select(
-      "id, user_id, digital_contract_id, visitador_id, estado, cliente_nombre, cliente_celular, direccion_visita, barrio, fecha_programada, notas, created_at, updated_at, visitadores(id, nombre, foto_url, telefono, activo)",
+      "id, user_id, digital_contract_id, visitador_id, estado, cliente_nombre, cliente_celular, direccion_visita, barrio, fecha_programada, notas, evidencia_fotos, evidencia_videos, ubicacion_verificada, fecha_completada, notas_visita, created_at, updated_at, visitadores(id, nombre, foto_url, telefono, activo, user_id)",
     )
     .eq("user_id", userId)
     .maybeSingle();
@@ -126,7 +140,7 @@ export async function getClientPipeline(
     user: user as UserRow,
     document: (document as UserDocumentRow | null) ?? null,
     contract: (contract as DigitalContractRow | null) ?? null,
-    visita: (visita as VisitaRow | null) ?? null,
+    visita: normalizeVisita(visita),
     compra: (compra as UserMotoCompraRow | null) ?? null,
     tracking: (tracking as UserTrackingRow | null) ?? null,
     tarifas: tarifaRows,
@@ -533,19 +547,20 @@ export async function getActiveVisitadores(): Promise<VisitadorRow[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("visitadores")
-    .select("id, nombre, foto_url, telefono, activo")
+    .select("id, nombre, foto_url, telefono, activo, user_id, users(id, user)")
     .eq("activo", true)
+    .not("user_id", "is", null)
     .order("nombre");
-  return (data as VisitadorRow[]) ?? [];
+  return ((data ?? []) as unknown as VisitadorRow[]);
 }
 
 export async function getAllVisitadores(): Promise<VisitadorRow[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("visitadores")
-    .select("id, nombre, foto_url, telefono, activo")
+    .select("id, nombre, foto_url, telefono, activo, user_id, users(id, user)")
     .order("nombre");
-  return (data as VisitadorRow[]) ?? [];
+  return ((data ?? []) as unknown as VisitadorRow[]);
 }
 
 export async function getAllBikes(): Promise<BikeRow[]> {
@@ -565,4 +580,177 @@ export async function getFirstPendingUserId(
 ): Promise<number | null> {
   const items = await getInboxListItems(queueId);
   return items[0]?.userId ?? null;
+}
+
+function escapeIlike(value: string): string {
+  return value.replace(/[%_\\]/g, "\\$&");
+}
+
+function setMatchLabel(
+  map: Map<number, string>,
+  userId: number,
+  label: string,
+  priority: number,
+  priorities: Map<number, number>,
+) {
+  const current = priorities.get(userId);
+  if (current === undefined || priority < current) {
+    map.set(userId, label);
+    priorities.set(userId, priority);
+  }
+}
+
+export async function searchClients(
+  query: string,
+): Promise<ClientSearchResult[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+
+  const supabase = createAdminClient();
+  const pattern = `%${escapeIlike(q)}%`;
+  const matchLabels = new Map<number, string>();
+  const matchPriorities = new Map<number, number>();
+
+  const [
+    { data: byPlaca },
+    { data: byCedulaHoja },
+    { data: byCedulaContrato },
+    { data: byVisitaNombre },
+    { data: byUser },
+    { data: byNombreCompleto },
+  ] = await Promise.all([
+    supabase.from("user_moto_compra").select("user_id").ilike("placa", pattern),
+    supabase
+      .from("digital_contracts")
+      .select("user_id")
+      .filter("hoja_vida_data->>numero_identificacion", "ilike", pattern),
+    supabase
+      .from("digital_contracts")
+      .select("user_id")
+      .filter("contrato_data->>cedula_contratante", "ilike", pattern),
+    supabase.from("visitas").select("user_id").ilike("cliente_nombre", pattern),
+    supabase.from("users").select("id").ilike("user", pattern),
+    supabase
+      .from("digital_contracts")
+      .select("user_id")
+      .filter("hoja_vida_data->>nombre_completo", "ilike", pattern),
+  ]);
+
+  for (const row of byPlaca ?? []) {
+    setMatchLabel(matchLabels, row.user_id as number, "Placa", 0, matchPriorities);
+  }
+  for (const row of [...(byCedulaHoja ?? []), ...(byCedulaContrato ?? [])]) {
+    setMatchLabel(matchLabels, row.user_id as number, "Cédula", 1, matchPriorities);
+  }
+  for (const row of [...(byVisitaNombre ?? []), ...(byNombreCompleto ?? [])]) {
+    setMatchLabel(matchLabels, row.user_id as number, "Nombre", 2, matchPriorities);
+  }
+  for (const row of byUser ?? []) {
+    setMatchLabel(matchLabels, row.id as number, "Usuario", 3, matchPriorities);
+  }
+
+  const userIds = [...matchLabels.keys()];
+  if (userIds.length === 0) return [];
+
+  const [{ data: users }, { data: paidTarifas }] = await Promise.all([
+    supabase
+      .from("users")
+      .select(
+        "id, user, user_moto_compra(modelo, color, placa, estado), visitas(cliente_nombre), digital_contracts(hoja_vida_data, contrato_data, created_at)",
+      )
+      .in("id", userIds),
+    supabase
+      .from("tarifas_pagadas")
+      .select("user_id")
+      .in("user_id", userIds)
+      .eq("estado", "pagada"),
+  ]);
+
+  const paidCount = new Map<number, number>();
+  for (const row of paidTarifas ?? []) {
+    const id = row.user_id as number;
+    paidCount.set(id, (paidCount.get(id) ?? 0) + 1);
+  }
+
+  const results: ClientSearchResult[] = (users ?? []).map((raw) => {
+    const user = raw as {
+      id: number;
+      user: string;
+      user_moto_compra:
+        | {
+            modelo: string;
+            color: string;
+            placa: string | null;
+            estado: ClientSearchResult["compraEstado"];
+          }
+        | {
+            modelo: string;
+            color: string;
+            placa: string | null;
+            estado: ClientSearchResult["compraEstado"];
+          }[]
+        | null;
+      visitas: { cliente_nombre: string | null } | { cliente_nombre: string | null }[] | null;
+      digital_contracts:
+        | {
+            hoja_vida_data: Record<string, unknown>;
+            contrato_data: Record<string, unknown>;
+            created_at: string;
+          }
+        | {
+            hoja_vida_data: Record<string, unknown>;
+            contrato_data: Record<string, unknown>;
+            created_at: string;
+          }[]
+        | null;
+    };
+
+    const compraRaw = user.user_moto_compra;
+    const compra = Array.isArray(compraRaw) ? compraRaw[0] : compraRaw;
+
+    const visitaRaw = user.visitas;
+    const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
+
+    const contractsRaw = user.digital_contracts;
+    const contracts = Array.isArray(contractsRaw)
+      ? contractsRaw
+      : contractsRaw
+        ? [contractsRaw]
+        : [];
+    const latestContract = contracts.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )[0];
+
+    const hoja = latestContract?.hoja_vida_data ?? null;
+    const contrato = latestContract?.contrato_data ?? null;
+    const cedulaFromHoja = hoja?.numero_identificacion as string | undefined;
+    const cedulaFromContrato = contrato?.cedula_contratante as string | undefined;
+    const cedula =
+      cedulaFromHoja?.trim() ||
+      cedulaFromContrato?.trim() ||
+      null;
+
+    const nombreFromHoja = hoja?.nombre_completo as string | undefined;
+    const displayName =
+      nombreFromHoja?.trim() ||
+      visita?.cliente_nombre?.trim() ||
+      user.user;
+
+    return {
+      userId: user.id,
+      username: user.user,
+      displayName,
+      cedula,
+      placa: compra?.placa ?? null,
+      motoLabel: compra ? `${compra.modelo} · ${compra.color}` : null,
+      compraEstado: compra?.estado ?? null,
+      cuotasPagadas: paidCount.get(user.id) ?? 0,
+      matchLabel: matchLabels.get(user.id) ?? "—",
+    };
+  });
+
+  return results.sort((a, b) =>
+    a.displayName.localeCompare(b.displayName, "es"),
+  );
 }

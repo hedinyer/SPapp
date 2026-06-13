@@ -72,7 +72,19 @@ class _NoCreditHomeScreenState extends State<NoCreditHomeScreen> {
   }
 
   Future<void> _checkMotoEntregada() async {
-    final compra = await MotoCompraService.getLatestCompra(widget.userId);
+    final cached = await MotoCompraService.getLatestCompra(widget.userId);
+    if (!mounted) return;
+    if (cached?.isDelivered == true) {
+      setState(() {
+        _motoEntregada = true;
+        _compraEntregada = cached;
+      });
+    }
+
+    final compra = await MotoCompraService.getLatestCompra(
+      widget.userId,
+      forceRefresh: true,
+    );
     if (!mounted) return;
     if (compra?.isDelivered == true) {
       setState(() {

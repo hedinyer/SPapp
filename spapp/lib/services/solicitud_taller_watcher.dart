@@ -23,7 +23,7 @@ class SolicitudTallerWatcher {
   bool _initialDelivered = false;
 
   void start() {
-    _fetchSolicitudes();
+    unawaited(_loadCachedThenFetch());
     _channel = SolicitudTallerService.subscribeToSolicitudes(
       userId: userId,
       onChanged: _fetchSolicitudes,
@@ -38,13 +38,31 @@ class SolicitudTallerWatcher {
     _channel = null;
   }
 
-  Future<void> refresh() => _fetchSolicitudes();
+  Future<void> refresh() => _fetchSolicitudes(forceRefresh: true);
 
-  Future<void> _fetchSolicitudes() async {
+  Future<void> _loadCachedThenFetch() async {
+    final cached =
+        await SolicitudTallerService.getLatestSolicitudesCached(userId);
+    if (_isDisposed) return;
+
+    if (cached.isNotEmpty) {
+      _initialDelivered = true;
+      _lastSolicitudes = cached;
+      onChanged(cached);
+      _syncPolling(cached);
+    }
+
+    await _fetchSolicitudes();
+  }
+
+  Future<void> _fetchSolicitudes({bool forceRefresh = false}) async {
     if (_isDisposed) return;
 
     final solicitudes =
-        await SolicitudTallerService.getLatestSolicitudes(userId);
+        await SolicitudTallerService.getLatestSolicitudesCached(
+      userId,
+      forceRefresh: forceRefresh,
+    );
     if (_isDisposed) return;
 
     final changed = _hasChanged(_lastSolicitudes, solicitudes);
@@ -93,4 +111,3 @@ class SolicitudTallerWatcher {
     return false;
   }
 }
-

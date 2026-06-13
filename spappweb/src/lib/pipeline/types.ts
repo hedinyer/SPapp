@@ -75,12 +75,32 @@ export interface DigitalContractRow {
   updated_at: string;
 }
 
+export interface VisitaEvidenciaFoto {
+  url: string;
+  captured_at: string;
+}
+
+export interface VisitaEvidenciaVideo {
+  url: string;
+  captured_at: string;
+  duration_sec?: number;
+}
+
+export interface VisitaUbicacionVerificada {
+  lat: number;
+  lng: number;
+  accuracy?: number;
+  captured_at: string;
+}
+
 export interface VisitadorRow {
   id: number;
   nombre: string;
   foto_url: string | null;
   telefono: string | null;
   activo: boolean;
+  user_id: number | null;
+  users?: { id: number; user: string } | { id: number; user: string }[] | null;
 }
 
 export interface VisitaRow {
@@ -95,6 +115,11 @@ export interface VisitaRow {
   barrio: string | null;
   fecha_programada: string | null;
   notas: string | null;
+  evidencia_fotos: VisitaEvidenciaFoto[];
+  evidencia_videos: VisitaEvidenciaVideo[];
+  ubicacion_verificada: VisitaUbicacionVerificada | null;
+  fecha_completada: string | null;
+  notas_visita: string | null;
   visitadores: VisitadorRow | null;
   created_at: string;
   updated_at: string;
@@ -222,6 +247,18 @@ export interface InboxListItem {
   displayName: string;
   subtitle: string;
   queueId: InboxQueueId;
+}
+
+export interface ClientSearchResult {
+  userId: number;
+  username: string;
+  displayName: string;
+  cedula: string | null;
+  placa: string | null;
+  motoLabel: string | null;
+  compraEstado: MotoCompraEstado | null;
+  cuotasPagadas: number;
+  matchLabel: string;
 }
 
 export interface BikeRow {

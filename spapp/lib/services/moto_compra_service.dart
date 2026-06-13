@@ -3,29 +3,58 @@ import 'package:spapp/models/bike_inventory.dart';
 import 'package:spapp/models/moto_payment_calculator.dart';
 import 'package:spapp/models/user_moto_compra.dart';
 import 'package:spapp/services/bike_service.dart';
+import 'package:spapp/services/local_cache_service.dart';
+import 'package:spapp/services/network_resilience.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MotoCompraService {
   static SupabaseClient get _client => Supabase.instance.client;
 
-  static Future<UserMotoCompra?> getLatestCompra(int userId) async {
-    try {
-      final response = await _client
-          .from('user_moto_compra')
-          .select()
-          .eq('user_id', userId)
-          .order('created_at', ascending: false)
-          .limit(1)
-          .maybeSingle();
+  static Future<UserMotoCompra?> getLatestCompra(
+    int userId, {
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = LocalCacheService.userMotoCompraKey(userId);
 
-      if (response == null) return null;
-      return UserMotoCompra.fromJson(response);
+    if (!forceRefresh) {
+      final cached = await LocalCacheService.getObject(
+        cacheKey,
+        UserMotoCompra.fromJson,
+      );
+      if (cached != null) return cached;
+    }
+
+    try {
+      final response = await NetworkResilience.runWithRetry(
+        () => _client
+            .from('user_moto_compra')
+            .select()
+            .eq('user_id', userId)
+            .order('created_at', ascending: false)
+            .limit(1)
+            .maybeSingle(),
+        debugLabel: 'user_moto_compra',
+      );
+
+      if (response == null) {
+        await LocalCacheService.remove(cacheKey);
+        return null;
+      }
+
+      final json = Map<String, dynamic>.from(response);
+      await LocalCacheService.setObject(cacheKey, json);
+      return UserMotoCompra.fromJson(json);
     } on PostgrestException catch (error) {
       if (kDebugMode) {
         debugPrint('user_moto_compra select failed: ${error.message}');
       }
-      return null;
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('user_moto_compra select failed: $error');
+      }
     }
+
+    return LocalCacheService.getObject(cacheKey, UserMotoCompra.fromJson);
   }
 
   static Future<UserMotoCompra> createCompra({
@@ -47,24 +76,32 @@ class MotoCompraService {
     );
 
     try {
-      final response = await _client
-          .from('user_moto_compra')
-          .insert({
-            'user_id': userId,
-            'digital_contract_id': digitalContractId,
-            'bike_id': freshBike.id,
-            'modelo': freshBike.modelo,
-            'color': freshBike.color,
-            'frecuencia_pago': frecuencia.dbValue,
-            'cuota_inicial_monto': payment.cuotaInicialMonto,
-            'monto_cuota_periodo': payment.montoCuotaPeriodo,
-            'monto_total_primer_pago': payment.montoTotalPrimerPago,
-            'estado': MotoCompraEstado.pendientePago.dbValue,
-          })
-          .select()
-          .single();
+      final response = await NetworkResilience.runWithRetry(
+        () => _client
+            .from('user_moto_compra')
+            .insert({
+              'user_id': userId,
+              'digital_contract_id': digitalContractId,
+              'bike_id': freshBike.id,
+              'modelo': freshBike.modelo,
+              'color': freshBike.color,
+              'frecuencia_pago': frecuencia.dbValue,
+              'cuota_inicial_monto': payment.cuotaInicialMonto,
+              'monto_cuota_periodo': payment.montoCuotaPeriodo,
+              'monto_total_primer_pago': payment.montoTotalPrimerPago,
+              'estado': MotoCompraEstado.pendientePago.dbValue,
+            })
+            .select()
+            .single(),
+        debugLabel: 'create_user_moto_compra',
+      );
 
-      return UserMotoCompra.fromJson(response);
+      final json = Map<String, dynamic>.from(response);
+      await LocalCacheService.setObject(
+        LocalCacheService.userMotoCompraKey(userId),
+        json,
+      );
+      return UserMotoCompra.fromJson(json);
     } on PostgrestException catch (error) {
       if (kDebugMode) {
         debugPrint('user_moto_compra insert failed: ${error.message}');

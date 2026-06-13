@@ -23,7 +23,7 @@ class ApplicationStatusWatcher {
   bool _initialDelivered = false;
 
   void start() {
-    _fetchStatus();
+    unawaited(_loadCachedThenFetch());
     _channel = DocumentService.subscribeToUserDocuments(
       userId: userId,
       onChanged: _fetchStatus,
@@ -38,12 +38,29 @@ class ApplicationStatusWatcher {
     _channel = null;
   }
 
-  Future<void> refresh() => _fetchStatus();
+  Future<void> refresh() => _fetchStatus(forceRefresh: true);
 
-  Future<void> _fetchStatus() async {
+  Future<void> _loadCachedThenFetch() async {
+    final cached = await DocumentService.getLatestUserDocumentCached(userId);
     if (_isDisposed) return;
 
-    final document = await DocumentService.getLatestUserDocument(userId);
+    if (cached != null) {
+      _initialDelivered = true;
+      _lastDocument = cached;
+      onChanged(cached);
+      _syncPolling(cached);
+    }
+
+    await _fetchStatus();
+  }
+
+  Future<void> _fetchStatus({bool forceRefresh = false}) async {
+    if (_isDisposed) return;
+
+    final document = await DocumentService.getLatestUserDocumentCached(
+      userId,
+      forceRefresh: forceRefresh,
+    );
     if (_isDisposed) return;
 
     final changed = _hasChanged(_lastDocument, document);

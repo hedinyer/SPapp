@@ -2,11 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import {
-  assignVisit,
-  cancelVisit,
-  completeVisit,
-} from "@/lib/actions/admin-actions";
+import { ExternalLink, MapPin } from "lucide-react";
+import { assignVisit, cancelVisit } from "@/lib/actions/admin-actions";
 import type { VisitaRow, VisitadorRow } from "@/lib/pipeline/types";
 import { formatDate } from "@/lib/utils/format";
 import { visitaEstadoLabel } from "@/lib/pipeline/step-logic";
@@ -67,6 +64,10 @@ export function VisitActionPanel({
     });
   }
 
+  const fotos = visita.evidencia_fotos ?? [];
+  const videos = visita.evidencia_videos ?? [];
+  const ubicacion = visita.ubicacion_verificada;
+
   return (
     <Card className="border-neutral-200 shadow-none">
       <CardHeader>
@@ -125,58 +126,125 @@ export function VisitActionPanel({
               <span className="text-neutral-500">Fecha: </span>
               {formatDate(visita.fecha_programada)}
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                size="lg"
-                className="bg-black text-white hover:bg-neutral-800"
-                disabled={pending}
-                onClick={() =>
-                  run(
-                    () => completeVisit(visita.id, userId),
-                    "Visita marcada como completada.",
-                  )
-                }
-              >
-                Marcar completada
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button size="lg" variant="outline" disabled={pending}>
-                    Cancelar visita
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="bg-white">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>¿Cancelar visita?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      El cliente verá que debe contactar al concesionario.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Volver</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() =>
-                        run(
-                          () => cancelVisit(visita.id, userId),
-                          "Visita cancelada.",
-                        )
-                      }
-                    >
-                      Sí, cancelar
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            <p className="text-sm text-neutral-600">
+              El visitador debe completar la visita desde la app o el portal
+              visitador, subiendo fotos, video y ubicación.
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="lg" variant="outline" disabled={pending}>
+                  Cancelar visita
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Cancelar visita?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    El cliente verá que debe contactar al concesionario.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Volver</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() =>
+                      run(
+                        () => cancelVisit(visita.id, userId),
+                        "Visita cancelada.",
+                      )
+                    }
+                  >
+                    Sí, cancelar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
 
-        {(visita.estado === "completada" || visita.estado === "cancelada") && (
-          <p className="text-sm text-neutral-600">
-            {visita.estado === "completada"
-              ? "Visita completada. El cliente puede elegir su moto."
-              : "Visita cancelada."}
-          </p>
+        {visita.estado === "completada" && (
+          <div className="space-y-4">
+            <p className="text-sm text-neutral-600">
+              Visita completada
+              {visita.fecha_completada
+                ? ` el ${formatDate(visita.fecha_completada)}`
+                : ""}
+              . El cliente puede elegir su moto.
+            </p>
+
+            {visita.notas_visita && (
+              <div className="rounded-lg border border-neutral-200 p-3 text-sm">
+                <p className="font-medium text-neutral-700">Notas del visitador</p>
+                <p className="mt-1 text-neutral-600">{visita.notas_visita}</p>
+              </div>
+            )}
+
+            {fotos.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Fotos de evidencia</p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {fotos.map((foto, i) => (
+                    <a
+                      key={`${foto.url}-${i}`}
+                      href={foto.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block overflow-hidden rounded-lg border border-neutral-200"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={foto.url}
+                        alt={`Evidencia ${i + 1}`}
+                        className="aspect-square w-full object-cover"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {videos.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Videos de evidencia</p>
+                <div className="space-y-3">
+                  {videos.map((video, i) => (
+                    <video
+                      key={`${video.url}-${i}`}
+                      src={video.url}
+                      controls
+                      className="w-full max-w-md rounded-lg border border-neutral-200"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {ubicacion?.lat != null && ubicacion?.lng != null && (
+              <div className="rounded-lg border border-neutral-200 p-3 text-sm">
+                <p className="flex items-center gap-2 font-medium text-neutral-700">
+                  <MapPin className="h-4 w-4" />
+                  Ubicación verificada
+                </p>
+                <p className="mt-1 text-neutral-600">
+                  {ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}
+                  {ubicacion.accuracy != null &&
+                    ` · ±${Math.round(ubicacion.accuracy)} m`}
+                </p>
+                <a
+                  href={`https://www.google.com/maps?q=${ubicacion.lat},${ubicacion.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                >
+                  Ver en Google Maps
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
+        {visita.estado === "cancelada" && (
+          <p className="text-sm text-neutral-600">Visita cancelada.</p>
         )}
       </CardContent>
     </Card>
@@ -253,7 +321,7 @@ function AssignForm({
       </Button>
       {visitadores.length === 0 && (
         <p className="text-sm text-neutral-500">
-          Crea visitadores en el menú lateral primero.
+          Crea visitadores con cuenta de acceso en el menú lateral primero.
         </p>
       )}
     </form>

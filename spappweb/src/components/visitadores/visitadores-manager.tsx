@@ -43,6 +43,14 @@ import {
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 
+function visitadorUsername(v: VisitadorRow): string | null {
+  if (!v.users) return null;
+  if (Array.isArray(v.users)) {
+    return v.users[0]?.user ?? null;
+  }
+  return v.users.user ?? null;
+}
+
 export function VisitadoresManager({
   visitadores,
 }: {
@@ -68,6 +76,8 @@ export function VisitadoresManager({
     fotoUrl: string;
     activo: boolean;
     photoFile: File | null;
+    username: string;
+    password: string;
   }) {
     startTransition(async () => {
       try {
@@ -87,6 +97,8 @@ export function VisitadoresManager({
           telefono: form.telefono,
           fotoUrl,
           activo: form.activo,
+          username: editing ? undefined : form.username,
+          password: form.password || undefined,
         });
         toast.success(editing ? "Visitador actualizado." : "Visitador creado.");
         setOpen(false);
@@ -113,6 +125,7 @@ export function VisitadoresManager({
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
+              <TableHead>Usuario</TableHead>
               <TableHead>Teléfono</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="w-24" />
@@ -121,73 +134,84 @@ export function VisitadoresManager({
           <TableBody>
             {visitadores.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-neutral-500">
+                <TableCell colSpan={5} className="text-center text-neutral-500">
                   No hay visitadores. Crea uno para asignar visitas.
                 </TableCell>
               </TableRow>
             ) : (
-              visitadores.map((v) => (
-                <TableRow key={v.id}>
-                  <TableCell className="font-medium">{v.nombre}</TableCell>
-                  <TableCell>{v.telefono ?? "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant={v.activo ? "outline" : "secondary"}>
-                      {v.activo ? "Activo" : "Inactivo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEdit(v)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              ¿Eliminar visitador?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              {v.nombre}
-                              {v.telefono ? ` · ${v.telefono}` : ""}. Las visitas
-                              asignadas quedarán sin visitador.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() =>
-                                startTransition(async () => {
-                                  try {
-                                    await deleteVisitador(v.id);
-                                    toast.success("Visitador eliminado.");
-                                  } catch (e) {
-                                    toast.error(
-                                      e instanceof Error
-                                        ? e.message
-                                        : "No se pudo eliminar.",
-                                    );
-                                  }
-                                })
-                              }
-                            >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+              visitadores.map((v) => {
+                const username = visitadorUsername(v);
+                return (
+                  <TableRow key={v.id}>
+                    <TableCell className="font-medium">{v.nombre}</TableCell>
+                    <TableCell>
+                      {username ? (
+                        <span className="font-mono text-sm">{username}</span>
+                      ) : (
+                        <Badge variant="secondary">Sin cuenta</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>{v.telefono ?? "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={v.activo ? "outline" : "secondary"}>
+                        {v.activo ? "Activo" : "Inactivo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEdit(v)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="bg-white">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                ¿Eliminar visitador?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                {v.nombre}
+                                {v.telefono ? ` · ${v.telefono}` : ""}. Se
+                                eliminará también su cuenta de acceso. Las visitas
+                                asignadas quedarán sin visitador.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  startTransition(async () => {
+                                    try {
+                                      await deleteVisitador(v.id);
+                                      toast.success("Visitador eliminado.");
+                                    } catch (e) {
+                                      toast.error(
+                                        e instanceof Error
+                                          ? e.message
+                                          : "No se pudo eliminar.",
+                                      );
+                                    }
+                                  })
+                                }
+                              >
+                                Eliminar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -221,6 +245,8 @@ function VisitadorDialog({
     fotoUrl: string;
     activo: boolean;
     photoFile: File | null;
+    username: string;
+    password: string;
   }) => void;
 }) {
   const [nombre, setNombre] = useState("");
@@ -228,6 +254,8 @@ function VisitadorDialog({
   const [fotoUrl, setFotoUrl] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [activo, setActivo] = useState(true);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   function resetFromEditing() {
     setNombre(editing?.nombre ?? "");
@@ -235,6 +263,8 @@ function VisitadorDialog({
     setFotoUrl(editing?.foto_url ?? "");
     setPhotoFile(null);
     setActivo(editing?.activo ?? true);
+    setUsername(editing ? (visitadorUsername(editing) ?? "") : "");
+    setPassword("");
   }
 
   return (
@@ -268,6 +298,35 @@ function VisitadorDialog({
               onChange={(e) => setTelefono(e.target.value)}
             />
           </div>
+          {!editing && (
+            <div className="space-y-2">
+              <Label htmlFor="username">Usuario de acceso</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+          )}
+          {editing && username && (
+            <div className="space-y-2">
+              <Label>Usuario de acceso</Label>
+              <Input value={username} disabled />
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="password">
+              {editing ? "Nueva contraseña (opcional)" : "Contraseña"}
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
           <ImageFileField
             label="Foto del visitador"
             existingUrl={fotoUrl}
@@ -286,9 +345,21 @@ function VisitadorDialog({
           </Button>
           <Button
             className="bg-black text-white hover:bg-neutral-800"
-            disabled={pending || nombre.trim().length < 2}
+            disabled={
+              pending ||
+              nombre.trim().length < 2 ||
+              (!editing && (username.trim().length < 3 || password.length < 4))
+            }
             onClick={() =>
-              onSave({ nombre, telefono, fotoUrl, activo, photoFile })
+              onSave({
+                nombre,
+                telefono,
+                fotoUrl,
+                activo,
+                photoFile,
+                username,
+                password,
+              })
             }
           >
             {pending ? "Guardando…" : "Guardar"}
