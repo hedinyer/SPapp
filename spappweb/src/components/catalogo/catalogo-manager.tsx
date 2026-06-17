@@ -43,7 +43,6 @@ import {
   uploadImageFile,
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
-import { mobileLog } from "@/lib/debug/mobile-log";
 
 export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
   const [open, setOpen] = useState(false);
@@ -54,17 +53,9 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
     <>
       <div className="flex justify-end">
         <Button
-          data-mobile-probe="catalogo-nueva-moto"
           onClick={() => {
             setEditing(null);
             setOpen(true);
-            // #region agent log
-            mobileLog({
-              location: "catalogo-manager.tsx:openDialog",
-              message: "bike dialog open",
-              hypothesisId: "C",
-            });
-            // #endregion
           }}
           className="bg-black text-white hover:bg-neutral-800"
         >
@@ -246,15 +237,6 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
         pending={pending}
         onSave={(form) =>
           startTransition(async () => {
-            // #region agent log
-            mobileLog({
-              location: "catalogo-manager.tsx:save:start",
-              message: "bike save start",
-              hypothesisId: "D",
-              runId: "post-fix",
-              data: { hasImage: !!form.imageFile, imageSize: form.imageFile?.size ?? 0 },
-            });
-            // #endregion
             try {
               let imagenUrl = form.imagenUrl;
 
@@ -267,24 +249,9 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
               }
 
               await saveBike({ ...form, imagenUrl });
-              // #region agent log
-              mobileLog({
-                location: "catalogo-manager.tsx:save:ok",
-                message: "bike save ok",
-                hypothesisId: "D",
-              });
-              // #endregion
               toast.success(editing ? "Moto actualizada." : "Moto creada.");
               setOpen(false);
             } catch (e) {
-              // #region agent log
-              mobileLog({
-                location: "catalogo-manager.tsx:save:error",
-                message: "bike save error",
-                hypothesisId: "D",
-                data: { error: e instanceof Error ? e.message : String(e) },
-              });
-              // #endregion
               toast.error(
                 e instanceof Error ? e.message : "Error al guardar.",
               );

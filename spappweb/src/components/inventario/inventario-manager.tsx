@@ -56,7 +56,6 @@ import {
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import { Textarea } from "@/components/ui/textarea";
 import { TouchSelect } from "@/components/ui/touch-select";
-import { mobileLog } from "@/lib/debug/mobile-log";
 
 export function InventarioManager({
   categorias,
@@ -95,18 +94,9 @@ export function InventarioManager({
         <div className="flex justify-end">
           <Button
             className="bg-black text-white hover:bg-neutral-800"
-            data-mobile-probe="inventario-nuevo-producto"
             onClick={() => {
               setEditingProd(null);
               setProdOpen(true);
-              // #region agent log
-              mobileLog({
-                location: "inventario-manager.tsx:openProd",
-                message: "product dialog open",
-                hypothesisId: "C",
-                data: { editing: false },
-              });
-              // #endregion
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -523,18 +513,6 @@ export function InventarioManager({
         pending={pending}
         onSave={(form) =>
           startTransition(async () => {
-            // #region agent log
-            mobileLog({
-              location: "inventario-manager.tsx:saveProd:start",
-              message: "product save start",
-              hypothesisId: "D",
-              data: {
-                hasImage: !!form.imageFile,
-                imageSize: form.imageFile?.size ?? 0,
-                categoriaId: form.categoriaId,
-              },
-            });
-            // #endregion
             try {
               let imagenUrl = form.imagenUrl;
               if (form.imageFile) {
@@ -545,24 +523,9 @@ export function InventarioManager({
                 );
               }
               await saveProducto({ ...form, imagenUrl });
-              // #region agent log
-              mobileLog({
-                location: "inventario-manager.tsx:saveProd:ok",
-                message: "product save ok",
-                hypothesisId: "D",
-              });
-              // #endregion
               toast.success(editingProd ? "Producto actualizado." : "Producto creado.");
               setProdOpen(false);
             } catch (e) {
-              // #region agent log
-              mobileLog({
-                location: "inventario-manager.tsx:saveProd:error",
-                message: "product save error",
-                hypothesisId: "D",
-                data: { error: e instanceof Error ? e.message : String(e) },
-              });
-              // #endregion
               toast.error(e instanceof Error ? e.message : "Error al guardar.");
             }
           })
@@ -736,18 +699,7 @@ function ProductoDialog({
             <TouchSelect
               aria-label="Categoría"
               value={categoriaId}
-              onChange={(v) => {
-                setCategoriaId(v);
-                // #region agent log
-                mobileLog({
-                  location: "inventario-manager.tsx:categoriaSelect",
-                  message: "categoria selected",
-                  hypothesisId: "B",
-                  runId: "post-fix",
-                  data: { value: v },
-                });
-                // #endregion
-              }}
+              onChange={setCategoriaId}
               options={categorias.map((c) => ({
                 value: String(c.id),
                 label: c.nombre,
