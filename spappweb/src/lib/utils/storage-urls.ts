@@ -1,4 +1,4 @@
-import { getSupabaseUrl } from "@/lib/supabase/env";
+import { SUPABASE_URL } from "@/lib/supabase/public-env";
 
 export function getStoragePublicUrl(
   bucket: string,
@@ -6,7 +6,7 @@ export function getStoragePublicUrl(
 ): string | null {
   if (!path) return null;
   if (path.startsWith("http")) return path;
-  const base = getSupabaseUrl().replace(/\/$/, "");
+  const base = SUPABASE_URL.replace(/\/$/, "");
   return `${base}/storage/v1/object/public/${bucket}/${path}`;
 }
 

@@ -29,9 +29,9 @@ import { TouchSelect } from "@/components/ui/touch-select";
 import {
   garajeUploadFolder,
   ImageFileField,
-  uploadImageFile,
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
+import { uploadImageFromBrowser } from "@/lib/utils/upload-image-client";
 import { cn } from "@/lib/utils";
 
 const actionBtnClass =
@@ -189,13 +189,13 @@ export function NewMotoForm({
 
     startTransition(async () => {
       try {
-        const placaFotoUrl = await uploadImageFile(
+        const placaFotoUrl = await uploadImageFromBrowser(
           STORAGE_BUCKETS.garajeImagenes,
           garajeUploadFolder(placa || referencia),
           imageFile,
         );
 
-        await saveGarajeMoto({
+        const result = await saveGarajeMoto({
           parqueaderoId:
             parqueaderoId === "none" ? null : Number(parqueaderoId),
           placa,
@@ -209,6 +209,11 @@ export function NewMotoForm({
           notas,
           isNewManual: true,
         });
+
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
 
         clearGarajeNuevaMotoDraft();
         toast.success("Moto registrada.");

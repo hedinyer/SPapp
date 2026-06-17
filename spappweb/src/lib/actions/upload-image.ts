@@ -50,26 +50,43 @@ export async function uploadAdminImage(formData: FormData): Promise<{
   }
 
   const rawBytes = Buffer.from(await file.arrayBuffer());
-  let bytes: Buffer;
+  let bytes: Buffer = rawBytes;
+  let contentType = "image/jpeg";
   try {
     bytes = await sharp(rawBytes)
       .rotate()
       .jpeg({ quality: 85, mozjpeg: true })
       .toBuffer();
   } catch {
-    throw new Error(
-      "No se pudo procesar la imagen. Prueba con otra foto (JPG o PNG).",
-    );
+    const mime = file.type.toLowerCase();
+    if (
+      mime === "image/jpeg" ||
+      mime === "image/png" ||
+      mime === "image/webp"
+    ) {
+      bytes = rawBytes;
+      contentType = mime;
+    } else {
+      throw new Error(
+        "No se pudo procesar la imagen. Prueba con otra foto (JPG o PNG).",
+      );
+    }
   }
   if (bytes.length > MAX_BYTES) {
     throw new Error("La imagen no puede superar 5 MB después de procesarla.");
   }
 
-  const path = `${folder}/${Date.now()}.jpg`;
+  const ext =
+    contentType === "image/png"
+      ? "png"
+      : contentType === "image/webp"
+        ? "webp"
+        : "jpg";
+  const path = `${folder}/${Date.now()}.${ext}`;
   const supabase = createAdminClient();
 
   const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
-    contentType: "image/jpeg",
+    contentType,
     upsert: true,
   });
 

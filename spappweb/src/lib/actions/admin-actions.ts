@@ -671,36 +671,45 @@ const garajeMotoSchema = z
     }
   });
 
-export async function saveGarajeMoto(input: z.infer<typeof garajeMotoSchema>) {
-  const parsed = garajeMotoSchema.parse(input);
-  const supabase = await assertAdmin();
-  const payload = {
-    parqueadero_id: parsed.parqueaderoId,
-    placa: parsed.placa?.trim() || null,
-    placa_foto_url: parsed.placaFotoUrl?.trim() || null,
-    referencia: parsed.referencia.trim(),
-    modelo: parsed.modelo.trim(),
-    color: parsed.color.trim(),
-    origen: parsed.origen,
-    condicion: parsed.condicion,
-    estado: parsed.estado,
-    notas: parsed.notas?.trim() || null,
-  };
-  if (parsed.id) {
-    const { error } = await supabase
-      .from("garaje_motos")
-      .update(payload)
-      .eq("id", parsed.id);
-    if (error) throw new Error(error.message);
-  } else {
-    const { error } = await supabase.from("garaje_motos").insert({
-      ...payload,
-      origen: parsed.origen ?? "manual",
-    });
-    if (error) throw new Error(error.message);
+export async function saveGarajeMoto(
+  input: z.infer<typeof garajeMotoSchema>,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const parsed = garajeMotoSchema.parse(input);
+    const supabase = createAdminClient();
+    const payload = {
+      parqueadero_id: parsed.parqueaderoId,
+      placa: parsed.placa?.trim() || null,
+      placa_foto_url: parsed.placaFotoUrl?.trim() || null,
+      referencia: parsed.referencia.trim(),
+      modelo: parsed.modelo.trim(),
+      color: parsed.color.trim(),
+      origen: parsed.origen,
+      condicion: parsed.condicion,
+      estado: parsed.estado,
+      notas: parsed.notas?.trim() || null,
+    };
+    if (parsed.id) {
+      const { error } = await supabase
+        .from("garaje_motos")
+        .update(payload)
+        .eq("id", parsed.id);
+      if (error) return { ok: false, error: error.message };
+    } else {
+      const { error } = await supabase.from("garaje_motos").insert({
+        ...payload,
+        origen: parsed.origen ?? "manual",
+      });
+      if (error) return { ok: false, error: error.message };
+    }
+    revalidatePath("/garaje");
+    return { ok: true };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "Error al guardar la moto.",
+    };
   }
-  revalidatePath("/garaje");
-  return { ok: true };
 }
 
 export async function deleteGarajeMoto(id: string) {

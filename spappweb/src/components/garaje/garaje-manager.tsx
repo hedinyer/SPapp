@@ -51,9 +51,9 @@ import {
 import {
   garajeUploadFolder,
   ImageFileField,
-  uploadImageFile,
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
+import { uploadImageFromBrowser } from "@/lib/utils/upload-image-client";
 import { Textarea } from "@/components/ui/textarea";
 import { TouchSelect } from "@/components/ui/touch-select";
 import { cn } from "@/lib/utils";
@@ -652,7 +652,7 @@ export function GarajeManager({
             try {
               let placaFotoUrl = form.placaFotoUrl;
               if (form.imageFile) {
-                placaFotoUrl = await uploadImageFile(
+                placaFotoUrl = await uploadImageFromBrowser(
                   STORAGE_BUCKETS.garajeImagenes,
                   garajeUploadFolder(form.placa || form.referencia, editingMoto?.id),
                   form.imageFile,
@@ -661,7 +661,7 @@ export function GarajeManager({
 
               const isNewManual = !editingMoto && form.origen === "manual";
 
-              await saveGarajeMoto({
+              const result = await saveGarajeMoto({
                 id: editingMoto?.id,
                 parqueaderoId: form.parqueaderoId,
                 placa: form.placa,
@@ -675,6 +675,10 @@ export function GarajeManager({
                 notas: form.notas,
                 isNewManual,
               });
+              if (!result.ok) {
+                toast.error(result.error);
+                return;
+              }
               toast.success(editingMoto ? "Moto actualizada." : "Moto registrada.");
               closeMotoEditor();
             } catch (e) {
