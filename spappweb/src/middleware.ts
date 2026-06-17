@@ -14,9 +14,11 @@ import {
 const adminProtectedPrefixes = [
   "/inbox",
   "/clientes",
+  "/crear-cliente",
   "/visitadores",
   "/catalogo",
   "/inventario",
+  "/garaje",
   "/solicitudes",
 ];
 
@@ -84,9 +86,12 @@ export const config = {
     "/inbox/:path*",
     "/clientes",
     "/clientes/:path*",
+    "/crear-cliente",
     "/visitadores/:path*",
     "/catalogo/:path*",
     "/inventario/:path*",
+    "/garaje",
+    "/garaje/:path*",
     "/solicitudes/:path*",
     "/visitador/login",
     "/visitador/mis-visitas",

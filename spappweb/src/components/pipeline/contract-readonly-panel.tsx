@@ -28,12 +28,12 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
 
   return (
     <Card className="border-neutral-200 shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div>
           <CardTitle className="text-lg">Contrato digital</CardTitle>
           <p className="mt-1 text-sm text-neutral-500">Solo lectura</p>
         </div>
-        <Badge variant="outline" className="border-neutral-300">
+        <Badge variant="outline" className="w-fit border-neutral-300">
           {contractStatusLabel(contract.status)}
         </Badge>
       </CardHeader>

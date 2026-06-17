@@ -32,7 +32,7 @@ export function ClientesSearchResults({
           <li key={client.userId}>
             <Link
               href={`/clientes/${client.userId}`}
-              className="flex items-center justify-between gap-4 px-4 py-4 hover:bg-neutral-50"
+              className="flex flex-col gap-3 px-4 py-4 hover:bg-neutral-50 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0 space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -46,7 +46,7 @@ export function ClientesSearchResults({
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-neutral-500">
+                <p className="truncate text-sm text-neutral-500">
                   @{client.username}
                   {client.cedula ? ` · C.C. ${client.cedula}` : ""}
                   {client.placa ? ` · Placa ${client.placa}` : ""}
@@ -60,7 +60,10 @@ export function ClientesSearchResults({
                   </p>
                 )}
               </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-neutral-400" />
+              <ArrowRight className="hidden h-4 w-4 shrink-0 text-neutral-400 sm:block" />
+              <span className="text-sm font-medium text-black sm:hidden">
+                Ver ficha →
+              </span>
             </Link>
           </li>
         ))}

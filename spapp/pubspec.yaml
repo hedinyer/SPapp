@@ -77,6 +77,8 @@ flutter:
 
   assets:
     - public/logos_login.jpeg
+    - "public/logos_login - Copy.jpeg"
+    - public/firmamarisolpinilla/marisolpinilla.png
     - public/motos/Berasbr150/
     - public/motos/gbr/
     - public/motos/milan/

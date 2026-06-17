@@ -121,7 +121,7 @@ class _SelectMotoCtaCardState extends State<_SelectMotoCtaCard>
           ),
         ),
       ),
-      title: '¡Visita completada!',
+      title: '¡Contrato firmado!',
       description:
           'Elige la moto que más te guste, selecciona el color y confirma '
           'tu frecuencia de pago. Recuerda: el primer pago incluye la cuota '
@@ -167,6 +167,30 @@ class _PendingPaymentCard extends StatelessWidget {
     'Daviplata 3168101010',
   ];
 
+  String get _title {
+    if (compra.pagoInicialConfirmado && !compra.pagoCuotaConfirmado) {
+      return 'Cuota inicial pagada';
+    }
+    if (compra.pagoCuotaConfirmado && !compra.pagoInicialConfirmado) {
+      return 'Cuota adelantada pagada';
+    }
+    return 'Moto seleccionada';
+  }
+
+  String get _description {
+    if (compra.pagoInicialConfirmado && !compra.pagoCuotaConfirmado) {
+      return 'Confirmamos tu cuota inicial. Falta confirmar la cuota '
+          '${compra.frecuenciaPago.label.toLowerCase()} por adelantado.';
+    }
+    if (compra.pagoCuotaConfirmado && !compra.pagoInicialConfirmado) {
+      return 'Confirmamos tu cuota adelantada. Falta confirmar la cuota inicial.';
+    }
+    return 'Tu ${compra.modelo} (${compra.color}) está reservada. '
+        'Realiza el pago de cuota inicial y cuota '
+        '${compra.frecuenciaPago.label.toLowerCase()} por adelantado. '
+        'Te avisaremos cuando sea confirmado.';
+  }
+
   @override
   Widget build(BuildContext context) {
     const accent = Color(0xFF1565C0);
@@ -195,10 +219,8 @@ class _PendingPaymentCard extends StatelessWidget {
           ],
         ),
       ),
-      title: 'Pago pendiente de confirmación',
-      description:
-          'Realiza tu pago de cuota inicial y cuota ${compra.frecuenciaPago.label.toLowerCase()} '
-          'por adelantado. Te avisaremos cuando sea confirmado.',
+      title: _title,
+      description: _description,
       footer: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -216,33 +238,37 @@ class _PendingPaymentCard extends StatelessWidget {
           StatusInfoRow(
             icon: Icons.attach_money_rounded,
             label:
-                'Cuota inicial: ${MotoPaymentCalculator.formatCop(compra.cuotaInicialMonto)}',
+                'Cuota inicial: ${MotoPaymentCalculator.formatCop(compra.cuotaInicialMonto)}'
+                '${compra.pagoInicialConfirmado ? ' · Pagada' : ' · Pendiente'}',
           ),
           const SizedBox(height: AppSpacing.sm),
           StatusInfoRow(
             icon: Icons.schedule_rounded,
             label:
                 'Cuota ${compra.frecuenciaPago.label.toLowerCase()}: '
-                '${MotoPaymentCalculator.formatCop(compra.montoCuotaPeriodo)} (por adelantado)',
+                '${MotoPaymentCalculator.formatCop(compra.montoCuotaPeriodo)}'
+                '${compra.pagoCuotaConfirmado ? ' · Pagada' : ' · Pendiente'}',
           ),
-          const SizedBox(height: AppSpacing.sm),
-          StatusInfoRow(
-            icon: Icons.receipt_long_outlined,
-            label:
-                'Total a pagar ahora: ${MotoPaymentCalculator.formatCop(compra.montoTotalPrimerPago)}',
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Medios de pago',
-            style: AppTypography.labelMd.copyWith(
-              color: AppColors.onSurface,
-              fontWeight: FontWeight.w600,
+          if (!compra.pagoInicialConfirmado || !compra.pagoCuotaConfirmado) ...[
+            const SizedBox(height: AppSpacing.sm),
+            StatusInfoRow(
+              icon: Icons.receipt_long_outlined,
+              label:
+                  'Total a pagar ahora: ${MotoPaymentCalculator.formatCop(compra.montoTotalPrimerPago)}',
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          for (final line in _paymentInstructions) ...[
-            StatusInfoRow(icon: Icons.account_balance_outlined, label: line),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              'Medios de pago',
+              style: AppTypography.labelMd.copyWith(
+                color: AppColors.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            for (final line in _paymentInstructions) ...[
+              StatusInfoRow(icon: Icons.account_balance_outlined, label: line),
+              const SizedBox(height: AppSpacing.xs),
+            ],
           ],
         ],
       ),
@@ -304,9 +330,9 @@ class _ReadyForPickupCardState extends State<_ReadyForPickupCard>
             color: accent,
           ),
         ),
-        title: '¡Listo! Ya puedes pasar por tu moto',
+        title: 'Pagado',
         description:
-            'Confirmamos tu pago inicial y tu cuota adelantada. '
+            'Confirmamos tu cuota inicial y tu cuota adelantada. '
             'Acércate al concesionario para retirar tu ${compra.modelo}.',
         footer: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

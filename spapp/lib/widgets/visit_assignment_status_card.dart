@@ -174,7 +174,7 @@ class _CompletadaCard extends StatelessWidget {
           ),
         ),
         title: 'Visita completada',
-        description: 'Continúa con la selección de tu moto abajo.',
+        description: 'La visita domiciliaria fue realizada correctamente.',
       );
     }
 
@@ -194,8 +194,8 @@ class _CompletadaCard extends StatelessWidget {
       ),
       title: 'Visita domiciliaria completada',
       description:
-          'La visita en tu domicilio fue realizada. Elige tu moto, color '
-          'y realiza tu pago inicial más cuota adelantada.',
+          'La visita en tu domicilio fue realizada. Gracias por completar '
+          'este paso del proceso.',
       footer: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

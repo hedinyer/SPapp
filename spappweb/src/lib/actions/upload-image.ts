@@ -1,5 +1,6 @@
 "use server";
 
+import sharp from "sharp";
 import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -12,20 +13,11 @@ const ALLOWED_BUCKETS: AdminImageBucket[] = [
   STORAGE_BUCKETS.visitadorFotos,
   STORAGE_BUCKETS.bikeImages,
   STORAGE_BUCKETS.inventarioImagenes,
+  STORAGE_BUCKETS.pagosComprobantes,
+  STORAGE_BUCKETS.garajeImagenes,
 ];
 const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
-
-function extensionFor(file: File): string {
-  switch (file.type) {
-    case "image/png":
-      return "png";
-    case "image/webp":
-      return "webp";
-    default:
-      return "jpg";
-  }
-}
+const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
 
 function sanitizeFolder(folder: string): string {
   return folder
@@ -51,21 +43,33 @@ export async function uploadAdminImage(formData: FormData): Promise<{
     throw new Error("Destino de imagen no válido.");
   }
   if (!(file instanceof File) || file.size === 0) {
-    throw new Error("Selecciona una imagen de tu PC.");
+    throw new Error("Selecciona una imagen.");
   }
-  if (file.size > MAX_BYTES) {
-    throw new Error("La imagen no puede superar 5 MB.");
-  }
-  if (!ALLOWED_MIME.has(file.type)) {
-    throw new Error("Usa JPG, PNG o WebP.");
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error("La imagen no puede superar 12 MB.");
   }
 
-  const path = `${folder}/${Date.now()}.${extensionFor(file)}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
+  const rawBytes = Buffer.from(await file.arrayBuffer());
+  let bytes: Buffer;
+  try {
+    bytes = await sharp(rawBytes)
+      .rotate()
+      .jpeg({ quality: 85, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    throw new Error(
+      "No se pudo procesar la imagen. Prueba con otra foto (JPG o PNG).",
+    );
+  }
+  if (bytes.length > MAX_BYTES) {
+    throw new Error("La imagen no puede superar 5 MB después de procesarla.");
+  }
+
+  const path = `${folder}/${Date.now()}.jpg`;
   const supabase = createAdminClient();
 
   const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
-    contentType: file.type,
+    contentType: "image/jpeg",
     upsert: true,
   });
 

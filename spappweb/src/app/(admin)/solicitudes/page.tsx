@@ -7,7 +7,7 @@ export default async function SolicitudesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Solicitudes de taller</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Solicitudes de taller</h1>
         <p className="mt-1 text-neutral-500">
           Repuestos, reparaciones y cambios de aceite solicitados por clientes.
         </p>

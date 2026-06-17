@@ -35,15 +35,15 @@ export default async function ClientPage({
         </Link>
       </Button>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{pipeline.displayName}</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">{pipeline.displayName}</h1>
           <p className="mt-1 text-sm text-neutral-500">
             Usuario @{pipeline.user.user} · ID {pipeline.user.id}
           </p>
         </div>
         {pipeline.currentAdminStep && (
-          <Badge className="bg-black text-white hover:bg-black">
+          <Badge className="w-fit bg-black text-white hover:bg-black">
             Acción requerida
           </Badge>
         )}

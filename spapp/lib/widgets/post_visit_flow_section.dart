@@ -9,7 +9,7 @@ import 'package:spapp/theme/responsive.dart';
 import 'package:spapp/widgets/moto_purchase_status_card.dart';
 import 'package:spapp/widgets/visit_assignment_status_card.dart';
 
-/// Coordina tarjetas de visita completada y flujo de selección/compra de moto.
+/// Coordina el flujo post-contrato: moto, pago, entrega y visita domiciliaria.
 class PostVisitFlowSection extends StatefulWidget {
   const PostVisitFlowSection({
     super.key,
@@ -17,14 +17,12 @@ class PostVisitFlowSection extends StatefulWidget {
     this.digitalContractId,
     this.username,
     this.onCompraChanged,
-    this.motoEntregada = false,
   });
 
   final int userId;
   final String? digitalContractId;
   final String? username;
   final ValueChanged<UserMotoCompra?>? onCompraChanged;
-  final bool motoEntregada;
 
   @override
   State<PostVisitFlowSection> createState() => _PostVisitFlowSectionState();
@@ -32,32 +30,22 @@ class PostVisitFlowSection extends StatefulWidget {
 
 class _PostVisitFlowSectionState extends State<PostVisitFlowSection> {
   Visita? _visita;
-  bool _isVisitLoading = true;
+  bool _isVisitLoading = false;
   bool _isCompraLoading = true;
   UserMotoCompra? _compra;
   VisitAssignmentWatcher? _visitWatcher;
   MotoCompraWatcher? _compraWatcher;
 
-  bool get _visitCompleted =>
-      _visita?.estado == VisitaEstado.completada;
-
-  bool get _showMotoFlow => _visitCompleted;
+  bool get _showVisitFlow => _compra?.isDelivered == true;
 
   bool get _compactVisitCard =>
-      _visitCompleted && (_compra != null || _isCompraLoading);
+      _visita?.estado == VisitaEstado.completada &&
+      (_compra != null || _isCompraLoading);
 
   @override
   void initState() {
     super.initState();
-    if (widget.motoEntregada) {
-      _isVisitLoading = false;
-      _startCompraWatcher();
-    } else {
-      _visitWatcher = VisitAssignmentWatcher(
-        userId: widget.userId,
-        onChanged: _onVisitChanged,
-      )..start();
-    }
+    _startCompraWatcher();
   }
 
   @override
@@ -74,19 +62,6 @@ class _PostVisitFlowSectionState extends State<PostVisitFlowSection> {
       _visita = visit;
       _isVisitLoading = false;
     });
-
-    final isCompleted = visit?.estado == VisitaEstado.completada;
-    if (isCompleted) {
-      if (_compraWatcher == null) {
-        _startCompraWatcher();
-      }
-    } else {
-      _stopCompraWatcher();
-      setState(() {
-        _compra = null;
-        _isCompraLoading = false;
-      });
-    }
   }
 
   void _startCompraWatcher() {
@@ -94,25 +69,48 @@ class _PostVisitFlowSectionState extends State<PostVisitFlowSection> {
     setState(() => _isCompraLoading = true);
     _compraWatcher = MotoCompraWatcher(
       userId: widget.userId,
-      onChanged: (compra) {
-        if (!mounted) return;
-        setState(() {
-          _compra = compra;
-          _isCompraLoading = false;
-        });
-        widget.onCompraChanged?.call(compra);
-      },
+      onChanged: _onCompraChanged,
     )..start();
   }
 
-  void _stopCompraWatcher() {
-    _compraWatcher?.dispose();
-    _compraWatcher = null;
+  void _onCompraChanged(UserMotoCompra? compra) {
+    if (!mounted) return;
+
+    setState(() {
+      _compra = compra;
+      _isCompraLoading = false;
+    });
+    widget.onCompraChanged?.call(compra);
+
+    if (compra?.isDelivered == true) {
+      if (_visitWatcher == null) {
+        _startVisitWatcher();
+      }
+    } else {
+      _stopVisitWatcher();
+      setState(() {
+        _visita = null;
+        _isVisitLoading = false;
+      });
+    }
+  }
+
+  void _startVisitWatcher() {
+    _visitWatcher?.dispose();
+    setState(() => _isVisitLoading = true);
+    _visitWatcher = VisitAssignmentWatcher(
+      userId: widget.userId,
+      onChanged: _onVisitChanged,
+    )..start();
+  }
+
+  void _stopVisitWatcher() {
+    _visitWatcher?.dispose();
+    _visitWatcher = null;
   }
 
   Future<void> _openMotoSelection() async {
-    final contractId =
-        widget.digitalContractId ?? _visita?.digitalContractId;
+    final contractId = widget.digitalContractId;
     if (contractId == null || contractId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -138,20 +136,38 @@ class _PostVisitFlowSectionState extends State<PostVisitFlowSection> {
 
   @override
   Widget build(BuildContext context) {
-    final visitKey = _isVisitLoading
-        ? 'visit_loading'
-        : _visita?.estado.dbValue ?? 'sin_visita';
-
     final motoKey = _isCompraLoading
         ? 'compra_loading'
         : _compra?.estado.dbValue ?? 'sin_compra';
 
-    final hideVisit = widget.motoEntregada || _compra?.isDelivered == true;
+    final visitKey = _isVisitLoading
+        ? 'visit_loading'
+        : _visita?.estado.dbValue ?? 'sin_visita';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (!hideVisit)
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: MotoPurchaseStatusCard(
+            key: ValueKey(motoKey),
+            compra: _compra,
+            isLoading: _isCompraLoading,
+            onSelectMoto: _openMotoSelection,
+            userId: widget.userId,
+            username: widget.username,
+          ),
+        ),
+        if (_showVisitFlow) ...[
+          SizedBox(
+            height: Responsive.lerp(
+              context,
+              min: AppSpacing.lg,
+              max: AppSpacing.xl,
+            ),
+          ),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 350),
             switchInCurve: Curves.easeOut,
@@ -161,29 +177,6 @@ class _PostVisitFlowSectionState extends State<PostVisitFlowSection> {
               visita: _visita,
               isLoading: _isVisitLoading,
               compactWhenCompleted: _compactVisitCard,
-            ),
-          ),
-        if (_showMotoFlow || hideVisit) ...[
-          if (!hideVisit) ...[
-            SizedBox(
-              height: Responsive.lerp(
-                context,
-                min: AppSpacing.lg,
-                max: AppSpacing.xl,
-              ),
-            ),
-          ],
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 350),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            child: MotoPurchaseStatusCard(
-              key: ValueKey(motoKey),
-              compra: _compra,
-              isLoading: _isCompraLoading,
-              onSelectMoto: _openMotoSelection,
-              userId: widget.userId,
-              username: widget.username,
             ),
           ),
         ],

@@ -1,38 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
-import { createAnonClient } from "@/lib/supabase/anon";
-import { USER_STATUS } from "@/lib/auth/user-status";
 import {
   defaultVisitadorSession,
   visitadorSessionOptions,
   type VisitadorSessionData,
 } from "@/lib/auth/visitador-session";
-import { getConfigErrorMessage } from "@/lib/supabase/env";
-
-function normalizeVisitadorUser(
-  result: unknown,
-): {
-  id: number;
-  user: string;
-  status: string;
-  visitador_id: number;
-} | null {
-  if (result == null) return null;
-  const row = Array.isArray(result)
-    ? (result[0] as Record<string, unknown> | undefined)
-    : (result as Record<string, unknown>);
-  if (!row || Object.keys(row).length === 0) return null;
-
-  const visitadorId = Number(row.visitador_id);
-  if (!visitadorId) return null;
-
-  return {
-    id: Number(row.id),
-    user: String(row.user),
-    status: String(row.status),
-    visitador_id: visitadorId,
-  };
-}
+import { verifyVisitadorLogin } from "@/lib/auth/verify-visitador-login";
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,40 +16,11 @@ export async function POST(request: NextRequest) {
     const username = body.username?.trim() ?? "";
     const password = body.password?.trim() ?? "";
 
-    if (!username || !password) {
+    const result = await verifyVisitadorLogin(username, password);
+    if ("error" in result) {
       return NextResponse.json(
-        { error: "Ingresa usuario y contraseña." },
-        { status: 400 },
-      );
-    }
-
-    const configError = getConfigErrorMessage();
-    if (configError) {
-      return NextResponse.json({ error: configError }, { status: 500 });
-    }
-
-    const anon = createAnonClient();
-    const { data: loginResult, error: loginError } = await anon.rpc(
-      "verify_visitador_login",
-      { p_user: username, p_password: password },
-    );
-
-    if (loginError) {
-      console.error("[visitador/login] verify_visitador_login:", loginError.message);
-      return NextResponse.json(
-        { error: "No se pudo conectar con el servidor." },
-        { status: 500 },
-      );
-    }
-
-    const user = normalizeVisitadorUser(loginResult);
-    if (!user || user.status !== USER_STATUS.visitador) {
-      return NextResponse.json(
-        {
-          error:
-            "Usuario o contraseña incorrectos, o la cuenta no es de visitador.",
-        },
-        { status: 401 },
+        { error: result.error },
+        { status: result.status },
       );
     }
 
@@ -86,9 +30,9 @@ export async function POST(request: NextRequest) {
       response,
       visitadorSessionOptions,
     );
-    session.userId = user.id;
-    session.username = user.user;
-    session.visitadorId = user.visitador_id;
+    session.userId = result.user.id;
+    session.username = result.user.user;
+    session.visitadorId = result.user.visitador_id;
     session.isLoggedIn = true;
     await session.save();
 

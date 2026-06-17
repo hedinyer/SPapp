@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:spapp/models/user_document.dart';
 import 'package:spapp/services/local_cache_service.dart';
@@ -95,30 +97,47 @@ class DocumentService {
 
   static RealtimeChannel subscribeToUserDocuments({
     required int userId,
-    required VoidCallback onChanged,
+    required void Function(PostgresChangePayload payload) onChanged,
   }) {
-    return _client
-        .channel('user_documents_$userId')
+    final channel = _client.channel('user_documents_$userId');
+
+    channel
         .onPostgresChanges(
           event: PostgresChangeEvent.all,
           schema: 'public',
           table: 'users_documents',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'user_id',
-            value: userId.toString(),
-          ),
           callback: (payload) {
+            final newUserId = payload.newRecord['user_id'];
+            final oldUserId = payload.oldRecord['user_id'];
+            final matchesUser = newUserId == userId ||
+                newUserId?.toString() == userId.toString() ||
+                oldUserId == userId ||
+                oldUserId?.toString() == userId.toString();
+
+            if (!matchesUser) return;
+
             if (kDebugMode) {
               debugPrint(
                 'users_documents realtime (${payload.eventType.name}): '
                 '${payload.newRecord}',
               );
             }
-            onChanged();
+
+            unawaited(
+              LocalCacheService.remove(LocalCacheService.userDocumentKey(userId)),
+            );
+            onChanged(payload);
           },
         )
-        .subscribe();
+        .subscribe((status, error) {
+          if (kDebugMode) {
+            debugPrint(
+              'users_documents channel status: $status, error: $error',
+            );
+          }
+        });
+
+    return channel;
   }
 
   static Future<void> unsubscribe(RealtimeChannel? channel) async {

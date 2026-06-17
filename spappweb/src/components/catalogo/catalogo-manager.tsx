@@ -64,7 +64,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-200">
+      <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -144,6 +144,90 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="space-y-3 lg:hidden">
+        {bikes.map((bike) => (
+          <div
+            key={bike.id}
+            className="rounded-lg border border-neutral-200 p-4 text-sm"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="font-medium">{bike.modelo}</p>
+                <p className="text-neutral-500">{bike.color}</p>
+              </div>
+              <Badge variant={bike.activo ? "outline" : "secondary"}>
+                {bike.activo ? "Activo" : "Inactivo"}
+              </Badge>
+            </div>
+            <dl className="mt-3 space-y-1.5">
+              <div className="flex justify-between gap-2">
+                <dt className="text-neutral-500">Stock</dt>
+                <dd>{bike.stock}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-neutral-500">Cuota inicial</dt>
+                <dd>{formatCop(bike.cuota_inicial)}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-neutral-500">Cuota diaria</dt>
+                <dd>{formatCop(bike.cuota_diaria)}</dd>
+              </div>
+            </dl>
+            <div className="mt-3 flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => {
+                  setEditing(bike);
+                  setOpen(true);
+                }}
+              >
+                <Pencil className="mr-1 h-4 w-4" />
+                Editar
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Trash2 className="mr-1 h-4 w-4" />
+                    Eliminar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-white">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Eliminar moto?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {bike.modelo} · {bike.color}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() =>
+                        startTransition(async () => {
+                          try {
+                            await deleteBike(bike.id);
+                            toast.success("Moto eliminada.");
+                          } catch (e) {
+                            toast.error(
+                              e instanceof Error
+                                ? e.message
+                                : "No se pudo eliminar.",
+                            );
+                          }
+                        })
+                      }
+                    >
+                      Eliminar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        ))}
       </div>
 
       <BikeDialog

@@ -91,7 +91,7 @@ export function InventarioManager({
         Stock actualizado hace {secondsAgo}s
       </p>
       <Tabs defaultValue="productos">
-      <TabsList>
+      <TabsList className="w-full max-w-full overflow-x-auto">
         <TabsTrigger value="productos">Productos</TabsTrigger>
         <TabsTrigger value="categorias">Categorías</TabsTrigger>
       </TabsList>
@@ -109,7 +109,7 @@ export function InventarioManager({
             Nuevo producto
           </Button>
         </div>
-        <div className="overflow-x-auto rounded-lg border border-neutral-200">
+        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -220,6 +220,112 @@ export function InventarioManager({
             </TableBody>
           </Table>
         </div>
+
+        <div className="space-y-3 lg:hidden">
+          {productos.map((p) => {
+            const img = getStoragePublicUrl(
+              STORAGE_BUCKETS.inventarioImagenes,
+              p.imagen_url,
+            );
+            const lowStock = p.stock <= p.stock_minimo;
+            return (
+              <div
+                key={p.id}
+                className="rounded-lg border border-neutral-200 p-4 text-sm"
+              >
+                <div className="flex gap-3">
+                  {img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={img}
+                      alt=""
+                      className="h-12 w-12 shrink-0 rounded object-cover"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 shrink-0 rounded bg-neutral-100" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{p.nombre}</p>
+                    <p className="text-neutral-500">{p.sku}</p>
+                  </div>
+                  <Badge variant={p.activo ? "outline" : "secondary"}>
+                    {p.activo ? "Activo" : "Inactivo"}
+                  </Badge>
+                </div>
+                <dl className="mt-3 space-y-1.5">
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Categoría</dt>
+                    <dd>{p.inventario_categorias?.nombre ?? "—"}</dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Precio</dt>
+                    <dd>{formatCop(p.precio)}</dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Stock</dt>
+                    <dd className={lowStock ? "font-medium text-red-700" : ""}>
+                      {p.stock}
+                      {lowStock && (
+                        <Badge variant="destructive" className="ml-2">
+                          Bajo
+                        </Badge>
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      setEditingProd(p);
+                      setProdOpen(true);
+                    }}
+                  >
+                    <Pencil className="mr-1 h-4 w-4" />
+                    Editar
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Trash2 className="mr-1 h-4 w-4" />
+                        Eliminar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
+                        <AlertDialogDescription>{p.nombre}</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() =>
+                            startTransition(async () => {
+                              try {
+                                await deleteProducto(p.id);
+                                toast.success("Producto eliminado.");
+                              } catch (e) {
+                                toast.error(
+                                  e instanceof Error
+                                    ? e.message
+                                    : "No se pudo eliminar.",
+                                );
+                              }
+                            })
+                          }
+                        >
+                          Eliminar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </TabsContent>
 
       <TabsContent value="categorias" className="space-y-4">
@@ -235,7 +341,7 @@ export function InventarioManager({
             Nueva categoría
           </Button>
         </div>
-        <div className="overflow-x-auto rounded-lg border border-neutral-200">
+        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -309,6 +415,81 @@ export function InventarioManager({
               ))}
             </TableBody>
           </Table>
+        </div>
+
+        <div className="space-y-3 lg:hidden">
+          {categorias.map((c) => (
+            <div
+              key={c.id}
+              className="rounded-lg border border-neutral-200 p-4 text-sm"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-medium">{c.nombre}</p>
+                <Badge variant={c.activo ? "outline" : "secondary"}>
+                  {c.activo ? "Activa" : "Inactiva"}
+                </Badge>
+              </div>
+              <dl className="mt-3 space-y-1.5">
+                <div className="flex justify-between gap-2">
+                  <dt className="text-neutral-500">Slug</dt>
+                  <dd>{c.slug}</dd>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <dt className="text-neutral-500">Orden</dt>
+                  <dd>{c.orden}</dd>
+                </div>
+              </dl>
+              <div className="mt-3 flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    setEditingCat(c);
+                    setCatOpen(true);
+                  }}
+                >
+                  <Pencil className="mr-1 h-4 w-4" />
+                  Editar
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      Eliminar
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="bg-white">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
+                      <AlertDialogDescription>{c.nombre}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() =>
+                          startTransition(async () => {
+                            try {
+                              await deleteCategoria(c.id);
+                              toast.success("Categoría eliminada.");
+                            } catch (e) {
+                              toast.error(
+                                e instanceof Error
+                                  ? e.message
+                                  : "No se pudo eliminar.",
+                              );
+                            }
+                          })
+                        }
+                      >
+                        Eliminar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))}
         </div>
       </TabsContent>
 

@@ -1,10 +1,16 @@
 "use client";
 
-import { useTransition } from "react";
-import { ExternalLink, MapPin } from "lucide-react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { ExternalLink, MapPin, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { setTracking } from "@/lib/actions/admin-actions";
-import type { MorosoRow, MotoParaRecogerRow, UserTrackingRow } from "@/lib/pipeline/types";
+import type {
+  MorosoRow,
+  MotoParaRecogerRow,
+  TrackingLocation,
+  UserTrackingRow,
+} from "@/lib/pipeline/types";
+import { createAnonClient } from "@/lib/supabase/anon";
 import { formatDate } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,6 +24,13 @@ interface TrackingPanelProps {
   recoger?: MotoParaRecogerRow | null;
 }
 
+function isLiveLocation(location: TrackingLocation | null | undefined) {
+  if (!location?.captured_at) return false;
+  const captured = new Date(location.captured_at).getTime();
+  if (Number.isNaN(captured)) return false;
+  return Date.now() - captured <= 90_000;
+}
+
 export function TrackingPanel({
   tracking,
   userId,
@@ -25,29 +38,70 @@ export function TrackingPanel({
   recoger,
 }: TrackingPanelProps) {
   const [pending, startTransition] = useTransition();
+  const [liveTracking, setLiveTracking] = useState(tracking);
 
-  if (!tracking) {
+  useEffect(() => {
+    setLiveTracking(tracking);
+  }, [tracking]);
+
+  useEffect(() => {
+    const supabase = createAnonClient();
+    const channel = supabase
+      .channel(`admin_tracking_${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "users_tracking",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          setLiveTracking(payload.new as UserTrackingRow);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
+  const needsIntensiveTracking =
+    (moroso?.dias_atraso ?? 0) >= 1 || recoger != null;
+  const location = liveTracking?.ubicacion_1 ?? null;
+  const hasLocation = location?.lat != null && location?.lng != null;
+  const liveNow = useMemo(() => isLiveLocation(location), [location]);
+  const mapsUrl = hasLocation
+    ? `https://www.google.com/maps?q=${location!.lat},${location!.lng}`
+    : null;
+
+  if (!liveTracking) {
     return null;
   }
 
-  const needsTracking =
-    (moroso?.dias_atraso ?? 0) >= 3 || recoger != null;
-  const location = tracking.ubicacion_1;
-  const hasLocation =
-    location?.lat != null && location?.lng != null;
-  const mapsUrl = hasLocation
-    ? `https://www.google.com/maps?q=${location.lat},${location.lng}`
-    : null;
-
   return (
     <Card
-      className={`border-neutral-200 shadow-none ${needsTracking && !tracking.seguimiento ? "border-amber-300 bg-amber-50/40" : ""}`}
+      className={`border-neutral-200 shadow-none ${needsIntensiveTracking && !liveTracking.seguimiento ? "border-amber-300 bg-amber-50/40" : ""}`}
     >
       <CardHeader>
-        <CardTitle className="text-base">Seguimiento GPS</CardTitle>
-        {needsTracking && !tracking.seguimiento && (
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-base">Seguimiento GPS</CardTitle>
+          {liveNow && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+              <Radio className="h-3 w-3" />
+              En vivo
+            </span>
+          )}
+        </div>
+        <p className="text-sm text-neutral-500">
+          La ubicación la envía la app del cliente en tiempo real a{" "}
+          <span className="font-medium text-neutral-700">ubicacion_1</span>.
+        </p>
+        {needsIntensiveTracking && !liveTracking.seguimiento && (
           <p className="text-sm font-medium text-amber-800">
-            Recomendado: activar GPS por mora o recogida pendiente.
+            Cliente en mora: activa seguimiento intensivo para forzar GPS en
+            segundo plano.
           </p>
         )}
         {recoger && (
@@ -59,18 +113,23 @@ export function TrackingPanel({
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <Label htmlFor="seguimiento" className="font-normal">
-            Seguimiento activo en la app
+            Seguimiento intensivo (mora)
           </Label>
           <Switch
             id="seguimiento"
-            checked={tracking.seguimiento}
+            checked={liveTracking.seguimiento}
             disabled={pending}
             onCheckedChange={(v) => {
               startTransition(async () => {
                 try {
                   await setTracking(userId, v);
+                  setLiveTracking((prev) =>
+                    prev ? { ...prev, seguimiento: v } : prev,
+                  );
                   toast.success(
-                    v ? "Seguimiento activado." : "Seguimiento desactivado.",
+                    v
+                      ? "Seguimiento intensivo activado en la app."
+                      : "Seguimiento intensivo desactivado.",
                   );
                 } catch (e) {
                   toast.error(
@@ -82,7 +141,7 @@ export function TrackingPanel({
           />
         </div>
 
-        {needsTracking && !tracking.seguimiento && (
+        {needsIntensiveTracking && !liveTracking.seguimiento && (
           <Button
             size="sm"
             className="w-full"
@@ -91,7 +150,10 @@ export function TrackingPanel({
               startTransition(async () => {
                 try {
                   await setTracking(userId, true);
-                  toast.success("Seguimiento activado.");
+                  setLiveTracking((prev) =>
+                    prev ? { ...prev, seguimiento: true } : prev,
+                  );
+                  toast.success("Seguimiento intensivo activado.");
                 } catch (e) {
                   toast.error(
                     e instanceof Error ? e.message : "Error al activar GPS.",
@@ -100,7 +162,7 @@ export function TrackingPanel({
               });
             }}
           >
-            Activar GPS ahora
+            Activar seguimiento intensivo
           </Button>
         )}
 
@@ -109,13 +171,21 @@ export function TrackingPanel({
             <div className="flex items-start gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-black">Última ubicación</p>
+                <p className="font-medium text-black">
+                  Última ubicación (app cliente)
+                </p>
                 <p className="mt-1 text-neutral-600">
                   {location.lat!.toFixed(5)}, {location.lng!.toFixed(5)}
                 </p>
+                {location.accuracy != null && (
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Precisión ±{Math.round(location.accuracy)} m
+                  </p>
+                )}
                 {location.captured_at && (
                   <p className="mt-1 text-xs text-neutral-500">
                     {formatDate(location.captured_at)}
+                    {liveNow ? " · recibiendo en vivo" : ""}
                   </p>
                 )}
                 {mapsUrl && (
@@ -134,8 +204,8 @@ export function TrackingPanel({
           </div>
         ) : (
           <p className="text-sm text-neutral-500">
-            Sin ubicación registrada aún. Activa el seguimiento y espera la
-            próxima captura desde la app.
+            Sin ubicación aún. El cliente debe tener la app abierta (o
+            seguimiento intensivo activo) y permisos de GPS concedidos.
           </p>
         )}
       </CardContent>

@@ -20,6 +20,9 @@ export function ClientPipelineView({
 }: ClientPipelineViewProps) {
   const { userId } = { userId: pipeline.user.id };
   const adminStep = pipeline.currentAdminStep;
+  const referenciasUsadas = pipeline.pagosHistorial
+    .map((p) => p.referencia)
+    .filter((r): r is string => Boolean(r?.trim()));
 
   return (
     <div className="space-y-8">
@@ -33,18 +36,23 @@ export function ClientPipelineView({
               userId={userId}
             />
           )}
+          {adminStep === "pago" && (
+            <PaymentConfirmPanel
+              compra={pipeline.compra}
+              pagos={pipeline.pagos}
+              userId={userId}
+              referenciasUsadas={referenciasUsadas}
+            />
+          )}
+          {adminStep === "entrega" && (
+            <DeliveryPanel compra={pipeline.compra} userId={userId} />
+          )}
           {adminStep === "visita" && (
             <VisitActionPanel
               visita={pipeline.visita}
               visitadores={visitadores}
               userId={userId}
             />
-          )}
-          {adminStep === "pago" && (
-            <PaymentConfirmPanel compra={pipeline.compra} userId={userId} />
-          )}
-          {adminStep === "entrega" && (
-            <DeliveryPanel compra={pipeline.compra} userId={userId} />
           )}
           {pipeline.compra?.estado === "entregada" && (
             <RentingPanel pipeline={pipeline} userId={userId} />
@@ -69,25 +77,27 @@ export function ClientPipelineView({
                 />
               )}
               <ContractReadonlyPanel contract={pipeline.contract} />
+              <MotoSelectionPanel
+                contract={pipeline.contract}
+                compra={pipeline.compra}
+              />
+              {adminStep !== "pago" && (
+                <PaymentConfirmPanel
+                  compra={pipeline.compra}
+                  pagos={pipeline.pagos}
+                  userId={userId}
+                  referenciasUsadas={referenciasUsadas}
+                />
+              )}
+              {adminStep !== "entrega" && (
+                <DeliveryPanel compra={pipeline.compra} userId={userId} />
+              )}
               {adminStep !== "visita" && (
                 <VisitActionPanel
                   visita={pipeline.visita}
                   visitadores={visitadores}
                   userId={userId}
                 />
-              )}
-              <MotoSelectionPanel
-                visita={pipeline.visita}
-                compra={pipeline.compra}
-              />
-              {adminStep !== "pago" && (
-                <PaymentConfirmPanel
-                  compra={pipeline.compra}
-                  userId={userId}
-                />
-              )}
-              {adminStep !== "entrega" && (
-                <DeliveryPanel compra={pipeline.compra} userId={userId} />
               )}
             </div>
           </details>

@@ -197,14 +197,80 @@ export interface MotoParaRecogerRow {
   notas: string | null;
 }
 
+export type GarajeOrigen = "manual" | "recuperacion";
+export type GarajeCondicion = "nueva" | "segunda_mano" | "recuperada";
+export type GarajeMotoEstado = "en_garaje" | "disponible" | "vendida" | "baja";
+
+export interface GarajeParqueaderoRow {
+  id: number;
+  nombre: string;
+  slug: string;
+  activo: boolean;
+  orden: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GarajeMotoRow {
+  id: string;
+  parqueadero_id: number | null;
+  parqueadero_nombre: string | null;
+  placa: string | null;
+  placa_foto_url: string | null;
+  referencia: string;
+  modelo: string;
+  color: string;
+  origen: GarajeOrigen;
+  condicion: GarajeCondicion;
+  estado: GarajeMotoEstado;
+  moto_para_recoger_id: string | null;
+  user_moto_compra_id: string | null;
+  notas: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const GARAJE_CONDICION_LABELS: Record<GarajeCondicion, string> = {
+  nueva: "Nueva",
+  segunda_mano: "Segunda mano",
+  recuperada: "Recuperada",
+};
+
+export const GARAJE_ORIGEN_LABELS: Record<GarajeOrigen, string> = {
+  manual: "Manual",
+  recuperacion: "Recuperación",
+};
+
+export const GARAJE_ESTADO_LABELS: Record<GarajeMotoEstado, string> = {
+  en_garaje: "En garaje",
+  disponible: "Disponible",
+  vendida: "Vendida",
+  baja: "Baja",
+};
+
 export interface RentingResumen {
   totalPagado: number;
   totalAdeudado: number;
+  /** Suma fraccional de cuotas cubiertas (ej. 2.5). */
   cuotasPagadas: number;
   cuotasPendientes: number;
   cuotasVencidas: number;
   diasAtraso: number | null;
   proximoVencimiento: string | null;
+}
+
+export interface PagoHistorialRow {
+  id: string;
+  fecha: string;
+  monto: number;
+  montoEsperado: number | null;
+  referencia: string | null;
+  contexto_pago: ContextoPago | null;
+  numeroPeriodo: number | null;
+  cuotasCubiertas: number;
+  variacionLabel: string;
+  variacionTone: "menor" | "mayor" | "exacto";
+  comprobante_url: string | null;
 }
 
 export interface ClientPipeline {
@@ -218,6 +284,8 @@ export interface ClientPipeline {
   moroso: MorosoRow | null;
   recoger: MotoParaRecogerRow | null;
   rentingResumen: RentingResumen | null;
+  pagosHistorial: PagoHistorialRow[];
+  pagos: PagoRow[];
   steps: PipelineStep[];
   currentAdminStep: PipelineStepId | null;
   displayName: string;
@@ -298,6 +366,59 @@ export const TARIFA_ESTADO_LABELS: Record<TarifaEstado, string> = {
   pendiente: "Pendiente",
   pagada: "Pagada",
   vencida: "Vencida",
+};
+
+export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada";
+export type MedioPagoAdmin =
+  | "nequi_nicolas"
+  | "nequi_pedro"
+  | "nequi_marisol"
+  | "davivienda"
+  | "efectivo";
+export type BancoOrigen = "nequi" | "davivienda" | "otro";
+export type PagoEstado = "pendiente_confirmacion" | "confirmado" | "rechazado";
+
+export interface PagoRow {
+  id: string;
+  user_moto_compra_id: string;
+  user_id: number;
+  monto: number;
+  dias_cubiertos: number | null;
+  medio_pago_usuario: "nequi" | "davivienda" | "efectivo";
+  medio_pago_admin: MedioPagoAdmin | null;
+  referencia: string | null;
+  comprobante_url: string | null;
+  origen: "usuario" | "admin";
+  estado: PagoEstado;
+  reportado_at: string;
+  confirmado_at: string | null;
+  confirmado_por: string | null;
+  fecha_comprobante: string | null;
+  tarifa_objetivo_id: string | null;
+  contexto_pago: ContextoPago | null;
+  notas_admin: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const CONTEXTO_PAGO_LABELS: Record<ContextoPago, string> = {
+  tarifa: "Tarifa de renting",
+  inicial: "Cuota inicial",
+  cuota_adelantada: "Cuota adelantada",
+};
+
+export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdmin, string> = {
+  nequi_nicolas: "Nequi — Nicolás",
+  nequi_pedro: "Nequi — Pedro",
+  nequi_marisol: "Nequi — Marisol",
+  davivienda: "Davivienda",
+  efectivo: "Efectivo",
+};
+
+export const BANCO_ORIGEN_LABELS: Record<BancoOrigen, string> = {
+  nequi: "Nequi",
+  davivienda: "Davivienda / Daviplata",
+  otro: "Otro banco",
 };
 
 export type SolicitudTallerTipo = "repuestos" | "reparacion" | "cambio_aceite";

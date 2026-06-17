@@ -1,41 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
-import { createAnonClient } from "@/lib/supabase/anon";
-import {
-  USER_STATUS,
-  type UserStatus,
-} from "@/lib/auth/user-status";
+import { USER_STATUS } from "@/lib/auth/user-status";
 import {
   defaultSession,
   sessionOptions,
   type SessionData,
 } from "@/lib/auth/session";
-import { getConfigErrorMessage } from "@/lib/supabase/env";
-
-function normalizeAdminUser(
-  result: unknown,
-): { id: number; user: string; status: UserStatus } | null {
-  if (result == null) return null;
-  if (Array.isArray(result)) {
-    if (result.length === 0) return null;
-    const first = result[0] as Record<string, unknown>;
-    return {
-      id: Number(first.id),
-      user: String(first.user),
-      status: String(first.status) as UserStatus,
-    };
-  }
-  if (typeof result === "object") {
-    const obj = result as Record<string, unknown>;
-    if (Object.keys(obj).length === 0) return null;
-    return {
-      id: Number(obj.id),
-      user: String(obj.user),
-      status: String(obj.status) as UserStatus,
-    };
-  }
-  return null;
-}
+import { verifyAdminLogin } from "@/lib/auth/verify-admin-login";
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,40 +17,11 @@ export async function POST(request: NextRequest) {
     const username = body.username?.trim() ?? "";
     const password = body.password?.trim() ?? "";
 
-    if (!username || !password) {
+    const result = await verifyAdminLogin(username, password);
+    if ("error" in result) {
       return NextResponse.json(
-        { error: "Ingresa usuario y contraseña." },
-        { status: 400 },
-      );
-    }
-
-    const configError = getConfigErrorMessage();
-    if (configError) {
-      return NextResponse.json({ error: configError }, { status: 500 });
-    }
-
-    const anon = createAnonClient();
-    const { data: loginResult, error: loginError } = await anon.rpc(
-      "verify_admin_login",
-      { p_user: username, p_password: password },
-    );
-
-    if (loginError) {
-      console.error("[login] verify_admin_login:", loginError.message);
-      return NextResponse.json(
-        { error: "No se pudo conectar con el servidor." },
-        { status: 500 },
-      );
-    }
-
-    const user = normalizeAdminUser(loginResult);
-    if (!user || user.status !== USER_STATUS.admin) {
-      return NextResponse.json(
-        {
-          error:
-            "Usuario o contraseña incorrectos, o la cuenta no es administrador.",
-        },
-        { status: 401 },
+        { error: result.error },
+        { status: result.status },
       );
     }
 
@@ -89,8 +31,8 @@ export async function POST(request: NextRequest) {
       response,
       sessionOptions,
     );
-    session.userId = user.id;
-    session.username = user.user;
+    session.userId = result.user.id;
+    session.username = result.user.user;
     session.userStatus = USER_STATUS.admin;
     session.isLoggedIn = true;
     await session.save();

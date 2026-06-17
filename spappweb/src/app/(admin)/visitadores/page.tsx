@@ -7,7 +7,7 @@ export default async function VisitadoresPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Visitadores</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Visitadores</h1>
         <p className="mt-1 text-neutral-500">
           Personas que realizan visitas domiciliarias.
         </p>

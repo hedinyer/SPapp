@@ -200,6 +200,25 @@ class _ContractReviewAndSignScreenState
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xl),
+                  Text(
+                    'Firma de LA PROPIETARIA',
+                    style: AppTypography.headlineMd,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Marisol Pinilla Rueda — Representante legal',
+                    style: AppTypography.bodyMd.copyWith(
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Image.asset(
+                    'public/firmamarisolpinilla/marisolpinilla.png',
+                    height: 80,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.centerLeft,
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
                   Text('Tu firma', style: AppTypography.headlineMd),
                   const SizedBox(height: AppSpacing.sm),
                   Text(

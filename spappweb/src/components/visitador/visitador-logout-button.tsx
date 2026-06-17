@@ -1,29 +1,17 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { logoutVisitadorAction } from "@/lib/actions/auth-actions";
 import { LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function VisitadorLogoutButton() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  async function logout() {
-    setLoading(true);
-    try {
-      await fetch("/api/visitador/auth/login", { method: "DELETE" });
-      router.push("/visitador/login");
-      router.refresh();
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
-    <Button variant="ghost" size="sm" disabled={loading} onClick={logout}>
-      <LogOut className="mr-1 h-4 w-4" />
-      Salir
-    </Button>
+    <form action={logoutVisitadorAction}>
+      <button
+        type="submit"
+        className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center gap-1 rounded-lg px-2 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 active:bg-neutral-100"
+        aria-label="Cerrar sesión"
+      >
+        <LogOut className="pointer-events-none h-4 w-4" />
+        Salir
+      </button>
+    </form>
   );
 }

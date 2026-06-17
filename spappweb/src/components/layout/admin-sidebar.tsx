@@ -1,40 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import {
-  Bike,
-  ClipboardList,
-  LogOut,
-  Package,
-  UserSearch,
-  Users,
-  Wrench,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useTransition } from "react";
+import { LogOut } from "lucide-react";
+import { logoutAdminAction } from "@/lib/actions/auth-actions";
+import { adminNavLinks } from "@/components/layout/admin-nav-links";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const links = [
-  { href: "/inbox", label: "Bandeja", icon: ClipboardList },
-  { href: "/clientes", label: "Clientes", icon: UserSearch },
-  { href: "/visitadores", label: "Visitadores", icon: Users },
-  { href: "/catalogo", label: "Catálogo", icon: Bike },
-  { href: "/inventario", label: "Inventario", icon: Package },
-  { href: "/solicitudes", label: "Solicitudes", icon: Wrench },
-];
-
-export function AdminSidebar() {
+export function AdminSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const router = useRouter();
+  const [loggingOut, startLogout] = useTransition();
 
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+  function handleLogout() {
+    startLogout(async () => {
+      await logoutAdminAction();
+    });
   }
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-neutral-200 bg-white">
+    <aside
+      className={cn(
+        "flex w-56 shrink-0 flex-col border-r border-neutral-200 bg-white",
+        className,
+      )}
+    >
       <div className="border-b border-neutral-200 px-5 py-6">
         <p className="text-xs font-medium uppercase tracking-widest text-neutral-500">
           SP Admin
@@ -42,7 +33,7 @@ export function AdminSidebar() {
         <p className="mt-1 text-sm text-neutral-900">Panel interno</p>
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
-        {links.map(({ href, label, icon: Icon }) => {
+        {adminNavLinks.map(({ href, label, icon: Icon }) => {
           const active =
             pathname === href || pathname.startsWith(`${href}/`);
           return (
@@ -64,12 +55,14 @@ export function AdminSidebar() {
       </nav>
       <div className="border-t border-neutral-200 p-3">
         <Button
+          type="button"
           variant="ghost"
           className="w-full justify-start gap-3 text-neutral-600 hover:text-black"
-          onClick={logout}
+          disabled={loggingOut}
+          onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" strokeWidth={1.75} />
-          Salir
+          {loggingOut ? "Saliendo…" : "Salir"}
         </Button>
       </div>
     </aside>

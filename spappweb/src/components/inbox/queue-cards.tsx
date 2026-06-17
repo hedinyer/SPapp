@@ -26,9 +26,9 @@ function QueueCard({ queue }: { queue: InboxQueue }) {
   return (
     <Link href={href}>
       <Card className="border-neutral-200 shadow-none transition-colors hover:border-neutral-400">
-        <CardContent className="flex items-start justify-between p-6">
+        <CardContent className="flex items-start justify-between p-4 sm:p-6">
           <div>
-            <p className="text-4xl font-semibold tabular-nums text-black">
+            <p className="text-3xl font-semibold tabular-nums text-black sm:text-4xl">
               {queue.count}
             </p>
             <p className="mt-2 text-base font-medium text-black">

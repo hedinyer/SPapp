@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,14 +14,15 @@ class UserTrackingService {
   static const nightlyTaskName = 'nightly_location_capture';
   static const prefsUserIdKey = 'tracking_user_id';
   static const _prefsLastNightlyPrefix = 'tracking_last_nightly_';
-  static const _realtimeInterval = Duration(seconds: 30);
+  static const _normalRealtimeInterval = Duration(seconds: 45);
+  static const _aggressiveRealtimeInterval = Duration(seconds: 15);
 
   static SupabaseClient get _client => Supabase.instance.client;
 
   static int? _activeUserId;
   static RealtimeChannel? _realtimeChannel;
   static StreamSubscription<Position>? _positionSubscription;
-  static Timer? _realtimeThrottle;
+  static bool _aggressiveTracking = false;
   static bool _seguimientoActive = false;
   static DateTime? _lastRealtimePush;
 
@@ -70,6 +72,8 @@ class UserTrackingService {
 
     await stop();
 
+    await ensureRow(userId: userId);
+
     final tracking = await getByUserId(userId);
     if (tracking == null) return;
 
@@ -82,9 +86,9 @@ class UserTrackingService {
     await _catchUpMissedNightly(userId);
 
     _seguimientoActive = tracking.seguimiento;
-    if (_seguimientoActive) {
-      await _startRealtimeStream(userId);
-    }
+    _aggressiveTracking = tracking.seguimiento;
+    await _startRealtimeStream(userId, aggressive: _aggressiveTracking);
+    unawaited(_captureAndPushNow(userId));
 
     _realtimeChannel = _client
         .channel('users_tracking_$userId')
@@ -107,10 +111,9 @@ class UserTrackingService {
   }
 
   static Future<void> stop() async {
-    _realtimeThrottle?.cancel();
-    _realtimeThrottle = null;
     await _positionSubscription?.cancel();
     _positionSubscription = null;
+    _aggressiveTracking = false;
     _seguimientoActive = false;
     _lastRealtimePush = null;
 
@@ -273,15 +276,52 @@ class UserTrackingService {
     if (seguimiento == _seguimientoActive) return;
 
     _seguimientoActive = seguimiento;
-    if (seguimiento) {
-      unawaited(_startRealtimeStream(userId));
-    } else {
-      unawaited(_stopRealtimeStream());
+    _aggressiveTracking = seguimiento;
+    unawaited(_startRealtimeStream(userId, aggressive: seguimiento));
+  }
+
+  static Future<void> _captureAndPushNow(int userId) async {
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(
+          accuracy: _aggressiveTracking
+              ? LocationAccuracy.high
+              : LocationAccuracy.medium,
+          timeLimit: const Duration(seconds: 25),
+        ),
+      );
+      await updateUbicacion1(
+        userId: userId,
+        location: TrackingLocation(
+          lat: position.latitude,
+          lng: position.longitude,
+          accuracy: position.accuracy,
+          capturedAt: DateTime.now().toUtc(),
+        ),
+      );
+      _lastRealtimePush = DateTime.now();
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('immediate location capture failed: $error');
+      }
     }
   }
 
-  static Future<void> _startRealtimeStream(int userId) async {
+  static Future<void> _startRealtimeStream(
+    int userId, {
+    required bool aggressive,
+  }) async {
     await _stopRealtimeStream();
+    _aggressiveTracking = aggressive;
 
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return;
@@ -295,11 +335,10 @@ class UserTrackingService {
       return;
     }
 
+    final locationSettings = _buildLocationSettings(aggressive: aggressive);
+
     _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 15,
-      ),
+      locationSettings: locationSettings,
     ).listen(
       (position) => _pushRealtimeLocation(userId, position),
       onError: (Object error) {
@@ -310,9 +349,31 @@ class UserTrackingService {
     );
   }
 
+  static LocationSettings _buildLocationSettings({required bool aggressive}) {
+    if (Platform.isAndroid) {
+      return AndroidSettings(
+        accuracy: aggressive ? LocationAccuracy.high : LocationAccuracy.medium,
+        distanceFilter: aggressive ? 10 : 30,
+        intervalDuration: Duration(seconds: aggressive ? 15 : 45),
+        foregroundNotificationConfig: aggressive
+            ? const ForegroundNotificationConfig(
+                notificationTitle: 'Soluciones Pinilla',
+                notificationText: 'Registro de ubicación activo',
+                enableWakeLock: true,
+              )
+            : null,
+      );
+    }
+
+    return AppleSettings(
+      accuracy: aggressive ? LocationAccuracy.high : LocationAccuracy.medium,
+      distanceFilter: aggressive ? 10 : 30,
+      pauseLocationUpdatesAutomatically: false,
+      showBackgroundLocationIndicator: aggressive,
+    );
+  }
+
   static Future<void> _stopRealtimeStream() async {
-    _realtimeThrottle?.cancel();
-    _realtimeThrottle = null;
     await _positionSubscription?.cancel();
     _positionSubscription = null;
     _lastRealtimePush = null;
@@ -320,8 +381,11 @@ class UserTrackingService {
 
   static void _pushRealtimeLocation(int userId, Position position) {
     final now = DateTime.now();
+    final minInterval = _aggressiveTracking
+        ? _aggressiveRealtimeInterval
+        : _normalRealtimeInterval;
     if (_lastRealtimePush != null &&
-        now.difference(_lastRealtimePush!) < _realtimeInterval) {
+        now.difference(_lastRealtimePush!) < minInterval) {
       return;
     }
     _lastRealtimePush = now;

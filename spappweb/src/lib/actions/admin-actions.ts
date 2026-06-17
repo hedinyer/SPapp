@@ -264,6 +264,47 @@ export async function resolveMoroso(input: z.infer<typeof resolveMorosoSchema>) 
   return { ok: true };
 }
 
+const createClientSchema = z.object({
+  cedula: z
+    .string()
+    .trim()
+    .min(5, "La cédula debe tener al menos 5 dígitos")
+    .max(15, "La cédula no puede superar 15 dígitos")
+    .regex(/^\d+$/, "La cédula solo puede contener números"),
+});
+
+export async function createClientUser(input: z.infer<typeof createClientSchema>) {
+  const parsed = createClientSchema.parse(input);
+  const supabase = await assertAdmin();
+  const cedula = parsed.cedula;
+
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("id")
+    .eq("user", cedula)
+    .maybeSingle();
+
+  if (existingUser) {
+    throw new Error("Ya existe un usuario con esa cédula.");
+  }
+
+  const { data: newUser, error } = await supabase
+    .from("users")
+    .insert({
+      user: cedula,
+      password: cedula,
+      status: "normal",
+    })
+    .select("id, user")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/clientes");
+  revalidatePath("/inbox");
+  return { ok: true, userId: newUser.id, username: newUser.user };
+}
+
 const visitadorSchema = z.object({
   id: z.number().optional(),
   nombre: z.string().min(2),
@@ -548,5 +589,160 @@ export async function updateSolicitudEstado(
   if (error) throw new Error(error.message);
   revalidatePath("/solicitudes");
   revalidatePath("/inbox");
+  return { ok: true };
+}
+
+const garajeParqueaderoSchema = z.object({
+  id: z.number().optional(),
+  nombre: z.string().min(1),
+  slug: z.string().min(1),
+  activo: z.boolean(),
+  orden: z.number().int().min(0),
+});
+
+export async function saveGarajeParqueadero(
+  input: z.infer<typeof garajeParqueaderoSchema>,
+) {
+  const parsed = garajeParqueaderoSchema.parse(input);
+  const supabase = await assertAdmin();
+  const payload = {
+    nombre: parsed.nombre.trim(),
+    slug: parsed.slug.trim().toLowerCase(),
+    activo: parsed.activo,
+    orden: parsed.orden,
+  };
+  if (parsed.id) {
+    const { error } = await supabase
+      .from("garaje_parqueaderos")
+      .update(payload)
+      .eq("id", parsed.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase
+      .from("garaje_parqueaderos")
+      .insert(payload);
+    if (error) throw new Error(error.message);
+  }
+  revalidatePath("/garaje");
+  return { ok: true };
+}
+
+export async function deleteGarajeParqueadero(id: number) {
+  const supabase = await assertAdmin();
+  const { count, error: countError } = await supabase
+    .from("garaje_motos")
+    .select("id", { count: "exact", head: true })
+    .eq("parqueadero_id", id);
+  if (countError) throw new Error(countError.message);
+  if ((count ?? 0) > 0) {
+    throw new Error("No se puede eliminar: hay motos asignadas a este parqueadero.");
+  }
+  const { error } = await supabase
+    .from("garaje_parqueaderos")
+    .delete()
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/garaje");
+  return { ok: true };
+}
+
+const garajeMotoSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    parqueaderoId: z.number().int().positive().nullable(),
+    placa: z.string().optional(),
+    placaFotoUrl: z.string().optional(),
+    referencia: z.string().min(1),
+    modelo: z.string().min(1),
+    color: z.string().min(1),
+    origen: z.enum(["manual", "recuperacion"]),
+    condicion: z.enum(["nueva", "segunda_mano", "recuperada"]),
+    estado: z.enum(["en_garaje", "disponible", "vendida", "baja"]),
+    notas: z.string().optional(),
+    isNewManual: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isNewManual && !data.placaFotoUrl?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "La foto de placa es obligatoria para registros manuales.",
+        path: ["placaFotoUrl"],
+      });
+    }
+  });
+
+export async function saveGarajeMoto(input: z.infer<typeof garajeMotoSchema>) {
+  const parsed = garajeMotoSchema.parse(input);
+  const supabase = await assertAdmin();
+  const payload = {
+    parqueadero_id: parsed.parqueaderoId,
+    placa: parsed.placa?.trim() || null,
+    placa_foto_url: parsed.placaFotoUrl?.trim() || null,
+    referencia: parsed.referencia.trim(),
+    modelo: parsed.modelo.trim(),
+    color: parsed.color.trim(),
+    origen: parsed.origen,
+    condicion: parsed.condicion,
+    estado: parsed.estado,
+    notas: parsed.notas?.trim() || null,
+  };
+  if (parsed.id) {
+    const { error } = await supabase
+      .from("garaje_motos")
+      .update(payload)
+      .eq("id", parsed.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from("garaje_motos").insert({
+      ...payload,
+      origen: parsed.origen ?? "manual",
+    });
+    if (error) throw new Error(error.message);
+  }
+  revalidatePath("/garaje");
+  return { ok: true };
+}
+
+export async function deleteGarajeMoto(id: string) {
+  const supabase = await assertAdmin();
+  const { error } = await supabase.from("garaje_motos").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/garaje");
+  return { ok: true };
+}
+
+const markMotoRecogidaSchema = z.object({
+  recogerId: z.string().uuid(),
+  userId: z.number(),
+});
+
+export async function markMotoRecogida(
+  input: z.infer<typeof markMotoRecogidaSchema>,
+) {
+  const parsed = markMotoRecogidaSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { data: existing, error: fetchError } = await supabase
+    .from("motos_para_recoger")
+    .select("id, estado")
+    .eq("id", parsed.recogerId)
+    .maybeSingle();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!existing) throw new Error("Registro de recogida no encontrado.");
+  if (existing.estado === "recogida") {
+    throw new Error("Esta moto ya fue marcada como recogida.");
+  }
+
+  const { error } = await supabase
+    .from("motos_para_recoger")
+    .update({
+      estado: "recogida",
+      fecha_recogida: new Date().toISOString(),
+    })
+    .eq("id", parsed.recogerId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/garaje");
+  revalidateClient(parsed.userId);
   return { ok: true };
 }

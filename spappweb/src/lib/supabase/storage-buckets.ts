@@ -4,6 +4,8 @@ export const STORAGE_BUCKETS = {
   visitaEvidencias: "visita-evidencias",
   bikeImages: "bike-images",
   inventarioImagenes: "inventario-imagenes",
+  pagosComprobantes: "pagos-comprobantes",
+  garajeImagenes: "garaje-imagenes",
 } as const;
 
 export type AdminImageBucket =

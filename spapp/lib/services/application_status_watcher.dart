@@ -26,7 +26,7 @@ class ApplicationStatusWatcher {
     unawaited(_loadCachedThenFetch());
     _channel = DocumentService.subscribeToUserDocuments(
       userId: userId,
-      onChanged: _fetchStatus,
+      onChanged: _onRealtimePayload,
     );
   }
 
@@ -54,6 +54,26 @@ class ApplicationStatusWatcher {
     await _fetchStatus();
   }
 
+  void _onRealtimePayload(PostgresChangePayload payload) {
+    final record = payload.newRecord;
+    if (record.isNotEmpty) {
+      try {
+        final document = UserDocument.fromJson(
+          Map<String, dynamic>.from(record),
+        );
+        if (document.userId == userId) {
+          _deliverDocument(document);
+        }
+      } catch (error) {
+        if (kDebugMode) {
+          debugPrint('users_documents realtime parse failed: $error');
+        }
+      }
+    }
+
+    unawaited(_fetchStatus(forceRefresh: true));
+  }
+
   Future<void> _fetchStatus({bool forceRefresh = false}) async {
     if (_isDisposed) return;
 
@@ -63,6 +83,10 @@ class ApplicationStatusWatcher {
     );
     if (_isDisposed) return;
 
+    _deliverDocument(document);
+  }
+
+  void _deliverDocument(UserDocument? document) {
     final changed = _hasChanged(_lastDocument, document);
     if (!_initialDelivered || changed) {
       _initialDelivered = true;
@@ -81,7 +105,7 @@ class ApplicationStatusWatcher {
     if (document?.estadoSolicitud != SolicitudEstado.pendiente) return;
 
     _pollTimer = Timer.periodic(pollInterval, (_) {
-      _fetchStatus();
+      _fetchStatus(forceRefresh: true);
     });
   }
 

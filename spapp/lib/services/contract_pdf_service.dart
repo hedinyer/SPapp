@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -9,15 +10,35 @@ import 'package:spapp/models/contrato_renting_form.dart';
 import 'package:spapp/models/hoja_vida_form.dart';
 
 class ContractPdfService {
+  static const _logoAsset = 'public/logos_login - Copy.jpeg';
+  static const _marisolSignatureAsset =
+      'public/firmamarisolpinilla/marisolpinilla.png';
+
   static pw.Font? _regularFont;
   static pw.Font? _boldFont;
   static Future<void>? _preloadFuture;
+  static pw.MemoryImage? _logoImage;
+  static pw.MemoryImage? _marisolSignatureImage;
 
   static Future<void> preloadFonts() {
     return _preloadFuture ??= () async {
       await _regular();
       await _bold();
+      await _loadAssets();
     }();
+  }
+
+  static Future<void> _loadAssets() async {
+    try {
+      final logoBytes = await rootBundle.load(_logoAsset);
+      _logoImage = pw.MemoryImage(logoBytes.buffer.asUint8List());
+
+      final sigBytes = await rootBundle.load(_marisolSignatureAsset);
+      _marisolSignatureImage =
+          pw.MemoryImage(sigBytes.buffer.asUint8List());
+    } catch (error) {
+      if (kDebugMode) debugPrint('PDF asset load error: $error');
+    }
   }
 
   static Future<pw.Font> _regular() async {
@@ -30,6 +51,30 @@ class ContractPdfService {
     return _boldFont!;
   }
 
+  static pw.Widget _pageHeader(pw.Context context) {
+    if (_logoImage == null) return pw.SizedBox();
+    return pw.Align(
+      alignment: pw.Alignment.topRight,
+      child: pw.Image(_logoImage!, height: 36),
+    );
+  }
+
+  static pw.Widget _pageFooter(pw.Context context) {
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Text(
+          'SOLUCIONES PINILLA S.A.S.',
+          style: pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
+        ),
+        pw.Text(
+          'Página ${context.pageNumber} de ${context.pagesCount}',
+          style: pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
+        ),
+      ],
+    );
+  }
+
   static Future<Uint8List> generateHojaVidaPdf({
     required HojaVidaForm form,
     Uint8List? signatureBytes,
@@ -37,11 +82,12 @@ class ContractPdfService {
     try {
       final regular = await _regular();
       final bold = await _bold();
+      await _loadAssets();
       final doc = pw.Document(
         theme: pw.ThemeData.withFont(base: regular, bold: bold),
       );
       final tipoLabel = form.tipoIdentificacion != null
-          ? HojaVidaForm.labelTipoIdentificacion(form.tipoIdentificacion!)
+          ? HojaVidaForm.pdfLabelTipoIdentificacion(form.tipoIdentificacion!)
           : '';
       final estadoLabel = form.estadoCivil != null
           ? HojaVidaForm.labelEstadoCivil(form.estadoCivil!)
@@ -50,7 +96,9 @@ class ContractPdfService {
       doc.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.letter,
-          margin: const pw.EdgeInsets.all(40),
+          margin: const pw.EdgeInsets.fromLTRB(40, 52, 40, 48),
+          header: _pageHeader,
+          footer: _pageFooter,
           build: (context) => [
             pw.Center(
               child: pw.Text(
@@ -66,8 +114,8 @@ class ContractPdfService {
             _line('NOMBRE COMPLETO: ${form.nombreCompleto}'),
             _line(
               'TIPO IDENTIFICACION: PPT: ${tipoLabel == 'PPT' ? 'X' : '_'} '
-              'C.C.: ${tipoLabel == 'C.C.' ? 'X' : '_'} '
-              'P: ${tipoLabel == 'P' ? 'X' : '_'} C.V. ${tipoLabel == 'C.V.' ? 'X' : '_'} '
+              'CC: ${tipoLabel == 'CC' ? 'X' : '_'} '
+              'PV: ${tipoLabel == 'PV' ? 'X' : '_'} CV: ${tipoLabel == 'CV' ? 'X' : '_'} '
               'No. ${form.numeroIdentificacion}',
             ),
             _line('FECHA DE NACIMIENTO ${form.fechaNacimiento}'),
@@ -166,6 +214,7 @@ class ContractPdfService {
     try {
       final regular = await _regular();
       final bold = await _bold();
+      await _loadAssets();
       final doc = pw.Document(
         theme: pw.ThemeData.withFont(base: regular, bold: bold),
       );
@@ -180,11 +229,25 @@ class ContractPdfService {
 
       final intro = ContratoRentingClausulas.renderIntro(formData);
       final widgets = <pw.Widget>[
+        pw.Center(
+          child: pw.Text(
+            'CONTRATO DE RENTING',
+            style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold),
+          ),
+        ),
+        pw.SizedBox(height: 12),
         pw.Text(intro, style: const pw.TextStyle(fontSize: 9)),
         pw.SizedBox(height: 12),
       ];
 
       for (final block in ContratoRentingClausulas.blocks) {
+        widgets.add(
+          pw.Text(
+            block.title,
+            style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+          ),
+        );
+        widgets.add(pw.SizedBox(height: 6));
         for (final clausula in block.clausulas) {
           widgets.add(
             pw.Text(
@@ -199,7 +262,7 @@ class ContractPdfService {
                 clausula.texto,
                 formData,
               ),
-              style: const pw.TextStyle(fontSize: 8),
+              style: const pw.TextStyle(fontSize: 8, lineSpacing: 1.4),
             ),
           );
           widgets.add(pw.SizedBox(height: 8));
@@ -207,6 +270,8 @@ class ContractPdfService {
       }
 
       widgets.addAll([
+        pw.Divider(color: PdfColors.grey400),
+        pw.SizedBox(height: 8),
         pw.Text(
           ContratoRentingClausulas.firmaTemplate
               .replaceAll('[DIA]', form.fechaFirmaDia)
@@ -216,19 +281,78 @@ class ContractPdfService {
           style: const pw.TextStyle(fontSize: 9),
         ),
         pw.SizedBox(height: 16),
-        pw.Text('EL CONTRATANTE'),
-        pw.Text(form.nombreContratante),
-        pw.Text('C.C. ${form.cedulaContratante}'),
-        if (signatureBytes != null) ...[
-          pw.SizedBox(height: 8),
-          pw.Image(pw.MemoryImage(signatureBytes), height: 60),
-        ],
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Expanded(
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'LA PROPIETARIA',
+                    style: pw.TextStyle(
+                      fontSize: 9,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    'MARISOL PINILLA RUEDA',
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
+                  pw.Text(
+                    'C.C. 37.547.626',
+                    style: const pw.TextStyle(fontSize: 8),
+                  ),
+                  pw.Text(
+                    'Representante legal\nSOLUCIONES PINILLA S.A.S.',
+                    style: const pw.TextStyle(fontSize: 8),
+                  ),
+                  if (_marisolSignatureImage != null) ...[
+                    pw.SizedBox(height: 8),
+                    pw.Image(_marisolSignatureImage!, height: 50),
+                  ],
+                ],
+              ),
+            ),
+            pw.SizedBox(width: 24),
+            pw.Expanded(
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    'EL CONTRATANTE',
+                    style: pw.TextStyle(
+                      fontSize: 9,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    form.nombreContratante,
+                    style: const pw.TextStyle(fontSize: 9),
+                  ),
+                  pw.Text(
+                    'C.C. ${form.cedulaContratante}',
+                    style: const pw.TextStyle(fontSize: 8),
+                  ),
+                  if (signatureBytes != null) ...[
+                    pw.SizedBox(height: 8),
+                    pw.Image(pw.MemoryImage(signatureBytes), height: 50),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ]);
 
       doc.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.letter,
-          margin: const pw.EdgeInsets.all(36),
+          margin: const pw.EdgeInsets.fromLTRB(36, 52, 36, 48),
+          header: _pageHeader,
+          footer: _pageFooter,
           build: (context) => widgets,
         ),
       );

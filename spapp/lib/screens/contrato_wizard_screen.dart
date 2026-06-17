@@ -4,6 +4,7 @@ import 'package:spapp/models/contrato_renting_form.dart';
 import 'package:spapp/services/contract_service.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/utils/colombia_time.dart';
+import 'package:spapp/utils/name_validation.dart';
 import 'package:spapp/widgets/contract_form_widgets.dart';
 
 class ContratoWizardScreen extends StatefulWidget {
@@ -214,8 +215,8 @@ class _ContratoWizardScreenState extends State<ContratoWizardScreen> {
               ContractTextField(
                 controller: _nameCtrl,
                 label: 'Nombre completo',
-                validator: (v) =>
-                    v == null || v.trim().isEmpty ? 'Escribe tu nombre' : null,
+                hint: 'Ej: Juan Pérez García',
+                validator: validateFullName,
               ),
               const SizedBox(height: AppSpacing.md),
               ContractTextField(
@@ -243,6 +244,7 @@ class _ContratoWizardScreenState extends State<ContratoWizardScreen> {
     if (_step == 1) {
       final intro = ContratoRentingClausulas.renderIntro(_formData);
       return SingleChildScrollView(
+        key: ValueKey('contrato-step-$_step'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -269,6 +271,7 @@ class _ContratoWizardScreenState extends State<ContratoWizardScreen> {
     if (blockIndex < ContratoRentingClausulas.blocks.length) {
       final block = ContratoRentingClausulas.blocks[blockIndex];
       return SingleChildScrollView(
+        key: ValueKey('contrato-step-$_step'),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -297,6 +300,7 @@ class _ContratoWizardScreenState extends State<ContratoWizardScreen> {
     }
 
     return SingleChildScrollView(
+      key: ValueKey('contrato-step-$_step'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -314,6 +318,18 @@ class _ContratoWizardScreenState extends State<ContratoWizardScreen> {
                 .replaceAll('[MES]', _form.fechaFirmaMes)
                 .replaceAll('[ANIO]', _form.fechaFirmaAnio)
                 .replaceAll('[ANIO_NUM]', _form.fechaFirmaAnio),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'LA PROPIETARIA',
+            style: AppTypography.labelMd.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Image.asset(
+            'public/firmamarisolpinilla/marisolpinilla.png',
+            height: 80,
+            fit: BoxFit.contain,
+            alignment: Alignment.centerLeft,
           ),
           const SizedBox(height: AppSpacing.lg),
           Container(

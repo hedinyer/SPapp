@@ -159,11 +159,12 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
               />
             </div>
           </div>
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
             <Button
               type="submit"
               variant="outline"
               size="lg"
+              className="w-full sm:w-auto"
               disabled={pending}
             >
               Guardar datos
@@ -171,12 +172,12 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
             <Button
               type="button"
               size="lg"
-              className="bg-black text-white hover:bg-neutral-800"
+              className="w-full bg-black text-white hover:bg-neutral-800 sm:w-auto"
               disabled={pending || !compra.placa}
               onClick={() =>
                 run(
                   () => markDelivered(compra.id, userId),
-                  "Moto marcada como entregada.",
+                  "Moto entregada. Agenda la visita domiciliaria abajo.",
                 )
               }
             >
@@ -184,7 +185,12 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button type="button" variant="ghost" disabled={pending}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full sm:w-auto"
+                  disabled={pending}
+                >
                   Cancelar compra
                 </Button>
               </AlertDialogTrigger>

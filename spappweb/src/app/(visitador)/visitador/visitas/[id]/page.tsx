@@ -36,7 +36,7 @@ export default async function VisitaDetallePage({
 
   return (
     <div className="space-y-4">
-      <Button variant="ghost" size="sm" asChild className="-ml-2">
+      <Button variant="ghost" asChild className="-ml-2 min-h-11 px-2">
         <Link href="/visitador/mis-visitas">
           <ArrowLeft className="mr-1 h-4 w-4" />
           Volver

@@ -47,7 +47,7 @@ export function VisitActionPanel({
     return (
       <Card className="border-neutral-200 shadow-none">
         <CardContent className="py-8 text-center text-sm text-neutral-500">
-          La visita se creará cuando el cliente firme el contrato.
+          La visita se creará cuando se entregue la moto al cliente.
         </CardContent>
       </Card>
     );
@@ -71,9 +71,15 @@ export function VisitActionPanel({
   return (
     <Card className="border-neutral-200 shadow-none">
       <CardHeader>
-        <CardTitle className="text-lg">Visita domiciliaria</CardTitle>
+        <CardTitle className="text-lg">
+          {visita.estado === "pendiente_asignacion"
+            ? "Agendar visita domiciliaria"
+            : "Visita domiciliaria"}
+        </CardTitle>
         <p className="text-sm text-neutral-500">
-          Estado: {visitaEstadoLabel(visita.estado)}
+          {visita.estado === "pendiente_asignacion"
+            ? "La moto fue entregada. Asigna visitador y fecha para la visita post-entrega."
+            : `Estado: ${visitaEstadoLabel(visita.estado)}`}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -101,6 +107,7 @@ export function VisitActionPanel({
             visitadores={visitadores}
             pending={pending}
             visita={visita}
+            highlight
             onAssign={(visitadorId, fecha) =>
               run(
                 () =>
@@ -168,7 +175,7 @@ export function VisitActionPanel({
               {visita.fecha_completada
                 ? ` el ${formatDate(visita.fecha_completada)}`
                 : ""}
-              . El cliente puede elegir su moto.
+              . El proceso de visita domiciliaria quedó registrado.
             </p>
 
             {visita.notas_visita && (
@@ -181,7 +188,7 @@ export function VisitActionPanel({
             {fotos.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm font-medium">Fotos de evidencia</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {fotos.map((foto, i) => (
                     <a
                       key={`${foto.url}-${i}`}
@@ -255,18 +262,24 @@ function AssignForm({
   visita,
   visitadores,
   pending,
+  highlight = false,
   onAssign,
 }: {
   visita: VisitaRow;
   visitadores: VisitadorRow[];
   pending: boolean;
+  highlight?: boolean;
   onAssign: (visitadorId: number, fecha: string) => void;
 }) {
   const [visitadorId, setVisitadorId] = useState<string>("");
 
   return (
     <form
-      className="space-y-4 rounded-lg border border-neutral-200 p-4"
+      className={`space-y-4 rounded-lg border p-4 ${
+        highlight
+          ? "border-black bg-neutral-50"
+          : "border-neutral-200"
+      }`}
       onSubmit={(e) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
@@ -279,7 +292,9 @@ function AssignForm({
         onAssign(id, new Date(fecha).toISOString());
       }}
     >
-      <p className="text-sm font-medium">Asignar visitador</p>
+      <p className="text-sm font-medium">
+        {highlight ? "Programar visita post-entrega" : "Asignar visitador"}
+      </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>Visitador</Label>

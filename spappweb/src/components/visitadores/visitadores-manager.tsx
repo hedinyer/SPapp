@@ -120,7 +120,7 @@ export function VisitadoresManager({
         </Button>
       </div>
 
-      <div className="rounded-lg border border-neutral-200">
+      <div className="hidden rounded-lg border border-neutral-200 lg:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -215,6 +215,97 @@ export function VisitadoresManager({
             )}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="space-y-3 lg:hidden">
+        {visitadores.length === 0 ? (
+          <p className="text-center text-sm text-neutral-500">
+            No hay visitadores. Crea uno para asignar visitas.
+          </p>
+        ) : (
+          visitadores.map((v) => {
+            const username = visitadorUsername(v);
+            return (
+              <div
+                key={v.id}
+                className="rounded-lg border border-neutral-200 p-4 text-sm"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium">{v.nombre}</p>
+                  <Badge variant={v.activo ? "outline" : "secondary"}>
+                    {v.activo ? "Activo" : "Inactivo"}
+                  </Badge>
+                </div>
+                <dl className="mt-3 space-y-1.5">
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Usuario</dt>
+                    <dd>
+                      {username ? (
+                        <span className="font-mono">{username}</span>
+                      ) : (
+                        <Badge variant="secondary">Sin cuenta</Badge>
+                      )}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Teléfono</dt>
+                    <dd>{v.telefono ?? "—"}</dd>
+                  </div>
+                </dl>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => openEdit(v)}
+                  >
+                    <Pencil className="mr-1 h-4 w-4" />
+                    Editar
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        <Trash2 className="mr-1 h-4 w-4" />
+                        Eliminar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>¿Eliminar visitador?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {v.nombre}
+                          {v.telefono ? ` · ${v.telefono}` : ""}. Se eliminará
+                          también su cuenta de acceso.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() =>
+                            startTransition(async () => {
+                              try {
+                                await deleteVisitador(v.id);
+                                toast.success("Visitador eliminado.");
+                              } catch (e) {
+                                toast.error(
+                                  e instanceof Error
+                                    ? e.message
+                                    : "No se pudo eliminar.",
+                                );
+                              }
+                            })
+                          }
+                        >
+                          Eliminar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       <VisitadorDialog

@@ -12,8 +12,12 @@ import type {
   InboxQueueId,
   InventarioCategoriaRow,
   InventarioProductoRow,
+  GarajeMotoRow,
+  GarajeParqueaderoRow,
   MorosoRow,
   MotoParaRecogerRow,
+  PagoHistorialRow,
+  PagoRow,
   RentingResumen,
   SolicitudTallerRow,
   TarifaPagadaRow,
@@ -24,6 +28,12 @@ import type {
   VisitaRow,
   VisitadorRow,
 } from "@/lib/pipeline/types";
+import {
+  cuotaFraction,
+  cuotasFromMonto,
+  describeMontoVariacion,
+  roundCuotas,
+} from "@/lib/payments/payment-metrics";
 
 function normalizeVisita(raw: unknown): VisitaRow | null {
   if (!raw) return null;
@@ -131,8 +141,26 @@ export async function getClientPipeline(
     .maybeSingle();
 
   const tarifaRows = (tarifas as TarifaPagadaRow[]) ?? [];
+
+  const { data: pagos } = compra
+    ? await supabase
+        .from("pagos")
+        .select(
+          "id, user_moto_compra_id, user_id, monto, referencia, comprobante_url, contexto_pago, fecha_comprobante, confirmado_at, tarifa_objetivo_id, estado, medio_pago_admin",
+        )
+        .eq("user_moto_compra_id", compra.id)
+        .eq("estado", "confirmado")
+        .order("confirmado_at", { ascending: false })
+    : { data: [] };
+
   const rentingResumen = buildRentingResumen(
     compra as UserMotoCompraRow | null,
+    tarifaRows,
+  );
+
+  const pagosHistorial = buildPagosHistorial(
+    compra as UserMotoCompraRow | null,
+    (pagos as PagoRow[]) ?? [],
     tarifaRows,
   );
 
@@ -147,6 +175,8 @@ export async function getClientPipeline(
     moroso: (moroso as MorosoRow | null) ?? null,
     recoger: (recoger as MotoParaRecogerRow | null) ?? null,
     rentingResumen,
+    pagosHistorial,
+    pagos: (pagos as PagoRow[]) ?? [],
   });
 }
 
@@ -159,9 +189,7 @@ function buildRentingResumen(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  let totalPagado = compra.pago_inicial_confirmado
-    ? compra.cuota_inicial_monto
-    : 0;
+  let totalPagado = 0;
   let totalAdeudado = 0;
   let cuotasPagadas = 0;
   let cuotasPendientes = 0;
@@ -170,33 +198,94 @@ function buildRentingResumen(
   let proximoVencimiento: string | null = null;
 
   for (const tarifa of tarifas) {
+    const pagadoParcial = tarifa.monto_pagado ?? 0;
+
     if (tarifa.estado === "pagada") {
-      cuotasPagadas++;
-      totalPagado += tarifa.monto_pagado ?? tarifa.monto_esperado;
-    } else if (tarifa.estado === "pendiente") {
-      cuotasPendientes++;
-      if (!proximoVencimiento) proximoVencimiento = tarifa.fecha_vencimiento;
-    } else if (tarifa.estado === "vencida") {
-      cuotasVencidas++;
-      totalAdeudado += tarifa.monto_esperado;
-      const venc = new Date(tarifa.fecha_vencimiento);
-      venc.setHours(0, 0, 0, 0);
-      const atraso = Math.floor(
-        (today.getTime() - venc.getTime()) / (1000 * 60 * 60 * 24),
-      );
-      if (diasAtraso === null || atraso > diasAtraso) diasAtraso = atraso;
+      const pagado = pagadoParcial || tarifa.monto_esperado;
+      cuotasPagadas += cuotaFraction(pagado, tarifa.monto_esperado);
+      totalPagado += pagado;
+    } else {
+      if (pagadoParcial > 0) {
+        cuotasPagadas += cuotaFraction(pagadoParcial, tarifa.monto_esperado);
+        totalPagado += pagadoParcial;
+      }
+
+      if (tarifa.estado === "pendiente") {
+        cuotasPendientes++;
+        if (!proximoVencimiento) proximoVencimiento = tarifa.fecha_vencimiento;
+      } else if (tarifa.estado === "vencida") {
+        cuotasVencidas++;
+        totalAdeudado += tarifa.monto_esperado - pagadoParcial;
+        const venc = new Date(tarifa.fecha_vencimiento);
+        venc.setHours(0, 0, 0, 0);
+        const atraso = Math.floor(
+          (today.getTime() - venc.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        if (diasAtraso === null || atraso > diasAtraso) diasAtraso = atraso;
+      }
     }
   }
 
   return {
     totalPagado,
     totalAdeudado,
-    cuotasPagadas,
+    cuotasPagadas: roundCuotas(cuotasPagadas),
     cuotasPendientes,
     cuotasVencidas,
     diasAtraso,
     proximoVencimiento,
   };
+}
+
+function buildPagosHistorial(
+  compra: UserMotoCompraRow | null,
+  pagos: PagoRow[],
+  tarifas: TarifaPagadaRow[],
+): PagoHistorialRow[] {
+  if (!compra) return [];
+
+  const tarifaById = new Map(tarifas.map((t) => [t.id, t]));
+
+  return pagos.map((pago) => {
+    const tarifa = pago.tarifa_objetivo_id
+      ? tarifaById.get(pago.tarifa_objetivo_id)
+      : undefined;
+
+    let montoEsperado: number | null = null;
+    if (pago.contexto_pago === "inicial") {
+      montoEsperado = compra.cuota_inicial_monto;
+    } else if (pago.contexto_pago === "cuota_adelantada") {
+      montoEsperado = compra.monto_cuota_periodo;
+    } else if (tarifa) {
+      montoEsperado = tarifa.monto_esperado;
+    } else if (pago.contexto_pago === "tarifa") {
+      montoEsperado = compra.monto_cuota_periodo;
+    }
+
+    const cuotasCubiertas =
+      pago.contexto_pago === "inicial"
+        ? 0
+        : cuotasFromMonto(pago.monto, compra.monto_cuota_periodo);
+
+    const variacion =
+      montoEsperado != null
+        ? describeMontoVariacion(pago.monto, montoEsperado)
+        : { label: "—", diff: 0, tone: "exacto" as const };
+
+    return {
+      id: pago.id,
+      fecha: pago.fecha_comprobante ?? pago.confirmado_at ?? "",
+      monto: pago.monto,
+      montoEsperado,
+      referencia: pago.referencia,
+      contexto_pago: pago.contexto_pago,
+      numeroPeriodo: tarifa?.numero_periodo ?? null,
+      cuotasCubiertas,
+      variacionLabel: variacion.label,
+      variacionTone: variacion.tone,
+      comprobante_url: pago.comprobante_url,
+    };
+  });
 }
 
 export async function getInboxQueues(): Promise<InboxQueue[]> {
@@ -264,18 +353,6 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
       count: creditos.count ?? 0,
     },
     {
-      id: "visitas_sin_asignar",
-      label: "Asignar visitas",
-      description: "Visitas domiciliarias sin visitador",
-      count: visitasSinAsignar.count ?? 0,
-    },
-    {
-      id: "visitas_programadas",
-      label: "Completar visitas",
-      description: "Visitas ya programadas con visitador",
-      count: visitasProgramadas.count ?? 0,
-    },
-    {
       id: "pagos",
       label: "Confirmar pagos",
       description: "Pagos iniciales por verificar",
@@ -292,6 +369,18 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
       label: "Registrar entrega",
       description: "Motos listas para marcar como entregadas",
       count: entrega.count ?? 0,
+    },
+    {
+      id: "visitas_sin_asignar",
+      label: "Asignar visitas",
+      description: "Visitas domiciliarias sin visitador",
+      count: visitasSinAsignar.count ?? 0,
+    },
+    {
+      id: "visitas_programadas",
+      label: "Completar visitas",
+      description: "Visitas ya programadas con visitador",
+      count: visitasProgramadas.count ?? 0,
     },
     {
       id: "morosos",
@@ -573,6 +662,55 @@ export async function getAllBikes(): Promise<BikeRow[]> {
     .order("modelo")
     .order("color");
   return (data as BikeRow[]) ?? [];
+}
+
+export async function getAllGarajeParqueaderos(): Promise<GarajeParqueaderoRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("garaje_parqueaderos")
+    .select("id, nombre, slug, activo, orden, created_at, updated_at")
+    .order("orden")
+    .order("nombre");
+  return (data as GarajeParqueaderoRow[]) ?? [];
+}
+
+export async function getAllGarajeMotos(): Promise<GarajeMotoRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("garaje_motos")
+    .select(
+      "id, parqueadero_id, placa, placa_foto_url, referencia, modelo, color, origen, condicion, estado, moto_para_recoger_id, user_moto_compra_id, notas, created_at, updated_at, garaje_parqueaderos(nombre)",
+    )
+    .order("created_at", { ascending: false });
+
+  return ((data ?? []) as unknown as Array<
+    Omit<GarajeMotoRow, "parqueadero_nombre"> & {
+      garaje_parqueaderos: { nombre: string } | { nombre: string }[] | null;
+    }
+  >).map((row) => {
+    const parq = row.garaje_parqueaderos;
+    const parqueaderoNombre = Array.isArray(parq)
+      ? (parq[0]?.nombre ?? null)
+      : (parq?.nombre ?? null);
+    return {
+      id: row.id,
+      parqueadero_id: row.parqueadero_id,
+      parqueadero_nombre: parqueaderoNombre,
+      placa: row.placa,
+      placa_foto_url: row.placa_foto_url,
+      referencia: row.referencia,
+      modelo: row.modelo,
+      color: row.color,
+      origen: row.origen,
+      condicion: row.condicion,
+      estado: row.estado,
+      moto_para_recoger_id: row.moto_para_recoger_id,
+      user_moto_compra_id: row.user_moto_compra_id,
+      notas: row.notas,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    };
+  });
 }
 
 export async function getFirstPendingUserId(

@@ -3,7 +3,7 @@ import {
   COMPRA_ESTADO_LABELS,
   FRECUENCIA_LABELS,
 } from "@/lib/pipeline/types";
-import { formatCop } from "@/lib/utils/format";
+import { formatCop, formatCuotas } from "@/lib/utils/format";
 import { Card, CardContent } from "@/components/ui/card";
 
 function InfoItem({ label, value }: { label: string; value: string }) {
@@ -76,7 +76,7 @@ export function ClientInfoSummary({ pipeline }: { pipeline: ClientPipeline }) {
           <>
             <InfoItem
               label="Cuotas pagadas"
-              value={String(resumen.cuotasPagadas)}
+              value={formatCuotas(resumen.cuotasPagadas)}
             />
             <InfoItem
               label="Total pagado"

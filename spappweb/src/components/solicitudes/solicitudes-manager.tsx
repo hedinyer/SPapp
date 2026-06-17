@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { usePollingRefresh } from "@/hooks/use-polling-refresh";
 import { updateSolicitudEstado } from "@/lib/actions/admin-actions";
@@ -45,6 +46,7 @@ export function SolicitudesManager({
   const [notasAdmin, setNotasAdmin] = useState("");
   const [notasDirty, setNotasDirty] = useState(false);
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
+  const [mobileShowDetail, setMobileShowDetail] = useState(false);
   const [pending, startTransition] = useTransition();
   const knownIdsRef = useRef<Set<string> | null>(null);
 
@@ -94,6 +96,7 @@ export function SolicitudesManager({
 
   function selectSolicitud(solicitud: SolicitudTallerRow) {
     setSelectedId(solicitud.id);
+    setMobileShowDetail(true);
     setNotasAdmin(solicitud.notas_admin ?? "");
     setNotasDirty(false);
     setHighlightedIds((prev) => {
@@ -123,10 +126,12 @@ export function SolicitudesManager({
 
   return (
     <div className="grid gap-6 lg:grid-cols-5">
-      <div className="space-y-4 lg:col-span-2">
+      <div
+        className={`space-y-4 lg:col-span-2 ${mobileShowDetail ? "hidden lg:block" : ""}`}
+      >
         <div className="flex flex-wrap gap-2">
           <Select value={tipoFilter} onValueChange={setTipoFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full min-w-0 sm:w-40">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -141,7 +146,7 @@ export function SolicitudesManager({
             </SelectContent>
           </Select>
           <Select value={estadoFilter} onValueChange={setEstadoFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full min-w-0 sm:w-40">
               <SelectValue placeholder="Estado" />
             </SelectTrigger>
             <SelectContent>
@@ -196,10 +201,20 @@ export function SolicitudesManager({
         </div>
       </div>
 
-      <div className="lg:col-span-3">
+      <div
+        className={`lg:col-span-3 ${!mobileShowDetail ? "hidden lg:block" : ""}`}
+      >
         {selected ? (
           <Card className="border-neutral-200 shadow-none">
             <CardHeader>
+              <Button
+                variant="ghost"
+                className="mb-2 gap-2 px-0 lg:hidden"
+                onClick={() => setMobileShowDetail(false)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Volver a la lista
+              </Button>
               <CardTitle className="text-lg">
                 {SOLICITUD_TIPO_LABELS[selected.tipo]}
               </CardTitle>
@@ -255,30 +270,48 @@ export function SolicitudesManager({
 
               {selected.tipo === "repuestos" &&
                 (selected.solicitud_repuesto_items?.length ?? 0) > 0 && (
-                  <div className="overflow-x-auto rounded-lg border border-neutral-200">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Producto</TableHead>
-                          <TableHead>Cant.</TableHead>
-                          <TableHead>Precio</TableHead>
-                          <TableHead>Subtotal</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {selected.solicitud_repuesto_items!.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell>
-                              {item.inventario_productos?.nombre ?? item.producto_id}
-                            </TableCell>
-                            <TableCell>{item.cantidad}</TableCell>
-                            <TableCell>{formatCop(item.precio_unitario)}</TableCell>
-                            <TableCell>{formatCop(item.subtotal)}</TableCell>
+                  <>
+                    <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Producto</TableHead>
+                            <TableHead>Cant.</TableHead>
+                            <TableHead>Precio</TableHead>
+                            <TableHead>Subtotal</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        </TableHeader>
+                        <TableBody>
+                          {selected.solicitud_repuesto_items!.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>
+                                {item.inventario_productos?.nombre ?? item.producto_id}
+                              </TableCell>
+                              <TableCell>{item.cantidad}</TableCell>
+                              <TableCell>{formatCop(item.precio_unitario)}</TableCell>
+                              <TableCell>{formatCop(item.subtotal)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <div className="space-y-2 lg:hidden">
+                      {selected.solicitud_repuesto_items!.map((item) => (
+                        <div
+                          key={item.id}
+                          className="rounded-lg border border-neutral-200 p-3 text-sm"
+                        >
+                          <p className="font-medium">
+                            {item.inventario_productos?.nombre ?? item.producto_id}
+                          </p>
+                          <p className="mt-1 text-neutral-500">
+                            {item.cantidad} × {formatCop(item.precio_unitario)} ={" "}
+                            {formatCop(item.subtotal)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
 
               <div className="space-y-2">
@@ -293,7 +326,7 @@ export function SolicitudesManager({
                 />
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 {selected.estado === "pendiente" && (
                   <Button
                     disabled={pending}

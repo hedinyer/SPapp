@@ -380,7 +380,6 @@ class _HeroSection extends StatelessWidget {
                     digitalContractId: digitalContractId,
                     username: username,
                     onCompraChanged: onCompraChanged,
-                    motoEntregada: true,
                   ),
                 ]
                 else if (isLoadingStatus)
@@ -412,7 +411,6 @@ class _HeroSection extends StatelessWidget {
                       digitalContractId: digitalContractId,
                       username: username,
                       onCompraChanged: onCompraChanged,
-                      motoEntregada: false,
                     ),
                   ],
                   if (showRequestButton) ...[

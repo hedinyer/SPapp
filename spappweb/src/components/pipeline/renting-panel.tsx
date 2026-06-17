@@ -1,18 +1,27 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
+import { Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { confirmTarifaPago, resolveMoroso } from "@/lib/actions/admin-actions";
+import { markMotoRecogida, resolveMoroso } from "@/lib/actions/admin-actions";
 import {
+  CONTEXTO_PAGO_LABELS,
   FRECUENCIA_LABELS,
   TARIFA_ESTADO_LABELS,
   type ClientPipeline,
   type TarifaPagadaRow,
 } from "@/lib/pipeline/types";
-import { formatCop, formatDateOnly } from "@/lib/utils/format";
+import { cuotaFraction } from "@/lib/payments/payment-metrics";
+import { formatCop, formatCuotas, formatDate, formatDateOnly } from "@/lib/utils/format";
+import {
+  captureElementAsPng,
+  copyImageBlobToClipboard,
+  downloadImageBlob,
+} from "@/lib/utils/capture-element-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PaymentComprobanteDialog } from "@/components/pipeline/payment-comprobante-dialog";
 
 interface RentingPanelProps {
   pipeline: ClientPipeline;
@@ -38,9 +48,39 @@ function tarifaBadgeVariant(estado: TarifaPagadaRow["estado"]) {
   }
 }
 
+function tarifaEstadoLabel(tarifa: TarifaPagadaRow): string {
+  const pagado = tarifa.monto_pagado ?? 0;
+  if (
+    tarifa.estado !== "pagada" &&
+    pagado > 0 &&
+    pagado < tarifa.monto_esperado
+  ) {
+    return "Parcial";
+  }
+  return TARIFA_ESTADO_LABELS[tarifa.estado];
+}
+
+function tarifaTieneAbono(tarifa: TarifaPagadaRow): boolean {
+  return (tarifa.monto_pagado ?? 0) > 0;
+}
+
 export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
   const [pending, startTransition] = useTransition();
-  const { compra, rentingResumen, tarifas, moroso, recoger } = pipeline;
+  const [capturingExtract, setCapturingExtract] = useState(false);
+  const extractRef = useRef<HTMLDivElement>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedTarifa, setSelectedTarifa] = useState<TarifaPagadaRow | null>(
+    null,
+  );
+  const { compra, rentingResumen, tarifas, moroso, recoger, pagosHistorial } = pipeline;
+
+  const referenciasUsadas = useMemo(
+    () =>
+      pagosHistorial
+        .map((p) => p.referencia)
+        .filter((r): r is string => Boolean(r?.trim())),
+    [pagosHistorial],
+  );
 
   const visibleTarifas = useMemo(() => {
     const pending = tarifas.filter((t) => t.estado !== "pagada");
@@ -56,15 +96,9 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
     return null;
   }
 
-  function confirmTarifa(tarifaId: string) {
-    startTransition(async () => {
-      try {
-        await confirmTarifaPago({ tarifaId, userId });
-        toast.success("Tarifa confirmada como pagada.");
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Error al confirmar.");
-      }
-    });
+  function openConfirmDialog(tarifa: TarifaPagadaRow) {
+    setSelectedTarifa(tarifa);
+    setDialogOpen(true);
   }
 
   function regularizarMoroso() {
@@ -79,144 +113,480 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
     });
   }
 
+  function marcarMotoRecogida() {
+    if (!recoger) return;
+    startTransition(async () => {
+      try {
+        await markMotoRecogida({ recogerId: recoger.id, userId });
+        toast.success(
+          "Moto registrada en Garaje. Completa la foto de placa y ubicación.",
+          {
+            action: {
+              label: "Ir a Garaje",
+              onClick: () => {
+                window.location.href = "/garaje?fotoPendiente=1";
+              },
+            },
+          },
+        );
+      } catch (e) {
+        toast.error(
+          e instanceof Error ? e.message : "No se pudo marcar como recogida.",
+        );
+      }
+    });
+  }
+
+  async function copiarExtractoPagos() {
+    const element = extractRef.current;
+    if (!element) return;
+
+    setCapturingExtract(true);
+    try {
+      const blob = await captureElementAsPng(element, {
+        hideSelector: "[data-export-hide]",
+      });
+
+      try {
+        await copyImageBlobToClipboard(blob);
+        toast.success("Extracto copiado al portapapeles.");
+      } catch {
+        const slug = `${compra!.modelo}-${compra!.placa ?? userId}`
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-");
+        downloadImageBlob(blob, `extracto-pagos-${slug}.png`);
+        toast.success("Extracto descargado como imagen.");
+      }
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "No se pudo generar el extracto.",
+      );
+    } finally {
+      setCapturingExtract(false);
+    }
+  }
+
   return (
-    <Card className="border-neutral-200 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-lg">Cartera de renting</CardTitle>
-        <p className="text-sm text-neutral-500">
-          {compra.modelo} · {compra.color}
-          {compra.placa ? ` · Placa ${compra.placa}` : ""}
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {rentingResumen && (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Total pagado" value={formatCop(rentingResumen.totalPagado)} />
-            <Stat
-              label="Adeudado"
-              value={formatCop(rentingResumen.totalAdeudado)}
-              highlight={rentingResumen.totalAdeudado > 0}
-            />
-            <Stat
-              label="Cuotas pagadas"
-              value={String(rentingResumen.cuotasPagadas)}
-            />
-            <Stat
-              label="Cuotas pendientes"
-              value={String(
-                rentingResumen.cuotasPendientes + rentingResumen.cuotasVencidas,
-              )}
-            />
-          </div>
-        )}
-
-        <div className="grid gap-2 text-sm sm:grid-cols-2">
-          <p>
-            <span className="text-neutral-500">Frecuencia: </span>
-            {FRECUENCIA_LABELS[compra.frecuencia_pago]}
-          </p>
-          <p>
-            <span className="text-neutral-500">Cuota por periodo: </span>
-            {formatCop(compra.monto_cuota_periodo)}
-          </p>
-          {rentingResumen?.proximoVencimiento && (
-            <p>
-              <span className="text-neutral-500">Próximo vencimiento: </span>
-              {formatDateOnly(rentingResumen.proximoVencimiento)}
-            </p>
-          )}
-          {rentingResumen?.diasAtraso != null && rentingResumen.diasAtraso > 0 && (
-            <p className="font-medium text-red-700">
-              Días de atraso: {rentingResumen.diasAtraso}
-            </p>
-          )}
-        </div>
-
-        {moroso && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
-            <p className="font-medium text-amber-900">Cliente en mora</p>
-            <p className="mt-1 text-amber-800">
-              {moroso.dias_atraso} días de atraso · Adeudado{" "}
-              {formatCop(moroso.monto_adeudado)}
-            </p>
+    <>
+      <Card
+        ref={extractRef}
+        data-renting-extract
+        className="border-neutral-200 shadow-none"
+      >
+        <CardHeader className="space-y-3">
+          <CardTitle className="text-lg">Cartera de renting</CardTitle>
+          <CardAction data-export-hide className="col-start-1 row-start-auto w-full sm:col-start-2 sm:w-auto">
             <Button
-              size="sm"
+              type="button"
               variant="outline"
-              className="mt-3"
-              disabled={pending}
-              onClick={regularizarMoroso}
+              size="sm"
+              className="w-full sm:w-auto"
+              disabled={capturingExtract || pending}
+              onClick={copiarExtractoPagos}
             >
-              Marcar regularizado
+              {capturingExtract ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              Copiar extracto de pagos
             </Button>
-          </div>
-        )}
-
-        {recoger && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm">
-            <p className="font-medium text-red-900">Moto para recoger</p>
-            <p className="mt-1 text-red-800">
-              {recoger.dias_atraso} días de mora · Adeudado{" "}
-              {formatCop(recoger.monto_adeudado)}
-            </p>
-          </div>
-        )}
-
-        {tarifas.length === 0 ? (
+          </CardAction>
           <p className="text-sm text-neutral-500">
-            Aún no hay calendario de tarifas. Se genera al marcar la moto como
-            entregada.
+            {compra.modelo} · {compra.color}
+            {compra.placa ? ` · Placa ${compra.placa}` : ""}
           </p>
-        ) : (
-          <div className="overflow-x-auto rounded-lg border border-neutral-200">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>Vencimiento</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acción</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {visibleTarifas.map((tarifa) => (
-                  <TableRow key={tarifa.id}>
-                    <TableCell>{tarifa.numero_periodo}</TableCell>
-                    <TableCell>
-                      {formatDateOnly(tarifa.fecha_vencimiento)}
-                    </TableCell>
-                    <TableCell>{formatCop(tarifa.monto_esperado)}</TableCell>
-                    <TableCell>
-                      <Badge variant={tarifaBadgeVariant(tarifa.estado)}>
-                        {TARIFA_ESTADO_LABELS[tarifa.estado]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {tarifa.estado !== "pagada" ? (
-                        <Button
-                          size="sm"
-                          disabled={pending}
-                          onClick={() => confirmTarifa(tarifa.id)}
-                        >
-                          Confirmar pago
-                        </Button>
-                      ) : (
-                        <span className="text-xs text-neutral-500">
-                          {tarifa.pagada_at
-                            ? formatDateOnly(tarifa.pagada_at)
-                            : "—"}
-                        </span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {rentingResumen && (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <Stat label="Total pagado" value={formatCop(rentingResumen.totalPagado)} />
+              <Stat
+                label="Adeudado"
+                value={formatCop(rentingResumen.totalAdeudado)}
+                highlight={rentingResumen.totalAdeudado > 0}
+              />
+              <Stat
+                label="Cuotas pagadas"
+                value={formatCuotas(rentingResumen.cuotasPagadas)}
+              />
+              <Stat
+                label="Cuotas pendientes"
+                value={String(
+                  rentingResumen.cuotasPendientes + rentingResumen.cuotasVencidas,
+                )}
+              />
+            </div>
+          )}
+
+          <div className="grid gap-2 text-sm sm:grid-cols-2">
+            <p>
+              <span className="text-neutral-500">Frecuencia: </span>
+              {FRECUENCIA_LABELS[compra.frecuencia_pago]}
+            </p>
+            <p>
+              <span className="text-neutral-500">Cuota por periodo: </span>
+              {formatCop(compra.monto_cuota_periodo)}
+            </p>
+            {rentingResumen?.proximoVencimiento && (
+              <p>
+                <span className="text-neutral-500">Próximo vencimiento: </span>
+                {formatDateOnly(rentingResumen.proximoVencimiento)}
+              </p>
+            )}
+            {rentingResumen?.diasAtraso != null && rentingResumen.diasAtraso > 0 && (
+              <p className="font-medium text-red-700">
+                Días de atraso: {rentingResumen.diasAtraso}
+              </p>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {moroso && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
+              <p className="font-medium text-amber-900">Cliente en mora</p>
+              <p className="mt-1 text-amber-800">
+                {moroso.dias_atraso} días de atraso · Adeudado{" "}
+                {formatCop(moroso.monto_adeudado)}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                disabled={pending}
+                data-export-hide
+                onClick={regularizarMoroso}
+              >
+                Marcar regularizado
+              </Button>
+            </div>
+          )}
+
+          {recoger && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm">
+              <p className="font-medium text-red-900">Moto para recoger</p>
+              <p className="mt-1 text-red-800">
+                {recoger.dias_atraso} días de mora · Adeudado{" "}
+                {formatCop(recoger.monto_adeudado)}
+              </p>
+              {recoger.estado !== "recogida" && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={pending}
+                    onClick={marcarMotoRecogida}
+                  >
+                    Marcar como recogida
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href="/garaje?fotoPendiente=1">Ver Garaje</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {tarifas.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              Aún no hay calendario de tarifas. Se genera al marcar la moto como
+              entregada.
+            </p>
+          ) : (
+            <>
+              <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>#</TableHead>
+                      <TableHead>Vencimiento</TableHead>
+                      <TableHead>Monto</TableHead>
+                      <TableHead>Pagado</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="text-right" data-export-hide>
+                        Acción
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {visibleTarifas.map((tarifa) => (
+                      <TableRow key={tarifa.id}>
+                        <TableCell>{tarifa.numero_periodo}</TableCell>
+                        <TableCell>
+                          {formatDateOnly(tarifa.fecha_vencimiento)}
+                        </TableCell>
+                        <TableCell>{formatCop(tarifa.monto_esperado)}</TableCell>
+                        <TableCell>
+                          {tarifaTieneAbono(tarifa) ? (
+                            <TarifaPagadoCell tarifa={tarifa} />
+                          ) : (
+                            <span className="text-neutral-400">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              tarifaEstadoLabel(tarifa) === "Parcial"
+                                ? "outline"
+                                : tarifaBadgeVariant(tarifa.estado)
+                            }
+                          >
+                            {tarifaEstadoLabel(tarifa)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right" data-export-hide>
+                          {tarifa.estado !== "pagada" ? (
+                            <Button
+                              size="sm"
+                              disabled={pending}
+                              onClick={() => openConfirmDialog(tarifa)}
+                            >
+                              Confirmar pago
+                            </Button>
+                          ) : (
+                            <span className="text-xs text-neutral-500">
+                              {tarifa.pagada_at
+                                ? formatDateOnly(tarifa.pagada_at)
+                                : "—"}
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="space-y-3 lg:hidden">
+                {visibleTarifas.map((tarifa) => (
+                  <div
+                    key={tarifa.id}
+                    className="rounded-lg border border-neutral-200 p-4 text-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium">
+                        Periodo #{tarifa.numero_periodo}
+                      </p>
+                      <Badge
+                        variant={
+                          tarifaEstadoLabel(tarifa) === "Parcial"
+                            ? "outline"
+                            : tarifaBadgeVariant(tarifa.estado)
+                        }
+                      >
+                        {tarifaEstadoLabel(tarifa)}
+                      </Badge>
+                    </div>
+                    <dl className="mt-3 space-y-1.5">
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-neutral-500">Vencimiento</dt>
+                        <dd>{formatDateOnly(tarifa.fecha_vencimiento)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-neutral-500">Monto</dt>
+                        <dd>{formatCop(tarifa.monto_esperado)}</dd>
+                      </div>
+                      {tarifaTieneAbono(tarifa) && (
+                        <div className="flex justify-between gap-2">
+                          <dt className="text-neutral-500">Pagado</dt>
+                          <dd>
+                            <TarifaPagadoCell tarifa={tarifa} />
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                    {tarifa.estado !== "pagada" ? (
+                      <Button
+                        size="sm"
+                        className="mt-3 w-full"
+                        disabled={pending}
+                        data-export-hide
+                        onClick={() => openConfirmDialog(tarifa)}
+                      >
+                        Confirmar pago
+                      </Button>
+                    ) : tarifa.pagada_at ? (
+                      <p className="mt-3 text-xs text-neutral-500">
+                        Pagada el {formatDateOnly(tarifa.pagada_at)}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {pagosHistorial.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium">Historial de pagos</h3>
+              <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Fecha</TableHead>
+                      <TableHead>Contexto</TableHead>
+                      <TableHead>Monto</TableHead>
+                      <TableHead>Esperado</TableHead>
+                      <TableHead>Variación</TableHead>
+                      <TableHead>Cuotas</TableHead>
+                      <TableHead>Referencia</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pagosHistorial.map((pago) => (
+                      <TableRow key={pago.id}>
+                        <TableCell>{formatDate(pago.fecha)}</TableCell>
+                        <TableCell>
+                          {pago.contexto_pago
+                            ? pago.numeroPeriodo
+                              ? `${CONTEXTO_PAGO_LABELS[pago.contexto_pago]} #${pago.numeroPeriodo}`
+                              : CONTEXTO_PAGO_LABELS[pago.contexto_pago]
+                            : "—"}
+                        </TableCell>
+                        <TableCell>{formatCop(pago.monto)}</TableCell>
+                        <TableCell>
+                          {pago.montoEsperado != null
+                            ? formatCop(pago.montoEsperado)
+                            : "—"}
+                        </TableCell>
+                        <TableCell>
+                          <VariacionBadge
+                            label={pago.variacionLabel}
+                            tone={pago.variacionTone}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {pago.cuotasCubiertas > 0
+                            ? formatCuotas(pago.cuotasCubiertas)
+                            : "—"}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {pago.referencia ?? "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="space-y-3 lg:hidden">
+                {pagosHistorial.map((pago) => (
+                  <div
+                    key={pago.id}
+                    className="rounded-lg border border-neutral-200 p-4 text-sm"
+                  >
+                    <p className="font-medium">{formatDate(pago.fecha)}</p>
+                    <p className="mt-1 text-neutral-500">
+                      {pago.contexto_pago
+                        ? pago.numeroPeriodo
+                          ? `${CONTEXTO_PAGO_LABELS[pago.contexto_pago]} #${pago.numeroPeriodo}`
+                          : CONTEXTO_PAGO_LABELS[pago.contexto_pago]
+                        : "—"}
+                    </p>
+                    <dl className="mt-3 space-y-1.5">
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-neutral-500">Monto</dt>
+                        <dd className="font-medium">{formatCop(pago.monto)}</dd>
+                      </div>
+                      {pago.montoEsperado != null && (
+                        <div className="flex justify-between gap-2">
+                          <dt className="text-neutral-500">Esperado</dt>
+                          <dd>{formatCop(pago.montoEsperado)}</dd>
+                        </div>
+                      )}
+                      {pago.variacionLabel !== "—" && (
+                        <div className="flex justify-between gap-2">
+                          <dt className="text-neutral-500">Variación</dt>
+                          <dd>
+                            <VariacionBadge
+                              label={pago.variacionLabel}
+                              tone={pago.variacionTone}
+                            />
+                          </dd>
+                        </div>
+                      )}
+                      {pago.cuotasCubiertas > 0 && (
+                        <div className="flex justify-between gap-2">
+                          <dt className="text-neutral-500">Cuotas</dt>
+                          <dd>{formatCuotas(pago.cuotasCubiertas)}</dd>
+                        </div>
+                      )}
+                      {pago.referencia && (
+                        <div className="flex justify-between gap-2">
+                          <dt className="text-neutral-500">Referencia</dt>
+                          <dd className="font-mono text-xs">{pago.referencia}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {selectedTarifa && (
+        <PaymentComprobanteDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          contexto="tarifa"
+          userId={userId}
+          compraId={compra.id}
+          tarifaId={selectedTarifa.id}
+          montoEsperado={Math.max(
+            0,
+            selectedTarifa.monto_esperado -
+              (selectedTarifa.monto_pagado ?? 0),
+          )}
+          referenciasUsadas={referenciasUsadas}
+        />
+      )}
+    </>
   );
+}
+
+function TarifaPagadoCell({ tarifa }: { tarifa: TarifaPagadaRow }) {
+  const pagado = tarifa.monto_pagado ?? tarifa.monto_esperado;
+  const fraccion = cuotaFraction(pagado, tarifa.monto_esperado);
+  const esParcial = pagado < tarifa.monto_esperado;
+  const esMayor = pagado > tarifa.monto_esperado;
+
+  return (
+    <div className="text-sm">
+      <p className="font-medium">{formatCop(pagado)}</p>
+      <p
+        className={`text-xs ${
+          esParcial
+            ? "text-amber-700"
+            : esMayor
+              ? "text-blue-700"
+              : "text-neutral-500"
+        }`}
+      >
+        {formatCuotas(fraccion)} cuota{fraccion === 1 ? "" : "s"}
+        {esParcial ? " · parcial" : esMayor ? " · mayor" : ""}
+      </p>
+    </div>
+  );
+}
+
+function VariacionBadge({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "menor" | "mayor" | "exacto";
+}) {
+  if (label === "—") {
+    return <span className="text-neutral-400">—</span>;
+  }
+
+  const className =
+    tone === "menor"
+      ? "text-amber-800"
+      : tone === "mayor"
+        ? "text-blue-800"
+        : "text-neutral-600";
+
+  return <span className={`text-xs ${className}`}>{label}</span>;
 }
 
 function Stat({

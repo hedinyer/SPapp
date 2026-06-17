@@ -1,3 +1,5 @@
+import 'package:spapp/utils/name_validation.dart';
+
 enum TipoIdentificacion { ppt, cc, p, cv }
 
 enum EstadoCivil { soltero, casado, unionLibre }
@@ -24,7 +26,8 @@ class ReferenciaPersonal {
     );
   }
 
-  bool get isComplete => nombre.trim().isNotEmpty && celular.trim().length >= 10;
+  bool get isComplete =>
+      isFullName(nombre) && celular.trim().length >= 10;
 }
 
 class HojaVidaForm {
@@ -72,7 +75,7 @@ class HojaVidaForm {
   final List<ReferenciaPersonal> referencias;
 
   bool get isComplete {
-    if (nombreCompleto.trim().isEmpty) return false;
+    if (!isFullName(nombreCompleto)) return false;
     if (tipoIdentificacion == null) return false;
     if (numeroIdentificacion.trim().isEmpty) return false;
     if (fechaNacimiento.trim().isEmpty) return false;
@@ -88,7 +91,7 @@ class HojaVidaForm {
     if (estadoCivil == null) return false;
     if (estadoCivil == EstadoCivil.casado ||
         estadoCivil == EstadoCivil.unionLibre) {
-      if (nombreConyuge.trim().isEmpty || celularConyuge.trim().length < 10) {
+      if (!isFullName(nombreConyuge) || celularConyuge.trim().length < 10) {
         return false;
       }
     }
@@ -224,10 +227,19 @@ class HojaVidaForm {
 
   static String labelTipoIdentificacion(TipoIdentificacion tipo) {
     return switch (tipo) {
+      TipoIdentificacion.ppt => 'Permiso Temporal de Permanencia (PPT)',
+      TipoIdentificacion.cc => 'Cédula de Ciudadanía (CC)',
+      TipoIdentificacion.p => 'Pasaporte Venezolano (PV)',
+      TipoIdentificacion.cv => 'Cédula Venezolana (CV)',
+    };
+  }
+
+  static String pdfLabelTipoIdentificacion(TipoIdentificacion tipo) {
+    return switch (tipo) {
       TipoIdentificacion.ppt => 'PPT',
-      TipoIdentificacion.cc => 'C.C.',
-      TipoIdentificacion.p => 'P',
-      TipoIdentificacion.cv => 'C.V.',
+      TipoIdentificacion.cc => 'CC',
+      TipoIdentificacion.p => 'PV',
+      TipoIdentificacion.cv => 'CV',
     };
   }
 

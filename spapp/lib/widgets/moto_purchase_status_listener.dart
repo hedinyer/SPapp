@@ -8,12 +8,12 @@ class MotoPurchaseStatusListener extends StatefulWidget {
   const MotoPurchaseStatusListener({
     super.key,
     required this.userId,
-    required this.visitCompleted,
+    required this.contractSigned,
     this.onSelectMoto,
   });
 
   final int userId;
-  final bool visitCompleted;
+  final bool contractSigned;
   final VoidCallback? onSelectMoto;
 
   @override
@@ -29,7 +29,7 @@ class _MotoPurchaseStatusListenerState extends State<MotoPurchaseStatusListener>
   @override
   void initState() {
     super.initState();
-    if (widget.visitCompleted) {
+    if (widget.contractSigned) {
       _startWatcher();
     } else {
       _isLoading = false;
@@ -39,9 +39,9 @@ class _MotoPurchaseStatusListenerState extends State<MotoPurchaseStatusListener>
   @override
   void didUpdateWidget(MotoPurchaseStatusListener oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.visitCompleted && !oldWidget.visitCompleted) {
+    if (widget.contractSigned && !oldWidget.contractSigned) {
       _startWatcher();
-    } else if (!widget.visitCompleted && oldWidget.visitCompleted) {
+    } else if (!widget.contractSigned && oldWidget.contractSigned) {
       _stopWatcher();
       setState(() {
         _compra = null;
@@ -80,7 +80,7 @@ class _MotoPurchaseStatusListenerState extends State<MotoPurchaseStatusListener>
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.visitCompleted) {
+    if (!widget.contractSigned) {
       return const SizedBox.shrink();
     }
 

@@ -36,7 +36,7 @@ export default async function MisVisitasPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Hola, {session.username}</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Hola, {session.username}</h1>
         <p className="text-sm text-neutral-500">
           {visitas.length === 0
             ? "No tienes visitas asignadas por ahora."
@@ -56,7 +56,7 @@ export default async function MisVisitasPage() {
             <li key={visita.id}>
               <Link href={`/visitador/visitas/${visita.id}`}>
                 <Card className="border-neutral-200 shadow-none transition-colors hover:bg-neutral-50">
-                  <CardContent className="flex items-center justify-between gap-3 py-4">
+                  <CardContent className="flex items-center justify-between gap-3 py-4 min-h-[4.5rem]">
                     <div className="min-w-0">
                       <p className="font-medium">
                         {visita.cliente_nombre ?? "Cliente"}

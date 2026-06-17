@@ -16,10 +16,10 @@ import type {
 const STEP_ORDER: PipelineStepId[] = [
   "credito",
   "contrato",
-  "visita",
   "moto",
   "pago",
   "entrega",
+  "visita",
 ];
 
 const STEP_LABELS: Record<PipelineStepId, string> = {
@@ -127,14 +127,14 @@ function isBlockedForStep(
       return false;
     case "contrato":
       return !creditDone(doc);
-    case "visita":
-      return !contractDone(contract);
     case "moto":
-      return !visitDone(visita);
+      return !contractDone(contract);
     case "pago":
       return !motoDone(compra);
     case "entrega":
       return !paymentDone(compra) && compra?.estado !== "lista_retiro";
+    case "visita":
+      return !deliveryDone(compra);
     default:
       return true;
   }
@@ -147,12 +147,6 @@ export function detectAdminActionStep(
 ): PipelineStepId | null {
   if (doc?.estado_solicitud === "pendiente") return "credito";
   if (
-    visita &&
-    (visita.estado === "pendiente_asignacion" || visita.estado === "asignada")
-  ) {
-    return "visita";
-  }
-  if (
     compra &&
     compra.estado === "pendiente_pago" &&
     (!compra.pago_inicial_confirmado || !compra.pago_cuota_confirmado)
@@ -161,6 +155,15 @@ export function detectAdminActionStep(
   }
   if (compra && compra.estado === "lista_retiro") {
     return "entrega";
+  }
+  if (deliveryDone(compra)) {
+    if (
+      !visita ||
+      visita.estado === "pendiente_asignacion" ||
+      visita.estado === "asignada"
+    ) {
+      return "visita";
+    }
   }
   return null;
 }
@@ -184,7 +187,7 @@ export function buildPipelineSteps(
       state = "bloqueado";
     } else if (adminStep === id) {
       state = "actual";
-    } else if (id === "moto" && visitDone(visita) && !compra) {
+    } else if (id === "moto" && contractDone(contract) && !compra) {
       state = "pendiente";
     }
 
@@ -225,6 +228,8 @@ export function buildClientPipeline(input: {
   moroso?: import("@/lib/pipeline/types").MorosoRow | null;
   recoger?: import("@/lib/pipeline/types").MotoParaRecogerRow | null;
   rentingResumen?: import("@/lib/pipeline/types").RentingResumen | null;
+  pagosHistorial?: import("@/lib/pipeline/types").PagoHistorialRow[];
+  pagos?: import("@/lib/pipeline/types").PagoRow[];
 }): ClientPipeline {
   const steps = buildPipelineSteps(
     input.document,
@@ -239,6 +244,8 @@ export function buildClientPipeline(input: {
     moroso: input.moroso ?? null,
     recoger: input.recoger ?? null,
     rentingResumen: input.rentingResumen ?? null,
+    pagosHistorial: input.pagosHistorial ?? [],
+    pagos: input.pagos ?? [],
     steps,
     currentAdminStep: detectAdminActionStep(
       input.document,

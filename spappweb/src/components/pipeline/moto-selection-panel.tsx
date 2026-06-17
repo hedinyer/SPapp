@@ -1,19 +1,30 @@
-import type { UserMotoCompraRow, VisitaRow } from "@/lib/pipeline/types";
+import type {
+  ContractStatus,
+  DigitalContractRow,
+  UserMotoCompraRow,
+} from "@/lib/pipeline/types";
 import { FRECUENCIA_LABELS, COMPRA_ESTADO_LABELS } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface MotoSelectionPanelProps {
-  visita: VisitaRow | null;
+  contract: DigitalContractRow | null;
   compra: UserMotoCompraRow | null;
 }
 
-export function MotoSelectionPanel({ visita, compra }: MotoSelectionPanelProps) {
-  if (!visita || visita.estado !== "completada") {
+function contractSigned(contract: DigitalContractRow | null): boolean {
+  return (contract?.status as ContractStatus | undefined) === "firmado";
+}
+
+export function MotoSelectionPanel({
+  contract,
+  compra,
+}: MotoSelectionPanelProps) {
+  if (!contractSigned(contract)) {
     return (
       <Card className="border-neutral-200 shadow-none">
         <CardContent className="py-8 text-center text-sm text-neutral-500">
-          El cliente aún no puede elegir moto (visita no completada).
+          El cliente aún no puede elegir moto (contrato no firmado).
         </CardContent>
       </Card>
     );

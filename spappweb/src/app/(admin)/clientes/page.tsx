@@ -14,7 +14,7 @@ export default async function ClientesPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Clientes</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Clientes</h1>
         <p className="mt-1 text-neutral-500">
           Busca por placa, cédula o nombre para ver datos, cuotas pagadas y el
           estado del proceso.

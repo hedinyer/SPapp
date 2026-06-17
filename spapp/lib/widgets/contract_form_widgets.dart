@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:spapp/theme/app_theme.dart';
 import 'package:spapp/theme/responsive.dart';
 
@@ -118,6 +119,7 @@ class ContractTextField extends StatelessWidget {
     this.maxLines = 1,
     this.validator,
     this.onChanged,
+    this.inputFormatters,
   });
 
   final TextEditingController controller;
@@ -127,6 +129,7 @@ class ContractTextField extends StatelessWidget {
   final int maxLines;
   final String? Function(String?)? validator;
   final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +139,7 @@ class ContractTextField extends StatelessWidget {
       maxLines: maxLines,
       validator: validator,
       onChanged: onChanged,
+      inputFormatters: inputFormatters,
       style: AppTypography.bodyMd,
       decoration: InputDecoration(
         labelText: label,
@@ -159,6 +163,151 @@ class ContractTextField extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
       ),
+    );
+  }
+}
+
+class ContractDateField extends StatelessWidget {
+  const ContractDateField({
+    super.key,
+    required this.controller,
+    this.validator,
+    this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return ContractTextField(
+      controller: controller,
+      hint: 'DD/MM/AAAA',
+      keyboardType: TextInputType.number,
+      inputFormatters: const [_DateSlashFormatter()],
+      validator: validator,
+      onChanged: onChanged,
+    );
+  }
+}
+
+class _DateSlashFormatter extends TextInputFormatter {
+  const _DateSlashFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) {
+      return const TextEditingValue(text: '');
+    }
+
+    final buffer = StringBuffer();
+    for (var i = 0; i < digits.length && i < 8; i++) {
+      if (i == 2 || i == 4) buffer.write('/');
+      buffer.write(digits[i]);
+    }
+
+    final formatted = buffer.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+String? validateBirthDate(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Escribe tu fecha de nacimiento';
+  }
+  final match = RegExp(r'^(\d{2})/(\d{2})/(\d{4})$').firstMatch(value.trim());
+  if (match == null) {
+    return 'Usa el formato DD/MM/AAAA';
+  }
+  final day = int.parse(match.group(1)!);
+  final month = int.parse(match.group(2)!);
+  final year = int.parse(match.group(3)!);
+  if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900) {
+    return 'Fecha no válida';
+  }
+  return null;
+}
+
+class ContractChoiceList<T> extends StatelessWidget {
+  const ContractChoiceList({
+    super.key,
+    required this.options,
+    required this.labelBuilder,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<T> options;
+  final String Function(T) labelBuilder;
+  final T? selected;
+  final ValueChanged<T> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: options.map((option) {
+        final isSelected = selected == option;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Material(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.08)
+                : AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            child: InkWell(
+              onTap: () => onSelected(option),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.outlineVariant,
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.onSurfaceVariant,
+                      size: 22,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        labelBuilder(option),
+                        style: AppTypography.bodyMd.copyWith(
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }
@@ -254,7 +403,12 @@ class ContractBottomActions extends StatelessWidget {
             Expanded(
               flex: onSecondary != null ? 2 : 1,
               child: FilledButton(
-                onPressed: isLoading || !primaryEnabled ? null : onPrimary,
+                onPressed: isLoading || !primaryEnabled
+                    ? null
+                    : () {
+                        FocusScope.of(context).unfocus();
+                        onPrimary();
+                      },
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,

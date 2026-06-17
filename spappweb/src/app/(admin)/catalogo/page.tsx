@@ -7,7 +7,7 @@ export default async function CatalogoPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Catálogo de motos</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Catálogo de motos</h1>
         <p className="mt-1 text-neutral-500">
           Inventario visible para clientes post-visita.
         </p>

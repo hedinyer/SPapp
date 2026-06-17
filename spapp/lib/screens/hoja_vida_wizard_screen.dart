@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:spapp/models/hoja_vida_form.dart';
 import 'package:spapp/services/contract_service.dart';
 import 'package:spapp/theme/app_theme.dart';
+import 'package:spapp/utils/name_validation.dart';
 import 'package:spapp/widgets/contract_form_widgets.dart';
 
 class HojaVidaWizardScreen extends StatefulWidget {
@@ -168,16 +169,20 @@ class _HojaVidaWizardScreenState extends State<HojaVidaWizardScreen> {
     }
     if (_currentStep == _HojaVidaStep.referencia1) {
       final ref = _form.referencias[0];
-      if (ref.nombre.trim().isEmpty || ref.celular.trim().length < 10) {
-        _showMessage('Completa nombre y celular de la referencia.');
+      if (!isFullName(ref.nombre) || ref.celular.trim().length < 10) {
+        _showMessage(
+          'Completa nombre completo (3 palabras) y celular de la referencia.',
+        );
         return false;
       }
       return true;
     }
     if (_currentStep == _HojaVidaStep.referencia2) {
       final ref = _form.referencias[1];
-      if (ref.nombre.trim().isEmpty || ref.celular.trim().length < 10) {
-        _showMessage('Completa nombre y celular de la segunda referencia.');
+      if (!isFullName(ref.nombre) || ref.celular.trim().length < 10) {
+        _showMessage(
+          'Completa nombre completo (3 palabras) y celular de la segunda referencia.',
+        );
         return false;
       }
       return true;
@@ -286,20 +291,20 @@ class _HojaVidaWizardScreenState extends State<HojaVidaWizardScreen> {
     return switch (step) {
       _HojaVidaStep.nombre => ContractStepShell(
           title: '¿Cómo te llamas completo?',
-          subtitle: 'Escribe tu nombre tal como aparece en tu documento.',
+          subtitle:
+              'Escribe tu nombre tal como aparece en tu documento: nombre, primer apellido y segundo apellido.',
           legalLabel: 'Hoja de Vida — NOMBRE COMPLETO',
           child: ContractTextField(
             controller: _textController,
             hint: 'Ej: Juan Pérez García',
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Escribe tu nombre' : null,
+            validator: validateFullName,
           ),
         ),
       _HojaVidaStep.tipoId => ContractStepShell(
           title: '¿Qué documento tienes?',
           subtitle: 'Elige una opción.',
           legalLabel: 'Hoja de Vida — TIPO IDENTIFICACION',
-          child: ContractChoiceChips<TipoIdentificacion>(
+          child: ContractChoiceList<TipoIdentificacion>(
             options: TipoIdentificacion.values,
             labelBuilder: HojaVidaForm.labelTipoIdentificacion,
             selected: _form.tipoIdentificacion,
@@ -320,13 +325,11 @@ class _HojaVidaWizardScreenState extends State<HojaVidaWizardScreen> {
         ),
       _HojaVidaStep.fechaNacimiento => ContractStepShell(
           title: '¿Cuándo naciste?',
-          subtitle: 'Formato: día/mes/año. Ej: 15/03/1995',
+          subtitle: 'Escribe día, mes y año. Los / se agregan solos.',
           legalLabel: 'Hoja de Vida — FECHA DE NACIMIENTO',
-          child: ContractTextField(
+          child: ContractDateField(
             controller: _textController,
-            hint: 'DD/MM/AAAA',
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Escribe tu fecha' : null,
+            validator: validateBirthDate,
           ),
         ),
       _HojaVidaStep.celular => ContractStepShell(
@@ -456,12 +459,13 @@ class _HojaVidaWizardScreenState extends State<HojaVidaWizardScreen> {
         ),
       _HojaVidaStep.conyugeNombre => ContractStepShell(
           title: 'Nombre de tu cónyuge o pareja',
-          subtitle: 'Como aparece en su documento.',
+          subtitle:
+              'Nombre completo: nombre, primer apellido y segundo apellido.',
           legalLabel: 'Hoja de Vida — NOMBRE CONYUGE',
           child: ContractTextField(
             controller: _textController,
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Escribe el nombre' : null,
+            hint: 'Ej: María López Rodríguez',
+            validator: validateFullName,
           ),
         ),
       _HojaVidaStep.conyugeCelular => ContractStepShell(
@@ -480,11 +484,13 @@ class _HojaVidaWizardScreenState extends State<HojaVidaWizardScreen> {
           ),
         ),
       _HojaVidaStep.referencia1 => _ReferenciaStep(
+          key: const ValueKey('referencia-0'),
           index: 0,
           form: _form,
           onChanged: (refs) => setState(() => _form = _form.copyWith(referencias: refs)),
         ),
       _HojaVidaStep.referencia2 => _ReferenciaStep(
+          key: const ValueKey('referencia-1'),
           index: 1,
           form: _form,
           onChanged: (refs) => setState(() => _form = _form.copyWith(referencias: refs)),
@@ -517,6 +523,7 @@ enum _HojaVidaStep {
 
 class _ReferenciaStep extends StatefulWidget {
   const _ReferenciaStep({
+    super.key,
     required this.index,
     required this.form,
     required this.onChanged,
@@ -565,13 +572,15 @@ class _ReferenciaStepState extends State<_ReferenciaStep> {
   Widget build(BuildContext context) {
     return ContractStepShell(
       title: 'Referencia ${widget.index + 1}',
-      subtitle: 'Una persona que te conozca y pueda contactarte.',
+      subtitle:
+          'Una persona que te conozca. Escribe su nombre completo: nombre, primer apellido y segundo apellido.',
       legalLabel: 'Hoja de Vida — REFERENCIAS FAMILIARES Ó PERSONALES',
       child: Column(
         children: [
           ContractTextField(
             controller: _nombre,
-            label: 'Nombre',
+            label: 'Nombre completo',
+            hint: 'Ej: Ana Gómez Martínez',
             onChanged: (_) => _update(),
           ),
           const SizedBox(height: AppSpacing.md),
