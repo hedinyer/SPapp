@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ClipboardPaste, Camera, ImagePlus, X } from "lucide-react";
-import { uploadAdminImage } from "@/lib/actions/upload-image";
+import { uploadImageFromBrowser } from "@/lib/utils/upload-image-client";
 import type { AdminImageBucket } from "@/lib/supabase/storage-buckets";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { mobileLog } from "@/lib/debug/mobile-log";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -243,6 +244,18 @@ export function ImageFileField({
     reader.onload = () => setPreview(String(reader.result));
     reader.readAsDataURL(normalized);
     onFileChange(normalized);
+    // #region agent log
+    mobileLog({
+      location: "image-file-field.tsx:selectFile",
+      message: "image selected",
+      hypothesisId: "D",
+      data: {
+        name: normalized.name,
+        size: normalized.size,
+        type: normalized.type,
+      },
+    });
+    // #endregion
     void onFileSelected?.(normalized);
   }
 
@@ -302,6 +315,7 @@ export function ImageFileField({
             {enableCamera && (
               <label
                 htmlFor={cameraInputId}
+                data-mobile-probe="image-camera"
                 className={cn(
                   "inline-flex min-h-11 touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-muted",
                   disabled && "pointer-events-none opacity-50",
@@ -313,6 +327,7 @@ export function ImageFileField({
             )}
             <label
               htmlFor={fileInputId}
+              data-mobile-probe="image-picker"
               className={cn(
                 "inline-flex min-h-11 touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-muted",
                 disabled && "pointer-events-none opacity-50",
@@ -372,13 +387,8 @@ export async function uploadImageFile(
   folder: string,
   file: File,
 ): Promise<string> {
-  const formData = new FormData();
-  formData.set("bucket", bucket);
-  formData.set("folder", folder);
-  formData.set("file", file);
-
-  const { publicUrl } = await uploadAdminImage(formData);
-  return publicUrl;
+  // ponytail: subida directa + compresión en cliente (mismo camino que garaje)
+  return uploadImageFromBrowser(bucket, folder, file);
 }
 
 function slugify(value: string): string {

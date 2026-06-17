@@ -23,12 +23,20 @@ export function usePollingRefresh({
     if (!enabled) return;
 
     const refresh = () => {
+      if (document.visibilityState !== "visible") return;
       router.refresh();
       setLastRefreshedAt(new Date());
     };
 
     const intervalId = setInterval(refresh, intervalMs);
-    return () => clearInterval(intervalId);
+    function onVisible() {
+      if (document.visibilityState === "visible") refresh();
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [router, intervalMs, enabled]);
 
   useEffect(() => {

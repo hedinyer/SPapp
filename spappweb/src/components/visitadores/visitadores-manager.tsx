@@ -256,7 +256,7 @@ export function VisitadoresManager({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1"
+                    className="min-h-11 flex-1 touch-manipulation"
                     onClick={() => openEdit(v)}
                   >
                     <Pencil className="mr-1 h-4 w-4" />
@@ -379,6 +379,7 @@ function VisitadorDialog({
               id="nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+              className="min-h-11 touch-manipulation text-base md:text-sm"
             />
           </div>
           <div className="space-y-2">
@@ -387,6 +388,7 @@ function VisitadorDialog({
               id="telefono"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
+              className="min-h-11 touch-manipulation text-base md:text-sm"
             />
           </div>
           {!editing && (
@@ -397,6 +399,7 @@ function VisitadorDialog({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="off"
+                className="min-h-11 touch-manipulation text-base md:text-sm"
               />
             </div>
           )}
@@ -416,6 +419,7 @@ function VisitadorDialog({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
+              className="min-h-11 touch-manipulation text-base md:text-sm"
             />
           </div>
           <ImageFileField
@@ -424,6 +428,9 @@ function VisitadorDialog({
             file={photoFile}
             onFileChange={setPhotoFile}
             disabled={pending}
+            enableCamera
+            fileInputId="visitador-foto-file"
+            cameraInputId="visitador-foto-camera"
           />
           <div className="flex items-center gap-2">
             <Switch checked={activo} onCheckedChange={setActivo} />

@@ -10,13 +10,7 @@ import { visitaEstadoLabel } from "@/lib/pipeline/step-logic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { TouchSelect } from "@/components/ui/touch-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -298,18 +292,16 @@ function AssignForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>Visitador</Label>
-          <Select value={visitadorId} onValueChange={setVisitadorId} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Elegir visitador" />
-            </SelectTrigger>
-            <SelectContent>
-              {visitadores.map((v) => (
-                <SelectItem key={v.id} value={String(v.id)}>
-                  {v.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TouchSelect
+            aria-label="Visitador"
+            value={visitadorId}
+            required
+            onChange={setVisitadorId}
+            options={visitadores.map((v) => ({
+              value: String(v.id),
+              label: v.nombre,
+            }))}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="fecha">Fecha y hora</Label>
@@ -317,6 +309,7 @@ function AssignForm({
             id="fecha"
             name="fecha"
             type="datetime-local"
+            className="min-h-11 touch-manipulation text-base md:text-sm"
             required
             defaultValue={
               visita.fecha_programada

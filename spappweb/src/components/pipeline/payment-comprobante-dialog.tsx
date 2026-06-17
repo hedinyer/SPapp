@@ -30,13 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { TouchSelect } from "@/components/ui/touch-select";
 
 interface PaymentComprobanteDialogProps {
   open: boolean;
@@ -261,24 +255,18 @@ export function PaymentComprobanteDialog({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Medio de pago</Label>
-            <Select
+            <TouchSelect
+              aria-label="Medio de pago"
               value={medioPagoAdmin}
-              onValueChange={(v) => setMedioPagoAdmin(v as MedioPagoAdmin)}
               disabled={pending || ocrPending}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(MEDIO_PAGO_ADMIN_LABELS) as MedioPagoAdmin[]).map(
-                  (key) => (
-                    <SelectItem key={key} value={key}>
-                      {MEDIO_PAGO_ADMIN_LABELS[key]}
-                    </SelectItem>
-                  ),
-                )}
-              </SelectContent>
-            </Select>
+              onChange={(v) => setMedioPagoAdmin(v as MedioPagoAdmin)}
+              options={(Object.keys(MEDIO_PAGO_ADMIN_LABELS) as MedioPagoAdmin[]).map(
+                (key) => ({
+                  value: key,
+                  label: MEDIO_PAGO_ADMIN_LABELS[key],
+                }),
+              )}
+            />
           </div>
 
           <ImageFileField
@@ -287,29 +275,26 @@ export function PaymentComprobanteDialog({
             onFileChange={setFile}
             disabled={pending || ocrPending}
             enableDialogPaste
+            enableCamera
+            fileInputId="pago-comprobante-file"
+            cameraInputId="pago-comprobante-camera"
           />
 
           {!isEfectivo && (
             <div className="space-y-2">
               <Label>Banco de origen</Label>
-              <Select
+              <TouchSelect
+                aria-label="Banco de origen"
                 value={bancoOrigen}
-                onValueChange={(v) => handleBancoChange(v as BancoOrigen)}
                 disabled={pending || ocrPending}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]).map(
-                    (key) => (
-                      <SelectItem key={key} value={key}>
-                        {BANCO_ORIGEN_LABELS[key]}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
+                onChange={(v) => handleBancoChange(v as BancoOrigen)}
+                options={(Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]).map(
+                  (key) => ({
+                    value: key,
+                    label: BANCO_ORIGEN_LABELS[key],
+                  }),
+                )}
+              />
             </div>
           )}
 

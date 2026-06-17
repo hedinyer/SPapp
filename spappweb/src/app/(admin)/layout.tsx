@@ -1,5 +1,6 @@
 import { AdminMobileNav } from "@/components/layout/admin-mobile-nav";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
+import { MobileDebugProbe } from "@/components/layout/mobile-debug-probe";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-white text-black lg:flex-row">
+      <MobileDebugProbe />
       <AdminSidebar className="hidden lg:flex" />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <AdminMobileNav />

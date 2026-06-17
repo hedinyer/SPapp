@@ -54,14 +54,9 @@ import {
   uploadImageFile,
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { TouchSelect } from "@/components/ui/touch-select";
+import { mobileLog } from "@/lib/debug/mobile-log";
 
 export function InventarioManager({
   categorias,
@@ -100,9 +95,18 @@ export function InventarioManager({
         <div className="flex justify-end">
           <Button
             className="bg-black text-white hover:bg-neutral-800"
+            data-mobile-probe="inventario-nuevo-producto"
             onClick={() => {
               setEditingProd(null);
               setProdOpen(true);
+              // #region agent log
+              mobileLog({
+                location: "inventario-manager.tsx:openProd",
+                message: "product dialog open",
+                hypothesisId: "C",
+                data: { editing: false },
+              });
+              // #endregion
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -519,6 +523,18 @@ export function InventarioManager({
         pending={pending}
         onSave={(form) =>
           startTransition(async () => {
+            // #region agent log
+            mobileLog({
+              location: "inventario-manager.tsx:saveProd:start",
+              message: "product save start",
+              hypothesisId: "D",
+              data: {
+                hasImage: !!form.imageFile,
+                imageSize: form.imageFile?.size ?? 0,
+                categoriaId: form.categoriaId,
+              },
+            });
+            // #endregion
             try {
               let imagenUrl = form.imagenUrl;
               if (form.imageFile) {
@@ -529,9 +545,24 @@ export function InventarioManager({
                 );
               }
               await saveProducto({ ...form, imagenUrl });
+              // #region agent log
+              mobileLog({
+                location: "inventario-manager.tsx:saveProd:ok",
+                message: "product save ok",
+                hypothesisId: "D",
+              });
+              // #endregion
               toast.success(editingProd ? "Producto actualizado." : "Producto creado.");
               setProdOpen(false);
             } catch (e) {
+              // #region agent log
+              mobileLog({
+                location: "inventario-manager.tsx:saveProd:error",
+                message: "product save error",
+                hypothesisId: "D",
+                data: { error: e instanceof Error ? e.message : String(e) },
+              });
+              // #endregion
               toast.error(e instanceof Error ? e.message : "Error al guardar.");
             }
           })
@@ -596,7 +627,11 @@ function CategoriaDialog({
           <Field label="Orden" value={orden} onChange={setOrden} type="number" />
           <div className="space-y-2">
             <Label>Descripción</Label>
-            <Textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+            <Textarea
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              className="min-h-24 touch-manipulation text-base md:text-sm"
+            />
           </div>
           <div className="flex items-center gap-2">
             <Switch checked={activo} onCheckedChange={setActivo} />
@@ -698,18 +733,26 @@ function ProductoDialog({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
             <Label>Categoría</Label>
-            <Select value={categoriaId} onValueChange={setCategoriaId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccionar" />
-              </SelectTrigger>
-              <SelectContent>
-                {categorias.map((c) => (
-                  <SelectItem key={c.id} value={String(c.id)}>
-                    {c.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <TouchSelect
+              aria-label="Categoría"
+              value={categoriaId}
+              onChange={(v) => {
+                setCategoriaId(v);
+                // #region agent log
+                mobileLog({
+                  location: "inventario-manager.tsx:categoriaSelect",
+                  message: "categoria selected",
+                  hypothesisId: "B",
+                  runId: "post-fix",
+                  data: { value: v },
+                });
+                // #endregion
+              }}
+              options={categorias.map((c) => ({
+                value: String(c.id),
+                label: c.nombre,
+              }))}
+            />
           </div>
           <Field label="SKU" value={sku} onChange={setSku} />
           <Field label="Nombre" value={nombre} onChange={setNombre} />
@@ -728,6 +771,9 @@ function ProductoDialog({
               file={imageFile}
               onFileChange={setImageFile}
               disabled={pending}
+              enableCamera
+              fileInputId="inventario-producto-file"
+              cameraInputId="inventario-producto-camera"
             />
           </div>
           <div className="sm:col-span-2">
@@ -739,7 +785,11 @@ function ProductoDialog({
           </div>
           <div className="sm:col-span-2">
             <Label>Descripción</Label>
-            <Textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+            <Textarea
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              className="min-h-24 touch-manipulation text-base md:text-sm"
+            />
           </div>
           <div className="flex items-center gap-2 sm:col-span-2">
             <Switch checked={activo} onCheckedChange={setActivo} />
@@ -795,7 +845,12 @@ function Field({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="min-h-11 touch-manipulation text-base md:text-sm"
+      />
     </div>
   );
 }

@@ -16,13 +16,7 @@ import { formatCop, formatDateOnly } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { TouchSelect } from "@/components/ui/touch-select";
 import {
   Table,
   TableBody,
@@ -129,37 +123,35 @@ export function SolicitudesManager({
       <div
         className={`space-y-4 lg:col-span-2 ${mobileShowDetail ? "hidden lg:block" : ""}`}
       >
-        <div className="flex flex-wrap gap-2">
-          <Select value={tipoFilter} onValueChange={setTipoFilter}>
-            <SelectTrigger className="w-full min-w-0 sm:w-40">
-              <SelectValue placeholder="Tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los tipos</SelectItem>
-              {(Object.keys(SOLICITUD_TIPO_LABELS) as SolicitudTallerTipo[]).map(
-                (t) => (
-                  <SelectItem key={t} value={t}>
-                    {SOLICITUD_TIPO_LABELS[t]}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
-          <Select value={estadoFilter} onValueChange={setEstadoFilter}>
-            <SelectTrigger className="w-full min-w-0 sm:w-40">
-              <SelectValue placeholder="Estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {(Object.keys(SOLICITUD_ESTADO_LABELS) as SolicitudTallerEstado[]).map(
-                (e) => (
-                  <SelectItem key={e} value={e}>
-                    {SOLICITUD_ESTADO_LABELS[e]}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
+        <div className="grid w-full gap-2 sm:flex sm:flex-wrap">
+          <TouchSelect
+            aria-label="Filtrar por tipo"
+            value={tipoFilter}
+            onChange={setTipoFilter}
+            options={[
+              { value: "all", label: "Todos los tipos" },
+              ...(Object.keys(SOLICITUD_TIPO_LABELS) as SolicitudTallerTipo[]).map(
+                (t) => ({
+                  value: t,
+                  label: SOLICITUD_TIPO_LABELS[t],
+                }),
+              ),
+            ]}
+          />
+          <TouchSelect
+            aria-label="Filtrar por estado"
+            value={estadoFilter}
+            onChange={setEstadoFilter}
+            options={[
+              { value: "all", label: "Todos" },
+              ...(Object.keys(SOLICITUD_ESTADO_LABELS) as SolicitudTallerEstado[]).map(
+                (e) => ({
+                  value: e,
+                  label: SOLICITUD_ESTADO_LABELS[e],
+                }),
+              ),
+            ]}
+          />
         </div>
 
         <div className="space-y-2">
