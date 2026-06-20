@@ -206,12 +206,18 @@ export function resolveDisplayName(
   visita: VisitaRow | null,
 ): string {
   const hoja = contract?.hoja_vida_data as
-    | { nombres?: string; apellidos?: string; nombre?: string }
+    | {
+        nombre_completo?: string;
+        nombres?: string;
+        apellidos?: string;
+        nombre?: string;
+      }
     | undefined;
   const fromHoja =
-    hoja?.nombres && hoja?.apellidos
+    hoja?.nombre_completo?.trim() ||
+    (hoja?.nombres && hoja?.apellidos
       ? `${hoja.nombres} ${hoja.apellidos}`.trim()
-      : hoja?.nombre?.trim();
+      : hoja?.nombre?.trim());
   if (fromHoja) return fromHoja;
   if (visita?.cliente_nombre) return visita.cliente_nombre;
   return user.user;

@@ -42,11 +42,18 @@ export default async function ClientPage({
             Usuario @{pipeline.user.user} · ID {pipeline.user.id}
           </p>
         </div>
-        {pipeline.currentAdminStep && (
-          <Badge className="w-fit bg-black text-white hover:bg-black">
-            Acción requerida
-          </Badge>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" asChild className="min-h-11">
+            <Link href="/hojadevida" target="_blank">
+              Formulario web
+            </Link>
+          </Button>
+          {pipeline.currentAdminStep && (
+            <Badge className="w-fit bg-black text-white hover:bg-black">
+              Acción requerida
+            </Badge>
+          )}
+        </div>
       </div>
 
       <ClientInfoSummary pipeline={pipeline} />

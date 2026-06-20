@@ -2,6 +2,12 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { contractStatusLabel } from "@/lib/pipeline/step-logic";
 import { getContractPublicUrl } from "@/lib/utils/storage-urls";
+import {
+  ESTADO_CIVIL_LABELS,
+  TIPO_IDENTIFICACION_LABELS,
+  type EstadoCivil,
+  type TipoIdentificacion,
+} from "@/lib/contracts/hoja-vida-schema";
 import type { DigitalContractRow } from "@/lib/pipeline/types";
 import { formatDate } from "@/lib/utils/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +31,21 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
   const hoja = contract.hoja_vida_data as Record<string, unknown>;
   const hojaPdf = getContractPublicUrl(contract.hoja_vida_pdf_path);
   const contratoPdf = getContractPublicUrl(contract.contrato_pdf_path);
+  const hasHojaData = Object.keys(hoja).length > 0;
+  const referencias = Array.isArray(hoja.referencias)
+    ? (hoja.referencias as { nombre?: string; celular?: string }[])
+    : [];
+
+  const tipo = hoja.tipo_identificacion as TipoIdentificacion | undefined;
+  const tipoLabel =
+    tipo && tipo in TIPO_IDENTIFICACION_LABELS
+      ? TIPO_IDENTIFICACION_LABELS[tipo]
+      : null;
+  const estado = hoja.estado_civil as EstadoCivil | undefined;
+  const estadoLabel =
+    estado && estado in ESTADO_CIVIL_LABELS
+      ? ESTADO_CIVIL_LABELS[estado]
+      : null;
 
   return (
     <Card className="border-neutral-200 shadow-none">
@@ -49,16 +70,29 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
             <PdfLink href={contratoPdf} label="PDF Contrato" />
           )}
         </div>
-        {Object.keys(hoja).length > 0 && (
+        {hasHojaData && (
           <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
             <p className="mb-2 font-medium">Datos de hoja de vida</p>
             <dl className="grid gap-2 sm:grid-cols-2">
               {(
                 [
+                  ["Nombre", hoja.nombre_completo],
+                  [
+                    "Identificación",
+                    tipoLabel && hoja.numero_identificacion
+                      ? `${tipoLabel} ${hoja.numero_identificacion}`
+                      : hoja.numero_identificacion,
+                  ],
+                  ["Fecha nacimiento", hoja.fecha_nacimiento],
                   ["Celular", hoja.celular],
+                  ["Correo", hoja.correo],
                   ["Dirección", hoja.direccion],
                   ["Barrio", hoja.barrio],
-                  ["Ciudad", hoja.ciudad],
+                  ["Estado civil", estadoLabel],
+                  ["Empresa", hoja.nombre_empresa],
+                  ["Oficio", hoja.habilidad],
+                  ["Cónyuge", hoja.nombre_conyuge],
+                  ["Celular cónyuge", hoja.celular_conyuge],
                 ] as [string, unknown][]
               ).map(([key, val]) =>
                 val ? (
@@ -69,11 +103,23 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
                 ) : null,
               )}
             </dl>
+            {referencias.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <p className="font-medium">Referencias</p>
+                {referencias.map((r, i) =>
+                  r.nombre || r.celular ? (
+                    <p key={i} className="text-neutral-700">
+                      {i + 1}. {r.nombre ?? "—"} · {r.celular ?? "—"}
+                    </p>
+                  ) : null,
+                )}
+              </div>
+            )}
           </div>
         )}
-        {contract.status !== "firmado" && (
+        {contract.status !== "firmado" && !hasHojaData && (
           <p className="text-neutral-500">
-            Esperando al cliente para completar y firmar.
+            Esperando al cliente para completar la hoja de vida.
           </p>
         )}
       </CardContent>

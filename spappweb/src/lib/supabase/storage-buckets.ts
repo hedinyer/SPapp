@@ -6,7 +6,10 @@ export const STORAGE_BUCKETS = {
   inventarioImagenes: "inventario-imagenes",
   pagosComprobantes: "pagos-comprobantes",
   garajeImagenes: "garaje-imagenes",
+  userDocuments: "user-documents",
 } as const;
 
 export type AdminImageBucket =
   (typeof STORAGE_BUCKETS)[keyof typeof STORAGE_BUCKETS];
+
+export type ClientImageBucket = typeof STORAGE_BUCKETS.userDocuments;

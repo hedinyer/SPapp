@@ -62,6 +62,10 @@ export async function middleware(request: NextRequest) {
     );
   }
 
+  if (pathname === "/hojadevida/login") {
+    return NextResponse.redirect(new URL("/hojadevida", request.url));
+  }
+
   if (pathname === "/") {
     return NextResponse.redirect(
       new URL(isAdminLoggedIn ? "/inbox" : "/login", request.url),
@@ -97,5 +101,6 @@ export const config = {
     "/visitador/mis-visitas",
     "/visitador/mis-visitas/:path*",
     "/visitador/visitas/:path*",
+    "/hojadevida/login",
   ],
 };

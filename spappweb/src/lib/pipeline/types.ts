@@ -46,6 +46,16 @@ export interface UserRow {
   user: string;
 }
 
+export interface VisitaUbicacionVerificada {
+  lat: number;
+  lng: number;
+  accuracy?: number;
+  captured_at: string;
+}
+
+/** GPS al enviar solicitud web (users_documents.ubicacion_solicitud). */
+export type SolicitudUbicacion = VisitaUbicacionVerificada;
+
 export interface UserDocumentRow {
   id: number;
   user_id: number;
@@ -55,6 +65,7 @@ export interface UserDocumentRow {
   document_front_url: string | null;
   document_back_url: string | null;
   selfie_url: string | null;
+  ubicacion_solicitud: SolicitudUbicacion | null;
   hora_actualizacion: string | null;
   created_at: string;
 }
@@ -84,13 +95,6 @@ export interface VisitaEvidenciaVideo {
   url: string;
   captured_at: string;
   duration_sec?: number;
-}
-
-export interface VisitaUbicacionVerificada {
-  lat: number;
-  lng: number;
-  accuracy?: number;
-  captured_at: string;
 }
 
 export interface VisitadorRow {

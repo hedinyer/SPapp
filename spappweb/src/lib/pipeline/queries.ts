@@ -75,7 +75,7 @@ export async function getClientPipeline(
   const { data: document } = await supabase
     .from("users_documents")
     .select(
-      "id, user_id, estado_solicitud, betado, motivo_rechazo, document_front_url, document_back_url, selfie_url, hora_actualizacion, created_at",
+      "id, user_id, estado_solicitud, betado, motivo_rechazo, document_front_url, document_back_url, selfie_url, ubicacion_solicitud, hora_actualizacion, created_at",
     )
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
