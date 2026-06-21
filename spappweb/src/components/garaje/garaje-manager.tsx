@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
@@ -83,6 +84,7 @@ export function GarajeManager({
   motos: GarajeMotoRow[];
   initialFotoPendiente?: boolean;
 }) {
+  const router = useRouter();
   const [motoOpen, setMotoOpen] = useState(false);
   const [parqOpen, setParqOpen] = useState(false);
   const [editingMoto, setEditingMoto] = useState<GarajeMotoRow | null>(null);
@@ -316,6 +318,7 @@ export function GarajeManager({
                                       try {
                                         await deleteGarajeMoto(m.id);
                                         toast.success("Moto eliminada.");
+                                        router.refresh();
                                       } catch (e) {
                                         toast.error(
                                           e instanceof Error
@@ -442,6 +445,7 @@ export function GarajeManager({
                                 try {
                                   await deleteGarajeMoto(m.id);
                                   toast.success("Moto eliminada.");
+                                  router.refresh();
                                 } catch (e) {
                                   toast.error(
                                     e instanceof Error
@@ -534,6 +538,7 @@ export function GarajeManager({
                                   try {
                                     await deleteGarajeParqueadero(p.id);
                                     toast.success("Parqueadero eliminado.");
+                                    router.refresh();
                                   } catch (e) {
                                     toast.error(
                                       e instanceof Error
@@ -618,6 +623,7 @@ export function GarajeManager({
                             try {
                               await deleteGarajeParqueadero(p.id);
                               toast.success("Parqueadero eliminado.");
+                              router.refresh();
                             } catch (e) {
                               toast.error(
                                 e instanceof Error
@@ -680,6 +686,7 @@ export function GarajeManager({
                 return;
               }
               toast.success(editingMoto ? "Moto actualizada." : "Moto registrada.");
+              router.refresh();
               closeMotoEditor();
             } catch (e) {
               toast.error(e instanceof Error ? e.message : "Error al guardar.");
@@ -700,6 +707,7 @@ export function GarajeManager({
               toast.success(
                 editingParq ? "Parqueadero actualizado." : "Parqueadero creado.",
               );
+              router.refresh();
               setParqOpen(false);
             } catch (e) {
               toast.error(e instanceof Error ? e.message : "Error al guardar.");

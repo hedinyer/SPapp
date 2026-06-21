@@ -16,7 +16,17 @@ npm install
 npm run dev
 ```
 
-Las credenciales Supabase y `SESSION_SECRET` están embebidas en `src/lib/supabase/env.ts` (no hace falta `.env.local`).
+URL y anon key de Supabase están en `src/lib/supabase/public-env.ts`.
+
+Crea `spappweb/.env.local` (gitignored) con la service role para operaciones admin (crear, editar, eliminar):
+
+```bash
+SUPABASE_SERVICE_ROLE_KEY=eyJ...   # Supabase → Settings → API → service_role
+# opcional en local:
+# SESSION_SECRET=una-cadena-secreta-de-al-menos-32-caracteres
+```
+
+Sin `SUPABASE_SERVICE_ROLE_KEY`, el panel queda en solo lectura efectiva (SELECT funciona; INSERT/UPDATE/DELETE fallan).
 
 Abre [http://localhost:3000](http://localhost:3000) — redirige a login o bandeja.
 
@@ -32,7 +42,12 @@ UPDATE public.users SET status = 'admin' WHERE "user" = 'tu_usuario_admin';
 
 1. Importa el repositorio en Vercel.
 2. **Root Directory:** `spappweb`
-3. Deploy (sin variables de entorno; las keys están en `src/lib/supabase/env.ts`).
+3. **Environment Variables** (obligatoria):
+   - `SUPABASE_SERVICE_ROLE_KEY` — Supabase Dashboard → Project Settings → API → **service_role** (secret). Aplicar a Production (y Preview si quieres).
+   - Opcional: `SESSION_SECRET` — cadena de al menos 32 caracteres para firmar cookies de sesión admin.
+4. Deploy / redeploy.
+
+Sin `SUPABASE_SERVICE_ROLE_KEY` en Vercel, crear/editar/eliminar en catálogo, inventario, garaje, visitadores y bandeja fallará en producción.
 
 ## Estructura
 
@@ -40,3 +55,6 @@ UPDATE public.users SET status = 'admin' WHERE "user" = 'tu_usuario_admin';
 - `/clientes/[userId]` — Pipeline del cliente con stepper
 - `/visitadores` — CRUD visitadores
 - `/catalogo` — CRUD catálogo `bike_table`
+- `/inventario` — CRUD repuestos y categorías
+- `/garaje` — CRUD parqueaderos y motos
+- `/solicitudes` — Solicitudes de taller

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -13,6 +14,45 @@ function revalidateClient(userId: number) {
 async function assertAdmin() {
   await requireAdminSession();
   return createAdminClient();
+}
+
+function mapDbError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("foreign key") || lower.includes("violates foreign key")) {
+    if (lower.includes("solicitud_repuesto_items") || lower.includes("producto_id")) {
+      return "Este producto tiene solicitudes de taller asociadas. Desactívalo en lugar de eliminarlo.";
+    }
+    if (lower.includes("inventario_productos") || lower.includes("categoria_id")) {
+      return "Esta categoría tiene productos. Elimínalos o reasígnalos primero.";
+    }
+    if (lower.includes("user_moto_compra") || lower.includes("bike_id")) {
+      return "Esta moto tiene compras asociadas. Desactívala en lugar de eliminarla.";
+    }
+    return "No se puede eliminar: hay registros relacionados.";
+  }
+  if (lower.includes("permission denied")) {
+    return "Sin permisos para eliminar. Configura SUPABASE_SERVICE_ROLE_KEY en el servidor.";
+  }
+  return message;
+}
+
+async function adminDelete(
+  supabase: SupabaseClient,
+  table: string,
+  id: number | string,
+  path: string,
+) {
+  const { data, error } = await supabase
+    .from(table)
+    .delete()
+    .eq("id", id)
+    .select("id");
+  if (error) throw new Error(mapDbError(error.message));
+  if (!data?.length) {
+    throw new Error("No se eliminó nada (sin permisos o referencias activas).");
+  }
+  revalidatePath(path);
+  return { ok: true as const };
 }
 
 export async function approveCredit(documentId: number, userId: number) {
@@ -399,19 +439,14 @@ export async function deleteVisitador(id: number) {
     .eq("id", parsed)
     .maybeSingle();
 
-  if (fetchError) throw new Error(fetchError.message);
+  if (fetchError) throw new Error(mapDbError(fetchError.message));
 
-  const { error } = await supabase
-    .from("visitadores")
-    .delete()
-    .eq("id", parsed);
-  if (error) throw new Error(error.message);
+  await adminDelete(supabase, "visitadores", parsed, "/visitadores");
 
   if (visitador?.user_id) {
     await supabase.from("users").delete().eq("id", visitador.user_id);
   }
 
-  revalidatePath("/visitadores");
   revalidatePath("/inbox");
   return { ok: true };
 }
@@ -460,10 +495,7 @@ export async function saveBike(input: z.infer<typeof bikeSchema>) {
 
 export async function deleteBike(id: number) {
   const supabase = await assertAdmin();
-  const { error } = await supabase.from("bike_table").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/catalogo");
-  return { ok: true };
+  return adminDelete(supabase, "bike_table", id, "/catalogo");
 }
 
 const categoriaSchema = z.object({
@@ -503,13 +535,7 @@ export async function saveCategoria(input: z.infer<typeof categoriaSchema>) {
 
 export async function deleteCategoria(id: number) {
   const supabase = await assertAdmin();
-  const { error } = await supabase
-    .from("inventario_categorias")
-    .delete()
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/inventario");
-  return { ok: true };
+  return adminDelete(supabase, "inventario_categorias", id, "/inventario");
 }
 
 const productoSchema = z.object({
@@ -559,13 +585,7 @@ export async function saveProducto(input: z.infer<typeof productoSchema>) {
 
 export async function deleteProducto(id: number) {
   const supabase = await assertAdmin();
-  const { error } = await supabase
-    .from("inventario_productos")
-    .delete()
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/inventario");
-  return { ok: true };
+  return adminDelete(supabase, "inventario_productos", id, "/inventario");
 }
 
 const updateSolicitudSchema = z.object({
@@ -637,13 +657,7 @@ export async function deleteGarajeParqueadero(id: number) {
   if ((count ?? 0) > 0) {
     throw new Error("No se puede eliminar: hay motos asignadas a este parqueadero.");
   }
-  const { error } = await supabase
-    .from("garaje_parqueaderos")
-    .delete()
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/garaje");
-  return { ok: true };
+  return adminDelete(supabase, "garaje_parqueaderos", id, "/garaje");
 }
 
 const garajeMotoSchema = z
@@ -714,10 +728,7 @@ export async function saveGarajeMoto(
 
 export async function deleteGarajeMoto(id: string) {
   const supabase = await assertAdmin();
-  const { error } = await supabase.from("garaje_motos").delete().eq("id", id);
-  if (error) throw new Error(error.message);
-  revalidatePath("/garaje");
-  return { ok: true };
+  return adminDelete(supabase, "garaje_motos", id, "/garaje");
 }
 
 const markMotoRecogidaSchema = z.object({

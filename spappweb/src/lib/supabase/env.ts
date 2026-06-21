@@ -4,8 +4,10 @@ import {
 } from "@/lib/supabase/public-env";
 
 /** Credenciales embebidas para deploy sin variables en Vercel. */
-const SUPABASE_SERVICE_ROLE_KEY = "";
-export const SESSION_SECRET = "spapp-admin-local-dev-secret-32chars-min";
+// ponytail: service_role solo servidor; anon queda para browser/storage
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+export const SESSION_SECRET =
+  process.env.SESSION_SECRET ?? "spapp-admin-local-dev-secret-32chars-min";
 
 export function getSupabaseUrl(): string {
   return SUPABASE_URL;

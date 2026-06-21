@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteBike, saveBike } from "@/lib/actions/admin-actions";
@@ -45,6 +46,7 @@ import {
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 
 export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<BikeRow | null>(null);
   const [pending, startTransition] = useTransition();
@@ -123,6 +125,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                                 try {
                                   await deleteBike(bike.id);
                                   toast.success("Moto eliminada.");
+                                  router.refresh();
                                 } catch (e) {
                                   toast.error(
                                     e instanceof Error
@@ -210,6 +213,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                           try {
                             await deleteBike(bike.id);
                             toast.success("Moto eliminada.");
+                            router.refresh();
                           } catch (e) {
                             toast.error(
                               e instanceof Error
@@ -250,6 +254,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
 
               await saveBike({ ...form, imagenUrl });
               toast.success(editing ? "Moto actualizada." : "Moto creada.");
+              router.refresh();
               setOpen(false);
             } catch (e) {
               toast.error(

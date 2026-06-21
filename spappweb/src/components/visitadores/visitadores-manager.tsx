@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteVisitador, saveVisitador } from "@/lib/actions/admin-actions";
@@ -56,6 +57,7 @@ export function VisitadoresManager({
 }: {
   visitadores: VisitadorRow[];
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<VisitadorRow | null>(null);
   const [pending, startTransition] = useTransition();
@@ -101,6 +103,7 @@ export function VisitadoresManager({
           password: form.password || undefined,
         });
         toast.success(editing ? "Visitador actualizado." : "Visitador creado.");
+        router.refresh();
         setOpen(false);
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Error al guardar.");
@@ -192,6 +195,7 @@ export function VisitadoresManager({
                                     try {
                                       await deleteVisitador(v.id);
                                       toast.success("Visitador eliminado.");
+                                      router.refresh();
                                     } catch (e) {
                                       toast.error(
                                         e instanceof Error
@@ -286,6 +290,7 @@ export function VisitadoresManager({
                               try {
                                 await deleteVisitador(v.id);
                                 toast.success("Visitador eliminado.");
+                                router.refresh();
                               } catch (e) {
                                 toast.error(
                                   e instanceof Error

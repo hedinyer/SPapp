@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { usePollingRefresh } from "@/hooks/use-polling-refresh";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -64,6 +65,7 @@ export function InventarioManager({
   categorias: InventarioCategoriaRow[];
   productos: InventarioProductoRow[];
 }) {
+  const router = useRouter();
   const [catOpen, setCatOpen] = useState(false);
   const [prodOpen, setProdOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<InventarioCategoriaRow | null>(
@@ -191,6 +193,7 @@ export function InventarioManager({
                                     try {
                                       await deleteProducto(p.id);
                                       toast.success("Producto eliminado.");
+                                      router.refresh();
                                     } catch (e) {
                                       toast.error(
                                         e instanceof Error
@@ -300,6 +303,7 @@ export function InventarioManager({
                               try {
                                 await deleteProducto(p.id);
                                 toast.success("Producto eliminado.");
+                                router.refresh();
                               } catch (e) {
                                 toast.error(
                                   e instanceof Error
@@ -388,6 +392,7 @@ export function InventarioManager({
                                   try {
                                     await deleteCategoria(c.id);
                                     toast.success("Categoría eliminada.");
+                                    router.refresh();
                                   } catch (e) {
                                     toast.error(
                                       e instanceof Error
@@ -466,6 +471,7 @@ export function InventarioManager({
                             try {
                               await deleteCategoria(c.id);
                               toast.success("Categoría eliminada.");
+                              router.refresh();
                             } catch (e) {
                               toast.error(
                                 e instanceof Error
@@ -497,6 +503,7 @@ export function InventarioManager({
             try {
               await saveCategoria(form);
               toast.success(editingCat ? "Categoría actualizada." : "Categoría creada.");
+              router.refresh();
               setCatOpen(false);
             } catch (e) {
               toast.error(e instanceof Error ? e.message : "Error al guardar.");
@@ -524,6 +531,7 @@ export function InventarioManager({
               }
               await saveProducto({ ...form, imagenUrl });
               toast.success(editingProd ? "Producto actualizado." : "Producto creado.");
+              router.refresh();
               setProdOpen(false);
             } catch (e) {
               toast.error(e instanceof Error ? e.message : "Error al guardar.");
