@@ -5,13 +5,15 @@ import { ExternalLink, MapPin, Radio } from "lucide-react";
 import { toast } from "sonner";
 import { setTracking } from "@/lib/actions/admin-actions";
 import type {
+  AtrasoSnapshot,
   MorosoRow,
   MotoParaRecogerRow,
   TrackingLocation,
   UserTrackingRow,
 } from "@/lib/pipeline/types";
+import { getMoraDisplay } from "@/lib/pipeline/mora-utils";
 import { createAnonClient } from "@/lib/supabase/anon";
-import { formatDate } from "@/lib/utils/format";
+import { formatCop, formatDate } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -22,6 +24,7 @@ interface TrackingPanelProps {
   userId: number;
   moroso?: MorosoRow | null;
   recoger?: MotoParaRecogerRow | null;
+  atraso?: AtrasoSnapshot | null;
 }
 
 function isLiveLocation(location: TrackingLocation | null | undefined) {
@@ -36,6 +39,7 @@ export function TrackingPanel({
   userId,
   moroso,
   recoger,
+  atraso,
 }: TrackingPanelProps) {
   const [pending, startTransition] = useTransition();
   const [liveTracking, setLiveTracking] = useState(tracking);
@@ -67,8 +71,8 @@ export function TrackingPanel({
     };
   }, [userId]);
 
-  const needsIntensiveTracking =
-    (moroso?.dias_atraso ?? 0) >= 1 || recoger != null;
+  const mora = getMoraDisplay({ moroso, recoger, atraso });
+  const needsIntensiveTracking = mora.tieneDeuda && mora.dias >= 1;
   const location = liveTracking?.ubicacion_1 ?? null;
   const hasLocation = location?.lat != null && location?.lng != null;
   const liveNow = useMemo(() => isLiveLocation(location), [location]);
@@ -98,15 +102,22 @@ export function TrackingPanel({
           La ubicación la envía la app del cliente en tiempo real a{" "}
           <span className="font-medium text-neutral-700">ubicacion_1</span>.
         </p>
-        {needsIntensiveTracking && !liveTracking.seguimiento && (
+        {mora.tieneDeuda && (
           <p className="text-sm font-medium text-amber-800">
-            Cliente en mora: activa seguimiento intensivo para forzar GPS en
-            segundo plano.
+            Cuenta de mora: {mora.dias > 0 ? `${mora.dias} días · ` : ""}
+            adeudado {formatCop(mora.monto)}
           </p>
         )}
-        {recoger && (
+        {needsIntensiveTracking && !liveTracking.seguimiento && (
+          <p className="text-sm font-medium text-amber-800">
+            {mora.paraRecoger
+              ? "Moto para recoger: activa seguimiento intensivo para forzar GPS en segundo plano."
+              : "Cliente con atraso: activa seguimiento intensivo para forzar GPS en segundo plano."}
+          </p>
+        )}
+        {mora.paraRecoger && (
           <p className="text-sm text-red-700">
-            Moto marcada para recoger ({recoger.dias_atraso} días de mora).
+            Moto marcada para recoger ({mora.dias} días de mora).
           </p>
         )}
       </CardHeader>

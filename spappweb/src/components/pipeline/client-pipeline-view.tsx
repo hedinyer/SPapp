@@ -7,6 +7,7 @@ import { MotoSelectionPanel } from "@/components/pipeline/moto-selection-panel";
 import { PaymentConfirmPanel } from "@/components/pipeline/payment-confirm-panel";
 import { DeliveryPanel } from "@/components/pipeline/delivery-panel";
 import { RentingPanel } from "@/components/pipeline/renting-panel";
+import { MoraSummaryBanner } from "@/components/pipeline/mora-summary-banner";
 import { TrackingPanel } from "@/components/pipeline/tracking-panel";
 
 interface ClientPipelineViewProps {
@@ -27,6 +28,7 @@ export function ClientPipelineView({
   return (
     <div className="space-y-8">
       <ClientStepper steps={pipeline.steps} />
+      <MoraSummaryBanner pipeline={pipeline} />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
@@ -109,6 +111,7 @@ export function ClientPipelineView({
             userId={userId}
             moroso={pipeline.moroso}
             recoger={pipeline.recoger}
+            atraso={pipeline.atraso}
           />
         </div>
       </div>

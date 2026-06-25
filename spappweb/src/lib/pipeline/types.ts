@@ -10,6 +10,12 @@ export type MotoCompraEstado =
   | "lista_retiro"
   | "entregada"
   | "cancelada";
+export type VendidaEstadoFisico =
+  | "activa"
+  | "recogida"
+  | "robada"
+  | "en_transito"
+  | "en_patio";
 export type FrecuenciaPago = "diario" | "semanal" | "quincenal" | "mensual";
 export type TarifaEstado = "pendiente" | "pagada" | "vencida";
 export type MorosoEstado = "activo" | "regularizado";
@@ -149,6 +155,35 @@ export interface UserMotoCompraRow {
   seleccionado_at: string;
 }
 
+export interface VendidaMotoRow extends UserMotoCompraRow {
+  estado_fisico: VendidaEstadoFisico;
+  users?: { id: number; user: string } | { id: number; user: string }[] | null;
+  morosos?: { estado: MorosoEstado; dias_atraso: number; monto_adeudado?: number } | null;
+  motos_para_recoger?: {
+    estado: MotoRecogerEstado;
+    dias_atraso?: number;
+  } | null;
+  garaje_motos?: { id: string }[] | null;
+  atraso?: AtrasoSnapshot | null;
+}
+
+export type AtrasoEstado = "al_dia" | "vencido" | "moroso";
+
+export interface AtrasoSnapshot {
+  dias_atraso: number;
+  monto_adeudado: number;
+  estado: AtrasoEstado;
+}
+
+export const VENDIDA_ESTADO_FISICO_LABELS: Record<VendidaEstadoFisico, string> =
+  {
+    activa: "Activa",
+    recogida: "Recogida",
+    robada: "Robada",
+    en_transito: "En tránsito",
+    en_patio: "En patio",
+  };
+
 export interface TrackingLocation {
   lat?: number;
   lng?: number;
@@ -287,6 +322,7 @@ export interface ClientPipeline {
   tarifas: TarifaPagadaRow[];
   moroso: MorosoRow | null;
   recoger: MotoParaRecogerRow | null;
+  atraso: AtrasoSnapshot | null;
   rentingResumen: RentingResumen | null;
   pagosHistorial: PagoHistorialRow[];
   pagos: PagoRow[];

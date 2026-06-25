@@ -3,6 +3,7 @@ import {
   ClipboardList,
   LogOut,
   Package,
+  ShoppingBag,
   Warehouse,
   UserPlus,
   UserSearch,
@@ -25,6 +26,7 @@ export const adminNavLinks: AdminNavLink[] = [
   { href: "/catalogo", label: "Catálogo", icon: Bike },
   { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/garaje", label: "Garaje", icon: Warehouse },
+  { href: "/vendidas", label: "Vendidas", icon: ShoppingBag },
   { href: "/solicitudes", label: "Solicitudes", icon: Wrench },
 ];
 

@@ -14,8 +14,12 @@ import type {
   InventarioProductoRow,
   GarajeMotoRow,
   GarajeParqueaderoRow,
+  VendidaMotoRow,
+  MorosoEstado,
   MorosoRow,
   MotoParaRecogerRow,
+  MotoRecogerEstado,
+  AtrasoSnapshot,
   PagoHistorialRow,
   PagoRow,
   RentingResumen,
@@ -34,6 +38,12 @@ import {
   describeMontoVariacion,
   roundCuotas,
 } from "@/lib/payments/payment-metrics";
+import {
+  DIAS_MORA_BANDEJA,
+  DIAS_RECOGER_BANDEJA,
+  mergeRentingResumenWithAtraso,
+} from "@/lib/pipeline/mora-utils";
+import { formatCop } from "@/lib/utils/format";
 
 function normalizeVisita(raw: unknown): VisitaRow | null {
   if (!raw) return null;
@@ -140,6 +150,14 @@ export async function getClientPipeline(
     .in("estado", ["pendiente", "asignada"])
     .maybeSingle();
 
+  const { data: atrasoRow } = compra
+    ? await supabase
+        .from("atrasos")
+        .select("dias_atraso, monto_adeudado, estado")
+        .eq("user_moto_compra_id", compra.id)
+        .maybeSingle()
+    : { data: null };
+
   const tarifaRows = (tarifas as TarifaPagadaRow[]) ?? [];
 
   const { data: pagos } = compra
@@ -153,9 +171,14 @@ export async function getClientPipeline(
         .order("confirmado_at", { ascending: false })
     : { data: [] };
 
-  const rentingResumen = buildRentingResumen(
+  const rentingResumenFromTarifas = buildRentingResumen(
     compra as UserMotoCompraRow | null,
     tarifaRows,
+  );
+  const rentingResumen = mergeRentingResumenWithAtraso(
+    compra as UserMotoCompraRow | null,
+    rentingResumenFromTarifas,
+    (atrasoRow as AtrasoSnapshot | null) ?? null,
   );
 
   const pagosHistorial = buildPagosHistorial(
@@ -174,6 +197,7 @@ export async function getClientPipeline(
     tarifas: tarifaRows,
     moroso: (moroso as MorosoRow | null) ?? null,
     recoger: (recoger as MotoParaRecogerRow | null) ?? null,
+    atraso: (atrasoRow as AtrasoSnapshot | null) ?? null,
     rentingResumen,
     pagosHistorial,
     pagos: (pagos as PagoRow[]) ?? [],
@@ -334,7 +358,9 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
     supabase
       .from("morosos")
       .select("id", { count: "exact", head: true })
-      .eq("estado", "activo"),
+      .eq("estado", "activo")
+      .gte("dias_atraso", DIAS_MORA_BANDEJA)
+      .lt("dias_atraso", DIAS_RECOGER_BANDEJA),
     supabase
       .from("motos_para_recoger")
       .select("id", { count: "exact", head: true })
@@ -385,7 +411,7 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
     {
       id: "morosos",
       label: "Clientes en mora",
-      description: "Atraso de 3+ días en tarifas",
+      description: "Exactamente 3 días de atraso en tarifas",
       count: morosos.count ?? 0,
     },
     {
@@ -522,7 +548,9 @@ export async function getInboxListItems(
           "user_id, dias_atraso, monto_adeudado, users(id, user), user_moto_compra(modelo, color, placa)",
         )
         .eq("estado", "activo")
-        .order("fecha_ingreso", { ascending: true });
+        .gte("dias_atraso", DIAS_MORA_BANDEJA)
+        .lt("dias_atraso", DIAS_RECOGER_BANDEJA)
+        .order("dias_atraso", { ascending: false });
 
       return (data ?? []).map((row) => {
         const users = joinUser(row.users);
@@ -535,7 +563,7 @@ export async function getInboxListItems(
           userId: row.user_id as number,
           username: users?.user ?? `#${row.user_id}`,
           displayName: users?.user ?? `Cliente ${row.user_id}`,
-          subtitle: `${compra?.modelo ?? "Moto"} · ${row.dias_atraso} días · ${compra?.placa ?? "sin placa"}`,
+          subtitle: `${compra?.modelo ?? "Moto"} · ${row.dias_atraso} días · ${formatCop(row.monto_adeudado)} · ${compra?.placa ?? "sin placa"}`,
           queueId,
         };
       });
@@ -560,7 +588,7 @@ export async function getInboxListItems(
           userId: row.user_id as number,
           username: users?.user ?? `#${row.user_id}`,
           displayName: users?.user ?? `Cliente ${row.user_id}`,
-          subtitle: `Recoger ${compra?.modelo ?? "moto"} · ${row.dias_atraso} días mora`,
+          subtitle: `Recoger ${compra?.modelo ?? "moto"} · ${row.dias_atraso} días · ${formatCop(row.monto_adeudado)}`,
           queueId,
         };
       });
@@ -662,6 +690,59 @@ export async function getAllBikes(): Promise<BikeRow[]> {
     .order("modelo")
     .order("color");
   return (data as BikeRow[]) ?? [];
+}
+
+export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
+  const supabase = createAdminClient();
+  const [{ data }, { data: atrasos }] = await Promise.all([
+    supabase
+      .from("user_moto_compra")
+      .select(
+        "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, estado_fisico, seleccionado_at, users(id, user), morosos(estado, dias_atraso, monto_adeudado), motos_para_recoger(estado, dias_atraso), garaje_motos(id)",
+      )
+      .eq("estado", "entregada")
+      .order("fecha_entrega", { ascending: false, nullsFirst: false })
+      .order("seleccionado_at", { ascending: false }),
+    supabase
+      .from("atrasos")
+      .select("user_moto_compra_id, dias_atraso, monto_adeudado, estado"),
+  ]);
+
+  const atrasoMap = new Map(
+    ((atrasos ?? []) as Array<
+      AtrasoSnapshot & { user_moto_compra_id: string }
+    >).map((a) => [a.user_moto_compra_id, a]),
+  );
+
+  return ((data ?? []) as unknown as VendidaMotoRow[]).map((row) => {
+    const users = row.users;
+    const morososRaw = row.morosos as
+      | { estado: MorosoEstado; dias_atraso: number; monto_adeudado?: number }
+      | { estado: MorosoEstado; dias_atraso: number; monto_adeudado?: number }[]
+      | null;
+    const recogerRaw = row.motos_para_recoger as
+      | { estado: MotoRecogerEstado; dias_atraso?: number }
+      | { estado: MotoRecogerEstado; dias_atraso?: number }[]
+      | null;
+    const atrasoRaw = atrasoMap.get(row.id);
+
+    return {
+      ...row,
+      users: Array.isArray(users) ? users[0] : users,
+      morosos: Array.isArray(morososRaw) ? morososRaw[0] : morososRaw,
+      motos_para_recoger: Array.isArray(recogerRaw)
+        ? recogerRaw[0]
+        : recogerRaw,
+      garaje_motos: row.garaje_motos ?? [],
+      atraso: atrasoRaw
+        ? {
+            dias_atraso: atrasoRaw.dias_atraso,
+            monto_adeudado: atrasoRaw.monto_adeudado,
+            estado: atrasoRaw.estado as AtrasoSnapshot["estado"],
+          }
+        : null,
+    } satisfies VendidaMotoRow;
+  });
 }
 
 export async function getAllGarajeParqueaderos(): Promise<GarajeParqueaderoRow[]> {

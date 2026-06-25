@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -302,26 +302,35 @@ function BikeDialog({
   const [descripcion, setDescripcion] = useState("");
   const [activo, setActivo] = useState(true);
 
-  function loadEditing() {
-    setModelo(editing?.modelo ?? "");
-    setColor(editing?.color ?? "");
-    setImagenUrl(editing?.imagen_url ?? "");
+  useEffect(() => {
+    if (!open) return;
+
+    if (editing) {
+      setModelo(editing.modelo);
+      setColor(editing.color);
+      setImagenUrl(editing.imagen_url ?? "");
+      setImageFile(null);
+      setStock(String(editing.stock));
+      setCuotaInicial(String(editing.cuota_inicial));
+      setCuotaDiaria(String(editing.cuota_diaria));
+      setDescripcion(editing.descripcion ?? "");
+      setActivo(editing.activo);
+      return;
+    }
+
+    setModelo("");
+    setColor("");
+    setImagenUrl("");
     setImageFile(null);
-    setStock(String(editing?.stock ?? 0));
-    setCuotaInicial(String(editing?.cuota_inicial ?? 0));
-    setCuotaDiaria(String(editing?.cuota_diaria ?? 38000));
-    setDescripcion(editing?.descripcion ?? "");
-    setActivo(editing?.activo ?? true);
-  }
+    setStock("");
+    setCuotaInicial("");
+    setCuotaDiaria("");
+    setDescripcion("");
+    setActivo(true);
+  }, [open, editing]);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(v) => {
-        onOpenChange(v);
-        if (v) loadEditing();
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar moto" : "Nueva moto"}</DialogTitle>

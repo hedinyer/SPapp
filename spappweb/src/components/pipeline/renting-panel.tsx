@@ -12,6 +12,7 @@ import {
   type ClientPipeline,
   type TarifaPagadaRow,
 } from "@/lib/pipeline/types";
+import { getMoraDisplay } from "@/lib/pipeline/mora-utils";
 import { cuotaFraction } from "@/lib/payments/payment-metrics";
 import { formatCop, formatCuotas, formatDate, formatDateOnly } from "@/lib/utils/format";
 import {
@@ -72,7 +73,11 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
   const [selectedTarifa, setSelectedTarifa] = useState<TarifaPagadaRow | null>(
     null,
   );
-  const { compra, rentingResumen, tarifas, moroso, recoger, pagosHistorial } = pipeline;
+  const { compra, rentingResumen, tarifas, moroso, recoger, pagosHistorial, atraso } =
+    pipeline;
+
+  const mora = getMoraDisplay({ atraso, moroso, recoger, rentingResumen });
+  const moraResumen = mora.tieneDeuda && !mora.paraRecoger;
 
   const referenciasUsadas = useMemo(
     () =>
@@ -241,13 +246,30 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
             )}
           </div>
 
-          {moroso && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
-              <p className="font-medium text-amber-900">Cliente en mora</p>
-              <p className="mt-1 text-amber-800">
-                {moroso.dias_atraso} días de atraso · Adeudado{" "}
-                {formatCop(moroso.monto_adeudado)}
+          {moraResumen && (
+            <div
+              className={`rounded-lg border p-4 text-sm ${
+                mora.enMoraBandeja
+                  ? "border-amber-200 bg-amber-50"
+                  : "border-neutral-200 bg-neutral-50"
+              }`}
+            >
+              <p
+                className={`font-medium ${
+                  mora.enMoraBandeja ? "text-amber-900" : "text-neutral-900"
+                }`}
+              >
+                {mora.enMoraBandeja ? "Cliente en mora" : "Saldo pendiente"}
               </p>
+              <p
+                className={`mt-1 ${
+                  mora.enMoraBandeja ? "text-amber-800" : "text-neutral-700"
+                }`}
+              >
+                {mora.dias > 0 ? `${mora.dias} días de atraso · ` : ""}
+                Adeudado {formatCop(mora.monto)}
+              </p>
+              {moroso && mora.enMoraBandeja ? (
               <Button
                 size="sm"
                 variant="outline"
@@ -258,17 +280,17 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
               >
                 Marcar regularizado
               </Button>
+              ) : null}
             </div>
           )}
 
-          {recoger && (
+          {mora.paraRecoger && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm">
               <p className="font-medium text-red-900">Moto para recoger</p>
               <p className="mt-1 text-red-800">
-                {recoger.dias_atraso} días de mora · Adeudado{" "}
-                {formatCop(recoger.monto_adeudado)}
+                {mora.dias} días de mora · Adeudado {formatCop(mora.monto)}
               </p>
-              {recoger.estado !== "recogida" && (
+              {recoger && recoger.estado !== "recogida" && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button
                     size="sm"

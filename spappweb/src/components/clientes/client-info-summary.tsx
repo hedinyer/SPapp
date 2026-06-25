@@ -3,6 +3,7 @@ import {
   COMPRA_ESTADO_LABELS,
   FRECUENCIA_LABELS,
 } from "@/lib/pipeline/types";
+import { getMoraDisplay, moraEstadoLabel } from "@/lib/pipeline/mora-utils";
 import { formatCop, formatCuotas } from "@/lib/utils/format";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -32,12 +33,14 @@ export function ClientInfoSummary({ pipeline }: { pipeline: ClientPipeline }) {
     null;
   const compra = pipeline.compra;
   const resumen = pipeline.rentingResumen;
+  const mora = getMoraDisplay(pipeline);
 
   const hasContent =
     cedula ||
     celular ||
     compra ||
     resumen ||
+    mora.tieneDeuda ||
     pipeline.visita?.direccion_visita;
 
   if (!hasContent) return null;
@@ -71,6 +74,19 @@ export function ClientInfoSummary({ pipeline }: { pipeline: ClientPipeline }) {
             label="Dirección"
             value={pipeline.visita.direccion_visita}
           />
+        )}
+        {mora.tieneDeuda && compra?.estado === "entregada" && (
+          <>
+            <InfoItem
+              label="Estado de pagos"
+              value={moraEstadoLabel(pipeline.atraso)}
+            />
+            <InfoItem
+              label="Días de atraso"
+              value={mora.dias > 0 ? String(mora.dias) : "—"}
+            />
+            <InfoItem label="Adeudado" value={formatCop(mora.monto)} />
+          </>
         )}
         {resumen && (
           <>

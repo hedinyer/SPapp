@@ -766,3 +766,57 @@ export async function markMotoRecogida(
   revalidateClient(parsed.userId);
   return { ok: true };
 }
+
+const vendidaEstadoFisicoSchema = z.object({
+  compraId: z.string().uuid(),
+  userId: z.number(),
+  estadoFisico: z.enum([
+    "activa",
+    "recogida",
+    "robada",
+    "en_transito",
+    "en_patio",
+  ]),
+});
+
+export async function updateVendidaEstadoFisico(
+  input: z.infer<typeof vendidaEstadoFisicoSchema>,
+) {
+  const parsed = vendidaEstadoFisicoSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { error } = await supabase
+    .from("user_moto_compra")
+    .update({ estado_fisico: parsed.estadoFisico })
+    .eq("id", parsed.compraId)
+    .eq("estado", "entregada");
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/vendidas");
+  revalidateClient(parsed.userId);
+  return { ok: true };
+}
+
+export async function deleteVendidaMoto(compraId: string, userId: number) {
+  const supabase = await assertAdmin();
+
+  const { error: garajeError } = await supabase
+    .from("garaje_motos")
+    .delete()
+    .eq("user_moto_compra_id", compraId);
+  if (garajeError) throw new Error(mapDbError(garajeError.message));
+
+  const { data, error } = await supabase
+    .from("user_moto_compra")
+    .delete()
+    .eq("id", compraId)
+    .select("id");
+  if (error) throw new Error(mapDbError(error.message));
+  if (!data?.length) throw new Error("Compra no encontrada.");
+
+  revalidatePath("/vendidas");
+  revalidatePath("/garaje");
+  revalidatePath("/inbox");
+  revalidateClient(userId);
+  return { ok: true };
+}

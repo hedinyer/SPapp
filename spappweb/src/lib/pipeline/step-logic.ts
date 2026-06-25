@@ -233,6 +233,7 @@ export function buildClientPipeline(input: {
   tarifas?: import("@/lib/pipeline/types").TarifaPagadaRow[];
   moroso?: import("@/lib/pipeline/types").MorosoRow | null;
   recoger?: import("@/lib/pipeline/types").MotoParaRecogerRow | null;
+  atraso?: import("@/lib/pipeline/types").AtrasoSnapshot | null;
   rentingResumen?: import("@/lib/pipeline/types").RentingResumen | null;
   pagosHistorial?: import("@/lib/pipeline/types").PagoHistorialRow[];
   pagos?: import("@/lib/pipeline/types").PagoRow[];
@@ -249,6 +250,7 @@ export function buildClientPipeline(input: {
     tarifas: input.tarifas ?? [],
     moroso: input.moroso ?? null,
     recoger: input.recoger ?? null,
+    atraso: input.atraso ?? null,
     rentingResumen: input.rentingResumen ?? null,
     pagosHistorial: input.pagosHistorial ?? [],
     pagos: input.pagos ?? [],
