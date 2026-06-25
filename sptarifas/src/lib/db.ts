@@ -5,11 +5,14 @@ declare global {
   var _viaductPool: Pool | undefined;
 }
 
+// Cadena Railway hardcodeada como respaldo para que funcione sin configurar env en Vercel.
+// La env var DATABASE_URL_VIADUCT, si existe, tiene prioridad.
+const FALLBACK_VIADUCT_URL =
+  "postgresql://postgres:nzodrSFiCoFVhmcChrywBGsHVciVEgio@viaduct.proxy.rlwy.net:50499/railway";
+
 function getPool(): Pool {
-  const connectionString = process.env.DATABASE_URL_VIADUCT;
-  if (!connectionString) {
-    throw new Error("Falta la variable de entorno DATABASE_URL_VIADUCT.");
-  }
+  const connectionString =
+    process.env.DATABASE_URL_VIADUCT?.trim() || FALLBACK_VIADUCT_URL;
   // ponytail: pool global reutilizado entre invocaciones serverless.
   if (!global._viaductPool) {
     global._viaductPool = new Pool({ connectionString, max: 3 });
