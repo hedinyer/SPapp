@@ -58,3 +58,20 @@ Sin `SUPABASE_SERVICE_ROLE_KEY` en Vercel, crear/editar/eliminar en catálogo, i
 - `/inventario` — CRUD repuestos y categorías
 - `/garaje` — CRUD parqueaderos y motos
 - `/solicitudes` — Solicitudes de taller
+
+## Integración con agentes IA (Hermes Agent)
+
+El panel expone una capa de herramientas para agentes IA en `/api/agent/tools`
+(catálogo `GET`, ejecución `POST`). **Abierta por defecto** (sin key) para integrar
+fácil; el agente actúa como admin.
+
+```bash
+# Opcional (recomendado en producción): si se define, /api/agent/* exige
+# Authorization: Bearer <AGENT_API_KEY>
+AGENT_API_KEY=<cadena-secreta-larga>
+```
+
+- Contexto completo para el agente: [`AGENT_CONTEXT.md`](AGENT_CONTEXT.md)
+- Plugin de Hermes + guía: [`integrations/hermes/README.md`](integrations/hermes/README.md)
+- Las herramientas se definen en `src/lib/agent/registry.ts` (reusan las server
+  actions y queries existentes). Añadir una entrada ahí la publica automáticamente.
