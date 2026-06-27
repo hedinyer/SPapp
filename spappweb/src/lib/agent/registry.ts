@@ -1,60 +1,19 @@
-import "server-only";
-
 import { z } from "zod";
 
-import {
-  getActiveVisitadores,
-  getAllBikes,
-  getAllCategorias,
-  getAllGarajeMotos,
-  getAllGarajeParqueaderos,
-  getAllProductos,
-  getAllSolicitudesTaller,
-  getAllVendidasMotos,
-  getAllVisitadores,
-  getClientPipeline,
-  getInboxListItems,
-  getInboxQueues,
-  searchClients,
-} from "@/lib/pipeline/queries";
-import {
-  approveCredit,
-  assignVisit,
-  cancelCompra,
-  cancelVisit,
-  completeVisit,
-  confirmPayment,
-  confirmTarifaPago,
-  createClientUser,
-  deleteBike,
-  deleteCategoria,
-  deleteGarajeMoto,
-  deleteGarajeParqueadero,
-  deleteProducto,
-  deleteVendidaMoto,
-  deleteVisitador,
-  markDelivered,
-  markMotoRecogida,
-  rejectCredit,
-  resolveMoroso,
-  saveBike,
-  saveCategoria,
-  saveGarajeMoto,
-  saveGarajeParqueadero,
-  saveProducto,
-  saveVisitador,
-  setTracking,
-  updateDelivery,
-  updateSolicitudEstado,
-  updateVendidaEstadoFisico,
-} from "@/lib/actions/admin-actions";
-import {
-  checkReferenciaPagoUsada,
-  confirmPagoConComprobante,
-  removePagoAbono,
-} from "@/lib/actions/payment-comprobante-actions";
-import { submitPublicApplication } from "@/lib/actions/client-actions";
 import { hojaVidaFormSchema } from "@/lib/contracts/hoja-vida-schema";
+
+/**
+ * Cargadores perezosos (dynamic import) de las capas de negocio. Mantienen el
+ * módulo del registro y la ruta `/api/agent/tools` libres de dependencias pesadas
+ * (Supabase server-only, `sharp`, `tesseract.js`), de modo que el catálogo se
+ * pueda generar siempre, incluso en cold-start de Vercel. Cada handler carga su
+ * módulo solo cuando se invoca.
+ */
+const loadQueries = () => import("@/lib/pipeline/queries");
+const loadAdminActions = () => import("@/lib/actions/admin-actions");
+const loadPaymentActions = () =>
+  import("@/lib/actions/payment-comprobante-actions");
+const loadClientActions = () => import("@/lib/actions/client-actions");
 
 const INBOX_QUEUE_IDS = [
   "creditos",
@@ -109,7 +68,7 @@ export const AGENT_TOOLS = {
     description:
       "Devuelve las 9 colas accionables de la bandeja con su conteo: créditos pendientes, pagos por confirmar, retiros, entregas, visitas, morosos, motos para recoger y solicitudes de taller.",
     input: empty,
-    handler: () => getInboxQueues(),
+    handler: async () => (await loadQueries()).getInboxQueues(),
   }),
   inbox_list: tool({
     category: "lectura",
@@ -118,7 +77,7 @@ export const AGENT_TOOLS = {
     input: z.object({
       queueId: z.enum(INBOX_QUEUE_IDS).describe("Identificador de la cola"),
     }),
-    handler: ({ queueId }) => getInboxListItems(queueId),
+    handler: async ({ queueId }) => (await loadQueries()).getInboxListItems(queueId),
   }),
   search_clients: tool({
     category: "lectura",
@@ -127,7 +86,7 @@ export const AGENT_TOOLS = {
     input: z.object({
       query: z.string().min(2, "Mínimo 2 caracteres"),
     }),
-    handler: ({ query }) => searchClients(query),
+    handler: async ({ query }) => (await loadQueries()).searchClients(query),
   }),
   get_client_pipeline: tool({
     category: "lectura",
@@ -136,61 +95,61 @@ export const AGENT_TOOLS = {
     input: z.object({
       userId: z.number().int().positive(),
     }),
-    handler: ({ userId }) => getClientPipeline(userId),
+    handler: async ({ userId }) => (await loadQueries()).getClientPipeline(userId),
   }),
   list_bikes: tool({
     category: "catalogo",
     description: "Catálogo completo de motos (bike_table).",
     input: empty,
-    handler: () => getAllBikes(),
+    handler: async () => (await loadQueries()).getAllBikes(),
   }),
   list_categorias: tool({
     category: "inventario",
     description: "Categorías de inventario de repuestos.",
     input: empty,
-    handler: () => getAllCategorias(),
+    handler: async () => (await loadQueries()).getAllCategorias(),
   }),
   list_productos: tool({
     category: "inventario",
     description: "Productos de inventario (repuestos) con su categoría.",
     input: empty,
-    handler: () => getAllProductos(),
+    handler: async () => (await loadQueries()).getAllProductos(),
   }),
   list_solicitudes_taller: tool({
     category: "taller",
     description: "Solicitudes de taller (repuestos, reparación, cambio de aceite).",
     input: empty,
-    handler: () => getAllSolicitudesTaller(),
+    handler: async () => (await loadQueries()).getAllSolicitudesTaller(),
   }),
   list_visitadores: tool({
     category: "visitas",
     description: "Todos los visitadores registrados.",
     input: empty,
-    handler: () => getAllVisitadores(),
+    handler: async () => (await loadQueries()).getAllVisitadores(),
   }),
   list_active_visitadores: tool({
     category: "visitas",
     description: "Visitadores activos con usuario, aptos para asignar visitas.",
     input: empty,
-    handler: () => getActiveVisitadores(),
+    handler: async () => (await loadQueries()).getActiveVisitadores(),
   }),
   list_garaje_parqueaderos: tool({
     category: "garaje",
     description: "Parqueaderos del garaje.",
     input: empty,
-    handler: () => getAllGarajeParqueaderos(),
+    handler: async () => (await loadQueries()).getAllGarajeParqueaderos(),
   }),
   list_garaje_motos: tool({
     category: "garaje",
     description: "Motos físicas en el garaje (inventario físico/recuperaciones).",
     input: empty,
-    handler: () => getAllGarajeMotos(),
+    handler: async () => (await loadQueries()).getAllGarajeMotos(),
   }),
   list_vendidas: tool({
     category: "garaje",
     description: "Motos entregadas (vendidas) con su estado físico y mora.",
     input: empty,
-    handler: () => getAllVendidasMotos(),
+    handler: async () => (await loadQueries()).getAllVendidasMotos(),
   }),
 
   // ---------------------------------------------------------------- CRÉDITO
@@ -202,7 +161,8 @@ export const AGENT_TOOLS = {
       documentId: z.number().int().positive(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ documentId, userId }) => approveCredit(documentId, userId),
+    handler: async ({ documentId, userId }) =>
+      (await loadAdminActions()).approveCredit(documentId, userId),
   }),
   reject_credit: tool({
     category: "credito",
@@ -214,7 +174,7 @@ export const AGENT_TOOLS = {
       motivo: z.string().min(3),
       betado: z.boolean(),
     }),
-    handler: (args) => rejectCredit(args),
+    handler: async (args) => (await loadAdminActions()).rejectCredit(args),
   }),
 
   // ---------------------------------------------------------------- VISITAS
@@ -231,7 +191,7 @@ export const AGENT_TOOLS = {
         .min(1)
         .describe("Fecha/hora ISO 8601 de la visita"),
     }),
-    handler: (args) => assignVisit(args),
+    handler: async (args) => (await loadAdminActions()).assignVisit(args),
   }),
   complete_visit: tool({
     category: "visitas",
@@ -240,7 +200,8 @@ export const AGENT_TOOLS = {
       visitaId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ visitaId, userId }) => completeVisit(visitaId, userId),
+    handler: async ({ visitaId, userId }) =>
+      (await loadAdminActions()).completeVisit(visitaId, userId),
   }),
   cancel_visit: tool({
     category: "visitas",
@@ -249,7 +210,8 @@ export const AGENT_TOOLS = {
       visitaId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ visitaId, userId }) => cancelVisit(visitaId, userId),
+    handler: async ({ visitaId, userId }) =>
+      (await loadAdminActions()).cancelVisit(visitaId, userId),
   }),
 
   // ---------------------------------------------------------------- PAGOS
@@ -263,7 +225,7 @@ export const AGENT_TOOLS = {
       field: z.enum(["inicial", "cuota"]),
       value: z.boolean(),
     }),
-    handler: (args) => confirmPayment(args),
+    handler: async (args) => (await loadAdminActions()).confirmPayment(args),
   }),
   confirm_tarifa_pago: tool({
     category: "pagos",
@@ -274,7 +236,7 @@ export const AGENT_TOOLS = {
       userId: z.number().int().positive(),
       notas: z.string().optional(),
     }),
-    handler: (args) => confirmTarifaPago(args),
+    handler: async (args) => (await loadAdminActions()).confirmTarifaPago(args),
   }),
   register_payment: tool({
     category: "pagos",
@@ -312,7 +274,7 @@ export const AGENT_TOOLS = {
       fd.set("bancoOrigen", args.bancoOrigen);
       fd.set("entradaManual", String(args.entradaManual));
       if (args.notas) fd.set("notas", args.notas);
-      return confirmPagoConComprobante(fd);
+      return (await loadPaymentActions()).confirmPagoConComprobante(fd);
     },
   }),
   check_referencia_usada: tool({
@@ -323,7 +285,8 @@ export const AGENT_TOOLS = {
       userId: z.number().int().positive(),
       referencia: z.string().min(1),
     }),
-    handler: (args) => checkReferenciaPagoUsada(args),
+    handler: async (args) =>
+      (await loadPaymentActions()).checkReferenciaPagoUsada(args),
   }),
   remove_pago_abono: tool({
     category: "pagos",
@@ -333,7 +296,8 @@ export const AGENT_TOOLS = {
       pagoId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ pagoId, userId }) => removePagoAbono(pagoId, userId),
+    handler: async ({ pagoId, userId }) =>
+      (await loadPaymentActions()).removePagoAbono(pagoId, userId),
   }),
 
   // ---------------------------------------------------------------- ENTREGA
@@ -349,7 +313,7 @@ export const AGENT_TOOLS = {
       referencia: z.string().optional(),
       fechaEntrega: z.string().min(1).describe("Fecha ISO/date de entrega"),
     }),
-    handler: (args) => updateDelivery(args),
+    handler: async (args) => (await loadAdminActions()).updateDelivery(args),
   }),
   mark_delivered: tool({
     category: "entrega",
@@ -358,7 +322,8 @@ export const AGENT_TOOLS = {
       compraId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ compraId, userId }) => markDelivered(compraId, userId),
+    handler: async ({ compraId, userId }) =>
+      (await loadAdminActions()).markDelivered(compraId, userId),
   }),
   cancel_compra: tool({
     category: "entrega",
@@ -367,7 +332,8 @@ export const AGENT_TOOLS = {
       compraId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ compraId, userId }) => cancelCompra(compraId, userId),
+    handler: async ({ compraId, userId }) =>
+      (await loadAdminActions()).cancelCompra(compraId, userId),
   }),
   update_vendida_estado_fisico: tool({
     category: "entrega",
@@ -384,7 +350,8 @@ export const AGENT_TOOLS = {
         "en_patio",
       ]),
     }),
-    handler: (args) => updateVendidaEstadoFisico(args),
+    handler: async (args) =>
+      (await loadAdminActions()).updateVendidaEstadoFisico(args),
   }),
   delete_vendida_moto: tool({
     category: "entrega",
@@ -394,7 +361,8 @@ export const AGENT_TOOLS = {
       compraId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: ({ compraId, userId }) => deleteVendidaMoto(compraId, userId),
+    handler: async ({ compraId, userId }) =>
+      (await loadAdminActions()).deleteVendidaMoto(compraId, userId),
   }),
 
   // ---------------------------------------------------------------- MORA / TRACKING
@@ -405,7 +373,8 @@ export const AGENT_TOOLS = {
       userId: z.number().int().positive(),
       seguimiento: z.boolean(),
     }),
-    handler: ({ userId, seguimiento }) => setTracking(userId, seguimiento),
+    handler: async ({ userId, seguimiento }) =>
+      (await loadAdminActions()).setTracking(userId, seguimiento),
   }),
   resolve_moroso: tool({
     category: "mora",
@@ -415,7 +384,7 @@ export const AGENT_TOOLS = {
       morosoId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: (args) => resolveMoroso(args),
+    handler: async (args) => (await loadAdminActions()).resolveMoroso(args),
   }),
   mark_moto_recogida: tool({
     category: "mora",
@@ -424,7 +393,7 @@ export const AGENT_TOOLS = {
       recogerId: z.string().uuid(),
       userId: z.number().int().positive(),
     }),
-    handler: (args) => markMotoRecogida(args),
+    handler: async (args) => (await loadAdminActions()).markMotoRecogida(args),
   }),
 
   // ---------------------------------------------------------------- CLIENTES
@@ -439,7 +408,8 @@ export const AGENT_TOOLS = {
         .max(15)
         .regex(/^\d+$/, "Solo dígitos"),
     }),
-    handler: ({ cedula }) => createClientUser({ cedula }),
+    handler: async ({ cedula }) =>
+      (await loadAdminActions()).createClientUser({ cedula }),
   }),
   submit_public_application: tool({
     category: "clientes",
@@ -451,7 +421,8 @@ export const AGENT_TOOLS = {
       selfieUrl: z.string().url(),
       hojaVida: hojaVidaFormSchema,
     }),
-    handler: (args) => submitPublicApplication(args),
+    handler: async (args) =>
+      (await loadClientActions()).submitPublicApplication(args),
   }),
 
   // ---------------------------------------------------------------- VISITADORES (CRUD)
@@ -468,13 +439,13 @@ export const AGENT_TOOLS = {
       username: z.string().min(3).optional(),
       password: z.string().min(4).optional(),
     }),
-    handler: (args) => saveVisitador(args),
+    handler: async (args) => (await loadAdminActions()).saveVisitador(args),
   }),
   delete_visitador: tool({
     category: "visitas",
     description: "Elimina un visitador y su usuario asociado.",
     input: z.object({ id: z.number().int().positive() }),
-    handler: ({ id }) => deleteVisitador(id),
+    handler: async ({ id }) => (await loadAdminActions()).deleteVisitador(id),
   }),
 
   // ---------------------------------------------------------------- CATÁLOGO (CRUD)
@@ -492,13 +463,13 @@ export const AGENT_TOOLS = {
       descripcion: z.string().optional(),
       activo: z.boolean(),
     }),
-    handler: (args) => saveBike(args),
+    handler: async (args) => (await loadAdminActions()).saveBike(args),
   }),
   delete_bike: tool({
     category: "catalogo",
     description: "Elimina una moto del catálogo.",
     input: z.object({ id: z.number().int().positive() }),
-    handler: ({ id }) => deleteBike(id),
+    handler: async ({ id }) => (await loadAdminActions()).deleteBike(id),
   }),
 
   // ---------------------------------------------------------------- INVENTARIO (CRUD)
@@ -513,13 +484,13 @@ export const AGENT_TOOLS = {
       activo: z.boolean(),
       orden: z.number().int().min(0),
     }),
-    handler: (args) => saveCategoria(args),
+    handler: async (args) => (await loadAdminActions()).saveCategoria(args),
   }),
   delete_categoria: tool({
     category: "inventario",
     description: "Elimina una categoría de inventario.",
     input: z.object({ id: z.number().int().positive() }),
-    handler: ({ id }) => deleteCategoria(id),
+    handler: async ({ id }) => (await loadAdminActions()).deleteCategoria(id),
   }),
   save_producto: tool({
     category: "inventario",
@@ -537,13 +508,13 @@ export const AGENT_TOOLS = {
       compatibleModelos: z.array(z.string()).optional(),
       activo: z.boolean(),
     }),
-    handler: (args) => saveProducto(args),
+    handler: async (args) => (await loadAdminActions()).saveProducto(args),
   }),
   delete_producto: tool({
     category: "inventario",
     description: "Elimina un producto de inventario.",
     input: z.object({ id: z.number().int().positive() }),
-    handler: ({ id }) => deleteProducto(id),
+    handler: async ({ id }) => (await loadAdminActions()).deleteProducto(id),
   }),
 
   // ---------------------------------------------------------------- TALLER
@@ -556,7 +527,8 @@ export const AGENT_TOOLS = {
       estado: z.enum(["pendiente", "en_proceso", "completada", "cancelada"]),
       notasAdmin: z.string().optional(),
     }),
-    handler: (args) => updateSolicitudEstado(args),
+    handler: async (args) =>
+      (await loadAdminActions()).updateSolicitudEstado(args),
   }),
 
   // ---------------------------------------------------------------- GARAJE (CRUD)
@@ -570,14 +542,16 @@ export const AGENT_TOOLS = {
       activo: z.boolean(),
       orden: z.number().int().min(0),
     }),
-    handler: (args) => saveGarajeParqueadero(args),
+    handler: async (args) =>
+      (await loadAdminActions()).saveGarajeParqueadero(args),
   }),
   delete_garaje_parqueadero: tool({
     category: "garaje",
     description:
       "Elimina un parqueadero. Falla si hay motos asignadas a él.",
     input: z.object({ id: z.number().int().positive() }),
-    handler: ({ id }) => deleteGarajeParqueadero(id),
+    handler: async ({ id }) =>
+      (await loadAdminActions()).deleteGarajeParqueadero(id),
   }),
   save_garaje_moto: tool({
     category: "garaje",
@@ -597,13 +571,13 @@ export const AGENT_TOOLS = {
       notas: z.string().optional(),
       isNewManual: z.boolean().optional(),
     }),
-    handler: (args) => saveGarajeMoto(args),
+    handler: async (args) => (await loadAdminActions()).saveGarajeMoto(args),
   }),
   delete_garaje_moto: tool({
     category: "garaje",
     description: "Elimina una moto del garaje.",
     input: z.object({ id: z.string().uuid() }),
-    handler: ({ id }) => deleteGarajeMoto(id),
+    handler: async ({ id }) => (await loadAdminActions()).deleteGarajeMoto(id),
   }),
 } satisfies Record<string, ToolDef>;
 
@@ -616,6 +590,14 @@ export interface AgentToolSchema {
   parameters: Record<string, unknown>;
 }
 
+function safeJsonSchema(input: z.ZodTypeAny): Record<string, unknown> {
+  try {
+    return z.toJSONSchema(input, { target: "draft-7" }) as Record<string, unknown>;
+  } catch {
+    return { type: "object", properties: {}, additionalProperties: true };
+  }
+}
+
 /** Catálogo OpenAI/Hermes-compatible (function-calling) generado desde Zod. */
 export function getAgentToolCatalog(): AgentToolSchema[] {
   return (Object.keys(AGENT_TOOLS) as AgentToolName[]).map((name) => {
@@ -624,10 +606,7 @@ export function getAgentToolCatalog(): AgentToolSchema[] {
       name,
       category: def.category,
       description: def.description,
-      parameters: z.toJSONSchema(def.input, { target: "draft-7" }) as Record<
-        string,
-        unknown
-      >,
+      parameters: safeJsonSchema(def.input),
     };
   });
 }

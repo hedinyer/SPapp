@@ -28,8 +28,19 @@ export async function GET(request: NextRequest) {
   const denied = guard(request);
   if (denied) return denied;
 
-  const tools = getAgentToolCatalog();
-  return NextResponse.json({ ok: true, count: tools.length, tools });
+  try {
+    const tools = getAgentToolCatalog();
+    return NextResponse.json({ ok: true, count: tools.length, tools });
+  } catch (e) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          e instanceof Error ? e.message : "No se pudo generar el catálogo.",
+      },
+      { status: 500 },
+    );
+  }
 }
 
 /** Ejecuta una herramienta: body `{ tool: string, args?: object }`. */
