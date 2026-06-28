@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
+import { Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { approveCredit, rejectCredit } from "@/lib/actions/admin-actions";
 import type { UserDocumentRow } from "@/lib/pipeline/types";
@@ -21,11 +22,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface CreditReviewPanelProps {
   document: UserDocumentRow;
   userId: number;
+  contractId?: string | null;
+  clienteCelular?: string | null;
+  contractSigned?: boolean;
 }
 
 export function CreditReviewPanel({
   document,
   userId,
+  contractId,
+  clienteCelular,
+  contractSigned,
 }: CreditReviewPanelProps) {
   const [rejectOpen, setRejectOpen] = useState(false);
   const [motivo, setMotivo] = useState("");
@@ -61,7 +68,14 @@ export function CreditReviewPanel({
   }
 
   if (document.estado_solicitud !== "pendiente") {
-    return <ReadonlyCredit document={document} />;
+    return (
+      <ReadonlyCredit
+        document={document}
+        contractId={contractId}
+        clienteCelular={clienteCelular}
+        contractSigned={contractSigned}
+      />
+    );
   }
 
   return (
@@ -139,7 +153,17 @@ export function CreditReviewPanel({
   );
 }
 
-function ReadonlyCredit({ document }: { document: UserDocumentRow }) {
+function ReadonlyCredit({
+  document,
+  contractId,
+  clienteCelular,
+  contractSigned,
+}: {
+  document: UserDocumentRow;
+  contractId?: string | null;
+  clienteCelular?: string | null;
+  contractSigned?: boolean;
+}) {
   return (
     <Card className="border-neutral-200 shadow-none">
       <CardHeader>
@@ -157,9 +181,67 @@ function ReadonlyCredit({ document }: { document: UserDocumentRow }) {
             Motivo: {document.motivo_rechazo}
           </p>
         )}
+        {document.estado_solicitud === "aceptada" &&
+          contractId &&
+          !contractSigned && (
+            <ShareLinkCard contractId={contractId} celular={clienteCelular} />
+          )}
         <PhotoGrid document={document} />
       </CardContent>
     </Card>
+  );
+}
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "https://s-papp-mauve.vercel.app";
+
+function ShareLinkCard({
+  contractId,
+  celular,
+}: {
+  contractId: string;
+  celular?: string | null;
+}) {
+  const link = `${SITE_URL}/contrato/${contractId}`;
+
+  function copy() {
+    navigator.clipboard
+      .writeText(link)
+      .then(() => toast.success("Link copiado."))
+      .catch(() => toast.error("No se pudo copiar."));
+  }
+
+  const mensaje = `Hola, tu crédito fue aprobado. Firma tu contrato aquí: ${link}`;
+  const digits = (celular ?? "").replace(/\D/g, "");
+  const waBase = digits ? `https://wa.me/57${digits}` : "https://wa.me/";
+  const waUrl = `${waBase}?text=${encodeURIComponent(mensaje)}`;
+
+  return (
+    <div className="space-y-3 rounded-lg border border-green-300 bg-green-50 p-4">
+      <p className="text-sm font-medium text-green-900">
+        Link de firma del contrato para el cliente
+      </p>
+      <p className="break-all rounded-md border border-green-200 bg-white px-3 py-2 text-xs text-neutral-700">
+        {link}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" onClick={copy}>
+          <Copy className="mr-1.5 h-4 w-4" />
+          Copiar link
+        </Button>
+        <Button
+          size="sm"
+          className="bg-green-600 text-white hover:bg-green-700"
+          asChild
+        >
+          <a href={waUrl} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="mr-1.5 h-4 w-4" />
+            Enviar por WhatsApp
+          </a>
+        </Button>
+      </div>
+    </div>
   );
 }
 

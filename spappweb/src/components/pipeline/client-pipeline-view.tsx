@@ -21,6 +21,12 @@ export function ClientPipelineView({
 }: ClientPipelineViewProps) {
   const { userId } = { userId: pipeline.user.id };
   const adminStep = pipeline.currentAdminStep;
+  const contractId = pipeline.contract?.id ?? null;
+  const contractSigned = pipeline.contract?.status === "firmado";
+  const clienteCelular =
+    typeof pipeline.contract?.hoja_vida_data?.celular === "string"
+      ? (pipeline.contract.hoja_vida_data.celular as string)
+      : null;
   const referenciasUsadas = pipeline.pagosHistorial
     .map((p) => p.referencia)
     .filter((r): r is string => Boolean(r?.trim()));
@@ -36,6 +42,9 @@ export function ClientPipelineView({
             <CreditReviewPanel
               document={pipeline.document}
               userId={userId}
+              contractId={contractId}
+              clienteCelular={clienteCelular}
+              contractSigned={contractSigned}
             />
           )}
           {adminStep === "pago" && (
@@ -76,6 +85,9 @@ export function ClientPipelineView({
                 <CreditReviewPanel
                   document={pipeline.document}
                   userId={userId}
+                  contractId={contractId}
+                  clienteCelular={clienteCelular}
+                  contractSigned={contractSigned}
                 />
               )}
               <ContractReadonlyPanel contract={pipeline.contract} />
