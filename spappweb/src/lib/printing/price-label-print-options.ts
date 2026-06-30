@@ -26,6 +26,10 @@ export interface PriceLabelPrintOptions {
   copies: number;
   /** 0 = normal, 90 = girar a la derecha (horario). */
   rotationDeg: 0 | 90;
+  /** Empuja la columna izquierda hacia el centro (mm). */
+  nudgeLeftColumnMm: number;
+  /** Empuja la columna derecha hacia el centro (mm). */
+  nudgeRightColumnMm: number;
 }
 
 export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
@@ -42,7 +46,9 @@ export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
   offsetYmm: 0,
   contentScale: 1,
   copies: 3,
-  rotationDeg: 90,
+  rotationDeg: 0,
+  nudgeLeftColumnMm: 1.5,
+  nudgeRightColumnMm: 1.5,
 };
 
 export function clampSlot(
@@ -116,12 +122,26 @@ export function labelSlotsForPages(options: PriceLabelPrintOptions): number[][] 
   return pages;
 }
 
+export function slotEdgeNudgeX(
+  options: PriceLabelPrintOptions,
+  slot: number,
+): number {
+  const last = options.labelsPerRow - 1;
+  if (options.labelsPerRow <= 1) return 0;
+  if (slot === 0) return options.nudgeLeftColumnMm;
+  if (slot === last) return -options.nudgeRightColumnMm;
+  return 0;
+}
+
 export function labelLeftMm(
   options: PriceLabelPrintOptions,
   slot: number,
 ): number {
   return (
-    options.marginLeftMm + options.offsetXmm + labelSlotLeftMm(slot)
+    options.marginLeftMm +
+    options.offsetXmm +
+    labelSlotLeftMm(slot) +
+    slotEdgeNudgeX(options, slot)
   );
 }
 
@@ -143,7 +163,12 @@ export function labelPlacement(
   options: PriceLabelPrintOptions,
   slot: number,
 ): LabelPlacement {
-  const origLeft = labelLeftMm(options, slot);
+  const nudgeX = slotEdgeNudgeX(options, slot);
+  const origLeft =
+    options.marginLeftMm +
+    options.offsetXmm +
+    labelSlotLeftMm(slot) +
+    nudgeX;
   const origTop = labelTopMm(options);
 
   if (options.rotationDeg === 90) {

@@ -256,8 +256,55 @@ export function PrintPriceLabelDialog({
             </p>
           ) : null}
 
+          {options.labelsPerRow > 1 ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="nudge-left">
+                  Columna izquierda → centro (mm)
+                </Label>
+                <Input
+                  id="nudge-left"
+                  type="number"
+                  min={0}
+                  max={10}
+                  step={0.5}
+                  value={options.nudgeLeftColumnMm}
+                  onChange={(e) =>
+                    patch({
+                      nudgeLeftColumnMm: num(
+                        e.target.value,
+                        options.nudgeLeftColumnMm,
+                      ),
+                    })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nudge-right">
+                  Columna derecha → centro (mm)
+                </Label>
+                <Input
+                  id="nudge-right"
+                  type="number"
+                  min={0}
+                  max={10}
+                  step={0.5}
+                  value={options.nudgeRightColumnMm}
+                  onChange={(e) =>
+                    patch({
+                      nudgeRightColumnMm: num(
+                        e.target.value,
+                        options.nudgeRightColumnMm,
+                      ),
+                    })
+                  }
+                />
+              </div>
+            </>
+          ) : null}
+
           <div className="space-y-2">
-            <Label htmlFor="offset-x">Ajuste horizontal (mm)</Label>
+            <Label htmlFor="offset-x">Ajuste horizontal global (mm)</Label>
             <Input
               id="offset-x"
               type="number"
@@ -328,8 +375,8 @@ export function PrintPriceLabelDialog({
                 patch({ rotationDeg: Number(value) as 0 | 90 })
               }
               options={[
-                { value: "90", label: "90° a la derecha (recomendado)" },
-                { value: "0", label: "Sin rotar" },
+                { value: "0", label: "Sin rotar (recomendado)" },
+                { value: "90", label: "90° a la derecha" },
               ]}
             />
           </div>
