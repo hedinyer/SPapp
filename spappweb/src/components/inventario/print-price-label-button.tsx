@@ -18,8 +18,8 @@ interface PrintPriceLabelButtonProps {
 }
 
 /**
- * Imprime etiquetas de 30×20 mm vía el diálogo del navegador.
- * Requiere driver iDPRT/HPRT en Windows con tamaño de papel personalizado 30×20 mm.
+ * Imprime etiquetas de 30×20 mm en rollo de 3 columnas (fila 90×20 mm).
+ * Requiere driver iDPRT/HPRT en Windows con tamaño de papel personalizado 90×20 mm.
  */
 export function PrintPriceLabelButton({
   product,

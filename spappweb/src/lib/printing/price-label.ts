@@ -3,6 +3,8 @@ import { formatCop } from "@/lib/utils/format";
 
 export const LABEL_WIDTH_MM = 30;
 export const LABEL_HEIGHT_MM = 20;
+export const LABELS_PER_ROW = 3;
+export const ROW_WIDTH_MM = LABEL_WIDTH_MM * LABELS_PER_ROW;
 
 export interface PriceLabelData {
   nombre: string;
@@ -33,12 +35,9 @@ export function toPriceLabelData(
   };
 }
 
-function singleLabelHtml(data: PriceLabelData, index: number): string {
-  const pageBreak =
-    index > 0 ? ' style="page-break-before: always;"' : "";
-
+function labelCellHtml(data: PriceLabelData, index: number): string {
   return `
-    <div class="label"${pageBreak}>
+    <div class="label">
       <div class="name">${escapeHtml(data.nombre)}</div>
       <svg id="barcode-${index}"></svg>
       <div class="price">${escapeHtml(data.precioFormatted)}</div>
@@ -46,14 +45,36 @@ function singleLabelHtml(data: PriceLabelData, index: number): string {
   `;
 }
 
+function emptyCellHtml(): string {
+  return `<div class="label label--empty" aria-hidden="true"></div>`;
+}
+
+function rowHtml(
+  data: PriceLabelData,
+  startIndex: number,
+  labelsInRow: number,
+): string {
+  const cells = Array.from({ length: LABELS_PER_ROW }, (_, column) => {
+    if (column < labelsInRow) {
+      return labelCellHtml(data, startIndex + column);
+    }
+    return emptyCellHtml();
+  }).join("");
+
+  return `<div class="row">${cells}</div>`;
+}
+
 export function buildPriceLabelHtml(
   data: PriceLabelData,
   copies = 1,
 ): string {
   const count = Math.max(1, copies);
-  const labels = Array.from({ length: count }, (_, index) =>
-    singleLabelHtml(data, index),
-  ).join("");
+  const rows: string[] = [];
+
+  for (let index = 0; index < count; index += LABELS_PER_ROW) {
+    const labelsInRow = Math.min(LABELS_PER_ROW, count - index);
+    rows.push(rowHtml(data, index, labelsInRow));
+  }
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -62,7 +83,7 @@ export function buildPriceLabelHtml(
   <title>Etiqueta ${escapeHtml(data.sku)}</title>
   <style>
     @page {
-      size: ${LABEL_WIDTH_MM}mm ${LABEL_HEIGHT_MM}mm;
+      size: ${ROW_WIDTH_MM}mm ${LABEL_HEIGHT_MM}mm;
       margin: 0;
     }
     * {
@@ -71,11 +92,21 @@ export function buildPriceLabelHtml(
       padding: 0;
     }
     html, body {
-      width: ${LABEL_WIDTH_MM}mm;
+      width: ${ROW_WIDTH_MM}mm;
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+    }
+    .row {
+      width: ${ROW_WIDTH_MM}mm;
+      height: ${LABEL_HEIGHT_MM}mm;
+      display: grid;
+      grid-template-columns: repeat(${LABELS_PER_ROW}, ${LABEL_WIDTH_MM}mm);
+      page-break-inside: avoid;
+    }
+    .row + .row {
+      page-break-before: always;
     }
     .label {
       width: ${LABEL_WIDTH_MM}mm;
@@ -86,6 +117,9 @@ export function buildPriceLabelHtml(
       align-items: center;
       justify-content: space-between;
       overflow: hidden;
+    }
+    .label--empty {
+      visibility: hidden;
     }
     .name {
       font-size: 5pt;
@@ -110,14 +144,11 @@ export function buildPriceLabelHtml(
       html, body {
         margin: 0;
       }
-      .label {
-        page-break-inside: avoid;
-      }
     }
   </style>
 </head>
 <body>
-  ${labels}
+  ${rows.join("")}
 </body>
 </html>`;
 }
