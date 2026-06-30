@@ -17,6 +17,10 @@ export interface PriceLabelData {
   precioFormatted: string;
 }
 
+export function labelSlotLeftMm(slot: number): number {
+  return LABEL_GAP_MM + slot * (LABEL_WIDTH_MM + LABEL_GAP_MM);
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -40,9 +44,18 @@ export function toPriceLabelData(
   };
 }
 
-function labelCellHtml(data: PriceLabelData, index: number): string {
+function labelCellHtml(
+  data: PriceLabelData,
+  index: number,
+  column: number,
+): string {
+  const left = labelSlotLeftMm(column);
+
   return `
-    <div class="label">
+    <div
+      class="label"
+      style="left:${left}mm;top:${LABEL_GAP_MM}mm;"
+    >
       <div class="name">${escapeHtml(data.nombre)}</div>
       <svg id="barcode-${index}"></svg>
       <div class="price">${escapeHtml(data.precioFormatted)}</div>
@@ -50,23 +63,16 @@ function labelCellHtml(data: PriceLabelData, index: number): string {
   `;
 }
 
-function emptyCellHtml(): string {
-  return `<div class="label label--empty" aria-hidden="true"></div>`;
-}
-
 function rowHtml(
   data: PriceLabelData,
   startIndex: number,
   labelsInRow: number,
 ): string {
-  const cells = Array.from({ length: LABELS_PER_ROW }, (_, column) => {
-    if (column < labelsInRow) {
-      return labelCellHtml(data, startIndex + column);
-    }
-    return emptyCellHtml();
-  }).join("");
+  const labels = Array.from({ length: labelsInRow }, (_, column) =>
+    labelCellHtml(data, startIndex + column, column),
+  ).join("");
 
-  return `<div class="row">${cells}</div>`;
+  return `<div class="sheet">${labels}</div>`;
 }
 
 export function buildPriceLabelHtml(
@@ -74,17 +80,18 @@ export function buildPriceLabelHtml(
   copies = 1,
 ): string {
   const count = Math.max(1, copies);
-  const rows: string[] = [];
+  const sheets: string[] = [];
 
   for (let index = 0; index < count; index += LABELS_PER_ROW) {
     const labelsInRow = Math.min(LABELS_PER_ROW, count - index);
-    rows.push(rowHtml(data, index, labelsInRow));
+    sheets.push(rowHtml(data, index, labelsInRow));
   }
 
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=${ROW_WIDTH_MM}mm, height=${ROW_HEIGHT_MM}mm">
   <title>Etiqueta ${escapeHtml(data.sku)}</title>
   <style>
     @page {
@@ -96,26 +103,37 @@ export function buildPriceLabelHtml(
       margin: 0;
       padding: 0;
     }
-    html, body {
+    html {
       width: ${ROW_WIDTH_MM}mm;
+      height: ${ROW_HEIGHT_MM}mm;
+    }
+    body {
+      width: ${ROW_WIDTH_MM}mm;
+      height: ${ROW_HEIGHT_MM}mm;
       margin: 0;
+      padding: 0;
+      overflow: hidden;
       font-family: Arial, Helvetica, sans-serif;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+      background: #fff;
     }
-    .row {
+    .sheet {
+      position: relative;
       width: ${ROW_WIDTH_MM}mm;
       height: ${ROW_HEIGHT_MM}mm;
-      padding: ${LABEL_GAP_MM}mm;
-      display: grid;
-      grid-template-columns: repeat(${LABELS_PER_ROW}, ${LABEL_WIDTH_MM}mm);
-      column-gap: ${LABEL_GAP_MM}mm;
-      page-break-inside: avoid;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
     }
-    .row + .row {
-      page-break-before: always;
+    .sheet:last-child {
+      page-break-after: auto;
+      break-after: auto;
     }
     .label {
+      position: absolute;
       width: ${LABEL_WIDTH_MM}mm;
       height: ${LABEL_HEIGHT_MM}mm;
       padding: 0.5mm 1mm;
@@ -124,9 +142,8 @@ export function buildPriceLabelHtml(
       align-items: center;
       justify-content: space-between;
       overflow: hidden;
-    }
-    .label--empty {
-      visibility: hidden;
+      transform: rotate(0deg);
+      transform-origin: top left;
     }
     .name {
       font-size: 5pt;
@@ -138,24 +155,50 @@ export function buildPriceLabelHtml(
       text-overflow: ellipsis;
     }
     svg {
-      max-width: 28mm;
-      max-height: 8mm;
-      height: 8mm;
+      width: 26mm;
+      max-width: 26mm;
+      height: 7mm;
+      max-height: 7mm;
     }
     .price {
       font-size: 7pt;
       font-weight: bold;
       text-align: center;
+      line-height: 1;
     }
     @media print {
-      html, body {
+      @page {
+        size: ${ROW_WIDTH_MM}mm ${ROW_HEIGHT_MM}mm;
         margin: 0;
+      }
+      html, body {
+        width: ${ROW_WIDTH_MM}mm !important;
+        height: ${ROW_HEIGHT_MM}mm !important;
+        min-width: ${ROW_WIDTH_MM}mm !important;
+        max-width: ${ROW_WIDTH_MM}mm !important;
+        min-height: ${ROW_HEIGHT_MM}mm !important;
+        max-height: ${ROW_HEIGHT_MM}mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        transform: none !important;
+      }
+      .sheet {
+        width: ${ROW_WIDTH_MM}mm !important;
+        height: ${ROW_HEIGHT_MM}mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+      }
+      .label {
+        transform: rotate(0deg) !important;
+        transform-origin: top left !important;
       }
     }
   </style>
 </head>
 <body>
-  ${rows.join("")}
+  ${sheets.join("")}
 </body>
 </html>`;
 }

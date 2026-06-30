@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import {
   buildPriceLabelHtml,
+  ROW_HEIGHT_MM,
+  ROW_WIDTH_MM,
   toPriceLabelData,
 } from "@/lib/printing/price-label";
 import { Button } from "@/components/ui/button";
@@ -19,7 +21,7 @@ interface PrintPriceLabelButtonProps {
 
 /**
  * Imprime etiquetas de 30×20 mm en rollo horizontal de 3 columnas con 4 mm de separación.
- * Tamaño de página por fila: 106×28 mm (configurar así en el driver iDPRT/HPRT).
+ * Papel en driver: 106×28 mm. En el diálogo: márgenes Ninguno, escala 100 %.
  */
 export function PrintPriceLabelButton({
   product,
@@ -30,41 +32,70 @@ export function PrintPriceLabelButton({
   function handlePrint() {
     const data = toPriceLabelData(product);
     const count = Math.max(1, copies);
-    const popup = window.open("", "_blank", "width=200,height=150");
 
-    if (!popup) {
-      toast.error("Permite ventanas emergentes para imprimir.");
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("aria-hidden", "true");
+    Object.assign(iframe.style, {
+      position: "fixed",
+      left: "0",
+      top: "0",
+      width: `${ROW_WIDTH_MM}mm`,
+      height: `${ROW_HEIGHT_MM}mm`,
+      border: "0",
+      opacity: "0",
+      pointerEvents: "none",
+      zIndex: "-1",
+    });
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument;
+    const win = iframe.contentWindow;
+    if (!doc || !win) {
+      iframe.remove();
+      toast.error("No se pudo preparar la impresión.");
       return;
     }
 
-    popup.document.open();
-    popup.document.write(buildPriceLabelHtml(data, count));
-    popup.document.close();
+    doc.open();
+    doc.write(buildPriceLabelHtml(data, count));
+    doc.close();
 
     for (let index = 0; index < count; index += 1) {
-      const svg = popup.document.getElementById(`barcode-${index}`);
+      const svg = doc.getElementById(`barcode-${index}`);
       if (!svg) continue;
 
       try {
         JsBarcode(svg, data.sku, {
           format: "CODE128",
           width: 1,
-          height: 24,
+          height: 20,
           displayValue: false,
           margin: 0,
         });
       } catch {
+        iframe.remove();
         toast.error("No se pudo generar el código de barras del SKU.");
-        popup.close();
         return;
       }
     }
 
-    popup.focus();
+    const cleanup = () => {
+      iframe.remove();
+    };
+
+    win.onafterprint = cleanup;
+
+    win.focus();
     window.setTimeout(() => {
-      popup.print();
-      popup.onafterprint = () => popup.close();
-    }, 150);
+      try {
+        win.print();
+      } catch {
+        cleanup();
+        toast.error("No se pudo abrir el diálogo de impresión.");
+      }
+    }, 250);
+
+    window.setTimeout(cleanup, 60_000);
   }
 
   if (variant === "outline") {
