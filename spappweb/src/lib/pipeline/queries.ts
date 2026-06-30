@@ -312,11 +312,34 @@ function buildPagosHistorial(
   });
 }
 
+/** user_ids de clientes con solicitud (users_documents) y sin ninguna visita. */
+async function clientUserIdsWithoutVisita(
+  supabase: ReturnType<typeof createAdminClient>,
+): Promise<number[]> {
+  const [{ data: docs }, { data: visitas }] = await Promise.all([
+    supabase.from("users_documents").select("user_id"),
+    supabase.from("visitas").select("user_id"),
+  ]);
+  const withVisita = new Set((visitas ?? []).map((v) => v.user_id as number));
+  const ids = new Set<number>();
+  for (const d of docs ?? []) {
+    const uid = d.user_id as number;
+    if (!withVisita.has(uid)) ids.add(uid);
+  }
+  return [...ids];
+}
+
+function sinVisitaSubtitle(estado: string): string {
+  if (estado === "aceptada") return "Crédito aprobado · sin visita";
+  if (estado === "rechazada") return "Crédito rechazado · sin visita";
+  return "Solicitud pendiente · sin visita";
+}
+
 export async function getInboxQueues(): Promise<InboxQueue[]> {
   const supabase = createAdminClient();
 
   const [
-    creditos,
+    creditosIds,
     visitasSinAsignar,
     visitasProgramadas,
     pagos,
@@ -326,10 +349,7 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
     recoger,
     solicitudesTaller,
   ] = await Promise.all([
-    supabase
-      .from("users_documents")
-      .select("id", { count: "exact", head: true })
-      .eq("estado_solicitud", "pendiente"),
+    clientUserIdsWithoutVisita(supabase),
     supabase
       .from("visitas")
       .select("id", { count: "exact", head: true })
@@ -375,8 +395,8 @@ export async function getInboxQueues(): Promise<InboxQueue[]> {
     {
       id: "creditos",
       label: "Revisar solicitudes",
-      description: "Créditos pendientes de aprobación",
-      count: creditos.count ?? 0,
+      description: "Clientes que aún no tienen visita",
+      count: creditosIds.length,
     },
     {
       id: "pagos",
@@ -436,22 +456,33 @@ export async function getInboxListItems(
 
   switch (queueId) {
     case "creditos": {
-      const { data } = await supabase
-        .from("users_documents")
-        .select("user_id, created_at, users(id, user)")
-        .eq("estado_solicitud", "pendiente")
-        .order("created_at", { ascending: true });
+      const [{ data }, { data: visitas }] = await Promise.all([
+        supabase
+          .from("users_documents")
+          .select("user_id, estado_solicitud, created_at, users(id, user)")
+          .order("created_at", { ascending: true }),
+        supabase.from("visitas").select("user_id"),
+      ]);
 
-      return (data ?? []).map((row) => {
+      const withVisita = new Set(
+        (visitas ?? []).map((v) => v.user_id as number),
+      );
+      const seen = new Set<number>();
+      const items: InboxListItem[] = [];
+      for (const row of data ?? []) {
+        const uid = row.user_id as number;
+        if (withVisita.has(uid) || seen.has(uid)) continue;
+        seen.add(uid);
         const users = joinUser(row.users);
-        return {
-          userId: row.user_id as number,
-          username: users?.user ?? `#${row.user_id}`,
-          displayName: users?.user ?? `Cliente ${row.user_id}`,
-          subtitle: "Solicitud de crédito pendiente",
+        items.push({
+          userId: uid,
+          username: users?.user ?? `#${uid}`,
+          displayName: users?.user ?? `Cliente ${uid}`,
+          subtitle: sinVisitaSubtitle(row.estado_solicitud as string),
           queueId,
-        };
-      });
+        });
+      }
+      return items;
     }
     case "visitas_sin_asignar":
     case "visitas_programadas": {
