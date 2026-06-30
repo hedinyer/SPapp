@@ -18,8 +18,8 @@ function mm(mmValue: number) {
 }
 
 function labelStyles(scale: number, rotated: boolean) {
-  const barcodeW = rotated ? 16 : 28;
-  const barcodeH = rotated ? 22 : 11;
+  const barcodeW = rotated ? 14 : 22;
+  const barcodeH = rotated ? 24 : 14;
 
   return StyleSheet.create({
     page: {

@@ -47,8 +47,8 @@ export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
   contentScale: 1,
   copies: 3,
   rotationDeg: 0,
-  nudgeLeftColumnMm: 2.5,
-  nudgeRightColumnMm: 2.5,
+  nudgeLeftColumnMm: 3,
+  nudgeRightColumnMm: 3,
 };
 
 export function clampSlot(

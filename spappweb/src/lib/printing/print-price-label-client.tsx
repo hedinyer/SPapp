@@ -9,8 +9,8 @@ async function barcodeDataUrl(sku: string): Promise<string> {
   const canvas = document.createElement("canvas");
   JsBarcode(canvas, sku, {
     format: "CODE128",
-    width: 2,
-    height: 56,
+    width: 1.5,
+    height: 72,
     displayValue: false,
     margin: 0,
   });
