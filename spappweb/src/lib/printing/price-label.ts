@@ -3,8 +3,13 @@ import { formatCop } from "@/lib/utils/format";
 
 export const LABEL_WIDTH_MM = 30;
 export const LABEL_HEIGHT_MM = 20;
+export const LABEL_GAP_MM = 4;
 export const LABELS_PER_ROW = 3;
-export const ROW_WIDTH_MM = LABEL_WIDTH_MM * LABELS_PER_ROW;
+export const ROW_WIDTH_MM =
+  LABEL_GAP_MM * 2 +
+  LABELS_PER_ROW * LABEL_WIDTH_MM +
+  (LABELS_PER_ROW - 1) * LABEL_GAP_MM;
+export const ROW_HEIGHT_MM = LABEL_GAP_MM * 2 + LABEL_HEIGHT_MM;
 
 export interface PriceLabelData {
   nombre: string;
@@ -83,7 +88,7 @@ export function buildPriceLabelHtml(
   <title>Etiqueta ${escapeHtml(data.sku)}</title>
   <style>
     @page {
-      size: ${ROW_WIDTH_MM}mm ${LABEL_HEIGHT_MM}mm;
+      size: ${ROW_WIDTH_MM}mm ${ROW_HEIGHT_MM}mm;
       margin: 0;
     }
     * {
@@ -100,9 +105,11 @@ export function buildPriceLabelHtml(
     }
     .row {
       width: ${ROW_WIDTH_MM}mm;
-      height: ${LABEL_HEIGHT_MM}mm;
+      height: ${ROW_HEIGHT_MM}mm;
+      padding: ${LABEL_GAP_MM}mm;
       display: grid;
       grid-template-columns: repeat(${LABELS_PER_ROW}, ${LABEL_WIDTH_MM}mm);
+      column-gap: ${LABEL_GAP_MM}mm;
       page-break-inside: avoid;
     }
     .row + .row {
