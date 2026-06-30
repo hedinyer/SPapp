@@ -14,6 +14,8 @@ interface PrintPriceLabelButtonProps {
   className?: string;
 }
 
+const LABEL_PRINTER_STORAGE_KEY = "spapp_label_printer";
+
 function downloadZpl(zpl: string, sku: string) {
   const blob = new Blob([zpl], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -37,10 +39,16 @@ export function PrintPriceLabelButton({
   function handlePrint() {
     startTransition(async () => {
       try {
-        const result = await printPriceLabel(product.id, copies);
+        const savedPrinter = localStorage.getItem(LABEL_PRINTER_STORAGE_KEY);
+        const result = await printPriceLabel(
+          product.id,
+          copies,
+          savedPrinter ?? undefined,
+        );
 
         if (result.method === "direct") {
-          toast.success("Etiqueta enviada a la impresora.");
+          localStorage.setItem(LABEL_PRINTER_STORAGE_KEY, result.printerName);
+          toast.success(`Etiqueta enviada a ${result.printerName}.`);
           return;
         }
 
