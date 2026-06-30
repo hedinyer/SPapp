@@ -680,6 +680,25 @@ export async function getAllProductos(): Promise<InventarioProductoRow[]> {
   return ((data ?? []) as unknown as InventarioProductoRow[]);
 }
 
+const productoSelect =
+  "id, categoria_id, sku, nombre, descripcion, precio, stock, stock_minimo, imagen_url, compatible_modelos, activo, inventario_categorias(id, nombre, slug, descripcion, activo, orden)";
+
+export async function getProductoBySku(
+  sku: string,
+): Promise<InventarioProductoRow | null> {
+  const normalized = sku.trim().toUpperCase();
+  if (!normalized) return null;
+
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("inventario_productos")
+    .select(productoSelect)
+    .eq("sku", normalized)
+    .eq("activo", true)
+    .maybeSingle();
+  return (data as InventarioProductoRow | null) ?? null;
+}
+
 export async function getAllSolicitudesTaller(): Promise<SolicitudTallerRow[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
