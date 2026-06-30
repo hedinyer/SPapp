@@ -1,6 +1,7 @@
 import { pdf } from "@react-pdf/renderer";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import { PriceLabelPdfDoc } from "@/lib/printing/price-label-pdf";
+import type { PriceLabelPrintOptions } from "@/lib/printing/price-label-print-options";
 import { toPriceLabelData } from "@/lib/printing/price-label";
 
 async function barcodeDataUrl(sku: string): Promise<string> {
@@ -16,7 +17,29 @@ async function barcodeDataUrl(sku: string): Promise<string> {
   return canvas.toDataURL("image/png");
 }
 
-function printPdfBlob(blob: Blob): Promise<void> {
+export async function buildPriceLabelPdfBlob(
+  product: InventarioProductoRow,
+  options: PriceLabelPrintOptions,
+): Promise<Blob> {
+  const data = toPriceLabelData(product);
+  const barcodeSrc = await barcodeDataUrl(data.sku);
+  const doc = (
+    <PriceLabelPdfDoc data={data} barcodeSrc={barcodeSrc} options={options} />
+  );
+  return pdf(doc).toBlob();
+}
+
+export function openPdfPreview(blob: Blob): void {
+  const url = URL.createObjectURL(blob);
+  const opened = window.open(url, "_blank", "noopener,noreferrer");
+  if (!opened) {
+    URL.revokeObjectURL(url);
+    throw new Error("Permite ventanas emergentes para la vista previa.");
+  }
+  window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
+}
+
+export function printPdfBlob(blob: Blob): Promise<void> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");
@@ -37,14 +60,14 @@ function printPdfBlob(blob: Blob): Promise<void> {
 
     iframe.onerror = () => {
       cleanup();
-      reject(new Error("No se pudo abrir la vista de impresión."));
+      reject(new Error("No se pudo abrir el diálogo de impresión."));
     };
 
     iframe.onload = () => {
       const win = iframe.contentWindow;
       if (!win) {
         cleanup();
-        reject(new Error("No se pudo abrir la vista de impresión."));
+        reject(new Error("No se pudo abrir el diálogo de impresión."));
         return;
       }
 
@@ -64,12 +87,13 @@ function printPdfBlob(blob: Blob): Promise<void> {
 
 export async function printPriceLabelInBrowser(
   product: InventarioProductoRow,
+  options: PriceLabelPrintOptions,
+  mode: "preview" | "print",
 ): Promise<void> {
-  const data = toPriceLabelData(product);
-  const barcodeSrc = await barcodeDataUrl(data.sku);
-  const doc = (
-    <PriceLabelPdfDoc data={data} barcodeSrc={barcodeSrc} slot={0} />
-  );
-  const blob = await pdf(doc).toBlob();
+  const blob = await buildPriceLabelPdfBlob(product, options);
+  if (mode === "preview") {
+    openPdfPreview(blob);
+    return;
+  }
   await printPdfBlob(blob);
 }
