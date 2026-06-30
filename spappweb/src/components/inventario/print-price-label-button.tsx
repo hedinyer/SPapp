@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { Printer } from "lucide-react";
 import { toast } from "sonner";
-import { printPriceLabel } from "@/lib/actions/label-print-actions";
+import { printPriceLabelInBrowser } from "@/lib/printing/print-price-label-client";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import { Button } from "@/components/ui/button";
 
@@ -12,20 +12,6 @@ interface PrintPriceLabelButtonProps {
   copies?: number;
   variant?: "icon" | "outline";
   className?: string;
-}
-
-const LABEL_PRINTER_STORAGE_KEY = "spapp_label_printer";
-
-function downloadZpl(zpl: string, sku: string) {
-  const blob = new Blob([zpl], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `etiqueta-${sku}.zpl`;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
 }
 
 export function PrintPriceLabelButton({
@@ -39,22 +25,9 @@ export function PrintPriceLabelButton({
   function handlePrint() {
     startTransition(async () => {
       try {
-        const savedPrinter = localStorage.getItem(LABEL_PRINTER_STORAGE_KEY);
-        const result = await printPriceLabel(
-          product.id,
-          copies,
-          savedPrinter ?? undefined,
-        );
-
-        if (result.method === "direct") {
-          localStorage.setItem(LABEL_PRINTER_STORAGE_KEY, result.printerName);
-          toast.success(`Etiqueta enviada a ${result.printerName}.`);
-          return;
-        }
-
-        downloadZpl(result.zpl, result.sku);
+        await printPriceLabelInBrowser(product);
         toast.success(
-          "Archivo ZPL descargado. Ábrelo con la iF4 o configura LABEL_PRINTER_NAME en el servidor local.",
+          "En el diálogo: iF4, escala 100 %, márgenes ninguno, papel 106×28 mm.",
         );
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "No se pudo imprimir.");
