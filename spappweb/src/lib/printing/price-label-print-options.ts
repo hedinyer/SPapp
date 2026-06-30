@@ -23,6 +23,8 @@ export interface PriceLabelPrintOptions {
   offsetYmm: number;
   contentScale: number;
   copies: number;
+  /** 0 = normal, 90 = girar a la derecha (horario). */
+  rotationDeg: 0 | 90;
 }
 
 export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
@@ -39,6 +41,7 @@ export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
   offsetYmm: 0,
   contentScale: 1,
   copies: 3,
+  rotationDeg: 90,
 };
 
 export function clampSlot(

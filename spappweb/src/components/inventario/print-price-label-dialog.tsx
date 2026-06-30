@@ -319,6 +319,20 @@ export function PrintPriceLabelDialog({
               ]}
             />
           </div>
+          <div className="space-y-2">
+            <Label>Orientación</Label>
+            <TouchSelect
+              aria-label="Orientación"
+              value={String(options.rotationDeg)}
+              onChange={(value) =>
+                patch({ rotationDeg: Number(value) as 0 | 90 })
+              }
+              options={[
+                { value: "90", label: "90° a la derecha (recomendado)" },
+                { value: "0", label: "Sin rotar" },
+              ]}
+            />
+          </div>
         </div>
 
         <p className="text-xs text-neutral-500">

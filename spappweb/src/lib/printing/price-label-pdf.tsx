@@ -24,6 +24,9 @@ function labelStyles(scale: number) {
     page: {
       padding: 0,
     },
+    canvas: {
+      position: "relative",
+    },
     label: {
       position: "absolute",
       width: mm(LABEL_WIDTH_MM),
@@ -51,6 +54,28 @@ function labelStyles(scale: number) {
   });
 }
 
+function pageLayout(options: PriceLabelPrintOptions) {
+  const w = options.pageWidthMm;
+  const h = options.pageHeightMm;
+  const rotate = options.rotationDeg === 90;
+
+  if (!rotate) {
+    return {
+      pageSize: [mm(w), mm(h)] as [number, number],
+      canvasStyle: { width: mm(w), height: mm(h) },
+    };
+  }
+
+  return {
+    pageSize: [mm(h), mm(w)] as [number, number],
+    canvasStyle: {
+      width: mm(w),
+      height: mm(h),
+      transform: `rotate(90deg) translate(0, -${mm(w)})`,
+    },
+  };
+}
+
 export function PriceLabelPdfDoc({
   data,
   barcodeSrc,
@@ -62,31 +87,30 @@ export function PriceLabelPdfDoc({
 }) {
   const styles = labelStyles(options.contentScale);
   const pages = labelSlotsForPages(options);
+  const layout = pageLayout(options);
 
   return (
     <Document>
       {pages.map((slots, pageIndex) => (
-        <Page
-          key={pageIndex}
-          size={[mm(options.pageWidthMm), mm(options.pageHeightMm)]}
-          style={styles.page}
-        >
-          {slots.map((slot) => (
-            <View
-              key={`${pageIndex}-${slot}`}
-              style={[
-                styles.label,
-                {
-                  left: mm(labelLeftMm(options, slot)),
-                  top: mm(labelTopMm(options)),
-                },
-              ]}
-            >
-              <Text style={styles.name}>{data.nombre}</Text>
-              <Image src={barcodeSrc} style={styles.barcode} />
-              <Text style={styles.price}>{data.precioFormatted}</Text>
-            </View>
-          ))}
+        <Page key={pageIndex} size={layout.pageSize} style={styles.page}>
+          <View style={[styles.canvas, layout.canvasStyle]}>
+            {slots.map((slot) => (
+              <View
+                key={`${pageIndex}-${slot}`}
+                style={[
+                  styles.label,
+                  {
+                    left: mm(labelLeftMm(options, slot)),
+                    top: mm(labelTopMm(options)),
+                  },
+                ]}
+              >
+                <Text style={styles.name}>{data.nombre}</Text>
+                <Image src={barcodeSrc} style={styles.barcode} />
+                <Text style={styles.price}>{data.precioFormatted}</Text>
+              </View>
+            ))}
+          </View>
         </Page>
       ))}
     </Document>
