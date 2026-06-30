@@ -5,10 +5,15 @@ import { toast } from "sonner";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import {
   applyPaperPreset,
+  clampSlot,
   DEFAULT_PRINT_OPTIONS,
+  presetLabel,
+  setLabelsPerRow,
+  syncRowPageSize,
   type PaperPreset,
   type PriceLabelPrintOptions,
 } from "@/lib/printing/price-label-print-options";
+import type { LabelsPerRow } from "@/lib/printing/price-label";
 import { printPriceLabelInBrowser } from "@/lib/printing/print-price-label-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +51,11 @@ export function PrintPriceLabelDialog({
     setOptions((prev) => ({ ...prev, ...partial }));
   }
 
+  function onLabelsPerRowChange(value: string) {
+    const labelsPerRow = Number(value) as LabelsPerRow;
+    setOptions((prev) => setLabelsPerRow(labelsPerRow, prev));
+  }
+
   function onPresetChange(value: string) {
     const preset = value as PaperPreset;
     setOptions((prev) => applyPaperPreset(preset, prev));
@@ -79,12 +89,27 @@ export function PrintPriceLabelDialog({
           <DialogTitle>Imprimir etiqueta</DialogTitle>
           {product ? (
             <p className="text-sm text-neutral-500">
-              {product.nombre} · SKU {product.sku}
+              {product.nombre} · SKU {product.sku} · etiqueta 30 × 20 mm (3 × 2
+              cm)
             </p>
           ) : null}
         </DialogHeader>
 
         <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Códigos por fila en el rollo</Label>
+            <TouchSelect
+              aria-label="Códigos por fila"
+              value={String(options.labelsPerRow)}
+              onChange={onLabelsPerRowChange}
+              options={[
+                { value: "1", label: "1 por fila" },
+                { value: "2", label: "2 por fila" },
+                { value: "3", label: "3 por fila" },
+              ]}
+            />
+          </div>
+
           <div className="space-y-2 sm:col-span-2">
             <Label>Tamaño de hoja</Label>
             <TouchSelect
@@ -92,8 +117,11 @@ export function PrintPriceLabelDialog({
               value={options.preset}
               onChange={onPresetChange}
               options={[
-                { value: "row", label: "Fila 3 etiquetas (106 × 28 mm)" },
-                { value: "single", label: "Una etiqueta (38 × 28 mm)" },
+                {
+                  value: "row",
+                  label: presetLabel("row", options.labelsPerRow),
+                },
+                { value: "single", label: presetLabel("single", 1) },
                 { value: "custom", label: "Personalizado" },
               ]}
             />
@@ -199,22 +227,33 @@ export function PrintPriceLabelDialog({
             />
           </div>
 
-          {options.preset !== "single" ? (
+          {options.labelsPerRow > 1 && options.copies === 1 ? (
             <div className="space-y-2 sm:col-span-2">
               <Label>Columna en el rollo</Label>
               <TouchSelect
                 aria-label="Columna en el rollo"
                 value={String(options.slot)}
                 onChange={(value) =>
-                  patch({ slot: Number(value) as 0 | 1 | 2 })
+                  patch({
+                    slot: clampSlot(Number(value), options.labelsPerRow),
+                  })
                 }
                 options={[
                   { value: "0", label: "1 · izquierda" },
-                  { value: "1", label: "2 · centro" },
-                  { value: "2", label: "3 · derecha" },
+                  ...(options.labelsPerRow >= 2
+                    ? [{ value: "1", label: "2 · centro" }]
+                    : []),
+                  ...(options.labelsPerRow >= 3
+                    ? [{ value: "2", label: "3 · derecha" }]
+                    : []),
                 ]}
               />
             </div>
+          ) : options.copies > 1 ? (
+            <p className="text-sm text-neutral-500 sm:col-span-2">
+              Con {options.copies} copias se rellenan hasta{" "}
+              {options.labelsPerRow} códigos por fila, de izquierda a derecha.
+            </p>
           ) : null}
 
           <div className="space-y-2">
@@ -255,7 +294,15 @@ export function PrintPriceLabelDialog({
               max={99}
               value={options.copies}
               onChange={(e) =>
-                patch({ copies: Math.max(1, Math.min(99, num(e.target.value, 1))) })
+                setOptions((prev) =>
+                  syncRowPageSize({
+                    ...prev,
+                    copies: Math.max(
+                      1,
+                      Math.min(99, num(e.target.value, 1)),
+                    ),
+                  }),
+                )
               }
             />
           </div>

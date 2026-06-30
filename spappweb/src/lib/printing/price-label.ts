@@ -1,24 +1,33 @@
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 
+/** Cada etiqueta: 3 × 2 cm */
 export const LABEL_WIDTH_MM = 30;
 export const LABEL_HEIGHT_MM = 20;
 export const LABEL_GAP_MM = 4;
-export const LABELS_PER_ROW = 3;
-export const ROW_WIDTH_MM =
-  LABEL_GAP_MM * 2 +
-  LABELS_PER_ROW * LABEL_WIDTH_MM +
-  (LABELS_PER_ROW - 1) * LABEL_GAP_MM;
-export const ROW_HEIGHT_MM = LABEL_GAP_MM * 2 + LABEL_HEIGHT_MM;
+
+export type LabelsPerRow = 1 | 2 | 3;
+
+export function rowWidthMm(labelsPerRow: LabelsPerRow): number {
+  return (
+    LABEL_GAP_MM * 2 +
+    labelsPerRow * LABEL_WIDTH_MM +
+    (labelsPerRow - 1) * LABEL_GAP_MM
+  );
+}
+
+export function rowHeightMm(): number {
+  return LABEL_GAP_MM * 2 + LABEL_HEIGHT_MM;
+}
+
+export function labelSlotLeftMm(slot: number): number {
+  return LABEL_GAP_MM + slot * (LABEL_WIDTH_MM + LABEL_GAP_MM);
+}
 
 export interface PriceLabelData {
   nombre: string;
   sku: string;
   precioFormatted: string;
-}
-
-export function labelSlotLeftMm(slot: number): number {
-  return LABEL_GAP_MM + slot * (LABEL_WIDTH_MM + LABEL_GAP_MM);
 }
 
 export function toPriceLabelData(

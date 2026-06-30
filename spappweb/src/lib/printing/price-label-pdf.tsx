@@ -11,6 +11,7 @@ import { LABEL_HEIGHT_MM, LABEL_WIDTH_MM } from "@/lib/printing/price-label";
 import type { PriceLabelPrintOptions } from "@/lib/printing/price-label-print-options";
 import {
   labelLeftMm,
+  labelSlotsForPages,
   labelTopMm,
 } from "@/lib/printing/price-label-print-options";
 
@@ -50,6 +51,24 @@ function labelStyles(scale: number) {
   });
 }
 
+function LabelCell({
+  data,
+  barcodeSrc,
+  styles,
+}: {
+  data: PriceLabelData;
+  barcodeSrc: string;
+  styles: ReturnType<typeof labelStyles>;
+}) {
+  return (
+    <>
+      <Text style={styles.name}>{data.nombre}</Text>
+      <Image src={barcodeSrc} style={styles.barcode} />
+      <Text style={styles.price}>{data.precioFormatted}</Text>
+    </>
+  );
+}
+
 export function PriceLabelPdfDoc({
   data,
   barcodeSrc,
@@ -60,29 +79,34 @@ export function PriceLabelPdfDoc({
   options: PriceLabelPrintOptions;
 }) {
   const styles = labelStyles(options.contentScale);
-  const copies = Math.max(1, Math.min(options.copies, 99));
+  const pages = labelSlotsForPages(options);
 
   return (
     <Document>
-      {Array.from({ length: copies }, (_, index) => (
+      {pages.map((slots, pageIndex) => (
         <Page
-          key={index}
+          key={pageIndex}
           size={[mm(options.pageWidthMm), mm(options.pageHeightMm)]}
           style={styles.page}
         >
-          <View
-            style={[
-              styles.label,
-              {
-                left: mm(labelLeftMm(options)),
-                top: mm(labelTopMm(options)),
-              },
-            ]}
-          >
-            <Text style={styles.name}>{data.nombre}</Text>
-            <Image src={barcodeSrc} style={styles.barcode} />
-            <Text style={styles.price}>{data.precioFormatted}</Text>
-          </View>
+          {slots.map((slot) => (
+            <View
+              key={slot}
+              style={[
+                styles.label,
+                {
+                  left: mm(labelLeftMm(options, slot)),
+                  top: mm(labelTopMm(options)),
+                },
+              ]}
+            >
+              <LabelCell
+                data={data}
+                barcodeSrc={barcodeSrc}
+                styles={styles}
+              />
+            </View>
+          ))}
         </Page>
       ))}
     </Document>
