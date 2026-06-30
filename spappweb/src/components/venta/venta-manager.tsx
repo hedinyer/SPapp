@@ -66,7 +66,7 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
   ];
 }
 
-const SCAN_COOLDOWN_MS = 1500;
+const SCAN_COOLDOWN_SEC = 5;
 const SCANNER_ID = "venta-scanner";
 
 export function VentaManager() {
@@ -75,11 +75,13 @@ export function VentaManager() {
   const [cameraOn, setCameraOn] = useState(false);
   const [celular, setCelular] = useState("");
   const [manualSku, setManualSku] = useState("");
+  const [cooldownSec, setCooldownSec] = useState(0);
   const [pending, startTransition] = useTransition();
 
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scanLockRef = useRef(false);
-  const quaggaRunningRef = useRef(false);
+  const qrScannerRef = useRef<import("html5-qrcode").Html5Qrcode | null>(null);
+  const cooldownTimerRef = useRef<number | null>(null);
 
   const total = useMemo(() => cartTotal(lines), [lines]);
   const itemCount = useMemo(
@@ -92,16 +94,33 @@ export function VentaManager() {
     toast.success(`${producto.nombre} agregado`);
   }, []);
 
-  const resolveSku = useCallback(
-    (raw: string) => {
-      const sku = raw.trim();
-      if (!sku || scanLockRef.current) return;
+  const startCooldown = useCallback(() => {
+    if (cooldownTimerRef.current) {
+      window.clearInterval(cooldownTimerRef.current);
+    }
 
-      scanLockRef.current = true;
-      window.setTimeout(() => {
-        scanLockRef.current = false;
-      }, SCAN_COOLDOWN_MS);
+    scanLockRef.current = true;
+    setCooldownSec(SCAN_COOLDOWN_SEC);
+    qrScannerRef.current?.pause(true);
 
+    cooldownTimerRef.current = window.setInterval(() => {
+      setCooldownSec((prev) => {
+        if (prev <= 1) {
+          if (cooldownTimerRef.current) {
+            window.clearInterval(cooldownTimerRef.current);
+            cooldownTimerRef.current = null;
+          }
+          scanLockRef.current = false;
+          qrScannerRef.current?.resume();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  const lookupAndAdd = useCallback(
+    (sku: string) => {
       startTransition(async () => {
         try {
           const producto = await lookupProductoBySku(sku);
@@ -114,83 +133,101 @@ export function VentaManager() {
     [addProduct],
   );
 
+  const resolveSkuFromCamera = useCallback(
+    (raw: string) => {
+      const sku = raw.trim();
+      if (!sku || scanLockRef.current) return;
+      startCooldown();
+      lookupAndAdd(sku);
+    },
+    [lookupAndAdd, startCooldown],
+  );
+
+  const resolveSkuManual = useCallback(
+    (raw: string) => {
+      const sku = raw.trim();
+      if (!sku) return;
+      lookupAndAdd(sku);
+    },
+    [lookupAndAdd],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        window.clearInterval(cooldownTimerRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!cameraOn) {
-      if (quaggaRunningRef.current) {
-        void import("@ericblade/quagga2").then(({ default: Quagga }) => {
-          Quagga.stop();
-          quaggaRunningRef.current = false;
-        });
+      if (qrScannerRef.current) {
+        void qrScannerRef.current
+          .stop()
+          .catch(() => {})
+          .finally(() => {
+            qrScannerRef.current?.clear();
+            qrScannerRef.current = null;
+          });
       }
       scannerInputRef.current?.focus();
       return;
     }
 
     let cancelled = false;
-    let onDetected: ((result: { codeResult: { code?: string } }) => void) | null =
-      null;
 
-    void import("@ericblade/quagga2").then(({ default: Quagga }) => {
+    void import("html5-qrcode").then(({ Html5Qrcode, Html5QrcodeSupportedFormats }) => {
       if (cancelled) return;
 
-      const target = document.getElementById(SCANNER_ID);
-      if (!target) return;
+      const scanner = new Html5Qrcode(SCANNER_ID, {
+        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+        verbose: false,
+      });
+      qrScannerRef.current = scanner;
 
-      onDetected = (result) => {
-        if (cancelled || scanLockRef.current) return;
-        const code = result.codeResult.code;
-        if (code) resolveSku(code);
-      };
-
-      Quagga.init(
-        {
-          inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target,
-            constraints: {
-              facingMode: "environment",
-              width: { min: 640, ideal: 1920, max: 1920 },
-              height: { min: 480, ideal: 1080, max: 1080 },
-              // @ts-expect-error focusMode no está en todos los typings
-              focusMode: "continuous",
+      scanner
+        .start(
+          { facingMode: "environment" },
+          {
+            fps: 15,
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+              const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75);
+              return { width: edge, height: edge };
             },
+            aspectRatio: 1,
+            disableFlip: false,
           },
-          // Etiquetas 30×20 mm: parches pequeños, sin halfSample.
-          locator: { patchSize: "x-small", halfSample: false },
-          decoder: { readers: ["code_128_reader"], multiple: false },
-          locate: true,
-          numOfWorkers: 0,
-          frequency: 10,
-        },
-        (err) => {
-          if (cancelled) return;
-          if (err) {
+          (decodedText) => {
+            if (cancelled || scanLockRef.current) return;
+            resolveSkuFromCamera(decodedText);
+          },
+          () => {},
+        )
+        .catch(() => {
+          if (!cancelled) {
             toast.error("No se pudo acceder a la cámara.");
             setCameraOn(false);
-            return;
           }
-          Quagga.onDetected(onDetected as Parameters<typeof Quagga.onDetected>[0]);
-          Quagga.start();
-          quaggaRunningRef.current = true;
-        },
-      );
+        });
     });
 
     return () => {
       cancelled = true;
-      void import("@ericblade/quagga2").then(({ default: Quagga }) => {
-        if (onDetected) {
-          Quagga.offDetected(onDetected as Parameters<typeof Quagga.onDetected>[0]);
-        }
-        Quagga.stop();
-        quaggaRunningRef.current = false;
-      });
+      if (qrScannerRef.current) {
+        void qrScannerRef.current
+          .stop()
+          .catch(() => {})
+          .finally(() => {
+            qrScannerRef.current?.clear();
+            qrScannerRef.current = null;
+          });
+      }
     };
-  }, [cameraOn, resolveSku]);
+  }, [cameraOn, resolveSkuFromCamera]);
 
   function onManualSkuSubmit() {
-    resolveSku(manualSku);
+    resolveSkuManual(manualSku);
     setManualSku("");
   }
 
@@ -198,7 +235,7 @@ export function VentaManager() {
     if (e.key !== "Enter") return;
     e.preventDefault();
     const input = e.currentTarget;
-    resolveSku(input.value);
+    resolveSkuManual(input.value);
     input.value = "";
     input.focus();
   }
@@ -229,7 +266,7 @@ export function VentaManager() {
 
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm text-neutral-500">
-          Escanea la etiqueta impresa (CODE128) o ingresa el SKU.
+          Escanea el QR de la etiqueta impresa o ingresa el SKU.
         </p>
         <Button
           type="button"
@@ -252,21 +289,24 @@ export function VentaManager() {
       </div>
 
       {cameraOn && (
-        <div className="relative mx-auto mt-4 max-w-[280px]">
+        <div className="relative mx-auto mt-4 w-full max-w-[320px]">
           <div
             id={SCANNER_ID}
-            className="relative min-h-[200px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_canvas]:!absolute [&_canvas]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
+            className="relative min-h-[260px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
           />
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-            <div className="h-14 w-[90%] rounded border-2 border-green-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
-          </div>
-          {pending && (
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg bg-black/30 text-xs text-white">
+          {cooldownSec > 0 && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-black/60 text-white">
+              <span className="text-5xl font-bold tabular-nums">{cooldownSec}</span>
+              <span className="mt-1 text-sm">Espera para escanear de nuevo</span>
+            </div>
+          )}
+          {pending && cooldownSec === 0 && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/30 text-xs text-white">
               Buscando producto…
             </div>
           )}
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Acerca la etiqueta impresa (10–15 cm), buena luz, barras horizontales.
+            Apunta al QR de la etiqueta (10–20 cm), con buena luz.
           </p>
         </div>
       )}

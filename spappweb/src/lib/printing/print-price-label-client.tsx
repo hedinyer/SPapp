@@ -4,17 +4,13 @@ import { PriceLabelPdfDoc } from "@/lib/printing/price-label-pdf";
 import type { PriceLabelPrintOptions } from "@/lib/printing/price-label-print-options";
 import { toPriceLabelData } from "@/lib/printing/price-label";
 
-async function barcodeDataUrl(sku: string): Promise<string> {
-  const JsBarcode = (await import("jsbarcode")).default;
-  const canvas = document.createElement("canvas");
-  JsBarcode(canvas, sku, {
-    format: "CODE128",
-    width: 1.5,
-    height: 72,
-    displayValue: false,
+async function qrDataUrl(sku: string): Promise<string> {
+  const QRCode = (await import("qrcode")).default;
+  return QRCode.toDataURL(sku, {
+    width: 256,
     margin: 0,
+    errorCorrectionLevel: "M",
   });
-  return canvas.toDataURL("image/png");
 }
 
 export async function buildPriceLabelPdfBlob(
@@ -22,9 +18,9 @@ export async function buildPriceLabelPdfBlob(
   options: PriceLabelPrintOptions,
 ): Promise<Blob> {
   const data = toPriceLabelData(product);
-  const barcodeSrc = await barcodeDataUrl(data.sku);
+  const qrSrc = await qrDataUrl(data.sku);
   const doc = (
-    <PriceLabelPdfDoc data={data} barcodeSrc={barcodeSrc} options={options} />
+    <PriceLabelPdfDoc data={data} qrSrc={qrSrc} options={options} />
   );
   return pdf(doc).toBlob();
 }

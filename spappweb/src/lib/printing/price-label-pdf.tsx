@@ -18,8 +18,7 @@ function mm(mmValue: number) {
 }
 
 function labelStyles(scale: number, rotated: boolean) {
-  const barcodeW = rotated ? 14 : 22;
-  const barcodeH = rotated ? 24 : 14;
+  const qrSize = rotated ? 14 : 14;
 
   return StyleSheet.create({
     page: {
@@ -37,9 +36,9 @@ function labelStyles(scale: number, rotated: boolean) {
       textAlign: "center",
       maxLines: 1,
     },
-    barcode: {
-      width: mm(barcodeW * scale),
-      height: mm(barcodeH * scale),
+    qr: {
+      width: mm(qrSize * scale),
+      height: mm(qrSize * scale),
       objectFit: "contain",
     },
     price: {
@@ -52,11 +51,11 @@ function labelStyles(scale: number, rotated: boolean) {
 
 export function PriceLabelPdfDoc({
   data,
-  barcodeSrc,
+  qrSrc,
   options,
 }: {
   data: PriceLabelData;
-  barcodeSrc: string;
+  qrSrc: string;
   options: PriceLabelPrintOptions;
 }) {
   const rotated = options.rotationDeg === 90;
@@ -88,7 +87,7 @@ export function PriceLabelPdfDoc({
                 ]}
               >
                 <Text style={styles.name}>{data.nombre}</Text>
-                <Image src={barcodeSrc} style={styles.barcode} />
+                <Image src={qrSrc} style={styles.qr} />
                 <Text style={styles.price}>{data.precioFormatted}</Text>
               </View>
             );
