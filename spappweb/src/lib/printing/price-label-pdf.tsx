@@ -7,73 +7,47 @@ import {
   View,
 } from "@react-pdf/renderer";
 import type { PriceLabelData } from "@/lib/printing/price-label";
-import { LABEL_HEIGHT_MM, LABEL_WIDTH_MM } from "@/lib/printing/price-label";
 import type { PriceLabelPrintOptions } from "@/lib/printing/price-label-print-options";
 import {
-  labelLeftMm,
+  labelPlacement,
   labelSlotsForPages,
-  labelTopMm,
 } from "@/lib/printing/price-label-print-options";
 
 function mm(mmValue: number) {
   return mmValue * 2.834645669291;
 }
 
-function labelStyles(scale: number) {
+function labelStyles(scale: number, rotated: boolean) {
+  const barcodeW = rotated ? 16 : 26;
+  const barcodeH = rotated ? 22 : 7;
+
   return StyleSheet.create({
     page: {
       padding: 0,
     },
-    canvas: {
-      position: "relative",
-    },
     label: {
       position: "absolute",
-      width: mm(LABEL_WIDTH_MM),
-      height: mm(LABEL_HEIGHT_MM),
       paddingHorizontal: 2,
       paddingVertical: 1,
       justifyContent: "space-between",
       alignItems: "center",
     },
     name: {
-      fontSize: 5 * scale,
+      fontSize: (rotated ? 4 : 5) * scale,
       textAlign: "center",
       maxLines: 1,
     },
     barcode: {
-      width: mm(26 * scale),
-      height: mm(7 * scale),
+      width: mm(barcodeW * scale),
+      height: mm(barcodeH * scale),
       objectFit: "contain",
     },
     price: {
-      fontSize: 7 * scale,
+      fontSize: (rotated ? 6 : 7) * scale,
       fontWeight: "bold",
       textAlign: "center",
     },
   });
-}
-
-function pageLayout(options: PriceLabelPrintOptions) {
-  const w = options.pageWidthMm;
-  const h = options.pageHeightMm;
-  const rotate = options.rotationDeg === 90;
-
-  if (!rotate) {
-    return {
-      pageSize: [mm(w), mm(h)] as [number, number],
-      canvasStyle: { width: mm(w), height: mm(h) },
-    };
-  }
-
-  return {
-    pageSize: [mm(h), mm(w)] as [number, number],
-    canvasStyle: {
-      width: mm(w),
-      height: mm(h),
-      transform: `rotate(90deg) translate(0, -${mm(w)})`,
-    },
-  };
 }
 
 export function PriceLabelPdfDoc({
@@ -85,23 +59,31 @@ export function PriceLabelPdfDoc({
   barcodeSrc: string;
   options: PriceLabelPrintOptions;
 }) {
-  const styles = labelStyles(options.contentScale);
+  const rotated = options.rotationDeg === 90;
+  const styles = labelStyles(options.contentScale, rotated);
   const pages = labelSlotsForPages(options);
-  const layout = pageLayout(options);
+  const sample = labelPlacement(options, 0);
 
   return (
     <Document>
       {pages.map((slots, pageIndex) => (
-        <Page key={pageIndex} size={layout.pageSize} style={styles.page}>
-          <View style={[styles.canvas, layout.canvasStyle]}>
-            {slots.map((slot) => (
+        <Page
+          key={pageIndex}
+          size={[mm(sample.pageWidthMm), mm(sample.pageHeightMm)]}
+          style={styles.page}
+        >
+          {slots.map((slot) => {
+            const place = labelPlacement(options, slot);
+            return (
               <View
                 key={`${pageIndex}-${slot}`}
                 style={[
                   styles.label,
                   {
-                    left: mm(labelLeftMm(options, slot)),
-                    top: mm(labelTopMm(options)),
+                    left: mm(place.leftMm),
+                    top: mm(place.topMm),
+                    width: mm(place.widthMm),
+                    height: mm(place.heightMm),
                   },
                 ]}
               >
@@ -109,8 +91,8 @@ export function PriceLabelPdfDoc({
                 <Image src={barcodeSrc} style={styles.barcode} />
                 <Text style={styles.price}>{data.precioFormatted}</Text>
               </View>
-            ))}
-          </View>
+            );
+          })}
         </Page>
       ))}
     </Document>

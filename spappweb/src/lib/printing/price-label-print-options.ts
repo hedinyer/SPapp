@@ -1,5 +1,6 @@
 import {
   LABEL_GAP_MM,
+  LABEL_HEIGHT_MM,
   LABEL_WIDTH_MM,
   type LabelsPerRow,
   labelSlotLeftMm,
@@ -126,6 +127,44 @@ export function labelLeftMm(
 
 export function labelTopMm(options: PriceLabelPrintOptions): number {
   return options.marginTopMm + options.offsetYmm + LABEL_GAP_MM;
+}
+
+export interface LabelPlacement {
+  pageWidthMm: number;
+  pageHeightMm: number;
+  leftMm: number;
+  topMm: number;
+  widthMm: number;
+  heightMm: number;
+}
+
+/** Posición y tamaño de etiqueta (rotación 90° sin transform CSS). */
+export function labelPlacement(
+  options: PriceLabelPrintOptions,
+  slot: number,
+): LabelPlacement {
+  const origLeft = labelLeftMm(options, slot);
+  const origTop = labelTopMm(options);
+
+  if (options.rotationDeg === 90) {
+    return {
+      pageWidthMm: options.pageHeightMm,
+      pageHeightMm: options.pageWidthMm,
+      leftMm: origTop,
+      topMm: origLeft,
+      widthMm: LABEL_HEIGHT_MM,
+      heightMm: LABEL_WIDTH_MM,
+    };
+  }
+
+  return {
+    pageWidthMm: options.pageWidthMm,
+    pageHeightMm: options.pageHeightMm,
+    leftMm: origLeft,
+    topMm: origTop,
+    widthMm: LABEL_WIDTH_MM,
+    heightMm: LABEL_HEIGHT_MM,
+  };
 }
 
 export function presetLabel(preset: PaperPreset, labelsPerRow: LabelsPerRow) {
