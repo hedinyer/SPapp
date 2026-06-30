@@ -260,7 +260,7 @@ export function PrintPriceLabelDialog({
             <>
               <div className="space-y-2">
                 <Label htmlFor="nudge-left">
-                  Columna izquierda → centro (mm)
+                  Columna izquierda ← separar (mm)
                 </Label>
                 <Input
                   id="nudge-left"
@@ -281,7 +281,7 @@ export function PrintPriceLabelDialog({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="nudge-right">
-                  Columna derecha → centro (mm)
+                  Columna derecha → separar (mm)
                 </Label>
                 <Input
                   id="nudge-right"

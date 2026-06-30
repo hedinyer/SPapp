@@ -26,9 +26,9 @@ export interface PriceLabelPrintOptions {
   copies: number;
   /** 0 = normal, 90 = girar a la derecha (horario). */
   rotationDeg: 0 | 90;
-  /** Empuja la columna izquierda hacia el centro (mm). */
+  /** Separa la columna izquierda del centro (mm, hacia la izquierda). */
   nudgeLeftColumnMm: number;
-  /** Empuja la columna derecha hacia el centro (mm). */
+  /** Separa la columna derecha del centro (mm, hacia la derecha). */
   nudgeRightColumnMm: number;
 }
 
@@ -47,8 +47,8 @@ export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
   contentScale: 1,
   copies: 3,
   rotationDeg: 0,
-  nudgeLeftColumnMm: 1.5,
-  nudgeRightColumnMm: 1.5,
+  nudgeLeftColumnMm: 2.5,
+  nudgeRightColumnMm: 2.5,
 };
 
 export function clampSlot(
@@ -128,8 +128,8 @@ export function slotEdgeNudgeX(
 ): number {
   const last = options.labelsPerRow - 1;
   if (options.labelsPerRow <= 1) return 0;
-  if (slot === 0) return options.nudgeLeftColumnMm;
-  if (slot === last) return -options.nudgeRightColumnMm;
+  if (slot === 0) return -options.nudgeLeftColumnMm;
+  if (slot === last) return options.nudgeRightColumnMm;
   return 0;
 }
 
