@@ -10,6 +10,7 @@ export const ROW_WIDTH_MM =
   LABELS_PER_ROW * LABEL_WIDTH_MM +
   (LABELS_PER_ROW - 1) * LABEL_GAP_MM;
 export const ROW_HEIGHT_MM = LABEL_GAP_MM * 2 + LABEL_HEIGHT_MM;
+const LABEL_DPI = 203;
 
 export interface PriceLabelData {
   nombre: string;
@@ -17,16 +18,16 @@ export interface PriceLabelData {
   precioFormatted: string;
 }
 
+export function mmToDots(mm: number): number {
+  return Math.round((mm * LABEL_DPI) / 25.4);
+}
+
 export function labelSlotLeftMm(slot: number): number {
   return LABEL_GAP_MM + slot * (LABEL_WIDTH_MM + LABEL_GAP_MM);
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function escapeZpl(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\^/g, "\\^");
 }
 
 export function toPriceLabelData(
@@ -44,161 +45,43 @@ export function toPriceLabelData(
   };
 }
 
-function labelCellHtml(
-  data: PriceLabelData,
-  index: number,
-  column: number,
-): string {
-  const left = labelSlotLeftMm(column);
+function buildLabelFields(data: PriceLabelData, slot: number): string {
+  const x = mmToDots(labelSlotLeftMm(slot)) + 8;
+  const y = mmToDots(LABEL_GAP_MM) + 4;
+  const nombre = escapeZpl(data.nombre);
+  const sku = escapeZpl(data.sku);
+  const precio = escapeZpl(data.precioFormatted);
 
-  return `
-    <div
-      class="label"
-      style="left:${left}mm;top:${LABEL_GAP_MM}mm;"
-    >
-      <div class="name">${escapeHtml(data.nombre)}</div>
-      <svg id="barcode-${index}"></svg>
-      <div class="price">${escapeHtml(data.precioFormatted)}</div>
-    </div>
-  `;
+  return `^FO${x},${y}^A0N,18,18^FD${nombre}^FS
+^FO${x},${y + 28}^BY1^BCN,40,N,N,N^FD${sku}^FS
+^FO${x},${y + 82}^A0N,26,26^FD${precio}^FS
+`;
 }
 
-function rowHtml(
-  data: PriceLabelData,
-  startIndex: number,
-  labelsInRow: number,
-): string {
-  const labels = Array.from({ length: labelsInRow }, (_, column) =>
-    labelCellHtml(data, startIndex + column, column),
+function buildZplRow(data: PriceLabelData, labelsInRow: number): string {
+  const fields = Array.from({ length: labelsInRow }, (_, slot) =>
+    buildLabelFields(data, slot),
   ).join("");
 
-  return `<div class="sheet">${labels}</div>`;
+  return `^XA
+^PW${mmToDots(ROW_WIDTH_MM)}
+^LL${mmToDots(ROW_HEIGHT_MM)}
+^LH0,0
+^CI28
+${fields}^XZ`;
 }
 
-export function buildPriceLabelHtml(
+export function buildPriceLabelZpl(
   data: PriceLabelData,
   copies = 1,
 ): string {
   const count = Math.max(1, copies);
-  const sheets: string[] = [];
+  const rows: string[] = [];
 
   for (let index = 0; index < count; index += LABELS_PER_ROW) {
     const labelsInRow = Math.min(LABELS_PER_ROW, count - index);
-    sheets.push(rowHtml(data, index, labelsInRow));
+    rows.push(buildZplRow(data, labelsInRow));
   }
 
-  return `<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=${ROW_WIDTH_MM}mm, height=${ROW_HEIGHT_MM}mm">
-  <title>Etiqueta ${escapeHtml(data.sku)}</title>
-  <style>
-    @page {
-      size: ${ROW_WIDTH_MM}mm ${ROW_HEIGHT_MM}mm;
-      margin: 0;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    html {
-      width: ${ROW_WIDTH_MM}mm;
-      height: ${ROW_HEIGHT_MM}mm;
-    }
-    body {
-      width: ${ROW_WIDTH_MM}mm;
-      height: ${ROW_HEIGHT_MM}mm;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      background: #fff;
-    }
-    .sheet {
-      position: relative;
-      width: ${ROW_WIDTH_MM}mm;
-      height: ${ROW_HEIGHT_MM}mm;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      page-break-after: always;
-      break-after: page;
-    }
-    .sheet:last-child {
-      page-break-after: auto;
-      break-after: auto;
-    }
-    .label {
-      position: absolute;
-      width: ${LABEL_WIDTH_MM}mm;
-      height: ${LABEL_HEIGHT_MM}mm;
-      padding: 0.5mm 1mm;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      overflow: hidden;
-      transform: rotate(0deg);
-      transform-origin: top left;
-    }
-    .name {
-      font-size: 5pt;
-      line-height: 1.1;
-      text-align: center;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    svg {
-      width: 26mm;
-      max-width: 26mm;
-      height: 7mm;
-      max-height: 7mm;
-    }
-    .price {
-      font-size: 7pt;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1;
-    }
-    @media print {
-      @page {
-        size: ${ROW_WIDTH_MM}mm ${ROW_HEIGHT_MM}mm;
-        margin: 0;
-      }
-      html, body {
-        width: ${ROW_WIDTH_MM}mm !important;
-        height: ${ROW_HEIGHT_MM}mm !important;
-        min-width: ${ROW_WIDTH_MM}mm !important;
-        max-width: ${ROW_WIDTH_MM}mm !important;
-        min-height: ${ROW_HEIGHT_MM}mm !important;
-        max-height: ${ROW_HEIGHT_MM}mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-        transform: none !important;
-      }
-      .sheet {
-        width: ${ROW_WIDTH_MM}mm !important;
-        height: ${ROW_HEIGHT_MM}mm !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        transform: none !important;
-      }
-      .label {
-        transform: rotate(0deg) !important;
-        transform-origin: top left !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  ${sheets.join("")}
-</body>
-</html>`;
+  return rows.join("\n");
 }
