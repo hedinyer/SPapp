@@ -57,6 +57,7 @@ import {
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import { Textarea } from "@/components/ui/textarea";
 import { TouchSelect } from "@/components/ui/touch-select";
+import { PrintPriceLabelButton } from "@/components/inventario/print-price-label-button";
 
 export function InventarioManager({
   categorias,
@@ -115,7 +116,7 @@ export function InventarioManager({
                 <TableHead>Precio</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead className="w-24" />
+                <TableHead className="w-32" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -164,6 +165,7 @@ export function InventarioManager({
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
+                        <PrintPriceLabelButton product={p} />
                         <Button
                           variant="ghost"
                           size="icon"
@@ -271,6 +273,11 @@ export function InventarioManager({
                   </div>
                 </dl>
                 <div className="mt-3 flex gap-2">
+                  <PrintPriceLabelButton
+                    product={p}
+                    variant="outline"
+                    className="flex-1"
+                  />
                   <Button
                     variant="outline"
                     size="sm"

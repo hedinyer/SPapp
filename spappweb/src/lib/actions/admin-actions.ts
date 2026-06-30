@@ -5,6 +5,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
+import { storagePathFromPublicUrl } from "@/lib/utils/storage-urls";
 
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
@@ -823,6 +825,119 @@ export async function updateVendidaEstadoFisico(
   if (error) throw new Error(error.message);
   revalidatePath("/vendidas");
   revalidateClient(parsed.userId);
+  return { ok: true };
+}
+
+export async function deleteClienteSinVisita(userId: number) {
+  const parsed = z.number().int().positive().parse(userId);
+  const supabase = await assertAdmin();
+
+  const { data: userRow, error: userFetchError } = await supabase
+    .from("users")
+    .select("id, status")
+    .eq("id", parsed)
+    .maybeSingle();
+  if (userFetchError) throw new Error(mapDbError(userFetchError.message));
+  if (!userRow) throw new Error("Cliente no encontrado.");
+  if (userRow.status !== "normal") {
+    throw new Error("Solo se pueden eliminar clientes.");
+  }
+
+  const [{ data: visita }, { data: compra }] = await Promise.all([
+    supabase.from("visitas").select("id").eq("user_id", parsed).maybeSingle(),
+    supabase
+      .from("user_moto_compra")
+      .select("id")
+      .eq("user_id", parsed)
+      .maybeSingle(),
+  ]);
+  if (visita) {
+    throw new Error("No se puede eliminar: el cliente ya tiene visita.");
+  }
+  if (compra) {
+    throw new Error("No se puede eliminar: el cliente tiene una compra de moto.");
+  }
+
+  const [{ data: docs }, { data: contracts }] = await Promise.all([
+    supabase
+      .from("users_documents")
+      .select("document_front_url, document_back_url, selfie_url")
+      .eq("user_id", parsed),
+    supabase
+      .from("digital_contracts")
+      .select("signature_path, hoja_vida_pdf_path, contrato_pdf_path")
+      .eq("user_id", parsed),
+  ]);
+
+  const userDocPaths = new Set<string>();
+  for (const doc of docs ?? []) {
+    for (const url of [
+      doc.document_front_url,
+      doc.document_back_url,
+      doc.selfie_url,
+    ]) {
+      const path = storagePathFromPublicUrl(
+        STORAGE_BUCKETS.userDocuments,
+        url as string | null,
+      );
+      if (path) userDocPaths.add(path);
+    }
+  }
+
+  const contractPaths = new Set<string>();
+  for (const contract of contracts ?? []) {
+    for (const path of [
+      contract.signature_path,
+      contract.hoja_vida_pdf_path,
+      contract.contrato_pdf_path,
+    ]) {
+      if (path) contractPaths.add(path as string);
+    }
+  }
+
+  const { error: contractsError } = await supabase
+    .from("digital_contracts")
+    .delete()
+    .eq("user_id", parsed);
+  if (contractsError) throw new Error(mapDbError(contractsError.message));
+
+  const { error: docsError } = await supabase
+    .from("users_documents")
+    .delete()
+    .eq("user_id", parsed);
+  if (docsError) throw new Error(mapDbError(docsError.message));
+
+  if (userDocPaths.size > 0) {
+    await supabase.storage
+      .from(STORAGE_BUCKETS.userDocuments)
+      .remove([...userDocPaths]);
+  }
+
+  const { data: folderFiles } = await supabase.storage
+    .from(STORAGE_BUCKETS.userDocuments)
+    .list(String(parsed));
+  if (folderFiles?.length) {
+    await supabase.storage
+      .from(STORAGE_BUCKETS.userDocuments)
+      .remove(folderFiles.map((f) => `${parsed}/${f.name}`));
+  }
+
+  if (contractPaths.size > 0) {
+    await supabase.storage
+      .from("contract-documents")
+      .remove([...contractPaths]);
+  }
+
+  const { data: deleted, error: userError } = await supabase
+    .from("users")
+    .delete()
+    .eq("id", parsed)
+    .select("id");
+  if (userError) throw new Error(mapDbError(userError.message));
+  if (!deleted?.length) throw new Error("Cliente no encontrado.");
+
+  revalidatePath("/inbox");
+  revalidateClient(parsed);
   return { ok: true };
 }
 

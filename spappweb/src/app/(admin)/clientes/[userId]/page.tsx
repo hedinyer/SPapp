@@ -29,7 +29,7 @@ export default async function ClientPage({
   return (
     <div className="space-y-6">
       <Button variant="ghost" asChild className="gap-2 px-0">
-        <Link href="/clientes">
+        <Link href="/inbox?cola=creditos">
           <ChevronLeft className="h-4 w-4" />
           Volver a clientes
         </Link>

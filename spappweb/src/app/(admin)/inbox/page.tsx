@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { getInboxListItems, getInboxQueues } from "@/lib/pipeline/queries";
+import { InboxQueueList } from "@/components/inbox/inbox-queue-list";
 import { InboxQueuesLive } from "@/components/inbox/inbox-queues-live";
 import { queueTitle } from "@/components/inbox/queue-cards";
 import type { InboxQueueId } from "@/lib/pipeline/types";
@@ -56,30 +57,7 @@ export default async function InboxPage({
           </Link>
         </Button>
         <h2 className="text-lg font-medium">{queueTitle(queueId)}</h2>
-        {items.length === 0 ? (
-          <p className="text-sm text-neutral-500">No hay items en esta cola.</p>
-        ) : (
-          <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
-            {items.map((item) => (
-              <li key={item.userId}>
-                <Link
-                  href={`/clientes/${item.userId}`}
-                  className="flex flex-col gap-2 px-4 py-4 hover:bg-neutral-50 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium">{item.displayName}</p>
-                    <p className="truncate text-sm text-neutral-500">
-                      @{item.username} · {item.subtitle}
-                    </p>
-                  </div>
-                  <span className="text-sm font-medium text-black sm:text-neutral-400">
-                    Abrir →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        <InboxQueueList items={items} queueId={queueId} />
       </div>
     </div>
   );
