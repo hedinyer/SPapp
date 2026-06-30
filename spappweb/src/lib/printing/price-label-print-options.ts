@@ -38,7 +38,7 @@ export const DEFAULT_PRINT_OPTIONS: PriceLabelPrintOptions = {
   offsetXmm: 0,
   offsetYmm: 0,
   contentScale: 1,
-  copies: 1,
+  copies: 3,
 };
 
 export function clampSlot(
@@ -89,23 +89,11 @@ export function setLabelsPerRow(
     ...current,
     preset: labelsPerRow === 1 ? "single" : "row",
     labelsPerRow,
+    copies: labelsPerRow,
   });
 }
 
-export function labelLeftMm(
-  options: PriceLabelPrintOptions,
-  slot: number,
-): number {
-  return (
-    options.marginLeftMm + options.offsetXmm + labelSlotLeftMm(slot)
-  );
-}
-
-export function labelTopMm(options: PriceLabelPrintOptions): number {
-  return options.marginTopMm + options.offsetYmm + LABEL_GAP_MM;
-}
-
-/** Posiciones de slot por página según copias y columna inicial. */
+/** Slots a imprimir en cada página. */
 export function labelSlotsForPages(options: PriceLabelPrintOptions): number[][] {
   const copies = Math.max(1, Math.min(options.copies, 99));
   const perRow = options.labelsPerRow;
@@ -122,6 +110,19 @@ export function labelSlotsForPages(options: PriceLabelPrintOptions): number[][] 
     remaining -= count;
   }
   return pages;
+}
+
+export function labelLeftMm(
+  options: PriceLabelPrintOptions,
+  slot: number,
+): number {
+  return (
+    options.marginLeftMm + options.offsetXmm + labelSlotLeftMm(slot)
+  );
+}
+
+export function labelTopMm(options: PriceLabelPrintOptions): number {
+  return options.marginTopMm + options.offsetYmm + LABEL_GAP_MM;
 }
 
 export function presetLabel(preset: PaperPreset, labelsPerRow: LabelsPerRow) {

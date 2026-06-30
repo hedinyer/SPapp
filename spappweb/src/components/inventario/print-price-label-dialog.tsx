@@ -249,10 +249,10 @@ export function PrintPriceLabelDialog({
                 ]}
               />
             </div>
-          ) : options.copies > 1 ? (
+          ) : options.copies > 1 && options.labelsPerRow > 1 ? (
             <p className="text-sm text-neutral-500 sm:col-span-2">
-              Con {options.copies} copias se rellenan hasta{" "}
-              {options.labelsPerRow} códigos por fila, de izquierda a derecha.
+              {options.copies} etiqueta{options.copies === 1 ? "" : "s"} en filas
+              de hasta {options.labelsPerRow}, de izquierda a derecha.
             </p>
           ) : null}
 

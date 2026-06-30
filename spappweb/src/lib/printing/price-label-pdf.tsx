@@ -51,24 +51,6 @@ function labelStyles(scale: number) {
   });
 }
 
-function LabelCell({
-  data,
-  barcodeSrc,
-  styles,
-}: {
-  data: PriceLabelData;
-  barcodeSrc: string;
-  styles: ReturnType<typeof labelStyles>;
-}) {
-  return (
-    <>
-      <Text style={styles.name}>{data.nombre}</Text>
-      <Image src={barcodeSrc} style={styles.barcode} />
-      <Text style={styles.price}>{data.precioFormatted}</Text>
-    </>
-  );
-}
-
 export function PriceLabelPdfDoc({
   data,
   barcodeSrc,
@@ -91,7 +73,7 @@ export function PriceLabelPdfDoc({
         >
           {slots.map((slot) => (
             <View
-              key={slot}
+              key={`${pageIndex}-${slot}`}
               style={[
                 styles.label,
                 {
@@ -100,11 +82,9 @@ export function PriceLabelPdfDoc({
                 },
               ]}
             >
-              <LabelCell
-                data={data}
-                barcodeSrc={barcodeSrc}
-                styles={styles}
-              />
+              <Text style={styles.name}>{data.nombre}</Text>
+              <Image src={barcodeSrc} style={styles.barcode} />
+              <Text style={styles.price}>{data.precioFormatted}</Text>
             </View>
           ))}
         </Page>
