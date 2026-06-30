@@ -9,11 +9,6 @@ import {
   useState,
   useTransition,
 } from "react";
-import {
-  BrowserMultiFormatReader,
-  type IScannerControls,
-} from "@zxing/browser";
-import { BarcodeFormat, DecodeHintType, NotFoundException } from "@zxing/library";
 import { Camera, CameraOff, MessageCircle, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { lookupProductoBySku } from "@/lib/actions/venta-actions";
@@ -72,18 +67,19 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
 }
 
 const SCAN_COOLDOWN_MS = 1500;
+const SCANNER_ID = "venta-scanner";
 
 export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
   const [cartOpen, setCartOpen] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
   const [celular, setCelular] = useState("");
+  const [manualSku, setManualSku] = useState("");
   const [pending, startTransition] = useTransition();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scanLockRef = useRef(false);
-  const scannerControlsRef = useRef<IScannerControls | null>(null);
+  const quaggaRunningRef = useRef(false);
 
   const total = useMemo(() => cartTotal(lines), [lines]);
   const itemCount = useMemo(
@@ -119,58 +115,84 @@ export function VentaManager() {
   );
 
   useEffect(() => {
-    scannerInputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
     if (!cameraOn) {
-      scannerControlsRef.current?.stop();
-      scannerControlsRef.current = null;
+      if (quaggaRunningRef.current) {
+        void import("@ericblade/quagga2").then(({ default: Quagga }) => {
+          Quagga.stop();
+          quaggaRunningRef.current = false;
+        });
+      }
+      scannerInputRef.current?.focus();
       return;
     }
 
-    const video = videoRef.current;
-    if (!video) return;
-
-    const hints = new Map();
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_128]);
-
-    const reader = new BrowserMultiFormatReader(hints, {
-      delayBetweenScanAttempts: 300,
-    });
-
     let cancelled = false;
+    let onDetected: ((result: { codeResult: { code?: string } }) => void) | null =
+      null;
 
-    reader
-      .decodeFromConstraints(
-        { video: { facingMode: { ideal: "environment" } } },
-        video,
-        (result, err) => {
-          if (cancelled || !result) return;
-          if (err && !(err instanceof NotFoundException)) return;
-          resolveSku(result.getText());
+    void import("@ericblade/quagga2").then(({ default: Quagga }) => {
+      if (cancelled) return;
+
+      const target = document.getElementById(SCANNER_ID);
+      if (!target) return;
+
+      onDetected = (result) => {
+        if (cancelled || scanLockRef.current) return;
+        const code = result.codeResult.code;
+        if (code) resolveSku(code);
+      };
+
+      Quagga.init(
+        {
+          inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target,
+            constraints: {
+              facingMode: "environment",
+              width: { min: 640, ideal: 1920, max: 1920 },
+              height: { min: 480, ideal: 1080, max: 1080 },
+              // @ts-expect-error focusMode no está en todos los typings
+              focusMode: "continuous",
+            },
+          },
+          // Etiquetas 30×20 mm: parches pequeños, sin halfSample.
+          locator: { patchSize: "x-small", halfSample: false },
+          decoder: { readers: ["code_128_reader"], multiple: false },
+          locate: true,
+          numOfWorkers: 0,
+          frequency: 10,
         },
-      )
-      .then((controls) => {
-        if (cancelled) {
-          controls.stop();
-        } else {
-          scannerControlsRef.current = controls;
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          toast.error("No se pudo acceder a la cámara.");
-          setCameraOn(false);
-        }
-      });
+        (err) => {
+          if (cancelled) return;
+          if (err) {
+            toast.error("No se pudo acceder a la cámara.");
+            setCameraOn(false);
+            return;
+          }
+          Quagga.onDetected(onDetected as Parameters<typeof Quagga.onDetected>[0]);
+          Quagga.start();
+          quaggaRunningRef.current = true;
+        },
+      );
+    });
 
     return () => {
       cancelled = true;
-      scannerControlsRef.current?.stop();
-      scannerControlsRef.current = null;
+      void import("@ericblade/quagga2").then(({ default: Quagga }) => {
+        if (onDetected) {
+          Quagga.offDetected(onDetected as Parameters<typeof Quagga.onDetected>[0]);
+        }
+        Quagga.stop();
+        quaggaRunningRef.current = false;
+      });
     };
   }, [cameraOn, resolveSku]);
+
+  function onManualSkuSubmit() {
+    resolveSku(manualSku);
+    setManualSku("");
+  }
 
   function onScannerKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
@@ -200,12 +222,14 @@ export function VentaManager() {
         aria-label="Escaneo con pistola lectora"
         className="pointer-events-none absolute h-0 w-0 opacity-0"
         onKeyDown={onScannerKeyDown}
-        onBlur={() => scannerInputRef.current?.focus()}
+        onBlur={() => {
+          if (!cameraOn) scannerInputRef.current?.focus();
+        }}
       />
 
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm text-neutral-500">
-          Escanea el código de barras o usa la pistola lectora.
+          Escanea la etiqueta impresa (CODE128) o ingresa el SKU.
         </p>
         <Button
           type="button"
@@ -228,20 +252,45 @@ export function VentaManager() {
       </div>
 
       {cameraOn && (
-        <div className="relative mt-4 overflow-hidden rounded-lg border border-neutral-200 bg-black">
-          <video
-            ref={videoRef}
-            className="aspect-[4/3] w-full object-cover"
-            muted
-            playsInline
+        <div className="relative mx-auto mt-4 max-w-[280px]">
+          <div
+            id={SCANNER_ID}
+            className="relative min-h-[200px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_canvas]:!absolute [&_canvas]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
           />
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <div className="h-14 w-[90%] rounded border-2 border-green-400 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+          </div>
           {pending && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 text-sm text-white">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg bg-black/30 text-xs text-white">
               Buscando producto…
             </div>
           )}
+          <p className="mt-2 text-center text-xs text-neutral-500">
+            Acerca la etiqueta impresa (10–15 cm), buena luz, barras horizontales.
+          </p>
         </div>
       )}
+
+      <div className="mt-3 flex gap-2">
+        <Input
+          value={manualSku}
+          onChange={(e) => setManualSku(e.target.value.toUpperCase())}
+          placeholder="SKU o pistola lectora"
+          className="font-mono"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onManualSkuSubmit();
+            }
+          }}
+          onFocus={() => {
+            if (cameraOn) setCameraOn(false);
+          }}
+        />
+        <Button type="button" variant="outline" onClick={onManualSkuSubmit}>
+          Agregar
+        </Button>
+      </div>
 
       <div className="mt-6 flex-1 space-y-2">
         {lines.length === 0 ? (
