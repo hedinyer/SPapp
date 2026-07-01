@@ -75,6 +75,15 @@ export async function ensureContractForCompra(
         .eq("id", contractId);
       if (updateError) throw new Error(updateError.message);
     } else {
+      const { data: sibling } = await supabase
+        .from("digital_contracts")
+        .select("hoja_vida_data")
+        .eq("user_id", userId)
+        .not("hoja_vida_data", "eq", "{}")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
       const { data: created, error: insertError } = await supabase
         .from("digital_contracts")
         .insert({
@@ -82,6 +91,9 @@ export async function ensureContractForCompra(
           users_documents_id: documentId,
           status: "borrador",
           admin_data: motoData,
+          ...(sibling?.hoja_vida_data
+            ? { hoja_vida_data: sibling.hoja_vida_data }
+            : {}),
         })
         .select("id")
         .single();

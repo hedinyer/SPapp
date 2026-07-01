@@ -1,8 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildContratoComercial } from "@/lib/contracts/contrato-renting-clausulas";
 import {
+  prefillFromHojaYContrato,
+  resolveHojaVidaForContract,
+} from "@/lib/contracts/contract-prefill";
+import {
   TIPO_IDENTIFICACION_LABELS,
-  parseHojaVidaForm,
 } from "@/lib/contracts/hoja-vida-schema";
 import { ContractSignFlow } from "@/components/contrato/contract-sign-flow";
 import type { FrecuenciaPago } from "@/lib/pipeline/types";
@@ -29,7 +32,7 @@ export default async function ContratoPage({
   const { data: contract } = await supabase
     .from("digital_contracts")
     .select(
-      "id, user_id, status, hoja_vida_data, users_documents(estado_solicitud)",
+      "id, user_id, status, hoja_vida_data, contrato_data, users_documents(estado_solicitud)",
     )
     .eq("id", contractId)
     .maybeSingle();
@@ -67,13 +70,24 @@ export default async function ContratoPage({
     );
   }
 
-  const { data: compra } = await supabase
+  let { data: compra } = await supabase
     .from("user_moto_compra")
     .select(
       "modelo, color, placa, chasis, referencia, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo",
     )
-    .eq("user_id", contract.user_id)
+    .eq("digital_contract_id", contractId)
     .maybeSingle();
+
+  if (!compra) {
+    const { data: byUser } = await supabase
+      .from("user_moto_compra")
+      .select(
+        "modelo, color, placa, chasis, referencia, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo",
+      )
+      .eq("user_id", contract.user_id)
+      .maybeSingle();
+    compra = byUser;
+  }
 
   if (!compra?.placa?.trim() || !compra?.chasis?.trim()) {
     return (
@@ -84,8 +98,24 @@ export default async function ContratoPage({
     );
   }
 
-  const hoja = parseHojaVidaForm(
+  const hoja = await resolveHojaVidaForContract(
+    supabase,
+    contract.user_id as number,
     contract.hoja_vida_data as Record<string, unknown>,
+  );
+
+  if (!hoja.nombre_completo.trim() || !hoja.numero_identificacion.trim()) {
+    return (
+      <Notice
+        title="Datos incompletos"
+        body="No encontramos tu hoja de vida en el sistema. Pide a tu asesor que revise tu solicitud."
+      />
+    );
+  }
+
+  const prefill = prefillFromHojaYContrato(
+    hoja,
+    contract.contrato_data as Record<string, unknown> | null,
   );
   const tipoLabel = hoja.tipo_identificacion
     ? TIPO_IDENTIFICACION_LABELS[hoja.tipo_identificacion]
@@ -94,11 +124,7 @@ export default async function ContratoPage({
   return (
     <ContractSignFlow
       contractId={contract.id}
-      prefill={{
-        nombre: hoja.nombre_completo,
-        cedula: hoja.numero_identificacion,
-        direccion: hoja.direccion,
-      }}
+      prefill={prefill}
       resumen={{
         nombre: hoja.nombre_completo,
         documento: `${tipoLabel} ${hoja.numero_identificacion}`.trim(),

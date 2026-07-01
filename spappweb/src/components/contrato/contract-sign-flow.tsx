@@ -34,15 +34,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { TouchSelect } from "@/components/ui/touch-select";
 import {
-  CIUDAD_DEFAULT,
-  DEPARTAMENTO_DEFAULT,
   listCiudades,
   listDepartamentos,
 } from "@/lib/colombia-locations";
 
 interface ContractSignFlowProps {
   contractId: string;
-  prefill: { nombre: string; cedula: string; direccion: string };
+  prefill: {
+    nombre: string;
+    cedula: string;
+    direccion: string;
+    departamento: string;
+    ciudad: string;
+  };
   resumen: { nombre: string; documento: string; celular: string; correo: string };
   comercial: Omit<
     ContratoData,
@@ -75,8 +79,8 @@ export function ContractSignFlow({
   const [nombre, setNombre] = useState(prefill.nombre);
   const [cedula, setCedula] = useState(prefill.cedula);
   const [direccion, setDireccion] = useState(prefill.direccion);
-  const [departamento, setDepartamento] = useState(DEPARTAMENTO_DEFAULT);
-  const [ciudad, setCiudad] = useState(CIUDAD_DEFAULT);
+  const [departamento, setDepartamento] = useState(prefill.departamento);
+  const [ciudad, setCiudad] = useState(prefill.ciudad);
   const [aceptaClausulas, setAceptaClausulas] = useState(false);
   const [aceptaFirma, setAceptaFirma] = useState(false);
   const [done, setDone] = useState(false);
@@ -180,7 +184,7 @@ export function ContractSignFlow({
       {step === 0 && (
         <StepCard
           title="Tus datos como contratante"
-          instruction="Estos datos van en el contrato. Revísalos con cuidado."
+          instruction="Revisa tus datos. Ya vienen de tu hoja de vida; corrígelos solo si algo cambió."
         >
           <FieldBlock label="Nombre completo" example="Juan Pérez García">
             <Input
