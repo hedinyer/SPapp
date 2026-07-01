@@ -11,10 +11,7 @@ import { FRECUENCIA_LABELS, COMPRA_ESTADO_LABELS } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://s-papp-mauve.vercel.app";
+import { getSiteUrl } from "@/lib/utils/site-url";
 
 interface MotoSelectionPanelProps {
   contract: DigitalContractRow | null;
@@ -115,7 +112,7 @@ function ShareMotoLinkCard({
   contractId: string;
   celular?: string | null;
 }) {
-  const link = `${SITE_URL}/moto/${contractId}`;
+  const link = `${getSiteUrl()}/moto/${contractId}`;
 
   function copy() {
     navigator.clipboard

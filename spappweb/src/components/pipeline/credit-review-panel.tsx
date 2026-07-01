@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSiteUrl } from "@/lib/utils/site-url";
 
 interface CreditReviewPanelProps {
   document: UserDocumentRow;
@@ -222,10 +223,6 @@ function ReadonlyCredit({
   );
 }
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://s-papp-mauve.vercel.app";
-
 function ShareLinkCard({
   contractId,
   celular,
@@ -233,7 +230,7 @@ function ShareLinkCard({
   contractId: string;
   celular?: string | null;
 }) {
-  const link = `${SITE_URL}/contrato/${contractId}`;
+  const link = `${getSiteUrl()}/contrato/${contractId}`;
 
   function copy() {
     navigator.clipboard

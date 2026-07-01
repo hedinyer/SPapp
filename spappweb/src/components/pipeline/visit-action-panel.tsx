@@ -23,6 +23,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  ShareVisitadorLink,
+  visitadorUsername,
+} from "@/components/visitadores/share-visitador-link";
 
 interface VisitActionPanelProps {
   visita: VisitaRow | null;
@@ -62,6 +66,12 @@ export function VisitActionPanel({
   const fotos = visita.evidencia_fotos ?? [];
   const videos = visita.evidencia_videos ?? [];
   const ubicacion = visita.ubicacion_verificada;
+  const assignedVisitador =
+    visita.estado === "asignada"
+      ? visitadores.find((v) => v.id === visita.visitador_id) ??
+        visita.visitadores
+      : null;
+  const assignedUsername = visitadorUsername(assignedVisitador);
 
   return (
     <Card className="border-neutral-200 shadow-none">
@@ -128,10 +138,18 @@ export function VisitActionPanel({
               <span className="text-neutral-500">Fecha: </span>
               {formatDate(visita.fecha_programada)}
             </p>
-            <p className="text-sm text-neutral-600">
-              El visitador debe completar la visita desde la app o el portal
-              visitador, subiendo fotos, video y ubicación.
-            </p>
+            {assignedVisitador && assignedUsername ? (
+              <ShareVisitadorLink
+                nombre={assignedVisitador.nombre}
+                username={assignedUsername}
+                telefono={assignedVisitador.telefono}
+              />
+            ) : (
+              <p className="text-sm text-neutral-600">
+                El visitador debe completar la visita desde la app o el portal
+                visitador, subiendo fotos, video y ubicación.
+              </p>
+            )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button size="lg" variant="outline" disabled={pending}>

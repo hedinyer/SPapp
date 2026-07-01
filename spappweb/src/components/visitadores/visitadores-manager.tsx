@@ -42,15 +42,11 @@ import {
   uploadImageFile,
   visitadorUploadFolder,
 } from "@/components/ui/image-file-field";
+import {
+  ShareVisitadorLink,
+  visitadorUsername,
+} from "@/components/visitadores/share-visitador-link";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
-
-function visitadorUsername(v: VisitadorRow): string | null {
-  if (!v.users) return null;
-  if (Array.isArray(v.users)) {
-    return v.users[0]?.user ?? null;
-  }
-  return v.users.user ?? null;
-}
 
 export function VisitadoresManager({
   visitadores,
@@ -131,13 +127,14 @@ export function VisitadoresManager({
               <TableHead>Usuario</TableHead>
               <TableHead>Teléfono</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead>Link portal</TableHead>
               <TableHead className="w-24" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {visitadores.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-neutral-500">
+                <TableCell colSpan={6} className="text-center text-neutral-500">
                   No hay visitadores. Crea uno para asignar visitas.
                 </TableCell>
               </TableRow>
@@ -159,6 +156,18 @@ export function VisitadoresManager({
                       <Badge variant={v.activo ? "outline" : "secondary"}>
                         {v.activo ? "Activo" : "Inactivo"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {username ? (
+                        <ShareVisitadorLink
+                          nombre={v.nombre}
+                          username={username}
+                          telefono={v.telefono}
+                          compact
+                        />
+                      ) : (
+                        <span className="text-xs text-neutral-400">Sin cuenta</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
@@ -256,6 +265,15 @@ export function VisitadoresManager({
                     <dd>{v.telefono ?? "—"}</dd>
                   </div>
                 </dl>
+                {username ? (
+                  <div className="mt-3">
+                    <ShareVisitadorLink
+                      nombre={v.nombre}
+                      username={username}
+                      telefono={v.telefono}
+                    />
+                  </div>
+                ) : null}
                 <div className="mt-3 flex gap-2">
                   <Button
                     variant="outline"
@@ -441,6 +459,13 @@ function VisitadorDialog({
             <Switch checked={activo} onCheckedChange={setActivo} />
             <Label>Activo</Label>
           </div>
+          {editing && username && (
+            <ShareVisitadorLink
+              nombre={nombre}
+              username={username}
+              telefono={telefono}
+            />
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

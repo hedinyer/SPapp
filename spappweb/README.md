@@ -45,6 +45,7 @@ UPDATE public.users SET status = 'admin' WHERE "user" = 'tu_usuario_admin';
 3. **Environment Variables** (obligatoria):
    - `SUPABASE_SERVICE_ROLE_KEY` — Supabase Dashboard → Project Settings → API → **service_role** (secret). Aplicar a Production (y Preview si quieres).
    - Opcional: `SESSION_SECRET` — cadena de al menos 32 caracteres para firmar cookies de sesión admin.
+   - Opcional: `NEXT_PUBLIC_SITE_URL` — `https://s-papp-mauve.vercel.app` (links que se copian/envían a clientes y visitadores).
 4. Deploy / redeploy.
 
 Sin `SUPABASE_SERVICE_ROLE_KEY` en Vercel, crear/editar/eliminar en catálogo, inventario, garaje, visitadores y bandeja fallará en producción.

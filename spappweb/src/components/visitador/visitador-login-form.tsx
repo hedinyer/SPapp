@@ -29,7 +29,11 @@ function SubmitButton() {
   );
 }
 
-export function VisitadorLoginForm() {
+export function VisitadorLoginForm({
+  defaultUsername = "",
+}: {
+  defaultUsername?: string;
+}) {
   const [state, formAction] = useActionState(loginVisitadorAction, null);
 
   return (
@@ -48,6 +52,7 @@ export function VisitadorLoginForm() {
               <Input
                 id="username"
                 name="username"
+                defaultValue={defaultUsername}
                 autoComplete="username"
                 autoCapitalize="none"
                 autoCorrect="off"
