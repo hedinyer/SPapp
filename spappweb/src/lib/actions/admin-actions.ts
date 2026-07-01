@@ -57,6 +57,10 @@ async function adminDelete(
   return { ok: true as const };
 }
 
+type CreditActionResult =
+  | { ok: true; contractId?: string }
+  | { ok: false; error: string };
+
 async function ensureContractId(
   supabase: SupabaseClient,
   userId: number,
@@ -85,20 +89,42 @@ async function ensureContractId(
   return data.id as string;
 }
 
-export async function approveCredit(documentId: number, userId: number) {
-  const supabase = await assertAdmin();
-  const { error } = await supabase
-    .from("users_documents")
-    .update({
-      estado_solicitud: "aceptada",
-      hora_actualizacion: new Date().toISOString(),
-    })
-    .eq("id", documentId);
+export async function approveCredit(
+  documentId: number,
+  userId: number,
+): Promise<CreditActionResult> {
+  try {
+    const docId = Number(documentId);
+    const uid = Number(userId);
+    if (!Number.isFinite(docId) || !Number.isFinite(uid)) {
+      return { ok: false, error: "Datos de solicitud inválidos." };
+    }
 
-  if (error) throw new Error(error.message);
-  const contractId = await ensureContractId(supabase, userId, documentId);
-  revalidateClient(userId);
-  return { ok: true, contractId };
+    const supabase = await assertAdmin();
+    const { data: updated, error } = await supabase
+      .from("users_documents")
+      .update({
+        estado_solicitud: "aceptada",
+        hora_actualizacion: new Date().toISOString(),
+      })
+      .eq("id", docId)
+      .select("id")
+      .maybeSingle();
+
+    if (error) return { ok: false, error: mapDbError(error.message) };
+    if (!updated) {
+      return { ok: false, error: "Solicitud no encontrada o sin permisos." };
+    }
+
+    const contractId = await ensureContractId(supabase, uid, docId);
+    revalidateClient(uid);
+    return { ok: true, contractId };
+  } catch (e) {
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "No se pudo aprobar el crédito.",
+    };
+  }
 }
 
 const rejectSchema = z.object({
@@ -108,22 +134,40 @@ const rejectSchema = z.object({
   betado: z.boolean(),
 });
 
-export async function rejectCredit(input: z.infer<typeof rejectSchema>) {
-  const parsed = rejectSchema.parse(input);
-  const supabase = await assertAdmin();
-  const { error } = await supabase
-    .from("users_documents")
-    .update({
-      estado_solicitud: "rechazada",
-      motivo_rechazo: parsed.motivo.trim(),
-      betado: parsed.betado,
-      hora_actualizacion: new Date().toISOString(),
-    })
-    .eq("id", parsed.documentId);
+export async function rejectCredit(
+  input: z.infer<typeof rejectSchema>,
+): Promise<CreditActionResult> {
+  try {
+    const parsed = rejectSchema.parse(input);
+    const supabase = await assertAdmin();
+    const { data: updated, error } = await supabase
+      .from("users_documents")
+      .update({
+        estado_solicitud: "rechazada",
+        motivo_rechazo: parsed.motivo.trim(),
+        betado: parsed.betado,
+        hora_actualizacion: new Date().toISOString(),
+      })
+      .eq("id", parsed.documentId)
+      .select("id")
+      .maybeSingle();
 
-  if (error) throw new Error(error.message);
-  revalidateClient(parsed.userId);
-  return { ok: true };
+    if (error) return { ok: false, error: mapDbError(error.message) };
+    if (!updated) {
+      return { ok: false, error: "Solicitud no encontrada o sin permisos." };
+    }
+
+    revalidateClient(parsed.userId);
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return { ok: false, error: e.issues[0]?.message ?? "Datos inválidos." };
+    }
+    return {
+      ok: false,
+      error: e instanceof Error ? e.message : "No se pudo rechazar.",
+    };
+  }
 }
 
 const assignVisitSchema = z.object({

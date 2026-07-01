@@ -3,8 +3,9 @@ import {
   SUPABASE_URL,
 } from "@/lib/supabase/public-env";
 
-// ponytail: credenciales embebidas; ignora env de Vercel (service_role mal puesta rompía writes)
-export const SESSION_SECRET = "spapp-admin-local-dev-secret-32chars-min";
+// ponytail: credenciales embebidas; anon JWT (publishable key rompía writes en algunos entornos)
+export const SESSION_SECRET =
+  process.env.SESSION_SECRET ?? "spapp-admin-local-dev-secret-32chars-min";
 
 export function getSupabaseUrl(): string {
   return SUPABASE_URL;

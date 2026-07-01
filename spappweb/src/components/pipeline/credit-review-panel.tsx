@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ export function CreditReviewPanel({
   clienteCelular,
   contractSigned,
 }: CreditReviewPanelProps) {
+  const router = useRouter();
   const [rejectOpen, setRejectOpen] = useState(false);
   const [motivo, setMotivo] = useState("");
   const [betado, setBetado] = useState(false);
@@ -41,29 +43,31 @@ export function CreditReviewPanel({
 
   function onApprove() {
     startTransition(async () => {
-      try {
-        await approveCredit(document.id, userId);
-        toast.success("Crédito aprobado. El cliente puede diligenciar formatos.");
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "No se pudo aprobar.");
+      const result = await approveCredit(Number(document.id), Number(userId));
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
       }
+      toast.success("Crédito aprobado. El cliente puede diligenciar formatos.");
+      router.refresh();
     });
   }
 
   function onReject() {
     startTransition(async () => {
-      try {
-        await rejectCredit({
-          documentId: document.id,
-          userId,
-          motivo,
-          betado,
-        });
-        toast.success("Solicitud rechazada.");
-        setRejectOpen(false);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "No se pudo rechazar.");
+      const result = await rejectCredit({
+        documentId: Number(document.id),
+        userId: Number(userId),
+        motivo,
+        betado,
+      });
+      if (!result.ok) {
+        toast.error(result.error);
+        return;
       }
+      toast.success("Solicitud rechazada.");
+      setRejectOpen(false);
+      router.refresh();
     });
   }
 
