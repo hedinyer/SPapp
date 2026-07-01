@@ -57,14 +57,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 52,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 44,
   },
+  headerLogos: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
   headerLogo: { height: 34, objectFit: "contain" },
-  headerBrand: { color: "#f8fafc", fontSize: 8, fontFamily: serifBold, letterSpacing: 0.5 },
+  headerBrand: { color: "#0f172a", fontSize: 8, fontFamily: serifBold, letterSpacing: 0.5 },
   logo: { position: "absolute", top: 16, right: 40, height: 36, objectFit: "contain" },
   footer: {
     position: "absolute",
@@ -138,10 +145,21 @@ function Footer() {
   );
 }
 
-function ContratoHeader({ logo }: { logo: { data: Buffer; format: "png" | "jpg" } }) {
+const BERA_LOGO_FILE = "beralogo.jpg";
+
+function ContratoHeader({
+  garridoLogo,
+  beraLogo,
+}: {
+  garridoLogo: { data: Buffer; format: "png" | "jpg" };
+  beraLogo: { data: Buffer; format: "png" | "jpg" };
+}) {
   return (
     <View style={styles.headerBand} fixed>
-      <Image style={styles.headerLogo} src={logo} />
+      <View style={styles.headerLogos}>
+        <Image style={styles.headerLogo} src={garridoLogo} />
+        <Image style={styles.headerLogo} src={beraLogo} />
+      </View>
       <Text style={styles.headerBrand}>{EMPRESA_PROPIETARIA.razonSocial}</Text>
     </View>
   );
@@ -249,14 +267,17 @@ export async function generateContratoPdf(args: {
   signatureDataUrl: string;
 }): Promise<Buffer> {
   const { contrato } = args;
-  const logo = await publicImage(EMPRESA_PROPIETARIA.logoFile);
-  const firmaProp = await publicImage(EMPRESA_PROPIETARIA.firmaFile);
+  const [logo, beraLogo, firmaProp] = await Promise.all([
+    publicImage(EMPRESA_PROPIETARIA.logoFile),
+    publicImage(BERA_LOGO_FILE),
+    publicImage(EMPRESA_PROPIETARIA.firmaFile),
+  ]);
   const e = EMPRESA_PROPIETARIA;
 
   const doc = (
     <Document>
       <Page size="LETTER" style={styles.pageContrato}>
-        <ContratoHeader logo={logo} />
+        <ContratoHeader garridoLogo={logo} beraLogo={beraLogo} />
         <Footer />
         <Text style={styles.titleContrato}>Contrato de Renting</Text>
         <Text style={styles.titleSub}>{e.razonSocial} · {e.ciudad}</Text>
@@ -278,7 +299,7 @@ export async function generateContratoPdf(args: {
         <Text style={styles.firmaIntro}>{renderFirma(contrato)}</Text>
         <View style={styles.firmaRow}>
           <FirmaCol
-            role="La propietaria"
+            role="El propietario"
             sigSrc={firmaProp}
             lines={[
               e.representante,

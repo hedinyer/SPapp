@@ -238,7 +238,7 @@ export function ContractSignFlow({
         >
           <LegalBox title="Firma del contrato" body={renderFirma(formData)} />
           <FirmaParty
-            title="LA PROPIETARIA"
+            title="EL PROPIETARIO"
             sigSrc={`/${EMPRESA_PROPIETARIA.firmaFile}`}
             sigAlt={`Firma de ${EMPRESA_PROPIETARIA.representante}`}
             lines={[
