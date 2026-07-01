@@ -152,6 +152,7 @@ export default function PagoForm() {
         placa,
         monto: Number(monto) || 0,
         contratoId: forcedContratoId ?? (contratoId === "" ? undefined : contratoId),
+        fechaPago: fecha,
       });
       setPreview(r);
       if (r.contratoId) setContratoId(r.contratoId);
@@ -181,6 +182,74 @@ export default function PagoForm() {
       });
       setResult(r);
       setPreview(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo registrar el pago.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function onPlacaChange(value: string) {
+    setPlaca(value.toUpperCase());
+    setContratoId("");
+    setPreview(null);
+    setResult(null);
+    setError(null);
+  }
+
+  async function handleAgregarPago() {
+    setResult(null);
+    setError(null);
+
+    if (!placa.trim()) {
+      setError("Escribe la placa.");
+      return;
+    }
+    const montoNum = Number(monto);
+    if (!montoNum || montoNum <= 0) {
+      setError("Ingresa un monto válido.");
+      return;
+    }
+    if (!referencia.trim()) {
+      setError("Ingresa la referencia.");
+      return;
+    }
+    if (configuracionId === "") {
+      setError("Elige el destinatario (cuenta Nequi).");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      let resolvedContratoId = contratoId === "" ? undefined : contratoId;
+
+      if (!resolvedContratoId) {
+        const prev = await previewPagoTarifa({
+          placa,
+          monto: montoNum,
+          fechaPago: fecha,
+        });
+        if (prev.contratoId === null && prev.contratos.length > 1) {
+          setPreview(prev);
+          setError("Hay varios contratos para esta placa. Elige uno abajo.");
+          return;
+        }
+        if (prev.contratoId) {
+          resolvedContratoId = prev.contratoId;
+          setContratoId(prev.contratoId);
+        }
+        setPreview(prev);
+      }
+
+      const r = await registrarPagoTarifa({
+        placa,
+        contratoId: resolvedContratoId,
+        monto: montoNum,
+        referencia,
+        fechaPago: fecha,
+        configuracionId: Number(configuracionId),
+      });
+      setResult(r);
     } catch (e) {
       setError(e instanceof Error ? e.message : "No se pudo registrar el pago.");
     } finally {
@@ -235,7 +304,7 @@ export default function PagoForm() {
           <label>Placa</label>
           <input
             value={placa}
-            onChange={(e) => setPlaca(e.target.value.toUpperCase())}
+            onChange={(e) => onPlacaChange(e.target.value)}
             placeholder="ABC12D"
             autoCapitalize="characters"
           />
@@ -319,15 +388,29 @@ export default function PagoForm() {
             </select>
           </div>
         </div>
-        <button onClick={() => runPreview()} disabled={previewLoading || !placa}>
-          {previewLoading ? "Calculando..." : "Ver reparto"}
-        </button>
+        <div className="btn-row">
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => runPreview()}
+            disabled={previewLoading || saving || !placa}
+          >
+            {previewLoading ? "Calculando..." : "Ver reparto"}
+          </button>
+          <button
+            type="button"
+            onClick={handleAgregarPago}
+            disabled={saving || previewLoading || !placa}
+          >
+            {saving ? "Registrando..." : "Agregar pago"}
+          </button>
+        </div>
       </div>
 
       {multiplesContratos && (
         <div className="card">
           <div className="alert info">
-            Hay varios contratos activos para esta placa. Elige uno:
+            Hay varios contratos para esta placa. Elige uno:
           </div>
           {preview!.contratos.map((c) => (
             <div className="btn-row" key={c.contratoId}>

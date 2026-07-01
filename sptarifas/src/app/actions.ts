@@ -4,6 +4,12 @@ import { z } from "zod";
 import { query, withTx } from "@/lib/db";
 import { ocrReceipt } from "@/lib/ocr";
 import { planFifo, type FacturaPendiente } from "@/lib/fifo";
+import {
+  SQL_FACTURAS_PENDIENTES,
+  ensureFacturasParaMonto,
+  facturasConEmisionSimulada,
+  mapFacturaRows,
+} from "@/lib/factura-tarifa";
 import type {
   ContratoOpt,
   Destinatario,
@@ -44,24 +50,11 @@ const SQL_CONTRATOS = `
   FROM arrendamientos_contrato c
   JOIN vehiculos_vehiculo v ON v.id = c.vehiculo_id
   JOIN clientes_cliente cl ON cl.id = c.cliente_id
-  WHERE upper(v.placa) = upper($1) AND c.estado = 'Activo'
+  WHERE upper(v.placa) = upper($1)
   ORDER BY c.id DESC;
 `;
 
-const SQL_FACTURAS = `
-  SELECT f.id, f.fecha::date::text AS fecha, f.total, f.total_pagado,
-         (f.total - f.total_pagado) AS saldo
-  FROM terminal_pagos_factura f
-  WHERE f.contrato_id = $1
-    AND f.estado = 'confirmada'
-    AND f.estado_pago = 'pendiente'
-    AND (f.total - f.total_pagado) > 0
-    AND EXISTS (
-      SELECT 1 FROM terminal_pagos_itemfactura i
-      WHERE i.factura_id = f.id AND i.tipo_item = 'tarifa'
-    )
-  ORDER BY f.fecha ASC, f.id ASC
-`;
+const SQL_FACTURAS = SQL_FACTURAS_PENDIENTES;
 
 async function fetchContratos(placa: string): Promise<ContratoOpt[]> {
   const rows = await query(SQL_CONTRATOS, [placa.trim()]);
@@ -77,13 +70,13 @@ async function fetchContratos(placa: string): Promise<ContratoOpt[]> {
 
 async function fetchFacturas(contratoId: number): Promise<FacturaPendiente[]> {
   const rows = await query(SQL_FACTURAS, [contratoId]);
-  return rows.map((r) => ({
-    id: Number(r.id),
-    fecha: String(r.fecha),
-    total: toInt(r.total),
-    pagado: toInt(r.total_pagado),
-    saldo: toInt(r.saldo),
-  }));
+  return mapFacturaRows(rows);
+}
+
+function isoHoyBogota(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(
+    new Date(),
+  );
 }
 
 export async function getDestinatarios(): Promise<Destinatario[]> {
@@ -117,36 +110,52 @@ const previewSchema = z.object({
   placa: z.string().trim().min(1, "Escribe la placa."),
   monto: z.number().int().nonnegative(),
   contratoId: z.number().int().optional(),
+  fechaPago: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 export async function previewPagoTarifa(input: {
   placa: string;
   monto: number;
   contratoId?: number;
+  fechaPago?: string;
 }): Promise<PreviewResult> {
   const data = previewSchema.parse(input);
+  const fechaPago = data.fechaPago ?? isoHoyBogota();
 
   const contratos = await fetchContratos(data.placa);
   if (contratos.length === 0) {
-    throw new Error(`No hay contrato activo para la placa ${data.placa.toUpperCase()}.`);
+    throw new Error(`No hay contrato para la placa ${data.placa.toUpperCase()}.`);
   }
 
   let contrato: ContratoOpt | undefined;
   if (data.contratoId) {
     contrato = contratos.find((c) => c.contratoId === data.contratoId);
-    if (!contrato) {
-      throw new Error("El contrato indicado no esta activo para esta placa.");
-    }
-  } else if (contratos.length === 1) {
+  }
+  if (!contrato && contratos.length === 1) {
     contrato = contratos[0];
   }
 
   if (!contrato) {
-    // Varios contratos activos: el usuario debe elegir uno.
+    // Varios contratos: el usuario debe elegir uno.
     return { contratos, contratoId: null, facturas: [], plan: [], sobrante: 0 };
   }
 
-  const facturas = await fetchFacturas(contrato.contratoId);
+  const existentes = await fetchFacturas(contrato.contratoId);
+  const facturas =
+    data.monto > 0
+      ? await facturasConEmisionSimulada(
+          (text, params) =>
+            query(text, params).then((rows) => ({ rows: rows as Record<string, unknown>[] })),
+          contrato.contratoId,
+          contrato.tarifa,
+          fechaPago,
+          data.monto,
+          existentes,
+        )
+      : existentes;
   const facturasView: FacturaView[] = facturas.map((f) => ({
     id: f.id,
     fecha: f.fecha,
@@ -214,11 +223,11 @@ export async function registrarPagoTarifa(input: {
       throw new Error("Destinatario invalido.");
     }
 
-    // Contrato activo
+    // Contrato por placa
     const contratoRows = (await client.query(SQL_CONTRATOS, [data.placa.trim()])).rows;
     if (contratoRows.length === 0) {
       throw new Error(
-        `No hay contrato activo para la placa ${data.placa.toUpperCase()}.`,
+        `No hay contrato para la placa ${data.placa.toUpperCase()}.`,
       );
     }
     let contratoRow;
@@ -226,13 +235,13 @@ export async function registrarPagoTarifa(input: {
       contratoRow = contratoRows.find(
         (c) => Number(c.contrato_id) === data.contratoId,
       );
-      if (!contratoRow) {
-        throw new Error("El contrato indicado no esta activo para esta placa.");
+    }
+    if (!contratoRow) {
+      if (contratoRows.length === 1) {
+        contratoRow = contratoRows[0];
+      } else {
+        throw new Error("Hay varios contratos para esta placa; elige uno.");
       }
-    } else if (contratoRows.length === 1) {
-      contratoRow = contratoRows[0];
-    } else {
-      throw new Error("Hay varios contratos activos; elige uno.");
     }
     const contratoId = Number(contratoRow.contrato_id);
     const clienteId = Number(contratoRow.cliente_id);
@@ -253,21 +262,18 @@ export async function registrarPagoTarifa(input: {
       );
     }
 
-    // Facturas pendientes (bloqueadas para esta transaccion)
-    const facturaRows = (
-      await client.query(`${SQL_FACTURAS} FOR UPDATE`, [contratoId])
-    ).rows;
-    const facturas: FacturaPendiente[] = facturaRows.map((r) => ({
-      id: Number(r.id),
-      fecha: String(r.fecha),
-      total: toInt(r.total),
-      pagado: toInt(r.total_pagado),
-      saldo: toInt(r.saldo),
-    }));
+    // ponytail: si no hay facturas pendientes, emitir tarifa(s) antes del FIFO
+    let facturas = await ensureFacturasParaMonto(
+      client,
+      contratoId,
+      toInt(contratoRow.tarifa),
+      data.fechaPago,
+      data.monto,
+    );
 
     const { plan, sobrante } = planFifo(facturas, data.monto);
     if (plan.length === 0) {
-      throw new Error("No hay facturas de tarifa pendientes para este contrato.");
+      throw new Error("No se pudo aplicar el pago a facturas de tarifa.");
     }
 
     const pagos: PagoAplicado[] = [];
