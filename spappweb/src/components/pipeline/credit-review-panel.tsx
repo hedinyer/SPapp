@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { UserDocumentRow } from "@/lib/pipeline/types";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSiteUrl } from "@/lib/utils/site-url";
 
 interface CreditReviewPanelProps {
   document: UserDocumentRow;
@@ -73,7 +71,7 @@ export function CreditReviewPanel({
         toast.error(result.error);
         return;
       }
-      toast.success("Crédito aprobado. El cliente puede diligenciar formatos.");
+      toast.success("Crédito aprobado. Asigna moto y placa.");
       // ponytail: reload evita crash RSC post-action en Vercel
       window.location.reload();
     });
@@ -186,9 +184,6 @@ export function CreditReviewPanel({
 
 function ReadonlyCredit({
   document,
-  contractId,
-  clienteCelular,
-  contractSigned,
 }: {
   document: UserDocumentRow;
   contractId?: string | null;
@@ -212,63 +207,9 @@ function ReadonlyCredit({
             Motivo: {document.motivo_rechazo}
           </p>
         )}
-        {document.estado_solicitud === "aceptada" &&
-          contractId &&
-          !contractSigned && (
-            <ShareLinkCard contractId={contractId} celular={clienteCelular} />
-          )}
         <PhotoGrid document={document} />
       </CardContent>
     </Card>
-  );
-}
-
-function ShareLinkCard({
-  contractId,
-  celular,
-}: {
-  contractId: string;
-  celular?: string | null;
-}) {
-  const link = `${getSiteUrl()}/contrato/${contractId}`;
-
-  function copy() {
-    navigator.clipboard
-      .writeText(link)
-      .then(() => toast.success("Link copiado."))
-      .catch(() => toast.error("No se pudo copiar."));
-  }
-
-  const mensaje = `Hola, tu crédito fue aprobado. Firma tu contrato aquí: ${link}`;
-  const digits = (celular ?? "").replace(/\D/g, "");
-  const waBase = digits ? `https://wa.me/57${digits}` : "https://wa.me/";
-  const waUrl = `${waBase}?text=${encodeURIComponent(mensaje)}`;
-
-  return (
-    <div className="space-y-3 rounded-lg border border-green-300 bg-green-50 p-4">
-      <p className="text-sm font-medium text-green-900">
-        Link de firma del contrato para el cliente
-      </p>
-      <p className="break-all rounded-md border border-green-200 bg-white px-3 py-2 text-xs text-neutral-700">
-        {link}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" onClick={copy}>
-          <Copy className="mr-1.5 h-4 w-4" />
-          Copiar link
-        </Button>
-        <Button
-          size="sm"
-          className="bg-green-600 text-white hover:bg-green-700"
-          asChild
-        >
-          <a href={waUrl} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="mr-1.5 h-4 w-4" />
-            Enviar por WhatsApp
-          </a>
-        </Button>
-      </div>
-    </div>
   );
 }
 

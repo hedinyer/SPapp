@@ -4,9 +4,9 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ExternalLink, MapPin } from "lucide-react";
 import { assignVisit, cancelVisit } from "@/lib/actions/admin-actions";
-import type { VisitaRow, VisitadorRow } from "@/lib/pipeline/types";
+import type { VisitaRow, VisitadorRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { formatDate } from "@/lib/utils/format";
-import { visitaEstadoLabel } from "@/lib/pipeline/step-logic";
+import { visitaEstadoLabel, entregaAntesVisita } from "@/lib/pipeline/step-logic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,12 +32,14 @@ interface VisitActionPanelProps {
   visita: VisitaRow | null;
   visitadores: VisitadorRow[];
   userId: number;
+  compra?: UserMotoCompraRow | null;
 }
 
 export function VisitActionPanel({
   visita,
   visitadores,
   userId,
+  compra = null,
 }: VisitActionPanelProps) {
   const [pending, startTransition] = useTransition();
 
@@ -83,7 +85,9 @@ export function VisitActionPanel({
         </CardTitle>
         <p className="text-sm text-neutral-500">
           {visita.estado === "pendiente_asignacion"
-            ? "Asigna visitador y fecha antes de entregar la moto al cliente."
+            ? entregaAntesVisita(compra)
+              ? "Programa la visita después de entregar la moto."
+              : "Asigna visitador y fecha antes de entregar la moto al cliente."
             : `Estado: ${visitaEstadoLabel(visita.estado)}`}
         </p>
       </CardHeader>

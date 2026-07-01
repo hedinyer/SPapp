@@ -153,6 +153,7 @@ export interface UserMotoCompraRow {
   referencia: string | null;
   fecha_entrega: string | null;
   seleccionado_at: string;
+  admin_data?: { entrega_antes_visita?: boolean };
 }
 
 export interface VendidaMotoRow extends UserMotoCompraRow {

@@ -27,7 +27,7 @@ export default async function ContratoPage({
   const { data: contract } = await supabase
     .from("digital_contracts")
     .select(
-      "id, status, hoja_vida_data, users_documents(estado_solicitud)",
+      "id, user_id, status, hoja_vida_data, users_documents(estado_solicitud)",
     )
     .eq("id", contractId)
     .maybeSingle();
@@ -61,6 +61,21 @@ export default async function ContratoPage({
       <Notice
         title="Contrato ya firmado"
         body="Este contrato ya fue firmado. No necesitas hacer nada más."
+      />
+    );
+  }
+
+  const { data: compra } = await supabase
+    .from("user_moto_compra")
+    .select("placa, chasis, modelo, color")
+    .eq("user_id", contract.user_id)
+    .maybeSingle();
+
+  if (!compra?.placa?.trim() || !compra?.chasis?.trim()) {
+    return (
+      <Notice
+        title="Moto aún no asignada"
+        body="Tu asesor debe asignar la moto y la placa antes de que puedas firmar. Te avisaremos cuando esté listo."
       />
     );
   }

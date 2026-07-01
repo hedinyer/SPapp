@@ -5,6 +5,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
 import { approveCreditOp, rejectCreditOp } from "@/lib/admin/credit-ops";
+import { assignMotoByAdminOp } from "@/lib/admin/moto-contract-ops";
+import { canChooseFlowOrder } from "@/lib/pipeline/step-logic";
+import type { VisitaRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import { storagePathFromPublicUrl } from "@/lib/utils/storage-urls";
@@ -103,6 +106,25 @@ export async function rejectCredit(
       error: e instanceof Error ? e.message : "No se pudo rechazar.",
     };
   }
+}
+
+const assignMotoSchema = z.object({
+  userId: z.number().int().positive(),
+  documentId: z.number().int().positive(),
+  bikeId: z.number().int().positive(),
+  frecuencia: z.enum(["diario", "semanal", "quincenal", "mensual"]),
+  placa: z.string().trim().min(1),
+  chasis: z.string().trim().min(1),
+  referencia: z.string().trim().optional(),
+});
+
+export async function assignMotoByAdmin(
+  input: z.infer<typeof assignMotoSchema>,
+) {
+  await requireAdminSession();
+  const result = await assignMotoByAdminOp(input);
+  revalidateClient(input.userId);
+  return result;
 }
 
 const assignVisitSchema = z.object({
@@ -210,6 +232,51 @@ export async function markDelivered(compraId: string, userId: number) {
   const { error } = await supabase
     .from("user_moto_compra")
     .update({ estado: "entregada" })
+    .eq("id", compraId);
+
+  if (error) throw new Error(error.message);
+  revalidateClient(userId);
+  return { ok: true };
+}
+
+export async function setEntregaAntesVisita(
+  compraId: string,
+  userId: number,
+  entregaAntesVisita: boolean,
+) {
+  const supabase = await assertAdmin();
+
+  const { data: compra, error: fetchError } = await supabase
+    .from("user_moto_compra")
+    .select("id, user_id, estado, admin_data")
+    .eq("id", compraId)
+    .single();
+
+  if (fetchError || !compra) throw new Error("Compra no encontrada.");
+
+  const { data: visita } = await supabase
+    .from("visitas")
+    .select("estado")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (
+    !canChooseFlowOrder(
+      compra as UserMotoCompraRow,
+      visita as VisitaRow | null,
+    )
+  ) {
+    throw new Error("Ya no se puede cambiar el orden visita/entrega.");
+  }
+
+  const adminData = {
+    ...((compra.admin_data as Record<string, unknown>) ?? {}),
+    entrega_antes_visita: entregaAntesVisita,
+  };
+
+  const { error } = await supabase
+    .from("user_moto_compra")
+    .update({ admin_data: adminData })
     .eq("id", compraId);
 
   if (error) throw new Error(error.message);

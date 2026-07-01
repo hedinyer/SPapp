@@ -34,7 +34,9 @@ export function MotoSelectionPanel({
     return (
       <Card className="border-neutral-200 shadow-none">
         <CardContent className="py-8 text-center text-sm text-neutral-500">
-          El cliente aún no puede elegir moto (contrato no firmado).
+          {contract?.status === "firmado"
+            ? "El cliente elige la moto desde el enlace (flujo anterior)."
+            : "Asigna moto y placa desde el panel de administración."}
         </CardContent>
       </Card>
     );

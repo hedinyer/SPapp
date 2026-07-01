@@ -113,7 +113,7 @@ export async function getClientPipeline(
   const { data: compra } = await supabase
     .from("user_moto_compra")
     .select(
-      "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, seleccionado_at",
+      "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, seleccionado_at, admin_data",
     )
     .eq("user_id", userId)
     .maybeSingle();

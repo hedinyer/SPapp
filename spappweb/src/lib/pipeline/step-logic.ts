@@ -15,8 +15,8 @@ import type {
 
 const STEP_ORDER: PipelineStepId[] = [
   "credito",
-  "contrato",
   "moto",
+  "contrato",
   "pago",
   "visita",
   "entrega",
@@ -30,6 +30,42 @@ const STEP_LABELS: Record<PipelineStepId, string> = {
   pago: "Pago",
   entrega: "Entrega",
 };
+
+export function entregaAntesVisita(compra: UserMotoCompraRow | null): boolean {
+  return compra?.admin_data?.entrega_antes_visita === true;
+}
+
+function stepOrder(compra: UserMotoCompraRow | null): PipelineStepId[] {
+  if (entregaAntesVisita(compra)) {
+    return ["credito", "moto", "contrato", "pago", "entrega", "visita"];
+  }
+  return STEP_ORDER;
+}
+
+export function motoListo(compra: UserMotoCompraRow | null): boolean {
+  return Boolean(compra?.placa?.trim() && compra?.chasis?.trim());
+}
+
+export function motoDone(
+  compra: UserMotoCompraRow | null,
+  contract: DigitalContractRow | null,
+): boolean {
+  if (!compra) return false;
+  // ponytail: legacy — cliente eligió moto tras contrato firmado sin placa admin
+  if (contractDone(contract) && !motoListo(compra)) return true;
+  return motoListo(compra);
+}
+
+export function canChooseFlowOrder(
+  compra: UserMotoCompraRow | null,
+  visita: VisitaRow | null,
+): boolean {
+  if (!compra || compra.estado !== "lista_retiro") return false;
+  if (deliveryDone(compra)) return false;
+  if (visitDone(visita)) return false;
+  if (compra.admin_data?.entrega_antes_visita !== undefined) return false;
+  return true;
+}
 
 function creditDone(doc: UserDocumentRow | null): boolean {
   return doc?.estado_solicitud === "aceptada";
@@ -49,10 +85,6 @@ function visitDone(visita: VisitaRow | null): boolean {
 
 function visitError(visita: VisitaRow | null): boolean {
   return visita?.estado === "cancelada";
-}
-
-function motoDone(compra: UserMotoCompraRow | null): boolean {
-  return compra != null;
 }
 
 function paymentDone(compra: UserMotoCompraRow | null): boolean {
@@ -87,7 +119,7 @@ function isStepComplete(
     case "visita":
       return visitDone(visita);
     case "moto":
-      return motoDone(compra);
+      return motoDone(compra, contract);
     case "pago":
       return paymentDone(compra);
     case "entrega":
@@ -125,15 +157,19 @@ function isBlockedForStep(
   switch (stepId) {
     case "credito":
       return false;
-    case "contrato":
-      return !creditDone(doc);
     case "moto":
-      return !contractDone(contract);
+      return !creditDone(doc);
+    case "contrato":
+      return !creditDone(doc) || !motoDone(compra, contract);
     case "pago":
-      return !motoDone(compra);
+      return !contractDone(contract) || !motoDone(compra, contract);
     case "visita":
+      if (entregaAntesVisita(compra)) return !deliveryDone(compra);
       return !paymentDone(compra) && compra?.estado !== "lista_retiro";
     case "entrega":
+      if (entregaAntesVisita(compra)) {
+        return !paymentDone(compra) && compra?.estado !== "lista_retiro";
+      }
       return !visitDone(visita);
     default:
       return true;
@@ -142,12 +178,20 @@ function isBlockedForStep(
 
 export function detectAdminActionStep(
   doc: UserDocumentRow | null,
+  contract: DigitalContractRow | null,
   visita: VisitaRow | null,
   compra: UserMotoCompraRow | null,
 ): PipelineStepId | null {
   if (doc?.estado_solicitud === "pendiente") return "credito";
+
+  if (creditDone(doc) && !motoDone(compra, contract)) {
+    if (!contractDone(contract)) return "moto";
+    if (!compra) return null;
+  }
+
   if (
     compra &&
+    contractDone(contract) &&
     compra.estado === "pendiente_pago" &&
     (!compra.pago_inicial_confirmado || !compra.pago_cuota_confirmado)
   ) {
@@ -158,6 +202,7 @@ export function detectAdminActionStep(
     (compra.estado === "lista_retiro" || paymentDone(compra)) &&
     !deliveryDone(compra)
   ) {
+    if (entregaAntesVisita(compra)) return "entrega";
     if (
       !visita ||
       visita.estado === "pendiente_asignacion" ||
@@ -169,7 +214,6 @@ export function detectAdminActionStep(
       return "entrega";
     }
   }
-  // ponytail: entregas legacy con visita aún abierta
   if (
     deliveryDone(compra) &&
     visita &&
@@ -187,9 +231,9 @@ export function buildPipelineSteps(
   visita: VisitaRow | null,
   compra: UserMotoCompraRow | null,
 ): PipelineStep[] {
-  const adminStep = detectAdminActionStep(doc, visita, compra);
+  const adminStep = detectAdminActionStep(doc, contract, visita, compra);
 
-  return STEP_ORDER.map((id) => {
+  return stepOrder(compra).map((id) => {
     let state: StepVisualState = "pendiente";
 
     if (isStepError(id, doc, visita, compra)) {
@@ -200,7 +244,12 @@ export function buildPipelineSteps(
       state = "bloqueado";
     } else if (adminStep === id) {
       state = "actual";
-    } else if (id === "moto" && contractDone(contract) && !compra) {
+    } else if (
+      id === "contrato" &&
+      motoDone(compra, contract) &&
+      contract &&
+      !contractDone(contract)
+    ) {
       state = "pendiente";
     }
 
@@ -270,6 +319,7 @@ export function buildClientPipeline(input: {
     steps,
     currentAdminStep: detectAdminActionStep(
       input.document,
+      input.contract,
       input.visita,
       input.compra,
     ),
@@ -320,4 +370,81 @@ export function visitaEstadoLabel(estado: VisitaEstado | undefined): string {
     default:
       return "—";
   }
+}
+
+function selfCheck() {
+  const docAceptada = { estado_solicitud: "aceptada" } as UserDocumentRow;
+  const contractFirmado = { status: "firmado" } as DigitalContractRow;
+  const compraLista: UserMotoCompraRow = {
+    id: "00000000-0000-0000-0000-000000000001",
+    user_id: 1,
+    bike_id: 1,
+    modelo: "X",
+    color: "Y",
+    frecuencia_pago: "semanal",
+    cuota_inicial_monto: 1,
+    monto_cuota_periodo: 1,
+    monto_total_primer_pago: 2,
+    estado: "lista_retiro",
+    pago_inicial_confirmado: true,
+    pago_cuota_confirmado: true,
+    placa: "ABC123",
+    chasis: "CH1",
+    referencia: null,
+    fecha_entrega: null,
+    seleccionado_at: "",
+  };
+  const visitaPendiente: VisitaRow = {
+    id: "v1",
+    user_id: 1,
+    digital_contract_id: null,
+    visitador_id: null,
+    estado: "pendiente_asignacion",
+    cliente_nombre: null,
+    cliente_celular: null,
+    direccion_visita: null,
+    barrio: null,
+    fecha_programada: null,
+    notas: null,
+    evidencia_fotos: [],
+    evidencia_videos: [],
+    ubicacion_verificada: null,
+    fecha_completada: null,
+    notas_visita: null,
+    visitadores: null,
+    created_at: "",
+    updated_at: "",
+  };
+
+  if (detectAdminActionStep(docAceptada, null, null, null) !== "moto") {
+    throw new Error("post-credit: moto first");
+  }
+  if (
+    detectAdminActionStep(
+      docAceptada,
+      contractFirmado,
+      visitaPendiente,
+      compraLista,
+    ) !== "visita"
+  ) {
+    throw new Error("default: visita first");
+  }
+  const compraExcepcion = {
+    ...compraLista,
+    admin_data: { entrega_antes_visita: true },
+  };
+  if (
+    detectAdminActionStep(
+      docAceptada,
+      contractFirmado,
+      visitaPendiente,
+      compraExcepcion,
+    ) !== "entrega"
+  ) {
+    throw new Error("exception: entrega first");
+  }
+}
+
+if (typeof process !== "undefined" && process.argv[1]?.includes("step-logic")) {
+  selfCheck();
 }

@@ -22,7 +22,7 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
     return (
       <Card className="border-neutral-200 shadow-none">
         <CardContent className="py-8 text-center text-sm text-neutral-500">
-          El cliente aún no ha iniciado los formatos.
+          El contrato se generará cuando asignes moto y placa.
         </CardContent>
       </Card>
     );

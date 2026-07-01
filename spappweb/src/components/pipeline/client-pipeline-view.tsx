@@ -1,8 +1,12 @@
-import type { ClientPipeline, VisitadorRow } from "@/lib/pipeline/types";
+import type { BikeRow, ClientPipeline, VisitadorRow } from "@/lib/pipeline/types";
+import { motoListo } from "@/lib/pipeline/step-logic";
 import { ClientStepper } from "@/components/pipeline/client-stepper";
+import { FlowOrderPrompt } from "@/components/pipeline/flow-order-prompt";
 import { CreditReviewPanel } from "@/components/pipeline/credit-review-panel";
 import { ContractReadonlyPanel } from "@/components/pipeline/contract-readonly-panel";
+import { ContractSharePanel } from "@/components/pipeline/contract-share-panel";
 import { VisitActionPanel } from "@/components/pipeline/visit-action-panel";
+import { AdminMotoAssignPanel } from "@/components/pipeline/admin-moto-assign-panel";
 import { MotoSelectionPanel } from "@/components/pipeline/moto-selection-panel";
 import { PaymentConfirmPanel } from "@/components/pipeline/payment-confirm-panel";
 import { DeliveryPanel } from "@/components/pipeline/delivery-panel";
@@ -13,11 +17,13 @@ import { TrackingPanel } from "@/components/pipeline/tracking-panel";
 interface ClientPipelineViewProps {
   pipeline: ClientPipeline;
   visitadores: VisitadorRow[];
+  bikes: BikeRow[];
 }
 
 export function ClientPipelineView({
   pipeline,
   visitadores,
+  bikes,
 }: ClientPipelineViewProps) {
   const { userId } = { userId: pipeline.user.id };
   const adminStep = pipeline.currentAdminStep;
@@ -30,10 +36,23 @@ export function ClientPipelineView({
   const referenciasUsadas = pipeline.pagosHistorial
     .map((p) => p.referencia)
     .filter((r): r is string => Boolean(r?.trim()));
+  const documentId = pipeline.document?.id;
+  const showContractShare =
+    pipeline.compra &&
+    motoListo(pipeline.compra) &&
+    pipeline.contract &&
+    !contractSigned;
+  const legacyClientMoto =
+    contractSigned && !pipeline.compra && contractId;
 
   return (
     <div className="space-y-8">
       <ClientStepper steps={pipeline.steps} />
+      <FlowOrderPrompt
+        compra={pipeline.compra}
+        visita={pipeline.visita}
+        userId={userId}
+      />
       <MoraSummaryBanner pipeline={pipeline} />
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -47,7 +66,22 @@ export function ClientPipelineView({
               contractSigned={contractSigned}
             />
           )}
-          {contractSigned && !pipeline.compra && (
+          {adminStep === "moto" && documentId && (
+            <AdminMotoAssignPanel
+              compra={pipeline.compra}
+              bikes={bikes}
+              userId={userId}
+              documentId={documentId}
+            />
+          )}
+          {showContractShare && (
+            <ContractSharePanel
+              contract={pipeline.contract!}
+              compra={pipeline.compra!}
+              clienteCelular={clienteCelular}
+            />
+          )}
+          {legacyClientMoto && (
             <MotoSelectionPanel
               contract={pipeline.contract}
               compra={pipeline.compra}
@@ -71,6 +105,7 @@ export function ClientPipelineView({
               visita={pipeline.visita}
               visitadores={visitadores}
               userId={userId}
+              compra={pipeline.compra}
             />
           )}
           {pipeline.compra?.estado === "entregada" && (
@@ -79,7 +114,8 @@ export function ClientPipelineView({
 
           {!adminStep &&
             pipeline.compra?.estado !== "entregada" &&
-            !(contractSigned && !pipeline.compra) && (
+            !showContractShare &&
+            !legacyClientMoto && (
             <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-10 text-center text-sm text-neutral-600">
               No hay acciones pendientes de tu parte. El cliente continúa en
               la app.
@@ -123,6 +159,7 @@ export function ClientPipelineView({
                   visita={pipeline.visita}
                   visitadores={visitadores}
                   userId={userId}
+                  compra={pipeline.compra}
                 />
               )}
             </div>

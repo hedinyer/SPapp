@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import {
   getActiveVisitadores,
+  getAllBikes,
   getClientPipeline,
 } from "@/lib/pipeline/queries";
 import { ClientPipelineView } from "@/components/pipeline/client-pipeline-view";
@@ -19,9 +20,10 @@ export default async function ClientPage({
   const userId = Number(userIdStr);
   if (!Number.isFinite(userId)) notFound();
 
-  const [pipeline, visitadores] = await Promise.all([
+  const [pipeline, visitadores, bikes] = await Promise.all([
     getClientPipeline(userId),
     getActiveVisitadores(),
+    getAllBikes(),
   ]);
 
   if (!pipeline) notFound();
@@ -58,7 +60,11 @@ export default async function ClientPage({
 
       <ClientInfoSummary pipeline={pipeline} />
 
-      <ClientPipelineView pipeline={pipeline} visitadores={visitadores} />
+      <ClientPipelineView
+        pipeline={pipeline}
+        visitadores={visitadores}
+        bikes={bikes}
+      />
     </div>
   );
 }
