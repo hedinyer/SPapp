@@ -282,7 +282,7 @@ export function VentaManager() {
             </div>
           )}
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta al QR; lee en movimiento, no hace falta enfocar perfecto.
+            Apunta al QR desde lejos dentro del cuadro pequeño. Funciona inclinado o al revés.
           </p>
         </div>
       )}
