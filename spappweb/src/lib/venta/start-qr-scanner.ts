@@ -13,22 +13,9 @@ declare global {
   }
 }
 
-/** Cuadro pequeño: permite leer el QR desde más lejos sin desenfocar. */
-const SCAN_BOX_RATIO = 0.36;
-const SCAN_BOX_MAX_PX = 140;
-
-function scanBoxEdge(viewfinderWidth: number, viewfinderHeight: number): number {
-  const min = Math.min(viewfinderWidth, viewfinderHeight);
-  return Math.min(SCAN_BOX_MAX_PX, Math.floor(min * SCAN_BOX_RATIO));
-}
-
-function scanBoxDimensions(
-  viewfinderWidth: number,
-  viewfinderHeight: number,
-): { width: number; height: number } {
-  const edge = scanBoxEdge(viewfinderWidth, viewfinderHeight);
-  return { width: edge, height: edge };
-}
+/** Marco guía (etiqueta 30×20 mm). La detección usa el frame completo. */
+const GUIDE_WIDTH_RATIO = 0.75;
+const GUIDE_HEIGHT_RATIO = 0.5;
 
 function isCoarsePointer(): boolean {
   return (
@@ -75,12 +62,11 @@ function addScanOverlay(container: HTMLElement): HTMLElement {
   });
 
   const hole = document.createElement("div");
-  const edge = `${SCAN_BOX_RATIO * 100}%`;
   Object.assign(hole.style, {
-    width: edge,
-    height: edge,
-    maxWidth: `${SCAN_BOX_MAX_PX}px`,
-    maxHeight: `${SCAN_BOX_MAX_PX}px`,
+    width: `${GUIDE_WIDTH_RATIO * 100}%`,
+    height: `${GUIDE_HEIGHT_RATIO * 100}%`,
+    maxWidth: "240px",
+    maxHeight: "160px",
     boxShadow: "0 0 0 9999px rgba(0,0,0,0.55)",
     border: "2px solid rgba(255,255,255,0.9)",
     borderRadius: "10px",
@@ -92,7 +78,7 @@ function addScanOverlay(container: HTMLElement): HTMLElement {
   return overlay;
 }
 
-function drawCroppedFrame(
+function drawFullFrame(
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
   video: HTMLVideoElement,
@@ -102,25 +88,21 @@ function drawCroppedFrame(
   const vh = video.videoHeight;
   if (!vw || !vh) return;
 
-  const cropW = Math.floor(vw * SCAN_BOX_RATIO);
-  const cropH = Math.floor(vh * SCAN_BOX_RATIO);
-  const sx = Math.floor((vw - cropW) / 2);
-  const sy = Math.floor((vh - cropH) / 2);
-
-  canvas.width = cropW;
-  canvas.height = cropH;
+  const rot90 = rotationDeg === 90 || rotationDeg === 270;
+  canvas.width = rot90 ? vh : vw;
+  canvas.height = rot90 ? vw : vh;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, cropW, cropH);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (rotationDeg === 0) {
-    ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
+    ctx.drawImage(video, 0, 0, vw, vh);
     return;
   }
 
   const rad = (rotationDeg * Math.PI) / 180;
-  ctx.translate(cropW / 2, cropH / 2);
+  ctx.translate(canvas.width / 2, canvas.height / 2);
   ctx.rotate(rad);
-  ctx.drawImage(video, sx, sy, cropW, cropH, -cropW / 2, -cropH / 2, cropW, cropH);
+  ctx.drawImage(video, -vw / 2, -vh / 2, vw, vh);
 }
 
 async function startNative(
@@ -166,7 +148,7 @@ async function startNative(
     const rotation = rotations[rotationIndex % rotations.length]!;
     rotationIndex += 1;
 
-    drawCroppedFrame(ctx, canvas, video, rotation);
+    drawFullFrame(ctx, canvas, video, rotation);
     void detector
       .detect(canvas)
       .then((codes) => {
@@ -211,7 +193,8 @@ async function startHtml5(
     { facingMode: "environment" },
     {
       fps: 20,
-      qrbox: scanBoxDimensions,
+      // ponytail: frame completo — el QR se encuentra aunque la etiqueta traiga texto arriba/abajo
+      qrbox: (w, h) => ({ width: w, height: h }),
       disableFlip: false,
     },
     (text) => {

@@ -282,7 +282,7 @@ export function VentaManager() {
             </div>
           )}
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta al QR desde lejos dentro del cuadro pequeño. Funciona inclinado o al revés.
+            Apunta a la etiqueta completa dentro del marco. El nombre y el precio no afectan la lectura.
           </p>
         </div>
       )}
