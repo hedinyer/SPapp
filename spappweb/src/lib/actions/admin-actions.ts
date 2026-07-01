@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
+import { approveCreditOp, rejectCreditOp } from "@/lib/admin/credit-ops";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import { storagePathFromPublicUrl } from "@/lib/utils/storage-urls";
@@ -61,64 +62,15 @@ type CreditActionResult =
   | { ok: true; contractId?: string }
   | { ok: false; error: string };
 
-async function ensureContractId(
-  supabase: SupabaseClient,
-  userId: number,
-  documentId: number,
-): Promise<string> {
-  const { data: existing } = await supabase
-    .from("digital_contracts")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("users_documents_id", documentId)
-    .maybeSingle();
-
-  if (existing) return existing.id as string;
-
-  const { data, error } = await supabase
-    .from("digital_contracts")
-    .insert({
-      user_id: userId,
-      users_documents_id: documentId,
-      status: "borrador",
-    })
-    .select("id")
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data.id as string;
-}
-
 export async function approveCredit(
   documentId: number,
   userId: number,
 ): Promise<CreditActionResult> {
   try {
-    const docId = Number(documentId);
-    const uid = Number(userId);
-    if (!Number.isFinite(docId) || !Number.isFinite(uid)) {
-      return { ok: false, error: "Datos de solicitud inválidos." };
-    }
-
-    const supabase = await assertAdmin();
-    const { data: updated, error } = await supabase
-      .from("users_documents")
-      .update({
-        estado_solicitud: "aceptada",
-        hora_actualizacion: new Date().toISOString(),
-      })
-      .eq("id", docId)
-      .select("id")
-      .maybeSingle();
-
-    if (error) return { ok: false, error: mapDbError(error.message) };
-    if (!updated) {
-      return { ok: false, error: "Solicitud no encontrada o sin permisos." };
-    }
-
-    const contractId = await ensureContractId(supabase, uid, docId);
-    revalidateClient(uid);
-    return { ok: true, contractId };
+    await requireAdminSession();
+    const result = await approveCreditOp(documentId, userId);
+    if (result.ok) revalidateClient(Number(userId));
+    return result;
   } catch (e) {
     return {
       ok: false,
@@ -138,27 +90,10 @@ export async function rejectCredit(
   input: z.infer<typeof rejectSchema>,
 ): Promise<CreditActionResult> {
   try {
-    const parsed = rejectSchema.parse(input);
-    const supabase = await assertAdmin();
-    const { data: updated, error } = await supabase
-      .from("users_documents")
-      .update({
-        estado_solicitud: "rechazada",
-        motivo_rechazo: parsed.motivo.trim(),
-        betado: parsed.betado,
-        hora_actualizacion: new Date().toISOString(),
-      })
-      .eq("id", parsed.documentId)
-      .select("id")
-      .maybeSingle();
-
-    if (error) return { ok: false, error: mapDbError(error.message) };
-    if (!updated) {
-      return { ok: false, error: "Solicitud no encontrada o sin permisos." };
-    }
-
-    revalidateClient(parsed.userId);
-    return { ok: true };
+    await requireAdminSession();
+    const result = await rejectCreditOp(input);
+    if (result.ok) revalidateClient(input.userId);
+    return result;
   } catch (e) {
     if (e instanceof z.ZodError) {
       return { ok: false, error: e.issues[0]?.message ?? "Datos inválidos." };

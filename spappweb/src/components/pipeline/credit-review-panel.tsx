@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import { approveCredit, rejectCredit } from "@/lib/actions/admin-actions";
 import type { UserDocumentRow } from "@/lib/pipeline/types";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,6 +26,29 @@ interface CreditReviewPanelProps {
   contractSigned?: boolean;
 }
 
+type CreditApiResult =
+  | { ok: true; contractId?: string }
+  | { ok: false; error: string };
+
+async function postCredit(body: Record<string, unknown>): Promise<CreditApiResult> {
+  try {
+    const res = await fetch("/api/admin/credit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json()) as CreditApiResult;
+    if (data.ok) return data;
+    return {
+      ok: false,
+      error: data.error ?? "No se pudo procesar la solicitud.",
+    };
+  } catch {
+    return { ok: false, error: "No se pudo contactar al servidor." };
+  }
+}
+
 export function CreditReviewPanel({
   document,
   userId,
@@ -35,7 +56,6 @@ export function CreditReviewPanel({
   clienteCelular,
   contractSigned,
 }: CreditReviewPanelProps) {
-  const router = useRouter();
   const [rejectOpen, setRejectOpen] = useState(false);
   const [motivo, setMotivo] = useState("");
   const [betado, setBetado] = useState(false);
@@ -43,19 +63,25 @@ export function CreditReviewPanel({
 
   function onApprove() {
     startTransition(async () => {
-      const result = await approveCredit(Number(document.id), Number(userId));
+      const result = await postCredit({
+        action: "approve",
+        documentId: Number(document.id),
+        userId: Number(userId),
+      });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
       toast.success("Crédito aprobado. El cliente puede diligenciar formatos.");
-      router.refresh();
+      // ponytail: reload evita crash RSC post-action en Vercel
+      window.location.reload();
     });
   }
 
   function onReject() {
     startTransition(async () => {
-      const result = await rejectCredit({
+      const result = await postCredit({
+        action: "reject",
         documentId: Number(document.id),
         userId: Number(userId),
         motivo,
@@ -67,7 +93,7 @@ export function CreditReviewPanel({
       }
       toast.success("Solicitud rechazada.");
       setRejectOpen(false);
-      router.refresh();
+      window.location.reload();
     });
   }
 
