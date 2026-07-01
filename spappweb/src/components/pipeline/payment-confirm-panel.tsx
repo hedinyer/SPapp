@@ -72,8 +72,8 @@ export function PaymentConfirmPanel({
         <CardHeader>
           <CardTitle className="text-lg">Confirmar pagos</CardTitle>
           <p className="text-sm text-neutral-500">
-            Registra uno o varios abonos por concepto (Nequi, Davivienda,
-            efectivo, etc.).
+            Registra uno o varios abonos por concepto (Nequi Nicolás o
+            Davivienda).
           </p>
         </CardHeader>
         <CardContent className="space-y-6">

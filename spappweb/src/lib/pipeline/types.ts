@@ -411,12 +411,19 @@ export const TARIFA_ESTADO_LABELS: Record<TarifaEstado, string> = {
 };
 
 export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada";
-export type MedioPagoAdmin =
-  | "nequi_nicolas"
+export type MedioPagoAdmin = "nequi_nicolas" | "davivienda";
+
+export type MedioPagoAdminLegacy =
   | "nequi_pedro"
   | "nequi_marisol"
-  | "davivienda"
   | "efectivo";
+
+export type MedioPagoAdminStored = MedioPagoAdmin | MedioPagoAdminLegacy;
+
+export const MEDIO_PAGO_ADMIN_OPTIONS: MedioPagoAdmin[] = [
+  "nequi_nicolas",
+  "davivienda",
+];
 export type BancoOrigen = "nequi" | "davivienda" | "otro";
 export type PagoEstado = "pendiente_confirmacion" | "confirmado" | "rechazado";
 
@@ -427,7 +434,7 @@ export interface PagoRow {
   monto: number;
   dias_cubiertos: number | null;
   medio_pago_usuario: "nequi" | "davivienda" | "efectivo";
-  medio_pago_admin: MedioPagoAdmin | null;
+  medio_pago_admin: MedioPagoAdminStored | null;
   referencia: string | null;
   comprobante_url: string | null;
   origen: "usuario" | "admin";
@@ -449,7 +456,7 @@ export const CONTEXTO_PAGO_LABELS: Record<ContextoPago, string> = {
   cuota_adelantada: "Cuota adelantada",
 };
 
-export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdmin, string> = {
+export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdminStored, string> = {
   nequi_nicolas: "Nequi — Nicolás",
   nequi_pedro: "Nequi — Pedro",
   nequi_marisol: "Nequi — Marisol",

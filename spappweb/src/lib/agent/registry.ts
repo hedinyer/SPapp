@@ -241,7 +241,7 @@ export const AGENT_TOOLS = {
   register_payment: tool({
     category: "pagos",
     description:
-      "Registra un pago confirmado con todos sus datos (sin comprobante adjunto). Contexto: 'tarifa' (requiere tarifaId y comprobante, no soportado por agente), 'inicial' o 'cuota_adelantada'. Para efectivo no se exige comprobante. Aplica validación de referencia única por cliente.",
+      "Registra un pago confirmado con todos sus datos (sin comprobante adjunto). Contexto: 'tarifa' (requiere tarifaId y comprobante, no soportado por agente), 'inicial' o 'cuota_adelantada'. Aplica validación de referencia única por cliente.",
     input: z.object({
       userId: z.number().int().positive(),
       compraId: z.string().uuid(),
@@ -250,13 +250,7 @@ export const AGENT_TOOLS = {
       referencia: z.string().optional(),
       monto: z.number().int().positive(),
       fechaComprobante: z.string().optional().describe("ISO 8601"),
-      medioPagoAdmin: z.enum([
-        "nequi_nicolas",
-        "nequi_pedro",
-        "nequi_marisol",
-        "davivienda",
-        "efectivo",
-      ]),
+      medioPagoAdmin: z.enum(["nequi_nicolas", "davivienda"]),
       bancoOrigen: z.enum(["nequi", "davivienda", "otro"]),
       entradaManual: z.boolean().default(true),
       notas: z.string().optional(),

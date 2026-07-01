@@ -25,13 +25,7 @@ import type {
 const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-const MEDIO_PAGO_ADMIN_VALUES = [
-  "nequi_nicolas",
-  "nequi_pedro",
-  "nequi_marisol",
-  "davivienda",
-  "efectivo",
-] as const;
+const MEDIO_PAGO_ADMIN_VALUES = ["nequi_nicolas", "davivienda"] as const;
 
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
@@ -74,9 +68,8 @@ function optionalImageFile(file: unknown): File | null {
 
 function medioPagoUsuarioFromAdmin(
   medio: MedioPagoAdmin,
-): "nequi" | "davivienda" | "efectivo" {
+): "nequi" | "davivienda" {
   if (medio === "davivienda") return "davivienda";
-  if (medio === "efectivo") return "efectivo";
   return "nequi";
 }
 
@@ -223,7 +216,6 @@ export async function confirmPagoConComprobante(
       : undefined,
   });
 
-  const isEfectivo = parsed.medioPagoAdmin === "efectivo";
   const isPrimerPago =
     parsed.contexto === "inicial" || parsed.contexto === "cuota_adelantada";
   const file = optionalImageFile(formData.get("file"));
@@ -236,7 +228,7 @@ export async function confirmPagoConComprobante(
     throw new Error("Sube el comprobante de pago.");
   }
 
-  if (isPrimerPago && !isEfectivo && !file) {
+  if (isPrimerPago && !file) {
     throw new Error("Sube el comprobante de pago.");
   }
 
@@ -262,10 +254,8 @@ export async function confirmPagoConComprobante(
     }
   }
 
-  let referencia = parsed.referencia?.trim() ?? "";
-  if (isEfectivo && !referencia) {
-    referencia = `EF-${Date.now()}`;
-  } else if (!referencia) {
+  const referencia = parsed.referencia?.trim() ?? "";
+  if (!referencia) {
     throw new Error("Ingresa la referencia.");
   }
 
@@ -300,10 +290,7 @@ export async function confirmPagoConComprobante(
     }
   }
 
-  const fechaComprobante =
-    parsed.fechaComprobante?.trim() ||
-    (isEfectivo ? new Date().toISOString() : "");
-
+  const fechaComprobante = parsed.fechaComprobante?.trim() ?? "";
   if (!fechaComprobante) {
     throw new Error("Ingresa la fecha del comprobante.");
   }
@@ -312,7 +299,6 @@ export async function confirmPagoConComprobante(
     parsed.notas?.trim(),
     parsed.entradaManual ? "Entrada manual" : null,
     parsed.bancoOrigen === "otro" ? "Otro banco" : null,
-    isEfectivo ? "Efectivo" : null,
   ]
     .filter(Boolean)
     .join(" · ") || null;

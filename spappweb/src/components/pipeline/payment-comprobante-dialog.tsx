@@ -13,6 +13,7 @@ import {
   BANCO_ORIGEN_LABELS,
   CONTEXTO_PAGO_LABELS,
   MEDIO_PAGO_ADMIN_LABELS,
+  MEDIO_PAGO_ADMIN_OPTIONS,
   type BancoOrigen,
   type ContextoPago,
   type MedioPagoAdmin,
@@ -87,9 +88,6 @@ export function PaymentComprobanteDialog({
   const [entradaManual, setEntradaManual] = useState(false);
   const [referenciaDuplicada, setReferenciaDuplicada] = useState(false);
   const [checkingReferencia, setCheckingReferencia] = useState(false);
-
-  const isEfectivo = medioPagoAdmin === "efectivo";
-  const isTarifa = contexto === "tarifa";
 
   const referenciaDuplicadaLocal = useMemo(
     () => isReferenciaDuplicada(referencia, referenciasUsadas),
@@ -181,12 +179,11 @@ export function PaymentComprobanteDialog({
   }
 
   function submit() {
-    const requiereComprobante = isTarifa || !isEfectivo;
-    if (requiereComprobante && !file) {
+    if (!file) {
       toast.error("Sube el comprobante de pago.");
       return;
     }
-    if (!isEfectivo && !referencia.trim()) {
+    if (!referencia.trim()) {
       toast.error("Ingresa la referencia.");
       return;
     }
@@ -199,7 +196,7 @@ export function PaymentComprobanteDialog({
       toast.error("Ingresa un monto válido.");
       return;
     }
-    if (!isEfectivo && !fecha) {
+    if (!fecha) {
       toast.error("Ingresa la fecha del comprobante.");
       return;
     }
@@ -216,10 +213,10 @@ export function PaymentComprobanteDialog({
         formData.set("monto", String(montoNum));
         if (fecha) formData.set("fechaComprobante", datetimeLocalToIso(fecha));
         formData.set("medioPagoAdmin", medioPagoAdmin);
-        formData.set("bancoOrigen", isEfectivo ? "otro" : bancoOrigen);
+        formData.set("bancoOrigen", bancoOrigen);
         formData.set(
           "entradaManual",
-          String(entradaManual || bancoOrigen === "otro" || isEfectivo),
+          String(entradaManual || bancoOrigen === "otro"),
         );
 
         await confirmPagoConComprobante(formData);
@@ -258,17 +255,15 @@ export function PaymentComprobanteDialog({
               value={medioPagoAdmin}
               disabled={pending || ocrPending}
               onChange={(v) => setMedioPagoAdmin(v as MedioPagoAdmin)}
-              options={(Object.keys(MEDIO_PAGO_ADMIN_LABELS) as MedioPagoAdmin[]).map(
-                (key) => ({
-                  value: key,
-                  label: MEDIO_PAGO_ADMIN_LABELS[key],
-                }),
-              )}
+              options={MEDIO_PAGO_ADMIN_OPTIONS.map((key) => ({
+                value: key,
+                label: MEDIO_PAGO_ADMIN_LABELS[key],
+              }))}
             />
           </div>
 
           <ImageFileField
-            label={isEfectivo ? "Comprobante (opcional)" : "Comprobante de pago"}
+            label="Comprobante de pago"
             file={file}
             onFileChange={setFile}
             disabled={pending || ocrPending}
@@ -278,30 +273,21 @@ export function PaymentComprobanteDialog({
             cameraInputId="pago-comprobante-camera"
           />
 
-          {!isEfectivo && (
-            <div className="space-y-2">
-              <Label>Banco de origen</Label>
-              <TouchSelect
-                aria-label="Banco de origen"
-                value={bancoOrigen}
-                disabled={pending || ocrPending}
-                onChange={(v) => handleBancoChange(v as BancoOrigen)}
-                options={(Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]).map(
-                  (key) => ({
-                    value: key,
-                    label: BANCO_ORIGEN_LABELS[key],
-                  }),
-                )}
-              />
-            </div>
-          )}
-
-          {isEfectivo && (
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
-              Pago en efectivo: indica el monto recibido. Puedes adjuntar una
-              foto opcional como respaldo.
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label>Banco de origen</Label>
+            <TouchSelect
+              aria-label="Banco de origen"
+              value={bancoOrigen}
+              disabled={pending || ocrPending}
+              onChange={(v) => handleBancoChange(v as BancoOrigen)}
+              options={(Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]).map(
+                (key) => ({
+                  value: key,
+                  label: BANCO_ORIGEN_LABELS[key],
+                }),
+              )}
+            />
+          </div>
 
           {bancoOrigen === "otro" && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
@@ -310,7 +296,7 @@ export function PaymentComprobanteDialog({
             </div>
           )}
 
-          {file && !isEfectivo && bancoOrigen !== "otro" && (
+          {file && bancoOrigen !== "otro" && (
             <Button
               type="button"
               variant="outline"
@@ -336,9 +322,7 @@ export function PaymentComprobanteDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="referencia">
-              Referencia{isEfectivo ? " (opcional)" : ""}
-            </Label>
+            <Label htmlFor="referencia">Referencia</Label>
             <Input
               id="referencia"
               value={referencia}
@@ -382,9 +366,7 @@ export function PaymentComprobanteDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fecha">
-              Fecha{isEfectivo ? " (opcional)" : " del comprobante"}
-            </Label>
+            <Label htmlFor="fecha">Fecha del comprobante</Label>
             <Input
               id="fecha"
               type="datetime-local"
