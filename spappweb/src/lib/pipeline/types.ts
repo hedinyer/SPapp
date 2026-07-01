@@ -327,6 +327,7 @@ export interface ClientPipeline {
   rentingResumen: RentingResumen | null;
   pagosHistorial: PagoHistorialRow[];
   pagos: PagoRow[];
+  compraProductosCredito: CompraProductoCreditoRow[];
   steps: PipelineStep[];
   currentAdminStep: PipelineStepId | null;
   displayName: string;
@@ -492,6 +493,31 @@ export interface InventarioProductoRow {
   compatible_modelos: string[];
   activo: boolean;
   inventario_categorias?: InventarioCategoriaRow | null;
+}
+
+export interface ProductoCreditoRow {
+  id: number;
+  nombre: string;
+  descripcion: string | null;
+  cuota_inicial: number;
+  cuota_diaria: number;
+  imagen_url: string | null;
+  activo: boolean;
+  orden: number;
+}
+
+export interface CompraProductoCreditoRow {
+  id: string;
+  user_moto_compra_id: string;
+  user_id: number;
+  producto_credito_id: number | null;
+  nombre: string;
+  cuota_inicial_monto: number;
+  cuota_diaria_monto: number;
+  cantidad: number;
+  notas: string | null;
+  created_at: string;
+  productos_credito?: ProductoCreditoRow | null;
 }
 
 export interface SolicitudRepuestoItemRow {

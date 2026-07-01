@@ -236,6 +236,7 @@ export async function markDelivered(compraId: string, userId: number) {
 
   if (error) throw new Error(error.message);
   revalidateClient(userId);
+  revalidatePath("/catalogo");
   return { ok: true };
 }
 
@@ -1009,6 +1010,156 @@ export async function deleteVendidaMoto(compraId: string, userId: number) {
   revalidatePath("/vendidas");
   revalidatePath("/garaje");
   revalidatePath("/inbox");
+  revalidateClient(userId);
+  return { ok: true };
+}
+
+const productoCreditoSchema = z.object({
+  id: z.number().optional(),
+  nombre: z.string().min(1),
+  descripcion: z.string().optional(),
+  cuotaInicial: z.number().int().min(0),
+  cuotaDiaria: z.number().int().positive(),
+  imagenUrl: z.string().optional(),
+  activo: z.boolean(),
+  orden: z.number().int().min(0),
+});
+
+export async function saveProductoCredito(
+  input: z.infer<typeof productoCreditoSchema>,
+) {
+  const parsed = productoCreditoSchema.parse(input);
+  const supabase = await assertAdmin();
+  const payload = {
+    nombre: parsed.nombre.trim(),
+    descripcion: parsed.descripcion?.trim() || null,
+    cuota_inicial: parsed.cuotaInicial,
+    cuota_diaria: parsed.cuotaDiaria,
+    imagen_url: parsed.imagenUrl?.trim() || null,
+    activo: parsed.activo,
+    orden: parsed.orden,
+  };
+  if (parsed.id) {
+    const { error } = await supabase
+      .from("productos_credito")
+      .update(payload)
+      .eq("id", parsed.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from("productos_credito").insert(payload);
+    if (error) throw new Error(error.message);
+  }
+  revalidatePath("/productos-credito");
+  return { ok: true };
+}
+
+export async function deleteProductoCredito(id: number) {
+  const supabase = await assertAdmin();
+  return adminDelete(supabase, "productos_credito", id, "/productos-credito");
+}
+
+const addCompraProductoCreditoSchema = z.object({
+  compraId: z.string().uuid(),
+  userId: z.number().int().positive(),
+  productoCreditoId: z.number().int().positive().optional(),
+  nombre: z.string().trim().min(1).optional(),
+  cuotaInicial: z.number().int().min(0).optional(),
+  cuotaDiaria: z.number().int().positive().optional(),
+  cantidad: z.number().int().positive().default(1),
+  notas: z.string().trim().optional(),
+});
+
+export async function addCompraProductoCredito(
+  input: z.infer<typeof addCompraProductoCreditoSchema>,
+) {
+  const parsed = addCompraProductoCreditoSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select("id, user_id, estado")
+    .eq("id", parsed.compraId)
+    .single();
+
+  if (compraError || !compra) throw new Error("Compra no encontrada.");
+  if (compra.estado !== "pendiente_pago") {
+    throw new Error("Solo se pueden agregar productos mientras el pago está pendiente.");
+  }
+
+  let nombre = parsed.nombre?.trim() ?? "";
+  let cuotaInicial = parsed.cuotaInicial ?? 0;
+  let cuotaDiaria = parsed.cuotaDiaria ?? 0;
+  let productoCreditoId: number | null = parsed.productoCreditoId ?? null;
+
+  if (parsed.productoCreditoId) {
+    const { data: catalogo, error: catError } = await supabase
+      .from("productos_credito")
+      .select("id, nombre, cuota_inicial, cuota_diaria, activo")
+      .eq("id", parsed.productoCreditoId)
+      .maybeSingle();
+
+    if (catError) throw new Error(catError.message);
+    if (!catalogo || !catalogo.activo) {
+      throw new Error("El producto del catálogo no está disponible.");
+    }
+
+    nombre = nombre || (catalogo.nombre as string);
+    cuotaInicial = parsed.cuotaInicial ?? (catalogo.cuota_inicial as number);
+    cuotaDiaria = parsed.cuotaDiaria ?? (catalogo.cuota_diaria as number);
+    productoCreditoId = catalogo.id as number;
+  }
+
+  if (!nombre) throw new Error("Indica el nombre del producto.");
+  if (cuotaDiaria <= 0) throw new Error("La cuota diaria debe ser mayor a cero.");
+
+  const { error: insertError } = await supabase
+    .from("compra_productos_credito")
+    .insert({
+      user_moto_compra_id: parsed.compraId,
+      user_id: parsed.userId,
+      producto_credito_id: productoCreditoId,
+      nombre,
+      cuota_inicial_monto: cuotaInicial,
+      cuota_diaria_monto: cuotaDiaria,
+      cantidad: parsed.cantidad,
+      notas: parsed.notas?.trim() || null,
+    });
+
+  if (insertError) throw new Error(insertError.message);
+  revalidateClient(parsed.userId);
+  return { ok: true };
+}
+
+export async function removeCompraProductoCredito(
+  itemId: string,
+  userId: number,
+) {
+  const supabase = await assertAdmin();
+
+  const { data: item, error: fetchError } = await supabase
+    .from("compra_productos_credito")
+    .select("id, user_moto_compra_id")
+    .eq("id", itemId)
+    .single();
+
+  if (fetchError || !item) throw new Error("Producto no encontrado.");
+
+  const { data: compra } = await supabase
+    .from("user_moto_compra")
+    .select("estado")
+    .eq("id", item.user_moto_compra_id)
+    .single();
+
+  if (compra?.estado !== "pendiente_pago") {
+    throw new Error("Solo se pueden quitar productos mientras el pago está pendiente.");
+  }
+
+  const { error } = await supabase
+    .from("compra_productos_credito")
+    .delete()
+    .eq("id", itemId);
+
+  if (error) throw new Error(error.message);
   revalidateClient(userId);
   return { ok: true };
 }

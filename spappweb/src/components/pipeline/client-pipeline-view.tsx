@@ -1,4 +1,4 @@
-import type { BikeRow, ClientPipeline, VisitadorRow } from "@/lib/pipeline/types";
+import type { BikeRow, ClientPipeline, ProductoCreditoRow, VisitadorRow } from "@/lib/pipeline/types";
 import { motoListo } from "@/lib/pipeline/step-logic";
 import { ClientStepper } from "@/components/pipeline/client-stepper";
 import { FlowOrderPrompt } from "@/components/pipeline/flow-order-prompt";
@@ -9,6 +9,7 @@ import { VisitActionPanel } from "@/components/pipeline/visit-action-panel";
 import { AdminMotoAssignPanel } from "@/components/pipeline/admin-moto-assign-panel";
 import { MotoSelectionPanel } from "@/components/pipeline/moto-selection-panel";
 import { PaymentConfirmPanel } from "@/components/pipeline/payment-confirm-panel";
+import { CreditProductsPanel } from "@/components/pipeline/credit-products-panel";
 import { DeliveryPanel } from "@/components/pipeline/delivery-panel";
 import { RentingPanel } from "@/components/pipeline/renting-panel";
 import { MoraSummaryBanner } from "@/components/pipeline/mora-summary-banner";
@@ -18,12 +19,14 @@ interface ClientPipelineViewProps {
   pipeline: ClientPipeline;
   visitadores: VisitadorRow[];
   bikes: BikeRow[];
+  productosCredito: ProductoCreditoRow[];
 }
 
 export function ClientPipelineView({
   pipeline,
   visitadores,
   bikes,
+  productosCredito,
 }: ClientPipelineViewProps) {
   const { userId } = { userId: pipeline.user.id };
   const adminStep = pipeline.currentAdminStep;
@@ -90,12 +93,20 @@ export function ClientPipelineView({
             />
           )}
           {adminStep === "pago" && (
-            <PaymentConfirmPanel
-              compra={pipeline.compra}
-              pagos={pipeline.pagos}
-              userId={userId}
-              referenciasUsadas={referenciasUsadas}
-            />
+            <>
+              <CreditProductsPanel
+                compra={pipeline.compra}
+                items={pipeline.compraProductosCredito}
+                catalogo={productosCredito}
+                userId={userId}
+              />
+              <PaymentConfirmPanel
+                compra={pipeline.compra}
+                pagos={pipeline.pagos}
+                userId={userId}
+                referenciasUsadas={referenciasUsadas}
+              />
+            </>
           )}
           {adminStep === "entrega" && (
             <DeliveryPanel compra={pipeline.compra} userId={userId} />
@@ -144,12 +155,20 @@ export function ClientPipelineView({
                 clienteCelular={clienteCelular}
               />
               {adminStep !== "pago" && (
-                <PaymentConfirmPanel
-                  compra={pipeline.compra}
-                  pagos={pipeline.pagos}
-                  userId={userId}
-                  referenciasUsadas={referenciasUsadas}
-                />
+                <>
+                  <CreditProductsPanel
+                    compra={pipeline.compra}
+                    items={pipeline.compraProductosCredito}
+                    catalogo={productosCredito}
+                    userId={userId}
+                  />
+                  <PaymentConfirmPanel
+                    compra={pipeline.compra}
+                    pagos={pipeline.pagos}
+                    userId={userId}
+                    referenciasUsadas={referenciasUsadas}
+                  />
+                </>
               )}
               {adminStep !== "entrega" && (
                 <DeliveryPanel compra={pipeline.compra} userId={userId} />

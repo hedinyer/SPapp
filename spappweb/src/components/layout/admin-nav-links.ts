@@ -1,6 +1,7 @@
 import {
   Bike,
   ClipboardList,
+  CreditCard,
   LogOut,
   Package,
   ShoppingBag,
@@ -25,6 +26,7 @@ export const adminNavLinks: AdminNavLink[] = [
   { href: "/crear-cliente", label: "Crear cliente", icon: UserPlus },
   { href: "/visitadores", label: "Visitadores", icon: Users },
   { href: "/catalogo", label: "Catálogo", icon: Bike },
+  { href: "/productos-credito", label: "Prod. crédito", icon: CreditCard },
   { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/venta", label: "Venta", icon: ShoppingCart },
   { href: "/garaje", label: "Garaje", icon: Warehouse },

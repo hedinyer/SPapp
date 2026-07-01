@@ -12,6 +12,8 @@ import type {
   InboxQueueId,
   InventarioCategoriaRow,
   InventarioProductoRow,
+  CompraProductoCreditoRow,
+  ProductoCreditoRow,
   GarajeMotoRow,
   GarajeParqueaderoRow,
   VendidaMotoRow,
@@ -187,6 +189,16 @@ export async function getClientPipeline(
     tarifaRows,
   );
 
+  const { data: compraProductosCredito } = compra
+    ? await supabase
+        .from("compra_productos_credito")
+        .select(
+          "id, user_moto_compra_id, user_id, producto_credito_id, nombre, cuota_inicial_monto, cuota_diaria_monto, cantidad, notas, created_at",
+        )
+        .eq("user_moto_compra_id", compra.id)
+        .order("created_at")
+    : { data: [] };
+
   return buildClientPipeline({
     user: user as UserRow,
     document: (document as UserDocumentRow | null) ?? null,
@@ -201,6 +213,8 @@ export async function getClientPipeline(
     rentingResumen,
     pagosHistorial,
     pagos: (pagos as PagoRow[]) ?? [],
+    compraProductosCredito:
+      (compraProductosCredito as CompraProductoCreditoRow[]) ?? [],
   });
 }
 
@@ -678,6 +692,18 @@ export async function getAllProductos(): Promise<InventarioProductoRow[]> {
     )
     .order("nombre");
   return ((data ?? []) as unknown as InventarioProductoRow[]);
+}
+
+export async function getAllProductosCredito(): Promise<ProductoCreditoRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("productos_credito")
+    .select(
+      "id, nombre, descripcion, cuota_inicial, cuota_diaria, imagen_url, activo, orden",
+    )
+    .order("orden")
+    .order("nombre");
+  return (data as ProductoCreditoRow[]) ?? [];
 }
 
 const productoSelect =
