@@ -41,7 +41,8 @@ export function VisitActionPanel({
     return (
       <Card className="border-neutral-200 shadow-none">
         <CardContent className="py-8 text-center text-sm text-neutral-500">
-          La visita se creará cuando se entregue la moto al cliente.
+          La visita se creará cuando el pago esté confirmado y la moto quede
+          lista para retiro.
         </CardContent>
       </Card>
     );
@@ -72,7 +73,7 @@ export function VisitActionPanel({
         </CardTitle>
         <p className="text-sm text-neutral-500">
           {visita.estado === "pendiente_asignacion"
-            ? "La moto fue entregada. Asigna visitador y fecha para la visita post-entrega."
+            ? "Asigna visitador y fecha antes de entregar la moto al cliente."
             : `Estado: ${visitaEstadoLabel(visita.estado)}`}
         </p>
       </CardHeader>
@@ -287,7 +288,7 @@ function AssignForm({
       }}
     >
       <p className="text-sm font-medium">
-        {highlight ? "Programar visita post-entrega" : "Asignar visitador"}
+        {highlight ? "Programar visita domiciliaria" : "Asignar visitador"}
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

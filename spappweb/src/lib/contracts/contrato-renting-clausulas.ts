@@ -4,6 +4,18 @@
  * los completa el concesionario.
  */
 
+export const EMPRESA_PROPIETARIA = {
+  razonSocial: "SOLUCIONES GARRIDO S.A.S.",
+  razonSocialCorto: "SOLUCIONES GARRIDO SAS",
+  representante: "NICOLAS FELIPE GARRIDO PINILLA",
+  cedula: "1.097.496.684",
+  ciudad: "Bucaramanga",
+  nit: "901.397.015-2",
+  email: "contacto@solucionesgarrido.com",
+  logoFile: "logosolucionesgarrido.jpg",
+  firmaFile: "firmanicolas.jpg",
+} as const;
+
 export interface ContratoData {
   nombreContratante: string;
   cedulaContratante: string;
@@ -24,7 +36,7 @@ export interface ClausulaBlock {
 }
 
 export const introTemplate = `El día [DIA] del mes de [MES] de [ANIO], en la ciudad de Bucaramanga, Santander, entre los suscrito a saber,
-MARISOL PINILLA RUEDA, mayor de edad, vecina y domiciliada en la ciudad de Bucaramanga, identificada como
+NICOLAS FELIPE GARRIDO PINILLA, mayor de edad, vecino y domiciliado en la ciudad de Bucaramanga, identificado como
 aparece al pie de su firma, quien en adelante se denominará LA PROPIETARIA, y por otro
 [NOMBRE_CONTRATANTE], mayor de edad, vecino y domiciliado en Bucaramanga,
 quien se identifica como aparece al pie de su firma y en adelante se denominará quien en adelante será
@@ -53,7 +65,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "CUARTA",
         texto:
-          "El precio por el uso del bien objeto del presente contrato es por la suma total de [Lo completará el concesionario] M/cte., los cuales tendrán la siguiente forma de pago.\n\nPARAGRAFO PRIMERO - FORMA DE PAGO: Un primer pago equivalente a la suma de la cual será pagadera al momento de la entrega de la motocicleta a favor del CONTRATANTE.\n\nEl saldo restante, será cancelado directamente por el CONTRATANTE a favor de la PROPIETARIA en 365 CUOTAS DIARIAS DE [Lo completará el concesionario] MCTE.\n\nPARAGRAFO SEGUNDO: Las cuotas diarias descritas en la presente clausula deberán ser entregadas en efectivo a favor de LA PROPIETARIA, a las 5 p.m. de cada día empezando a partir del día siguiente de la suscripción del presente contrato.\n\nEn caso de imposibilidad de parte del CONTRATANTE o la PROPIETARIA, se podrán consignar en la siguiente cuenta de DAVIVIENDA CONVENIO 1642750 O POR LA LLAVE @9013970152 de titularidad de SOLUCIONES PINILLA SAS Ó DAVIPLATA 3168101010 a nombre de JOSE MANUEL RUEDA FORERO. Numero autorizado de pasar el comprobante de pago para moto BERA 3166953000 Y para moto NKD 3165772514 con nombre y placa",
+          "El precio por el uso del bien objeto del presente contrato es por la suma total de [Lo completará el concesionario] M/cte., los cuales tendrán la siguiente forma de pago.\n\nPARAGRAFO PRIMERO - FORMA DE PAGO: Un primer pago equivalente a la suma de la cual será pagadera al momento de la entrega de la motocicleta a favor del CONTRATANTE.\n\nEl saldo restante, será cancelado directamente por el CONTRATANTE a favor de la PROPIETARIA en 365 CUOTAS DIARIAS DE [Lo completará el concesionario] MCTE.\n\nPARAGRAFO SEGUNDO: Las cuotas diarias descritas en la presente clausula deberán ser entregadas en efectivo a favor de LA PROPIETARIA, a las 5 p.m. de cada día empezando a partir del día siguiente de la suscripción del presente contrato.\n\nEn caso de imposibilidad de parte del CONTRATANTE o la PROPIETARIA, se podrán consignar en la siguiente cuenta de DAVIVIENDA CONVENIO 1642750 O POR LA LLAVE @9013970152 de titularidad de SOLUCIONES GARRIDO SAS Ó DAVIPLATA 3168101010 a nombre de JOSE MANUEL RUEDA FORERO. Numero autorizado de pasar el comprobante de pago para moto BERA 3166953000 Y para moto NKD 3165772514 con nombre y placa",
       },
     ],
   },
@@ -133,12 +145,12 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DÉCIMA SEXTA",
         texto:
-          "Autorizo de manera expresa e inequívoca a la PROPIETARIA, para que dé tratamiento sobre la recolección, almacenamiento, uso, circulación y la supresión de los datos personales indispensables, opcionales y sensibles que se hayan recolectado en fechas anteriores o que se requieran en un futuro para el desarrollo adecuado de la relación entre las partes del presente contrato, autorizo la Cesión Nacional o Transferencia Internacional de datos a: i) entidades públicas o administrativas en ejercicio de sus funciones legales o por orden judicial; ii) terceros con los cuales la propietaria haya celebrado contratos, para la realización de tareas tercerizadas relacionadas con la venta de vehículos automotores.\n\nCon mi firma certifico conocer la política de Protección de Datos Personales del responsable del Tratamiento y los derechos que me asisten en mi calidad de Titular de Datos Personales, entre los que se encuentran los siguientes: i) Conocer, actualizar y rectificar sus Datos Personales ii) Solicitar prueba de la autorización otorgada, salvo cuando la ley no lo requiera; iii) Previa solicitud, ser informado sobre el uso que se ha dado a sus Datos Personales, por el responsable o quienes por cuenta de éste realicen el Tratamiento de sus Datos Personales; iv) Presentar ante las autoridades competente quejas por violaciones al régimen legal colombiano de protección de datos personales; v) Revocar la presente autorización y/o solicitar la supresión de sus Datos Personales cuando la autoridad competente determine que el responsable incurrió en conductas contrarias a la ley y a la Constitución, y, vi) Acceder en forma gratuita a sus Datos Personales que hayan sido objeto de Tratamiento. Estos los puedo ejercer a través de los canales dispuestos y disponibles en marisolpinilla@hotmail.com",
+          "Autorizo de manera expresa e inequívoca a la PROPIETARIA, para que dé tratamiento sobre la recolección, almacenamiento, uso, circulación y la supresión de los datos personales indispensables, opcionales y sensibles que se hayan recolectado en fechas anteriores o que se requieran en un futuro para el desarrollo adecuado de la relación entre las partes del presente contrato, autorizo la Cesión Nacional o Transferencia Internacional de datos a: i) entidades públicas o administrativas en ejercicio de sus funciones legales o por orden judicial; ii) terceros con los cuales la propietaria haya celebrado contratos, para la realización de tareas tercerizadas relacionadas con la venta de vehículos automotores.\n\nCon mi firma certifico conocer la política de Protección de Datos Personales del responsable del Tratamiento y los derechos que me asisten en mi calidad de Titular de Datos Personales, entre los que se encuentran los siguientes: i) Conocer, actualizar y rectificar sus Datos Personales ii) Solicitar prueba de la autorización otorgada, salvo cuando la ley no lo requiera; iii) Previa solicitud, ser informado sobre el uso que se ha dado a sus Datos Personales, por el responsable o quienes por cuenta de éste realicen el Tratamiento de sus Datos Personales; iv) Presentar ante las autoridades competente quejas por violaciones al régimen legal colombiano de protección de datos personales; v) Revocar la presente autorización y/o solicitar la supresión de sus Datos Personales cuando la autoridad competente determine que el responsable incurrió en conductas contrarias a la ley y a la Constitución, y, vi) Acceder en forma gratuita a sus Datos Personales que hayan sido objeto de Tratamiento. Estos los puedo ejercer a través de los canales dispuestos y disponibles en contacto@solucionesgarrido.com",
       },
       {
         titulo: "DÉCIMA SÉPTIMA: SOLUCION DE CONFLICTOS- CLAUSULA COMPROMISORIA",
         texto:
-          "Toda controversia o diferencia relativa a este contrato, su celebración, ejecución, desarrollo, a su terminación, a su liquidación, o al cumplimiento de cualquiera de las obligaciones señaladas en el mismo, se resolverá por un Tribunal de Arbitramento, el cual será administrado por la Cámara de Comercio de Bucaramanga o directamente una conciliación con la empresa SOLUCIONES PINILLA SAS.\n\nEl Tribunal de arbitramento se regirá de acuerdo a las siguientes reglas:\n\nPRIMERA: El Tribunal estará integrado por 1 árbitro, de conformidad a la cuantía del proceso, elegidos de común acuerdo por las partes, de la lista oficial que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga. En caso de no existir acuerdo, las partes delegan expresamente en el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga, la designación de los Árbitros de conformidad con lo normado en su reglamento interno.\n\nSEGUNDA: La legislación procesal aplicable será la estipulada en la ley 1563 de 2012, y sus normas concordantes, así como las que las sustituyan.\n\nTERCERA: El Tribunal decidirá en Derecho.\n\nCUARTA: El secretario del Tribunal de Arbitramento será elegido de la lista de oficial de secretarios que para tal efecto lleve el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.\n\nQUINTA: El Tribunal sesionará en las instalaciones del Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.",
+          "Toda controversia o diferencia relativa a este contrato, su celebración, ejecución, desarrollo, a su terminación, a su liquidación, o al cumplimiento de cualquiera de las obligaciones señaladas en el mismo, se resolverá por un Tribunal de Arbitramento, el cual será administrado por la Cámara de Comercio de Bucaramanga o directamente una conciliación con la empresa SOLUCIONES GARRIDO SAS.\n\nEl Tribunal de arbitramento se regirá de acuerdo a las siguientes reglas:\n\nPRIMERA: El Tribunal estará integrado por 1 árbitro, de conformidad a la cuantía del proceso, elegidos de común acuerdo por las partes, de la lista oficial que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga. En caso de no existir acuerdo, las partes delegan expresamente en el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga, la designación de los Árbitros de conformidad con lo normado en su reglamento interno.\n\nSEGUNDA: La legislación procesal aplicable será la estipulada en la ley 1563 de 2012, y sus normas concordantes, así como las que las sustituyan.\n\nTERCERA: El Tribunal decidirá en Derecho.\n\nCUARTA: El secretario del Tribunal de Arbitramento será elegido de la lista de oficial de secretarios que para tal efecto lleve el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.\n\nQUINTA: El Tribunal sesionará en las instalaciones del Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.",
       },
     ],
   },
@@ -153,7 +165,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DECIMA NOVENA",
         texto:
-          "Para efectos de notificaciones LA PROPIETARIA las recibirán en la dirección electrónica marisolpinilla@hotmail.com o en centro la calle 37 #20-49 Bucaramanga, y EL CONTRATANTE, en la dirección: [DIRECCION_NOTIFICACIONES]",
+          "Para efectos de notificaciones LA PROPIETARIA las recibirán en la dirección electrónica contacto@solucionesgarrido.com o en centro la calle 37 #20-49 Bucaramanga, y EL CONTRATANTE, en la dirección: [DIRECCION_NOTIFICACIONES]",
       },
       {
         titulo: "VIGÉSIMA",
@@ -181,13 +193,16 @@ export const blocks: ClausulaBlock[] = [
 
 export const firmaTemplate = `Para constancia se firma en Bucaramanga a los [DIA] (xx) día del mes de [MES] de dos mil [ANIO] ([ANIO_NUM]), por quienes en el intervinieron.
 
-LA PROPIETARIA, EL CONTRATANTE
-MARISOL PINILLA RUEDA
-_______________________________
-37.547.626
+LA PROPIETARIA
+NICOLAS FELIPE GARRIDO PINILLA
+C.C. 1.097.496.684
 Representante legal
-SOLUCIONES PINILLA S.A.S.
-Nit: 901.397.015-2`;
+SOLUCIONES GARRIDO S.A.S.
+Nit: 901.397.015-2
+
+EL CONTRATANTE
+[NOMBRE_CONTRATANTE]
+C.C. [CEDULA_CONTRATANTE]`;
 
 export function renderIntro(form: ContratoData): string {
   return introTemplate
@@ -209,7 +224,9 @@ export function renderFirma(form: ContratoData): string {
     .replaceAll("[DIA]", form.fechaFirmaDia)
     .replaceAll("[MES]", form.fechaFirmaMes)
     .replaceAll("[ANIO]", form.fechaFirmaAnio)
-    .replaceAll("[ANIO_NUM]", form.fechaFirmaAnio);
+    .replaceAll("[ANIO_NUM]", form.fechaFirmaAnio)
+    .replaceAll("[NOMBRE_CONTRATANTE]", form.nombreContratante)
+    .replaceAll("[CEDULA_CONTRATANTE]", form.cedulaContratante);
 }
 
 const MESES = [

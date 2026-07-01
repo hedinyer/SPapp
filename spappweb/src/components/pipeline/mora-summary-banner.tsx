@@ -39,7 +39,7 @@ export function MoraSummaryBanner({ pipeline }: { pipeline: ClientPipeline }) {
           <p className="mt-1 text-xs opacity-80">
             {moraEstadoLabel(pipeline.atraso)}
             {visitaPendiente
-              ? " · Visible aunque la visita post-entrega siga pendiente"
+              ? " · Visible aunque la visita domiciliaria siga pendiente"
               : ""}
           </p>
         </div>

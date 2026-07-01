@@ -12,6 +12,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { signContract } from "@/lib/actions/contract-actions";
 import {
+  EMPRESA_PROPIETARIA,
   blocks,
   colombiaDateParts,
   renderClausulaTexto,
@@ -190,15 +191,18 @@ export function ContractSignFlow({
           instruction="Al marcar la casilla confirmas que leíste todo el contrato."
         >
           <LegalBox title="Firma del contrato" body={renderFirma(formData)} />
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-            <p className="mb-2 text-sm font-semibold text-black">LA PROPIETARIA</p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/marisolpinilla.png"
-              alt="Firma de Marisol Pinilla"
-              className="h-20 w-auto object-contain"
-            />
-          </div>
+          <FirmaParty
+            title="LA PROPIETARIA"
+            sigSrc={`/${EMPRESA_PROPIETARIA.firmaFile}`}
+            sigAlt={`Firma de ${EMPRESA_PROPIETARIA.representante}`}
+            lines={[
+              EMPRESA_PROPIETARIA.representante,
+              `C.C. ${EMPRESA_PROPIETARIA.cedula}`,
+              "Representante legal",
+              EMPRESA_PROPIETARIA.razonSocial,
+              `Nit: ${EMPRESA_PROPIETARIA.nit}`,
+            ]}
+          />
           <label className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4">
             <Checkbox
               checked={aceptaClausulas}
@@ -283,11 +287,50 @@ export function ContractSignFlow({
 
 function LegalBox({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-      <p className="mb-2 text-sm font-bold text-black">{title}</p>
-      <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+    <div className="overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm">
+      <div className="border-b border-slate-700 bg-slate-900 px-4 py-2.5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-white">
+          {title}
+        </p>
+      </div>
+      <p className="whitespace-pre-line px-4 py-4 font-serif text-sm leading-relaxed text-slate-800">
         {body}
       </p>
+    </div>
+  );
+}
+
+function FirmaParty({
+  title,
+  sigSrc,
+  sigAlt,
+  lines,
+}: {
+  title: string;
+  sigSrc: string;
+  sigAlt: string;
+  lines: string[];
+}) {
+  return (
+    <div className="rounded-lg border border-slate-300 bg-white p-4 shadow-sm">
+      <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-900">
+        {title}
+      </p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={sigSrc} alt={sigAlt} className="mb-2 h-20 w-auto object-contain" />
+      <div className="mb-3 border-b border-slate-400" />
+      {lines.map((line, i) => (
+        <p
+          key={line}
+          className={
+            i === 0
+              ? "text-sm font-semibold text-slate-900"
+              : "text-xs text-slate-600"
+          }
+        >
+          {line}
+        </p>
+      ))}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer";
 import {
+  EMPRESA_PROPIETARIA,
   blocks,
   renderFirma,
   renderIntro,
@@ -36,42 +37,98 @@ async function publicImage(file: string): Promise<{ data: Buffer; format: "png" 
   return { data, format: file.endsWith(".png") ? "png" : "jpg" };
 }
 
+const serif = "Times-Roman";
+const serifBold = "Times-Bold";
+
 const styles = StyleSheet.create({
-  page: { paddingTop: 52, paddingBottom: 48, paddingHorizontal: 40, fontSize: 10 },
-  pageContrato: { paddingTop: 52, paddingBottom: 48, paddingHorizontal: 36, fontSize: 9 },
+  page: { paddingTop: 52, paddingBottom: 48, paddingHorizontal: 40, fontSize: 10, fontFamily: serif },
+  pageContrato: {
+    paddingTop: 80,
+    paddingBottom: 56,
+    paddingHorizontal: 44,
+    fontSize: 9.5,
+    fontFamily: serif,
+    color: "#1a1a1a",
+    lineHeight: 1.45,
+  },
+  headerBand: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 52,
+    backgroundColor: "#0f172a",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 44,
+  },
+  headerLogo: { height: 34, objectFit: "contain" },
+  headerBrand: { color: "#f8fafc", fontSize: 8, fontFamily: serifBold, letterSpacing: 0.5 },
   logo: { position: "absolute", top: 16, right: 40, height: 36, objectFit: "contain" },
   footer: {
     position: "absolute",
     bottom: 24,
-    left: 40,
-    right: 40,
+    left: 44,
+    right: 44,
     flexDirection: "row",
     justifyContent: "space-between",
     fontSize: 7,
-    color: "#616161",
+    color: "#64748b",
+    fontFamily: serif,
   },
-  title: { textAlign: "center", fontSize: 14, fontWeight: "bold", marginBottom: 16 },
-  titleContrato: { textAlign: "center", fontSize: 12, fontWeight: "bold", marginBottom: 12 },
+  title: { textAlign: "center", fontSize: 14, fontFamily: serifBold, marginBottom: 16 },
+  titleContrato: {
+    textAlign: "center",
+    fontSize: 13,
+    fontFamily: serifBold,
+    marginBottom: 4,
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
+  titleSub: {
+    textAlign: "center",
+    fontSize: 8,
+    color: "#475569",
+    marginBottom: 14,
+  },
   line: { marginBottom: 6, fontSize: 10 },
-  sectionTitle: { fontWeight: "bold", marginTop: 12, marginBottom: 4 },
-  intro: { fontSize: 9, marginBottom: 12 },
-  blockTitle: { fontSize: 10, fontWeight: "bold", marginTop: 6, marginBottom: 6 },
-  clausulaTitulo: { fontSize: 9, fontWeight: "bold", marginBottom: 4 },
-  clausulaTexto: { fontSize: 8, lineHeight: 1.4, marginBottom: 8 },
-  divider: { borderBottomWidth: 1, borderBottomColor: "#bdbdbd", marginVertical: 8 },
-  firma: { fontSize: 9, marginBottom: 16 },
-  firmaRow: { flexDirection: "row" },
-  firmaCol: { flex: 1, paddingRight: 24 },
-  bold9: { fontSize: 9, fontWeight: "bold" },
-  t9: { fontSize: 9 },
-  t8: { fontSize: 8 },
-  sigImg: { height: 50, marginTop: 8, objectFit: "contain" },
+  sectionTitle: { fontFamily: serifBold, marginTop: 12, marginBottom: 4 },
+  intro: {
+    fontSize: 9.5,
+    marginBottom: 14,
+    padding: 10,
+    backgroundColor: "#f8fafc",
+    borderLeftWidth: 3,
+    borderLeftColor: "#0f172a",
+  },
+  blockTitle: {
+    fontSize: 10,
+    fontFamily: serifBold,
+    marginTop: 10,
+    marginBottom: 6,
+    color: "#0f172a",
+    borderBottomWidth: 1,
+    borderBottomColor: "#cbd5e1",
+    paddingBottom: 3,
+  },
+  clausulaTitulo: { fontSize: 9.5, fontFamily: serifBold, marginBottom: 3, color: "#0f172a" },
+  clausulaTexto: { fontSize: 9, lineHeight: 1.45, marginBottom: 8, textAlign: "justify" },
+  divider: { borderBottomWidth: 1, borderBottomColor: "#94a3b8", marginVertical: 12 },
+  firmaIntro: { fontSize: 9, marginBottom: 12, textAlign: "justify" },
+  firmaRow: { flexDirection: "row", gap: 24 },
+  firmaCol: { flex: 1 },
+  firmaRole: { fontSize: 9, fontFamily: serifBold, marginBottom: 6, textTransform: "uppercase" },
+  sigImg: { height: 52, marginBottom: 6, objectFit: "contain" },
+  sigLine: { borderBottomWidth: 1, borderBottomColor: "#334155", marginBottom: 6, height: 1 },
+  sigName: { fontSize: 9, fontFamily: serifBold },
+  sigMeta: { fontSize: 8, color: "#475569", marginTop: 2 },
 });
 
 function Footer() {
   return (
     <View style={styles.footer} fixed>
-      <Text>SOLUCIONES PINILLA S.A.S.</Text>
+      <Text>{EMPRESA_PROPIETARIA.razonSocial}</Text>
       <Text
         render={({ pageNumber, totalPages }) =>
           `Página ${pageNumber} de ${totalPages}`
@@ -81,12 +138,44 @@ function Footer() {
   );
 }
 
+function ContratoHeader({ logo }: { logo: { data: Buffer; format: "png" | "jpg" } }) {
+  return (
+    <View style={styles.headerBand} fixed>
+      <Image style={styles.headerLogo} src={logo} />
+      <Text style={styles.headerBrand}>{EMPRESA_PROPIETARIA.razonSocial}</Text>
+    </View>
+  );
+}
+
+function FirmaCol({
+  role,
+  sigSrc,
+  lines,
+}: {
+  role: string;
+  sigSrc: { data: Buffer; format: "png" | "jpg" } | string;
+  lines: string[];
+}) {
+  return (
+    <View style={styles.firmaCol}>
+      <Text style={styles.firmaRole}>{role}</Text>
+      <Image style={styles.sigImg} src={sigSrc} />
+      <View style={styles.sigLine} />
+      {lines.map((line, i) => (
+        <Text key={line} style={i === 0 ? styles.sigName : styles.sigMeta}>
+          {line}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
 export async function generateHojaVidaPdf(args: {
   hoja: Record<string, unknown>;
   signatureDataUrl: string;
 }): Promise<Buffer> {
   const form: HojaVidaFormData = parseHojaVidaForm(args.hoja);
-  const logo = await publicImage("logos_login.jpeg");
+  const logo = await publicImage(EMPRESA_PROPIETARIA.logoFile);
   const now = new Date();
   const tipo = form.tipo_identificacion ? TIPO_PDF_CODE[form.tipo_identificacion] : "";
   const estado = form.estado_civil ? ESTADO_CIVIL_LABELS[form.estado_civil] : "";
@@ -145,7 +234,7 @@ export async function generateHojaVidaPdf(args: {
         <Line>COMISION: _______________________________</Line>
         <Line>FECHA DE ENTREGA: ________________________</Line>
         <View>
-          <Text style={{ marginTop: 24 }}>FIRMA DEL SOLICITANTE:</Text>
+          <Text style={{ marginTop: 24, fontFamily: serifBold }}>FIRMA DEL SOLICITANTE:</Text>
           <Image style={{ height: 60, marginTop: 8, objectFit: "contain" }} src={args.signatureDataUrl} />
         </View>
       </Page>
@@ -160,21 +249,23 @@ export async function generateContratoPdf(args: {
   signatureDataUrl: string;
 }): Promise<Buffer> {
   const { contrato } = args;
-  const logo = await publicImage("logos_login.jpeg");
-  const marisol = await publicImage("marisolpinilla.png");
+  const logo = await publicImage(EMPRESA_PROPIETARIA.logoFile);
+  const firmaProp = await publicImage(EMPRESA_PROPIETARIA.firmaFile);
+  const e = EMPRESA_PROPIETARIA;
 
   const doc = (
     <Document>
       <Page size="LETTER" style={styles.pageContrato}>
-        <Image style={styles.logo} src={logo} fixed />
+        <ContratoHeader logo={logo} />
         <Footer />
-        <Text style={styles.titleContrato}>CONTRATO DE RENTING</Text>
+        <Text style={styles.titleContrato}>Contrato de Renting</Text>
+        <Text style={styles.titleSub}>{e.razonSocial} · {e.ciudad}</Text>
         <Text style={styles.intro}>{renderIntro(contrato)}</Text>
         {blocks.map((block) => (
           <View key={block.title}>
             <Text style={styles.blockTitle}>{block.title}</Text>
             {block.clausulas.map((c) => (
-              <View key={c.titulo} wrap={false}>
+              <View key={c.titulo}>
                 <Text style={styles.clausulaTitulo}>{c.titulo}</Text>
                 <Text style={styles.clausulaTexto}>
                   {renderClausulaTexto(c.texto, contrato)}
@@ -184,22 +275,24 @@ export async function generateContratoPdf(args: {
           </View>
         ))}
         <View style={styles.divider} />
-        <Text style={styles.firma}>{renderFirma(contrato)}</Text>
+        <Text style={styles.firmaIntro}>{renderFirma(contrato)}</Text>
         <View style={styles.firmaRow}>
-          <View style={styles.firmaCol}>
-            <Text style={styles.bold9}>LA PROPIETARIA</Text>
-            <Text style={styles.t9}>MARISOL PINILLA RUEDA</Text>
-            <Text style={styles.t8}>C.C. 37.547.626</Text>
-            <Text style={styles.t8}>Representante legal</Text>
-            <Text style={styles.t8}>SOLUCIONES PINILLA S.A.S.</Text>
-            <Image style={styles.sigImg} src={marisol} />
-          </View>
-          <View style={styles.firmaCol}>
-            <Text style={styles.bold9}>EL CONTRATANTE</Text>
-            <Text style={styles.t9}>{contrato.nombreContratante}</Text>
-            <Text style={styles.t8}>{`C.C. ${contrato.cedulaContratante}`}</Text>
-            <Image style={styles.sigImg} src={args.signatureDataUrl} />
-          </View>
+          <FirmaCol
+            role="La propietaria"
+            sigSrc={firmaProp}
+            lines={[
+              e.representante,
+              `C.C. ${e.cedula}`,
+              "Representante legal",
+              e.razonSocial,
+              `Nit: ${e.nit}`,
+            ]}
+          />
+          <FirmaCol
+            role="El contratante"
+            sigSrc={args.signatureDataUrl}
+            lines={[contrato.nombreContratante, `C.C. ${contrato.cedulaContratante}`]}
+          />
         </View>
       </Page>
     </Document>

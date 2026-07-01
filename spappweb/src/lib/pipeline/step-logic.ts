@@ -18,8 +18,8 @@ const STEP_ORDER: PipelineStepId[] = [
   "contrato",
   "moto",
   "pago",
-  "entrega",
   "visita",
+  "entrega",
 ];
 
 const STEP_LABELS: Record<PipelineStepId, string> = {
@@ -131,10 +131,10 @@ function isBlockedForStep(
       return !contractDone(contract);
     case "pago":
       return !motoDone(compra);
-    case "entrega":
-      return !paymentDone(compra) && compra?.estado !== "lista_retiro";
     case "visita":
-      return !deliveryDone(compra);
+      return !paymentDone(compra) && compra?.estado !== "lista_retiro";
+    case "entrega":
+      return !visitDone(visita);
     default:
       return true;
   }
@@ -153,10 +153,11 @@ export function detectAdminActionStep(
   ) {
     return "pago";
   }
-  if (compra && compra.estado === "lista_retiro") {
-    return "entrega";
-  }
-  if (deliveryDone(compra)) {
+  if (
+    compra &&
+    (compra.estado === "lista_retiro" || paymentDone(compra)) &&
+    !deliveryDone(compra)
+  ) {
     if (
       !visita ||
       visita.estado === "pendiente_asignacion" ||
@@ -164,6 +165,18 @@ export function detectAdminActionStep(
     ) {
       return "visita";
     }
+    if (compra.estado === "lista_retiro" && visitDone(visita)) {
+      return "entrega";
+    }
+  }
+  // ponytail: entregas legacy con visita aún abierta
+  if (
+    deliveryDone(compra) &&
+    visita &&
+    !visitDone(visita) &&
+    visita.estado !== "cancelada"
+  ) {
+    return "visita";
   }
   return null;
 }

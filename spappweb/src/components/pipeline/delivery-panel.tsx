@@ -177,7 +177,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
               onClick={() =>
                 run(
                   () => markDelivered(compra.id, userId),
-                  "Moto entregada. Agenda la visita domiciliaria abajo.",
+                  "Moto entregada.",
                 )
               }
             >

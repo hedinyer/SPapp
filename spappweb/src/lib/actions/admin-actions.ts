@@ -33,7 +33,7 @@ function mapDbError(message: string): string {
     return "No se puede eliminar: hay registros relacionados.";
   }
   if (lower.includes("permission denied")) {
-    return "Sin permisos para eliminar. Configura SUPABASE_SERVICE_ROLE_KEY en el servidor.";
+    return "Sin permisos para actualizar en la base de datos.";
   }
   return message;
 }

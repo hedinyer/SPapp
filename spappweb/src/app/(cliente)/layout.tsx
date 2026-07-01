@@ -15,8 +15,8 @@ export default function ClienteLayout({
       <main className="mx-auto max-w-lg px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <header className="safe-area-top mb-6 flex justify-center">
           <Image
-            src="/logos_login.jpeg"
-            alt="Speed Promotora"
+            src="/logosolucionesgarrido.jpg"
+            alt="Soluciones Garrido"
             width={320}
             height={120}
             className="h-auto w-full max-w-[280px] object-contain"
