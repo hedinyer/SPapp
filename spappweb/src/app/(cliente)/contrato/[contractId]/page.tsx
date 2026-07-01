@@ -1,9 +1,11 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { buildContratoComercial } from "@/lib/contracts/contrato-renting-clausulas";
 import {
   TIPO_IDENTIFICACION_LABELS,
   parseHojaVidaForm,
 } from "@/lib/contracts/hoja-vida-schema";
 import { ContractSignFlow } from "@/components/contrato/contract-sign-flow";
+import type { FrecuenciaPago } from "@/lib/pipeline/types";
 
 export const metadata = { title: "Firmar contrato" };
 
@@ -67,7 +69,9 @@ export default async function ContratoPage({
 
   const { data: compra } = await supabase
     .from("user_moto_compra")
-    .select("placa, chasis, modelo, color")
+    .select(
+      "modelo, color, placa, chasis, referencia, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo",
+    )
     .eq("user_id", contract.user_id)
     .maybeSingle();
 
@@ -101,6 +105,16 @@ export default async function ContratoPage({
         celular: hoja.celular,
         correo: hoja.correo,
       }}
+      comercial={buildContratoComercial({
+        modelo: compra.modelo as string,
+        color: compra.color as string,
+        placa: compra.placa as string,
+        chasis: compra.chasis as string,
+        referencia: (compra.referencia as string | null) ?? null,
+        frecuencia_pago: compra.frecuencia_pago as FrecuenciaPago,
+        cuota_inicial_monto: compra.cuota_inicial_monto as number,
+        monto_cuota_periodo: compra.monto_cuota_periodo as number,
+      })}
     />
   );
 }

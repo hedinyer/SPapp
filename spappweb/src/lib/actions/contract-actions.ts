@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
+  buildContratoComercial,
   colombiaDateParts,
   type ContratoData,
 } from "@/lib/contracts/contrato-renting-clausulas";
+import type { FrecuenciaPago } from "@/lib/pipeline/types";
 import {
   generateContratoPdf,
   generateHojaVidaPdf,
@@ -51,6 +53,21 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     throw new Error("El crédito aún no está aprobado.");
   }
 
+  const userId = contract.user_id as number;
+
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "modelo, color, placa, chasis, referencia, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo",
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (compraError) throw new Error(compraError.message);
+  if (!compra?.placa?.trim() || !compra?.chasis?.trim()) {
+    throw new Error("La moto aún no está asignada.");
+  }
+
   const fecha = colombiaDateParts();
   const contratoData: ContratoData = {
     nombreContratante: parsed.nombre,
@@ -61,6 +78,16 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     fechaFirmaDia: fecha.dia,
     fechaFirmaMes: fecha.mes,
     fechaFirmaAnio: fecha.anio,
+    ...buildContratoComercial({
+      modelo: compra.modelo as string,
+      color: compra.color as string,
+      placa: compra.placa as string,
+      chasis: compra.chasis as string,
+      referencia: (compra.referencia as string | null) ?? null,
+      frecuencia_pago: compra.frecuencia_pago as FrecuenciaPago,
+      cuota_inicial_monto: compra.cuota_inicial_monto as number,
+      monto_cuota_periodo: compra.monto_cuota_periodo as number,
+    }),
   };
 
   const signatureBuffer = Buffer.from(
@@ -72,6 +99,16 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     generateHojaVidaPdf({
       hoja: contract.hoja_vida_data as Record<string, unknown>,
       signatureDataUrl: parsed.firmaPngBase64,
+      comercial: {
+        placa: compra.placa as string,
+        chasis: compra.chasis as string,
+        color: compra.color as string,
+        referencia: (compra.referencia as string | null) ?? "—",
+        modelo: compra.modelo as string,
+        cuotaInicial: contratoData.cuotaInicial,
+        valorCuota: contratoData.valorCuota,
+        frecuenciaPago: contratoData.frecuenciaPago,
+      },
     }),
     generateContratoPdf({
       contrato: contratoData,
@@ -79,7 +116,6 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     }),
   ]);
 
-  const userId = contract.user_id as number;
   const base = `${userId}/${contract.id}`;
   const signaturePath = `${base}/signature.png`;
   const hojaVidaPath = `${base}/hoja_vida.pdf`;
@@ -115,6 +151,14 @@ export async function signContract(input: z.infer<typeof signSchema>) {
         fecha_firma_mes: fecha.mes,
         fecha_firma_anio: fecha.anio,
         clausulas_aceptadas: true,
+        moto_modelo: compra.modelo,
+        moto_color: compra.color,
+        moto_placa: compra.placa,
+        moto_chasis: compra.chasis,
+        frecuencia_pago: compra.frecuencia_pago,
+        cuota_inicial: compra.cuota_inicial_monto,
+        valor_cuota: compra.monto_cuota_periodo,
+        total_contrato: contratoData.totalContrato,
       },
       signature_path: signaturePath,
       hoja_vida_pdf_path: hojaVidaPath,

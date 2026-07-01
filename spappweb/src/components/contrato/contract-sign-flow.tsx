@@ -44,6 +44,17 @@ interface ContractSignFlowProps {
   contractId: string;
   prefill: { nombre: string; cedula: string; direccion: string };
   resumen: { nombre: string; documento: string; celular: string; correo: string };
+  comercial: Omit<
+    ContratoData,
+    | "nombreContratante"
+    | "cedulaContratante"
+    | "direccionNotificaciones"
+    | "ciudadContratante"
+    | "departamentoContratante"
+    | "fechaFirmaDia"
+    | "fechaFirmaMes"
+    | "fechaFirmaAnio"
+  >;
 }
 
 // Pasos: datos, encabezado, un paso por bloque de clausulas, confirmar, firmar.
@@ -58,6 +69,7 @@ export function ContractSignFlow({
   contractId,
   prefill,
   resumen,
+  comercial,
 }: ContractSignFlowProps) {
   const [step, setStep] = useState(0);
   const [nombre, setNombre] = useState(prefill.nombre);
@@ -85,6 +97,7 @@ export function ContractSignFlow({
     fechaFirmaDia: fecha.dia,
     fechaFirmaMes: fecha.mes,
     fechaFirmaAnio: fecha.anio,
+    ...comercial,
   };
 
   const isLast = step === TOTAL_STEPS - 1;
@@ -209,6 +222,17 @@ export function ContractSignFlow({
               aria-label="Ciudad o municipio"
             />
           </FieldBlock>
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm leading-relaxed text-neutral-800">
+            <p className="font-semibold text-black">Tu moto</p>
+            <p className="mt-1">
+              {comercial.marca} {comercial.modelo} · {comercial.color}
+            </p>
+            <p>Placa {comercial.placa} · Chasis {comercial.chasis}</p>
+            <p className="mt-2">
+              Cuota inicial {comercial.cuotaInicial} ·{" "}
+              {comercial.frecuenciaPago.toLowerCase()}: {comercial.valorCuota}
+            </p>
+          </div>
         </StepCard>
       )}
 

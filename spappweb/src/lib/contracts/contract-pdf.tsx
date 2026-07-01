@@ -191,6 +191,16 @@ function FirmaCol({
 export async function generateHojaVidaPdf(args: {
   hoja: Record<string, unknown>;
   signatureDataUrl: string;
+  comercial?: {
+    placa: string;
+    chasis: string;
+    color: string;
+    referencia: string;
+    modelo: string;
+    cuotaInicial: string;
+    valorCuota: string;
+    frecuenciaPago: string;
+  };
 }): Promise<Buffer> {
   const form: HojaVidaFormData = parseHojaVidaForm(args.hoja);
   const logo = await publicImage(EMPRESA_PROPIETARIA.logoFile);
@@ -200,6 +210,7 @@ export async function generateHojaVidaPdf(args: {
   const x = (cond: boolean) => (cond ? "X" : "_");
   const ref0 = form.referencias[0];
   const ref1 = form.referencias[1];
+  const c = args.comercial;
 
   const Line = ({ children }: { children: string }) => (
     <Text style={styles.line}>{children}</Text>
@@ -239,15 +250,15 @@ export async function generateHojaVidaPdf(args: {
           <Line>{`NOMBRE: ${ref1.nombre}    CELULAR: ${ref1.celular}`}</Line>
         )}
         <Line> </Line>
-        <Line>PLACA ASIGNADA: _____________________</Line>
-        <Line>CHASIS: ______________ COLOR: ________________ REFERENCIA: ___________</Line>
-        <Line>MODELO: ____________</Line>
+        <Line>{`PLACA ASIGNADA: ${c?.placa ?? "_____________________"}`}</Line>
+        <Line>{`CHASIS: ${c?.chasis ?? "______________"} COLOR: ${c?.color ?? "________________"} REFERENCIA: ${c?.referencia ?? "___________"}`}</Line>
+        <Line>{`MODELO: ${c?.modelo ?? "__________"}`}</Line>
         <Line>VISITA DOMICILIARIA: ________________________________</Line>
         <Text style={styles.sectionTitle}>FORMA DE PAGO</Text>
-        <Line>CUOTA INICIAL $__________ VISITA DOMICILIARIA $ ________ FECHA: ___________</Line>
+        <Line>{`CUOTA INICIAL ${c?.cuotaInicial ?? "$__________"} VISITA DOMICILIARIA $ ________ FECHA: ___________`}</Line>
         <Line>MEDIO EFECTIVO ___ NEQUI _____BANCOLOMBIA ___ DAVIPLATA __DAVIVIENDA</Line>
         <Line>MEDIO PAGO-REFRENCIA ________ ____________ _________ _________________</Line>
-        <Line>VALOR CUOTA: $ __________ TIEMPO: ________ MODALIDAD PAGO: ____________</Line>
+        <Line>{`VALOR CUOTA: ${c?.valorCuota ?? "$ __________"} TIEMPO: ${c?.frecuenciaPago ?? "________"} MODALIDAD PAGO: ${c?.frecuenciaPago ?? "__________"}`}</Line>
         <Line>OTRAS DEUDAS: ___________ CONCEPTO _____________PLAZO PAGO ___________</Line>
         <Line>COMISION: _______________________________</Line>
         <Line>FECHA DE ENTREGA: ________________________</Line>
