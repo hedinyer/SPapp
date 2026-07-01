@@ -742,6 +742,20 @@ export async function getAllBikes(): Promise<BikeRow[]> {
   return (data as BikeRow[]) ?? [];
 }
 
+export async function getAvailableBikes(): Promise<BikeRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("bike_table")
+    .select(
+      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, descripcion, activo",
+    )
+    .eq("activo", true)
+    .gt("stock", 0)
+    .order("modelo")
+    .order("color");
+  return (data as BikeRow[]) ?? [];
+}
+
 export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
   const supabase = createAdminClient();
   const [{ data }, { data: atrasos }] = await Promise.all([

@@ -47,6 +47,14 @@ export function ClientPipelineView({
               contractSigned={contractSigned}
             />
           )}
+          {contractSigned && !pipeline.compra && (
+            <MotoSelectionPanel
+              contract={pipeline.contract}
+              compra={pipeline.compra}
+              contractId={contractId}
+              clienteCelular={clienteCelular}
+            />
+          )}
           {adminStep === "pago" && (
             <PaymentConfirmPanel
               compra={pipeline.compra}
@@ -69,7 +77,9 @@ export function ClientPipelineView({
             <RentingPanel pipeline={pipeline} userId={userId} />
           )}
 
-          {!adminStep && pipeline.compra?.estado !== "entregada" && (
+          {!adminStep &&
+            pipeline.compra?.estado !== "entregada" &&
+            !(contractSigned && !pipeline.compra) && (
             <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-10 text-center text-sm text-neutral-600">
               No hay acciones pendientes de tu parte. El cliente continúa en
               la app.
@@ -94,6 +104,8 @@ export function ClientPipelineView({
               <MotoSelectionPanel
                 contract={pipeline.contract}
                 compra={pipeline.compra}
+                contractId={contractId}
+                clienteCelular={clienteCelular}
               />
               {adminStep !== "pago" && (
                 <PaymentConfirmPanel

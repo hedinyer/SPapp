@@ -1,3 +1,7 @@
+"use client";
+
+import { Copy, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 import type {
   ContractStatus,
   DigitalContractRow,
@@ -5,11 +9,18 @@ import type {
 } from "@/lib/pipeline/types";
 import { FRECUENCIA_LABELS, COMPRA_ESTADO_LABELS } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "https://s-papp-mauve.vercel.app";
 
 interface MotoSelectionPanelProps {
   contract: DigitalContractRow | null;
   compra: UserMotoCompraRow | null;
+  contractId?: string | null;
+  clienteCelular?: string | null;
 }
 
 function contractSigned(contract: DigitalContractRow | null): boolean {
@@ -19,6 +30,8 @@ function contractSigned(contract: DigitalContractRow | null): boolean {
 export function MotoSelectionPanel({
   contract,
   compra,
+  contractId,
+  clienteCelular,
 }: MotoSelectionPanelProps) {
   if (!contractSigned(contract)) {
     return (
@@ -33,8 +46,20 @@ export function MotoSelectionPanel({
   if (!compra) {
     return (
       <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
-          Esperando que el cliente elija su moto en la app.
+        <CardHeader>
+          <CardTitle className="text-lg">Selección de moto</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {contractId ? (
+            <ShareMotoLinkCard
+              contractId={contractId}
+              celular={clienteCelular}
+            />
+          ) : (
+            <p className="text-center text-sm text-neutral-500">
+              Esperando que el cliente elija su moto.
+            </p>
+          )}
         </CardContent>
       </Card>
     );
@@ -80,5 +105,54 @@ export function MotoSelectionPanel({
         </dl>
       </CardContent>
     </Card>
+  );
+}
+
+function ShareMotoLinkCard({
+  contractId,
+  celular,
+}: {
+  contractId: string;
+  celular?: string | null;
+}) {
+  const link = `${SITE_URL}/moto/${contractId}`;
+
+  function copy() {
+    navigator.clipboard
+      .writeText(link)
+      .then(() => toast.success("Link copiado."))
+      .catch(() => toast.error("No se pudo copiar."));
+  }
+
+  const mensaje = `Hola, ya puedes elegir tu moto aquí: ${link}`;
+  const digits = (celular ?? "").replace(/\D/g, "");
+  const waBase = digits ? `https://wa.me/57${digits}` : "https://wa.me/";
+  const waUrl = `${waBase}?text=${encodeURIComponent(mensaje)}`;
+
+  return (
+    <div className="space-y-3 rounded-lg border border-blue-300 bg-blue-50 p-4">
+      <p className="text-sm font-medium text-blue-900">
+        Link para que el cliente elija moto, modelo y color
+      </p>
+      <p className="break-all rounded-md border border-blue-200 bg-white px-3 py-2 text-xs text-neutral-700">
+        {link}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" onClick={copy}>
+          <Copy className="mr-1.5 h-4 w-4" />
+          Copiar link
+        </Button>
+        <Button
+          size="sm"
+          className="bg-green-600 text-white hover:bg-green-700"
+          asChild
+        >
+          <a href={waUrl} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="mr-1.5 h-4 w-4" />
+            Enviar por WhatsApp
+          </a>
+        </Button>
+      </div>
+    </div>
   );
 }

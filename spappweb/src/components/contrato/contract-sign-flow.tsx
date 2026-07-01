@@ -148,9 +148,14 @@ export function ContractSignFlow({
         <CheckCircle2 className="h-16 w-16 text-green-600" strokeWidth={1.5} />
         <h2 className="mt-4 text-2xl font-bold text-black">¡Contrato firmado!</h2>
         <p className="mt-3 text-base leading-relaxed text-neutral-700">
-          Tus documentos fueron firmados y guardados correctamente. Ya puedes
-          cerrar esta página.
+          Tus documentos fueron firmados y guardados correctamente.
         </p>
+        <a
+          href={`/moto/${contractId}`}
+          className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-black px-6 text-base font-semibold text-white"
+        >
+          Elegir mi moto
+        </a>
       </div>
     );
   }
