@@ -71,6 +71,13 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
 const SCAN_COOLDOWN_SEC = 5;
 const SCANNER_ID = "venta-scanner";
 
+function isTouchDevice(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches
+  );
+}
+
 export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
   const [cartOpen, setCartOpen] = useState(false);
@@ -159,6 +166,7 @@ export function VentaManager() {
     }
 
     flushSync(() => setCameraOn(true));
+    scannerInputRef.current?.blur();
 
     const container = scannerContainerRef.current;
     if (!container) {
@@ -198,7 +206,7 @@ export function VentaManager() {
   }, []);
 
   useEffect(() => {
-    if (!cameraOn) scannerInputRef.current?.focus();
+    if (!cameraOn && !isTouchDevice()) scannerInputRef.current?.focus();
   }, [cameraOn]);
 
   function onManualSkuSubmit() {
@@ -212,7 +220,7 @@ export function VentaManager() {
     const input = e.currentTarget;
     resolveSkuManual(input.value);
     input.value = "";
-    input.focus();
+    if (!isTouchDevice()) input.focus();
   }
 
   function onWhatsApp() {
@@ -231,11 +239,13 @@ export function VentaManager() {
         ref={scannerInputRef}
         type="text"
         autoComplete="off"
+        inputMode="none"
+        tabIndex={-1}
         aria-label="Escaneo con pistola lectora"
         className="pointer-events-none absolute h-0 w-0 opacity-0"
         onKeyDown={onScannerKeyDown}
         onBlur={() => {
-          if (!cameraOn) scannerInputRef.current?.focus();
+          if (!cameraOn && !isTouchDevice()) scannerInputRef.current?.focus();
         }}
       />
 
@@ -268,7 +278,7 @@ export function VentaManager() {
           <div
             id={SCANNER_ID}
             ref={scannerContainerRef}
-            className="relative min-h-[280px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
+            className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-neutral-200 bg-black [&_#qr-shaded-region]:hidden [&_video]:!absolute [&_video]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
           />
           {cooldownSec > 0 && (
             <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-black/60 text-white">

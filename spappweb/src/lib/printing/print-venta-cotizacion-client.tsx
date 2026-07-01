@@ -69,6 +69,16 @@ export async function shareCotizacionWhatsApp(
   const text = buildCotizacionText(lines);
   const filename = `cotizacion-${new Date().toISOString().slice(0, 10)}.pdf`;
   const file = new File([blob], filename, { type: "application/pdf" });
+  const waUrl = `https://wa.me/57${digits}?text=${encodeURIComponent(text)}`;
+
+  // ponytail: en celular wa.me abre el chat del cliente; share() no elige número
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches
+  ) {
+    window.location.assign(waUrl);
+    return;
+  }
 
   if (navigator.canShare?.({ files: [file], text })) {
     await navigator.share({ files: [file], text });
@@ -76,7 +86,6 @@ export async function shareCotizacionWhatsApp(
   }
 
   downloadPdf(blob, filename);
-  const waUrl = `https://wa.me/57${digits}?text=${encodeURIComponent(text + "\n\n(Adjunta el PDF descargado)")}`;
   window.open(waUrl, "_blank", "noopener,noreferrer");
   toast.info("Adjunta el PDF descargado en WhatsApp.");
 }

@@ -116,6 +116,8 @@ async function startNative(
   video.muted = true;
   video.autoplay = true;
   Object.assign(video.style, {
+    position: "absolute",
+    inset: "0",
     width: "100%",
     height: "100%",
     objectFit: "cover",
@@ -193,8 +195,6 @@ async function startHtml5(
     { facingMode: "environment" },
     {
       fps: 20,
-      // ponytail: frame completo — el QR se encuentra aunque la etiqueta traiga texto arriba/abajo
-      qrbox: (w, h) => ({ width: w, height: h }),
       disableFlip: false,
     },
     (text) => {
@@ -203,6 +203,17 @@ async function startHtml5(
     },
     () => {},
   );
+
+  const video = container.querySelector("video");
+  if (video instanceof HTMLVideoElement) {
+    Object.assign(video.style, {
+      position: "absolute",
+      inset: "0",
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    });
+  }
 
   return () => {
     void scanner.stop().catch(() => {});
