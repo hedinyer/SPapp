@@ -32,6 +32,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TouchSelect } from "@/components/ui/touch-select";
+import {
+  CIUDAD_DEFAULT,
+  DEPARTAMENTO_DEFAULT,
+  listCiudades,
+  listDepartamentos,
+} from "@/lib/colombia-locations";
 
 interface ContractSignFlowProps {
   contractId: string;
@@ -42,6 +49,11 @@ interface ContractSignFlowProps {
 // Pasos: datos, encabezado, un paso por bloque de clausulas, confirmar, firmar.
 const TOTAL_STEPS = 2 + blocks.length + 2;
 
+const departamentoOptions = listDepartamentos().map((d) => ({
+  value: d,
+  label: d,
+}));
+
 export function ContractSignFlow({
   contractId,
   prefill,
@@ -51,6 +63,8 @@ export function ContractSignFlow({
   const [nombre, setNombre] = useState(prefill.nombre);
   const [cedula, setCedula] = useState(prefill.cedula);
   const [direccion, setDireccion] = useState(prefill.direccion);
+  const [departamento, setDepartamento] = useState(DEPARTAMENTO_DEFAULT);
+  const [ciudad, setCiudad] = useState(CIUDAD_DEFAULT);
   const [aceptaClausulas, setAceptaClausulas] = useState(false);
   const [aceptaFirma, setAceptaFirma] = useState(false);
   const [done, setDone] = useState(false);
@@ -58,10 +72,16 @@ export function ContractSignFlow({
   const sigRef = useRef<SignaturePadHandle>(null);
 
   const fecha = colombiaDateParts();
+  const ciudadOptions = listCiudades(departamento).map((c) => ({
+    value: c,
+    label: c,
+  }));
   const formData: ContratoData = {
     nombreContratante: nombre,
     cedulaContratante: cedula,
     direccionNotificaciones: direccion,
+    ciudadContratante: ciudad,
+    departamentoContratante: departamento,
     fechaFirmaDia: fecha.dia,
     fechaFirmaMes: fecha.mes,
     fechaFirmaAnio: fecha.anio,
@@ -70,10 +90,16 @@ export function ContractSignFlow({
   const isLast = step === TOTAL_STEPS - 1;
   const isConfirm = step === TOTAL_STEPS - 2;
 
+  function handleDepartamentoChange(value: string) {
+    setDepartamento(value);
+    const ciudades = listCiudades(value);
+    setCiudad((prev) => (ciudades.includes(prev) ? prev : (ciudades[0] ?? "")));
+  }
+
   function next() {
     if (step === 0) {
-      if (!nombre.trim() || !cedula.trim() || !direccion.trim()) {
-        toast.error("Completa nombre, cédula y dirección.");
+      if (!nombre.trim() || !cedula.trim() || !direccion.trim() || !departamento || !ciudad) {
+        toast.error("Completa nombre, cédula, dirección, departamento y ciudad.");
         return;
       }
     }
@@ -105,6 +131,8 @@ export function ContractSignFlow({
           nombre: nombre.trim(),
           cedula: cedula.trim(),
           direccion: direccion.trim(),
+          departamento,
+          ciudad,
           firmaPngBase64: dataUrl,
         });
         setDone(true);
@@ -156,6 +184,24 @@ export function ContractSignFlow({
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
               rows={2}
+            />
+          </FieldBlock>
+          <FieldBlock label="Departamento">
+            <TouchSelect
+              value={departamento}
+              onChange={handleDepartamentoChange}
+              options={departamentoOptions}
+              className={fieldInputClass}
+              aria-label="Departamento"
+            />
+          </FieldBlock>
+          <FieldBlock label="Ciudad o municipio">
+            <TouchSelect
+              value={ciudad}
+              onChange={setCiudad}
+              options={ciudadOptions}
+              className={fieldInputClass}
+              aria-label="Ciudad o municipio"
             />
           </FieldBlock>
         </StepCard>
@@ -236,6 +282,7 @@ export function ContractSignFlow({
               `Contratante: ${nombre}`,
               `Cédula: ${cedula}`,
               `Dirección: ${direccion}`,
+              `Ciudad: ${ciudad}, ${departamento}`,
             ]}
           />
           <div>

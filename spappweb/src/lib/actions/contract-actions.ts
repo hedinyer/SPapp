@@ -19,6 +19,8 @@ const signSchema = z.object({
   nombre: z.string().trim().min(1, "Escribe tu nombre"),
   cedula: z.string().trim().min(1, "Escribe tu cédula"),
   direccion: z.string().trim().min(1, "Escribe tu dirección"),
+  departamento: z.string().trim().min(1, "Selecciona el departamento"),
+  ciudad: z.string().trim().min(1, "Selecciona la ciudad"),
   firmaPngBase64: z.string().regex(/^data:image\/png;base64,/, "Firma inválida"),
 });
 
@@ -54,6 +56,8 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     nombreContratante: parsed.nombre,
     cedulaContratante: parsed.cedula,
     direccionNotificaciones: parsed.direccion,
+    ciudadContratante: parsed.ciudad,
+    departamentoContratante: parsed.departamento,
     fechaFirmaDia: fecha.dia,
     fechaFirmaMes: fecha.mes,
     fechaFirmaAnio: fecha.anio,
@@ -105,6 +109,8 @@ export async function signContract(input: z.infer<typeof signSchema>) {
         nombre_contratante: parsed.nombre,
         cedula_contratante: parsed.cedula,
         direccion_notificaciones: parsed.direccion,
+        ciudad_contratante: parsed.ciudad,
+        departamento_contratante: parsed.departamento,
         fecha_firma_dia: fecha.dia,
         fecha_firma_mes: fecha.mes,
         fecha_firma_anio: fecha.anio,

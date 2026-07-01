@@ -20,6 +20,8 @@ export interface ContratoData {
   nombreContratante: string;
   cedulaContratante: string;
   direccionNotificaciones: string;
+  ciudadContratante: string;
+  departamentoContratante: string;
   fechaFirmaDia: string;
   fechaFirmaMes: string;
   fechaFirmaAnio: string;
@@ -38,7 +40,7 @@ export interface ClausulaBlock {
 export const introTemplate = `El día [DIA] del mes de [MES] de [ANIO], en la ciudad de Bucaramanga, Santander, entre los suscrito a saber,
 NICOLAS FELIPE GARRIDO PINILLA, mayor de edad, vecino y domiciliado en la ciudad de Bucaramanga, identificado como
 aparece al pie de su firma, quien en adelante se denominará LA PROPIETARIA, y por otro
-[NOMBRE_CONTRATANTE], mayor de edad, vecino y domiciliado en Bucaramanga,
+[NOMBRE_CONTRATANTE], mayor de edad, vecino y domiciliado en [CIUDAD_CONTRATANTE], [DEPARTAMENTO_CONTRATANTE],
 quien se identifica como aparece al pie de su firma y en adelante se denominará quien en adelante será
 denominado "EL CONTRATANTE", acuerdan celebrar un "CONTRATO DE RENTING" regido por las siguientes
 cláusulas:`;
@@ -165,7 +167,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DECIMA NOVENA",
         texto:
-          "Para efectos de notificaciones LA PROPIETARIA las recibirán en la dirección electrónica contacto@solucionesgarrido.com o en centro la calle 37 #20-49 Bucaramanga, y EL CONTRATANTE, en la dirección: [DIRECCION_NOTIFICACIONES]",
+          "Para efectos de notificaciones LA PROPIETARIA las recibirán en la dirección electrónica contacto@solucionesgarrido.com o en centro la calle 37 #20-49 Bucaramanga, y EL CONTRATANTE, en la dirección [DIRECCION_NOTIFICACIONES], ciudad de [CIUDAD_CONTRATANTE], departamento de [DEPARTAMENTO_CONTRATANTE]",
       },
       {
         titulo: "VIGÉSIMA",
@@ -185,7 +187,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "VIGESIMA TERCERA: DOMICILIO CONTRACTUAL",
         texto:
-          "Para todos los efectos legales del presente Contrato, se tendrá como domicilio contractual la ciudad de Bucaramanga.",
+          "Para todos los efectos legales del presente Contrato, se tendrá como domicilio contractual la ciudad de [CIUDAD_CONTRATANTE], departamento de [DEPARTAMENTO_CONTRATANTE].",
       },
     ],
   },
@@ -204,19 +206,32 @@ EL CONTRATANTE
 [NOMBRE_CONTRATANTE]
 C.C. [CEDULA_CONTRATANTE]`;
 
+function applyContratantePlaceholders(text: string, form: ContratoData): string {
+  return text
+    .replaceAll("[CIUDAD_CONTRATANTE]", form.ciudadContratante || "_________________________")
+    .replaceAll(
+      "[DEPARTAMENTO_CONTRATANTE]",
+      form.departamentoContratante || "_________________________",
+    )
+    .replaceAll(
+      "[DIRECCION_NOTIFICACIONES]",
+      form.direccionNotificaciones || "_________________________",
+    );
+}
+
 export function renderIntro(form: ContratoData): string {
-  return introTemplate
-    .replaceAll("[DIA]", form.fechaFirmaDia)
-    .replaceAll("[MES]", form.fechaFirmaMes)
-    .replaceAll("[ANIO]", form.fechaFirmaAnio)
-    .replaceAll("[NOMBRE_CONTRATANTE]", form.nombreContratante);
+  return applyContratantePlaceholders(
+    introTemplate
+      .replaceAll("[DIA]", form.fechaFirmaDia)
+      .replaceAll("[MES]", form.fechaFirmaMes)
+      .replaceAll("[ANIO]", form.fechaFirmaAnio)
+      .replaceAll("[NOMBRE_CONTRATANTE]", form.nombreContratante),
+    form,
+  );
 }
 
 export function renderClausulaTexto(texto: string, form: ContratoData): string {
-  return texto.replaceAll(
-    "[DIRECCION_NOTIFICACIONES]",
-    form.direccionNotificaciones || "_________________________",
-  );
+  return applyContratantePlaceholders(texto, form);
 }
 
 export function renderFirma(form: ContratoData): string {
