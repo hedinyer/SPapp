@@ -9,6 +9,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { flushSync } from "react-dom";
 import { Camera, CameraOff, MessageCircle, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { lookupProductoBySku } from "@/lib/actions/venta-actions";
@@ -68,6 +69,7 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
 }
 
 const SCAN_COOLDOWN_SEC = 5;
+const SCANNER_ID = "venta-scanner";
 
 export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
@@ -81,6 +83,8 @@ export function VentaManager() {
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
   const scanLockRef = useRef(false);
+  const stopScannerRef = useRef<(() => void) | null>(null);
+  const onCodeRef = useRef<(code: string) => void>(() => {});
   const cooldownTimerRef = useRef<number | null>(null);
 
   const total = useMemo(() => cartTotal(lines), [lines]);
@@ -140,6 +144,40 @@ export function VentaManager() {
     },
     [lookupAndAdd, startCooldown],
   );
+  onCodeRef.current = resolveSkuFromCamera;
+
+  const stopCamera = useCallback(() => {
+    stopScannerRef.current?.();
+    stopScannerRef.current = null;
+    setCameraOn(false);
+  }, []);
+
+  const toggleCamera = useCallback(async () => {
+    if (cameraOn) {
+      stopCamera();
+      return;
+    }
+
+    flushSync(() => setCameraOn(true));
+
+    const container = scannerContainerRef.current;
+    if (!container) {
+      toast.error("No se pudo acceder a la cámara.");
+      setCameraOn(false);
+      return;
+    }
+
+    try {
+      stopScannerRef.current = await startQrScanner(
+        container,
+        (code) => onCodeRef.current(code),
+        () => scanLockRef.current,
+      );
+    } catch {
+      toast.error("No se pudo acceder a la cámara.");
+      setCameraOn(false);
+    }
+  }, [cameraOn, stopCamera]);
 
   const resolveSkuManual = useCallback(
     (raw: string) => {
@@ -155,42 +193,13 @@ export function VentaManager() {
       if (cooldownTimerRef.current) {
         window.clearInterval(cooldownTimerRef.current);
       }
+      stopScannerRef.current?.();
     };
   }, []);
 
   useEffect(() => {
-    if (!cameraOn) {
-      scannerInputRef.current?.focus();
-      return;
-    }
-
-    const container = scannerContainerRef.current;
-    if (!container) return;
-
-    let stop: (() => void) | null = null;
-    let cancelled = false;
-
-    void startQrScanner(
-      container,
-      (code) => resolveSkuFromCamera(code),
-      () => scanLockRef.current,
-    )
-      .then((stopFn) => {
-        if (cancelled) stopFn();
-        else stop = stopFn;
-      })
-      .catch(() => {
-        if (!cancelled) {
-          toast.error("No se pudo acceder a la cámara.");
-          setCameraOn(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-      stop?.();
-    };
-  }, [cameraOn, resolveSkuFromCamera]);
+    if (!cameraOn) scannerInputRef.current?.focus();
+  }, [cameraOn]);
 
   function onManualSkuSubmit() {
     resolveSkuManual(manualSku);
@@ -238,7 +247,7 @@ export function VentaManager() {
           type="button"
           variant={cameraOn ? "default" : "outline"}
           size="sm"
-          onClick={() => setCameraOn((v) => !v)}
+          onClick={() => void toggleCamera()}
         >
           {cameraOn ? (
             <>
@@ -257,8 +266,9 @@ export function VentaManager() {
       {cameraOn && (
         <div className="relative mx-auto mt-4 w-full max-w-[320px]">
           <div
+            id={SCANNER_ID}
             ref={scannerContainerRef}
-            className="relative min-h-[280px] overflow-hidden rounded-lg border border-neutral-200 bg-black"
+            className="relative min-h-[280px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
           />
           {cooldownSec > 0 && (
             <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-black/60 text-white">
@@ -290,7 +300,7 @@ export function VentaManager() {
             }
           }}
           onFocus={() => {
-            if (cameraOn) setCameraOn(false);
+            if (cameraOn) stopCamera();
           }}
         />
         <Button type="button" variant="outline" onClick={onManualSkuSubmit}>

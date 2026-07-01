@@ -13,6 +13,29 @@ declare global {
   }
 }
 
+async function getCameraStream(): Promise<MediaStream> {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error("Camera API not available");
+  }
+
+  const attempts: MediaStreamConstraints[] = [
+    { video: { facingMode: { ideal: "environment" } }, audio: false },
+    { video: { facingMode: "environment" }, audio: false },
+    { video: { facingMode: "user" }, audio: false },
+    { video: true, audio: false },
+  ];
+
+  let lastError: unknown;
+  for (const constraints of attempts) {
+    try {
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
 async function startNative(
   container: HTMLElement,
   onCode: (code: string) => void,
@@ -20,6 +43,7 @@ async function startNative(
 ): Promise<QrScannerStop> {
   const video = document.createElement("video");
   video.playsInline = true;
+  video.setAttribute("playsinline", "true");
   video.muted = true;
   video.autoplay = true;
   Object.assign(video.style, {
@@ -30,16 +54,7 @@ async function startNative(
   });
   container.replaceChildren(video);
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: { ideal: "environment" },
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
-      // @ts-expect-error focusMode no está en todos los typings
-      focusMode: { ideal: "continuous" },
-    },
-    audio: false,
-  });
+  const stream = await getCameraStream();
   video.srcObject = stream;
   await video.play();
 
@@ -90,14 +105,16 @@ async function startHtml5(
   });
 
   await scanner.start(
+    { facingMode: "environment" },
     {
-      facingMode: "environment",
-      width: { ideal: 1920 },
-      height: { ideal: 1080 },
-    },
-    {
-      fps: 30,
-      qrbox: (w, h) => ({ width: w, height: h }),
+      fps: 15,
+      qrbox: (viewfinderWidth, viewfinderHeight) => {
+        const edge = Math.floor(
+          Math.min(viewfinderWidth, viewfinderHeight) * 0.75,
+        );
+        return { width: edge, height: edge };
+      },
+      aspectRatio: 1,
       disableFlip: false,
     },
     (text) => {
@@ -122,10 +139,14 @@ export async function startQrScanner(
     try {
       const formats = await window.BarcodeDetector.getSupportedFormats();
       if (formats.includes("qr_code")) {
-        return startNative(container, onCode, locked);
+        try {
+          return await startNative(container, onCode, locked);
+        } catch {
+          container.replaceChildren();
+        }
       }
     } catch {
-      /* fallback */
+      container.replaceChildren();
     }
   }
   return startHtml5(container, onCode, locked);
