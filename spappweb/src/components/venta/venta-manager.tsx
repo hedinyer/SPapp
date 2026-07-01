@@ -37,6 +37,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { startQrScanner } from "@/lib/venta/start-qr-scanner";
 
 type CartLine = VentaCartLine & { productoId: number };
 
@@ -67,7 +68,6 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
 }
 
 const SCAN_COOLDOWN_SEC = 5;
-const SCANNER_ID = "venta-scanner";
 
 export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
@@ -79,8 +79,8 @@ export function VentaManager() {
   const [pending, startTransition] = useTransition();
 
   const scannerInputRef = useRef<HTMLInputElement>(null);
+  const scannerContainerRef = useRef<HTMLDivElement>(null);
   const scanLockRef = useRef(false);
-  const qrScannerRef = useRef<import("html5-qrcode").Html5Qrcode | null>(null);
   const cooldownTimerRef = useRef<number | null>(null);
 
   const total = useMemo(() => cartTotal(lines), [lines]);
@@ -101,7 +101,6 @@ export function VentaManager() {
 
     scanLockRef.current = true;
     setCooldownSec(SCAN_COOLDOWN_SEC);
-    qrScannerRef.current?.pause(true);
 
     cooldownTimerRef.current = window.setInterval(() => {
       setCooldownSec((prev) => {
@@ -111,7 +110,6 @@ export function VentaManager() {
             cooldownTimerRef.current = null;
           }
           scanLockRef.current = false;
-          qrScannerRef.current?.resume();
           return 0;
         }
         return prev - 1;
@@ -162,67 +160,35 @@ export function VentaManager() {
 
   useEffect(() => {
     if (!cameraOn) {
-      if (qrScannerRef.current) {
-        void qrScannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            qrScannerRef.current?.clear();
-            qrScannerRef.current = null;
-          });
-      }
       scannerInputRef.current?.focus();
       return;
     }
 
+    const container = scannerContainerRef.current;
+    if (!container) return;
+
+    let stop: (() => void) | null = null;
     let cancelled = false;
 
-    void import("html5-qrcode").then(({ Html5Qrcode, Html5QrcodeSupportedFormats }) => {
-      if (cancelled) return;
-
-      const scanner = new Html5Qrcode(SCANNER_ID, {
-        formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-        verbose: false,
+    void startQrScanner(
+      container,
+      (code) => resolveSkuFromCamera(code),
+      () => scanLockRef.current,
+    )
+      .then((stopFn) => {
+        if (cancelled) stopFn();
+        else stop = stopFn;
+      })
+      .catch(() => {
+        if (!cancelled) {
+          toast.error("No se pudo acceder a la cámara.");
+          setCameraOn(false);
+        }
       });
-      qrScannerRef.current = scanner;
-
-      scanner
-        .start(
-          { facingMode: "environment" },
-          {
-            fps: 15,
-            qrbox: (viewfinderWidth, viewfinderHeight) => {
-              const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.75);
-              return { width: edge, height: edge };
-            },
-            aspectRatio: 1,
-            disableFlip: false,
-          },
-          (decodedText) => {
-            if (cancelled || scanLockRef.current) return;
-            resolveSkuFromCamera(decodedText);
-          },
-          () => {},
-        )
-        .catch(() => {
-          if (!cancelled) {
-            toast.error("No se pudo acceder a la cámara.");
-            setCameraOn(false);
-          }
-        });
-    });
 
     return () => {
       cancelled = true;
-      if (qrScannerRef.current) {
-        void qrScannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            qrScannerRef.current?.clear();
-            qrScannerRef.current = null;
-          });
-      }
+      stop?.();
     };
   }, [cameraOn, resolveSkuFromCamera]);
 
@@ -291,8 +257,8 @@ export function VentaManager() {
       {cameraOn && (
         <div className="relative mx-auto mt-4 w-full max-w-[320px]">
           <div
-            id={SCANNER_ID}
-            className="relative min-h-[260px] overflow-hidden rounded-lg border border-neutral-200 bg-black [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
+            ref={scannerContainerRef}
+            className="relative min-h-[280px] overflow-hidden rounded-lg border border-neutral-200 bg-black"
           />
           {cooldownSec > 0 && (
             <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-black/60 text-white">
@@ -306,7 +272,7 @@ export function VentaManager() {
             </div>
           )}
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta al QR de la etiqueta (10–20 cm), con buena luz.
+            Apunta al QR; lee en movimiento, no hace falta enfocar perfecto.
           </p>
         </div>
       )}

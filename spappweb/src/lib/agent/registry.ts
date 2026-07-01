@@ -502,6 +502,7 @@ export const AGENT_TOOLS = {
       nombre: z.string().min(1),
       descripcion: z.string().optional(),
       precio: z.number().int().min(0),
+      costo: z.number().int().min(0),
       stock: z.number().int().min(0),
       stockMinimo: z.number().int().min(0),
       imagenUrl: z.string().optional(),

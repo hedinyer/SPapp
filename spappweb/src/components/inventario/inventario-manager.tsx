@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { usePollingRefresh } from "@/hooks/use-polling-refresh";
@@ -114,6 +114,7 @@ export function InventarioManager({
                 <TableHead>SKU</TableHead>
                 <TableHead>Categoría</TableHead>
                 <TableHead>Precio</TableHead>
+                <TableHead>Costo</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="w-32" />
@@ -148,6 +149,7 @@ export function InventarioManager({
                       {p.inventario_categorias?.nombre ?? "—"}
                     </TableCell>
                     <TableCell>{formatCop(p.precio)}</TableCell>
+                    <TableCell>{formatCop(p.costo ?? 0)}</TableCell>
                     <TableCell>
                       <span className={lowStock ? "font-medium text-red-700" : ""}>
                         {p.stock}
@@ -259,6 +261,10 @@ export function InventarioManager({
                   <div className="flex justify-between gap-2">
                     <dt className="text-neutral-500">Precio</dt>
                     <dd>{formatCop(p.precio)}</dd>
+                  </div>
+                  <div className="flex justify-between gap-2">
+                    <dt className="text-neutral-500">Costo</dt>
+                    <dd>{formatCop(p.costo ?? 0)}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
                     <dt className="text-neutral-500">Stock</dt>
@@ -585,13 +591,14 @@ function CategoriaDialog({
     setActivo(editing?.activo ?? true);
   }
 
+  useEffect(() => {
+    if (open) load();
+  }, [open, editing]);
+
   return (
     <Dialog
       open={open}
-      onOpenChange={(v) => {
-        onOpenChange(v);
-        if (v) load();
-      }}
+      onOpenChange={onOpenChange}
     >
       <DialogContent className="bg-white">
         <DialogHeader>
@@ -662,6 +669,7 @@ function ProductoDialog({
     nombre: string;
     descripcion: string;
     precio: number;
+    costo: number;
     stock: number;
     stockMinimo: number;
     imagenUrl: string;
@@ -675,6 +683,7 @@ function ProductoDialog({
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("0");
+  const [costo, setCosto] = useState("0");
   const [stock, setStock] = useState("0");
   const [stockMinimo, setStockMinimo] = useState("0");
   const [imagenUrl, setImagenUrl] = useState("");
@@ -688,6 +697,7 @@ function ProductoDialog({
     setNombre(editing?.nombre ?? "");
     setDescripcion(editing?.descripcion ?? "");
     setPrecio(String(editing?.precio ?? 0));
+    setCosto(String(editing?.costo ?? 0));
     setStock(String(editing?.stock ?? 0));
     setStockMinimo(String(editing?.stock_minimo ?? 0));
     setImagenUrl(editing?.imagen_url ?? "");
@@ -696,13 +706,14 @@ function ProductoDialog({
     setActivo(editing?.activo ?? true);
   }
 
+  useEffect(() => {
+    if (open) load();
+  }, [open, editing]);
+
   return (
     <Dialog
       open={open}
-      onOpenChange={(v) => {
-        onOpenChange(v);
-        if (v) load();
-      }}
+      onOpenChange={onOpenChange}
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
@@ -724,6 +735,7 @@ function ProductoDialog({
           <Field label="SKU" value={sku} onChange={setSku} />
           <Field label="Nombre" value={nombre} onChange={setNombre} />
           <Field label="Precio" value={precio} onChange={setPrecio} type="number" />
+          <Field label="Costo" value={costo} onChange={setCosto} type="number" />
           <Field label="Stock" value={stock} onChange={setStock} type="number" />
           <Field
             label="Stock mínimo"
@@ -778,6 +790,7 @@ function ProductoDialog({
                 nombre,
                 descripcion,
                 precio: Number(precio),
+                costo: Number(costo),
                 stock: Number(stock),
                 stockMinimo: Number(stockMinimo),
                 imagenUrl,

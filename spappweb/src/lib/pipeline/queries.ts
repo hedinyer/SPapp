@@ -674,14 +674,14 @@ export async function getAllProductos(): Promise<InventarioProductoRow[]> {
   const { data } = await supabase
     .from("inventario_productos")
     .select(
-      "id, categoria_id, sku, nombre, descripcion, precio, stock, stock_minimo, imagen_url, compatible_modelos, activo, inventario_categorias(id, nombre, slug, descripcion, activo, orden)",
+      "id, categoria_id, sku, nombre, descripcion, precio, costo, stock, stock_minimo, imagen_url, compatible_modelos, activo, inventario_categorias(id, nombre, slug, descripcion, activo, orden)",
     )
     .order("nombre");
   return ((data ?? []) as unknown as InventarioProductoRow[]);
 }
 
 const productoSelect =
-  "id, categoria_id, sku, nombre, descripcion, precio, stock, stock_minimo, imagen_url, compatible_modelos, activo, inventario_categorias(id, nombre, slug, descripcion, activo, orden)";
+  "id, categoria_id, sku, nombre, descripcion, precio, costo, stock, stock_minimo, imagen_url, compatible_modelos, activo, inventario_categorias(id, nombre, slug, descripcion, activo, orden)";
 
 export async function getProductoBySku(
   sku: string,

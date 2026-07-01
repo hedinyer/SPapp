@@ -484,6 +484,7 @@ export interface InventarioProductoRow {
   nombre: string;
   descripcion: string | null;
   precio: number;
+  costo: number;
   stock: number;
   stock_minimo: number;
   imagen_url: string | null;
