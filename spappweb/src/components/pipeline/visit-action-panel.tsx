@@ -266,7 +266,10 @@ function AssignForm({
   highlight?: boolean;
   onAssign: (visitadorId: number, fecha: string) => void;
 }) {
-  const [visitadorId, setVisitadorId] = useState<string>("");
+  const [visitadorId, setVisitadorId] = useState("");
+  const [fecha, setFecha] = useState(
+    () => visita.fecha_programada?.slice(0, 16) ?? "",
+  );
 
   return (
     <form
@@ -277,14 +280,17 @@ function AssignForm({
       }`}
       onSubmit={(e) => {
         e.preventDefault();
-        const fd = new FormData(e.currentTarget);
-        const fecha = String(fd.get("fecha"));
         const id = Number(visitadorId);
-        if (!id || !fecha) {
+        if (!id || !fecha.trim()) {
           toast.error("Selecciona visitador y fecha.");
           return;
         }
-        onAssign(id, new Date(fecha).toISOString());
+        const parsed = new Date(fecha);
+        if (Number.isNaN(parsed.getTime())) {
+          toast.error("Fecha inválida.");
+          return;
+        }
+        onAssign(id, parsed.toISOString());
       }}
     >
       <p className="text-sm font-medium">
@@ -297,6 +303,7 @@ function AssignForm({
             aria-label="Visitador"
             value={visitadorId}
             required
+            placeholder="Selecciona visitador"
             onChange={setVisitadorId}
             options={visitadores.map((v) => ({
               value: String(v.id),
@@ -312,11 +319,8 @@ function AssignForm({
             type="datetime-local"
             className="min-h-11 touch-manipulation text-base md:text-sm"
             required
-            defaultValue={
-              visita.fecha_programada
-                ? visita.fecha_programada.slice(0, 16)
-                : undefined
-            }
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
           />
         </div>
       </div>

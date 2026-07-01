@@ -11,8 +11,10 @@ type TouchSelectProps = {
   options: TouchSelectOption[];
   className?: string;
   id?: string;
+  name?: string;
   disabled?: boolean;
   required?: boolean;
+  placeholder?: string;
   "aria-label"?: string;
 };
 
@@ -22,13 +24,16 @@ export function TouchSelect({
   options,
   className,
   id,
+  name,
   disabled,
   required,
+  placeholder,
   "aria-label": ariaLabel,
 }: TouchSelectProps) {
   return (
     <select
       id={id}
+      name={name}
       value={value}
       disabled={disabled}
       required={required}
@@ -39,6 +44,9 @@ export function TouchSelect({
         className,
       )}
     >
+      {placeholder != null && (
+        <option value="">{placeholder}</option>
+      )}
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}
