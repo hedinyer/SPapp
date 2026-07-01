@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import {
   checkReferenciaPagoUsada,
   confirmPagoConComprobante,
-  parseComprobanteOcr,
 } from "@/lib/actions/payment-comprobante-actions";
+import { ocrReceiptFile } from "@/lib/payments/receipt-ocr-client";
 import { isReferenciaDuplicada } from "@/lib/payments/referencia";
 import {
   BANCO_ORIGEN_LABELS,
@@ -155,9 +155,7 @@ export function PaymentComprobanteDialog({
 
     startOcrTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.set("file", file);
-        const result = await parseComprobanteOcr(formData);
+        const result = await ocrReceiptFile(file);
 
         setConfidence(result.confidence);
         if (result.referencia) setReferencia(result.referencia);

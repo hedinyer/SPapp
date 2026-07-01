@@ -5,7 +5,6 @@ import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
-import { ocrReceiptImage } from "@/lib/payments/receipt-ocr";
 import {
   faltanteConcepto,
   type PrimerPagoConcepto,
@@ -178,21 +177,6 @@ export async function checkReferenciaPagoUsada(input: {
       normalizada,
       (data ?? []).map((row) => String(row.referencia)),
     ),
-  };
-}
-
-export async function parseComprobanteOcr(formData: FormData) {
-  await requireAdminSession();
-  const file = validateImageFile(formData.get("file"));
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const result = await ocrReceiptImage(bytes);
-
-  return {
-    referencia: result.referencia,
-    monto: result.monto,
-    fechaComprobante: result.fechaComprobante,
-    bancoDetectado: result.bancoDetectado,
-    confidence: result.confidence,
   };
 }
 

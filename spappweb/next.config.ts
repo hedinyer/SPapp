@@ -8,7 +8,7 @@ const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? "")
 const nextConfig: NextConfig = {
   ...(allowedDevOrigins.length > 0 ? { allowedDevOrigins } : {}),
   reactCompiler: true,
-  serverExternalPackages: ["tesseract.js", "sharp"],
+  serverExternalPackages: ["sharp"],
   experimental: {
     serverActions: {
       // Fotos de cámara móvil pueden superar 1 MB (límite por defecto de Next.js)
