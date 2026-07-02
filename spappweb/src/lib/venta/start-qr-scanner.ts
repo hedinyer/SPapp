@@ -1,26 +1,6 @@
-import {
-  Html5Qrcode,
-  Html5QrcodeSupportedFormats,
-} from "html5-qrcode";
+import QrScanner from "qr-scanner";
 
 export type QrScannerStop = () => void;
-
-type BarcodeDetectorLike = {
-  detect: (source: ImageBitmapSource) => Promise<{ rawValue?: string }[]>;
-};
-
-declare global {
-  interface Window {
-    BarcodeDetector?: {
-      new (opts: { formats: string[] }): BarcodeDetectorLike;
-      getSupportedFormats: () => Promise<string[]>;
-    };
-  }
-}
-
-/** Marco guía (etiqueta 30×20 mm). La detección usa el frame completo. */
-const GUIDE_WIDTH_RATIO = 0.75;
-const GUIDE_HEIGHT_RATIO = 0.5;
 
 function isCoarsePointer(): boolean {
   return (
@@ -40,7 +20,12 @@ export function cameraErrorMessage(err: unknown): string {
       : err instanceof Error
         ? err.name
         : "";
-  const msg = err instanceof Error ? err.message : String(err);
+  const msg =
+    err instanceof Error
+      ? err.message
+      : typeof err === "string"
+        ? err
+        : String(err);
   if (
     name === "NotAllowedError" ||
     /not allowed|permission denied/i.test(msg)
@@ -50,111 +35,27 @@ export function cameraErrorMessage(err: unknown): string {
   if (!window.isSecureContext) {
     return "La cámara solo funciona con HTTPS (o localhost).";
   }
-  if (name === "NotFoundError" || /not found|no camera/i.test(msg)) {
+  if (
+    name === "NotFoundError" ||
+    /not found|no camera|camera not found/i.test(msg)
+  ) {
     return "No se encontró cámara en este dispositivo.";
   }
   return "No se pudo acceder a la cámara. Toca Cámara e intenta de nuevo.";
 }
 
-async function getCameraStream(): Promise<MediaStream> {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    throw new Error("Camera API not available");
-  }
-
-  const attempts: MediaStreamConstraints[] = [
-    { video: { facingMode: { ideal: "environment" } }, audio: false },
-    { video: { facingMode: "environment" }, audio: false },
-    { video: { facingMode: "user" }, audio: false },
-    { video: true, audio: false },
-  ];
-
-  let lastError: unknown;
-  for (const constraints of attempts) {
-    try {
-      return await navigator.mediaDevices.getUserMedia(constraints);
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  throw lastError;
-}
-
-function addScanOverlay(container: HTMLElement): HTMLElement {
-  container.style.position = "relative";
-
-  const overlay = document.createElement("div");
-  Object.assign(overlay.style, {
-    position: "absolute",
-    inset: "0",
-    pointerEvents: "none",
-    zIndex: "2",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+function prepareScannerMount(container: HTMLElement): void {
+  Object.assign(container.style, {
+    width: "100%",
+    height: "100%",
+    minHeight: "0",
+    position: "relative",
+    overflow: "hidden",
+    background: "#000",
   });
-
-  const hole = document.createElement("div");
-  Object.assign(hole.style, {
-    width: `${GUIDE_WIDTH_RATIO * 100}%`,
-    height: `${GUIDE_HEIGHT_RATIO * 100}%`,
-    maxWidth: "240px",
-    maxHeight: "160px",
-    boxShadow: "0 0 0 9999px rgba(0,0,0,0.55)",
-    border: "2px solid rgba(255,255,255,0.9)",
-    borderRadius: "10px",
-    boxSizing: "border-box",
-  });
-
-  overlay.appendChild(hole);
-  container.appendChild(overlay);
-  return overlay;
 }
 
-function styleScannerVideo(container: HTMLElement): void {
-  const video = container.querySelector("video");
-  if (video instanceof HTMLVideoElement) {
-    Object.assign(video.style, {
-      position: "absolute",
-      inset: "0",
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-    });
-  }
-}
-
-function drawFullFrame(
-  ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
-  video: HTMLVideoElement,
-  rotationDeg: number,
-): void {
-  const vw = video.videoWidth;
-  const vh = video.videoHeight;
-  if (!vw || !vh) return;
-
-  const rot90 = rotationDeg === 90 || rotationDeg === 270;
-  canvas.width = rot90 ? vh : vw;
-  canvas.height = rot90 ? vw : vh;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (rotationDeg === 0) {
-    ctx.drawImage(video, 0, 0, vw, vh);
-    return;
-  }
-
-  const rad = (rotationDeg * Math.PI) / 180;
-  ctx.translate(canvas.width / 2, canvas.height / 2);
-  ctx.rotate(rad);
-  ctx.drawImage(video, -vw / 2, -vh / 2, vw, vh);
-}
-
-async function startNative(
-  container: HTMLElement,
-  onCode: (code: string) => void,
-  locked: () => boolean,
-): Promise<QrScannerStop> {
+function createPreviewVideo(): HTMLVideoElement {
   const video = document.createElement("video");
   video.playsInline = true;
   video.setAttribute("playsinline", "true");
@@ -168,60 +69,84 @@ async function startNative(
     height: "100%",
     objectFit: "cover",
     display: "block",
+    zIndex: "1",
+    transform: "translateZ(0)",
+    WebkitTransform: "translateZ(0)",
   });
-  container.replaceChildren(video);
+  return video;
+}
 
-  const stream = await getCameraStream();
-  video.srcObject = stream;
-  await video.play();
-
-  addScanOverlay(container);
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas not supported");
-
-  const detector = new window.BarcodeDetector!({ formats: ["qr_code"] });
-  const rotations = [0, 90, 180, 270];
-  let alive = true;
-  let busy = false;
-  let raf = 0;
-  let rotationIndex = 0;
-
-  const tick = () => {
-    if (!alive) return;
-    raf = requestAnimationFrame(tick);
-    if (busy || locked() || video.readyState < video.HAVE_ENOUGH_DATA) return;
-
-    busy = true;
-    const rotation = rotations[rotationIndex % rotations.length]!;
-    rotationIndex += 1;
-
-    drawFullFrame(ctx, canvas, video, rotation);
-    void detector
-      .detect(canvas)
-      .then((codes) => {
-        const raw = codes[0]?.rawValue?.trim();
-        if (raw && !locked()) {
-          rotationIndex = 0;
-          onCode(raw);
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        busy = false;
-      });
-  };
-  raf = requestAnimationFrame(tick);
-
-  return () => {
-    alive = false;
-    cancelAnimationFrame(raf);
-    stream.getTracks().forEach((t) => t.stop());
-    container.replaceChildren();
+/** Escanea el frame completo (etiquetas con texto alrededor del QR). */
+function fullFrameScanRegion(video: HTMLVideoElement): QrScanner.ScanRegion {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  const downScaledWidth = 640;
+  if (!width || !height) {
+    return { downScaledWidth, downScaledHeight: downScaledWidth };
+  }
+  return {
+    x: 0,
+    y: 0,
+    width,
+    height,
+    downScaledWidth,
+    downScaledHeight: Math.round((downScaledWidth * height) / width),
   };
 }
 
-async function startHtml5(
+function guideBoxPx(container: HTMLElement, mobile: boolean): number {
+  const rect = container.getBoundingClientRect();
+  const base = Math.min(rect.width || 320, rect.height || 420);
+  if (mobile) {
+    return Math.max(80, Math.min(108, Math.floor(base * 0.28)));
+  }
+  return Math.max(96, Math.min(132, Math.floor(base * 0.24)));
+}
+
+function addScanOverlay(container: HTMLElement, mobile: boolean): void {
+  container.style.position = "relative";
+
+  const existing = container.querySelector("[data-qr-guide]");
+  existing?.remove();
+
+  const overlay = document.createElement("div");
+  overlay.setAttribute("data-qr-guide", "true");
+  Object.assign(overlay.style, {
+    position: "absolute",
+    inset: "0",
+    pointerEvents: "none",
+    zIndex: "2",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  });
+
+  const size = guideBoxPx(container, mobile);
+  const hole = document.createElement("div");
+  Object.assign(hole.style, {
+    width: `${size}px`,
+    height: `${size}px`,
+    boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+    border: "2px solid rgba(255, 255, 255, 0.92)",
+    borderRadius: "8px",
+    boxSizing: "border-box",
+  });
+
+  overlay.appendChild(hole);
+  container.appendChild(overlay);
+}
+
+function whenVideoReady(container: HTMLElement, fn: () => void): void {
+  const video = container.querySelector("video");
+  if (video instanceof HTMLVideoElement && video.readyState >= 2) {
+    fn();
+    return;
+  }
+  video?.addEventListener("loadeddata", () => fn(), { once: true });
+  window.setTimeout(fn, 400);
+}
+
+async function startQrScannerImpl(
   container: HTMLElement,
   onCode: (code: string) => void,
   locked: () => boolean,
@@ -231,66 +156,42 @@ async function startHtml5(
   }
 
   const mobile = isCoarsePointer();
-  const scanConfig = {
-    fps: mobile ? 10 : 15,
-    disableFlip: false,
-    qrbox: mobile
-      ? { width: 220, height: 220 }
-      : (viewfinderWidth: number, viewfinderHeight: number) => ({
-          width: Math.floor(Math.min(viewfinderWidth * 0.8, 240)),
-          height: Math.floor(Math.min(viewfinderHeight * 0.5, 180)),
-        }),
-  };
+  prepareScannerMount(container);
 
-  const cameraAttempts: MediaTrackConstraints[] = [
-    { facingMode: "environment" },
-    { facingMode: "user" },
-  ];
+  const video = createPreviewVideo();
+  container.replaceChildren(video);
 
-  let lastError: unknown;
+  const scanner = new QrScanner(
+    video,
+    (result) => {
+      if (locked()) return;
+      const raw = result.data?.trim();
+      if (raw) onCode(raw);
+    },
+    {
+      returnDetailedScanResult: true,
+      preferredCamera: "environment",
+      maxScansPerSecond: mobile ? 10 : 15,
+      calculateScanRegion: fullFrameScanRegion,
+      onDecodeError: (error) => {
+        if (error === QrScanner.NO_QR_CODE_FOUND) return;
+      },
+    },
+  );
 
-  for (const camera of cameraAttempts) {
-    container.replaceChildren();
-    const id = `qr-${crypto.randomUUID()}`;
-    container.id = id;
-
-    const scanner = new Html5Qrcode(id, {
-      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-      verbose: false,
-      useBarCodeDetectorIfSupported: false,
-    });
-
-    try {
-      await scanner.start(
-        camera,
-        scanConfig,
-        (text) => {
-          const raw = text.trim();
-          if (raw && !locked()) onCode(raw);
-        },
-        () => {},
-      );
-
-      styleScannerVideo(container);
-      addScanOverlay(container);
-
-      return () => {
-        void scanner.stop().catch(() => {});
-        scanner.clear();
-        container.replaceChildren();
-      };
-    } catch (error) {
-      lastError = error;
-      try {
-        await scanner.stop();
-      } catch {
-        // ignore
-      }
-      scanner.clear();
-    }
+  try {
+    await scanner.start();
+  } catch (error) {
+    scanner.destroy();
+    throw error;
   }
 
-  throw lastError ?? new Error("Camera start failed");
+  whenVideoReady(container, () => addScanOverlay(container, mobile));
+
+  return () => {
+    scanner.destroy();
+    container.replaceChildren();
+  };
 }
 
 export async function startQrScanner(
@@ -298,46 +199,5 @@ export async function startQrScanner(
   onCode: (code: string) => void,
   locked: () => boolean,
 ): Promise<QrScannerStop> {
-  if (!window.isSecureContext) {
-    throw new DOMException("Secure context required", "SecurityError");
-  }
-
-  // ponytail: sin await antes de getUserMedia — iOS exige gesto del usuario
-  if (isCoarsePointer()) {
-    try {
-      return await startHtml5(container, onCode, locked);
-    } catch {
-      container.replaceChildren();
-    }
-
-    if (window.BarcodeDetector) {
-      try {
-        const formats = await window.BarcodeDetector.getSupportedFormats();
-        if (formats.includes("qr_code")) {
-          return await startNative(container, onCode, locked);
-        }
-      } catch {
-        container.replaceChildren();
-      }
-    }
-
-    throw new Error("Camera unavailable on mobile");
-  }
-
-  if (window.BarcodeDetector) {
-    try {
-      const formats = await window.BarcodeDetector.getSupportedFormats();
-      if (formats.includes("qr_code")) {
-        try {
-          return await startNative(container, onCode, locked);
-        } catch {
-          container.replaceChildren();
-        }
-      }
-    } catch {
-      container.replaceChildren();
-    }
-  }
-
-  return startHtml5(container, onCode, locked);
+  return startQrScannerImpl(container, onCode, locked);
 }

@@ -313,7 +313,7 @@ export function VentaManager() {
         </div>
         {cameraOn ? (
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta a la etiqueta completa dentro del marco. El nombre y el precio no afectan la lectura.
+            Apunta al QR dentro del marco. Puedes alejar la cámara; detecta aunque haya texto alrededor.
           </p>
         ) : null}
       </div>

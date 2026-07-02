@@ -9,6 +9,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { createPortal, flushSync } from "react-dom";
 import {
   Camera,
   CameraOff,
@@ -242,7 +243,12 @@ export function VenderProductosSheet({
 
     scannerInputRef.current?.blur();
     busquedaRef.current?.blur();
-    setCameraOn(true);
+
+    if (isMobileTouchDevice()) {
+      flushSync(() => setCameraOn(true));
+    } else {
+      setCameraOn(true);
+    }
 
     const container = scannerContainerRef.current;
     if (!container) {
@@ -422,7 +428,30 @@ export function VenderProductosSheet({
     });
   }
 
+  const mobileCamera = isMobileTouchDevice();
+
+  function renderScannerOverlays() {
+    return (
+      <>
+        {cooldownSec > 0 && (
+          <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 text-white">
+            <span className="text-4xl font-bold tabular-nums">
+              {cooldownSec}
+            </span>
+            <span className="mt-1 text-xs">Listo para otro scan</span>
+          </div>
+        )}
+        {pending && cooldownSec === 0 && (
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 text-xs text-white">
+            Agregando…
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
+    <>
     <Sheet
       open={open}
       onOpenChange={(next) => {
@@ -490,45 +519,52 @@ export function VenderProductosSheet({
               </Button>
             </div>
 
-            <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
-              <div
-                id={SCANNER_ID}
-                ref={scannerContainerRef}
-                className="absolute inset-0 [&_#qr-shaded-region]:hidden [&_video]:!absolute [&_video]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
-              />
-              {!cameraOn ? (
-                <button
-                  type="button"
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
-                  onClick={() => void startCamera()}
-                >
-                  <Camera className="h-10 w-10" />
-                  <span className="text-sm font-medium">
-                    Toca para activar la cámara
-                  </span>
-                  <span className="text-xs text-neutral-500">
-                    Apunta al QR de la etiqueta
-                  </span>
-                </button>
-              ) : null}
-              {cooldownSec > 0 && (
-                <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 text-white">
-                  <span className="text-4xl font-bold tabular-nums">
-                    {cooldownSec}
-                  </span>
-                  <span className="mt-1 text-xs">Listo para otro scan</span>
-                </div>
-              )}
-              {pending && cooldownSec === 0 && cameraOn && (
-                <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 text-xs text-white">
-                  Agregando…
-                </div>
-              )}
-            </div>
+            {mobileCamera && !cameraOn ? (
+              <button
+                type="button"
+                className="flex min-h-[12rem] w-full flex-col items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+                onClick={() => void startCamera()}
+              >
+                <Camera className="h-10 w-10" />
+                <span className="text-sm font-medium">
+                  Toca para activar la cámara
+                </span>
+                <span className="text-xs text-neutral-500">
+                  Apunta al QR de la etiqueta
+                </span>
+              </button>
+            ) : !mobileCamera ? (
+              <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
+                <div
+                  id={SCANNER_ID}
+                  ref={scannerContainerRef}
+                  className={cn(
+                    "absolute inset-0",
+                    !cameraOn && "pointer-events-none opacity-0",
+                  )}
+                />
+                {!cameraOn ? (
+                  <button
+                    type="button"
+                    className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+                    onClick={() => void startCamera()}
+                  >
+                    <Camera className="h-10 w-10" />
+                    <span className="text-sm font-medium">
+                      Toca para activar la cámara
+                    </span>
+                    <span className="text-xs text-neutral-500">
+                      Apunta al QR de la etiqueta
+                    </span>
+                  </button>
+                ) : null}
+                {cameraOn ? renderScannerOverlays() : null}
+              </div>
+            ) : null}
 
-            {cameraOn ? (
+            {cameraOn && !mobileCamera ? (
               <p className="text-center text-xs text-neutral-500">
-                Centra el QR de la etiqueta en el recuadro blanco.
+                Apunta al QR dentro del marco. Puedes alejar el celular; detecta aunque haya texto alrededor.
               </p>
             ) : null}
           </div>
@@ -749,5 +785,39 @@ export function VenderProductosSheet({
         </SheetFooter>
       </SheetContent>
     </Sheet>
+
+    {mobileCamera &&
+      cameraOn &&
+      typeof document !== "undefined" &&
+      createPortal(
+        <div className="fixed inset-0 z-[200] flex flex-col bg-black">
+          <div className="flex shrink-0 items-center justify-between px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] text-white">
+            <span className="font-medium">Escanear etiqueta</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10"
+              onClick={stopCamera}
+            >
+              <CameraOff className="mr-1.5 h-4 w-4" />
+              Cerrar
+            </Button>
+          </div>
+          <div className="relative min-h-0 flex-1">
+            <div
+              id={SCANNER_ID}
+              ref={scannerContainerRef}
+              className="absolute inset-0"
+            />
+            {renderScannerOverlays()}
+          </div>
+          <p className="shrink-0 px-4 py-3 text-center text-xs text-white/70">
+            Apunta al QR dentro del marco. Puedes alejar el celular; detecta aunque haya texto alrededor.
+          </p>
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
