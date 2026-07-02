@@ -165,14 +165,7 @@ export async function assignMotoByAdminOp(
     throw new Error("La moto seleccionada no está disponible.");
   }
 
-  const payment = calcMotoPayment(
-    {
-      ...bike,
-      imagen_url: null,
-      descripcion: null,
-    },
-    parsed.frecuencia,
-  );
+  const payment = calcMotoPayment(bike, parsed.frecuencia);
 
   const placa = parsed.placa?.trim().toUpperCase() || null;
   const chasis = parsed.chasis?.trim() || null;

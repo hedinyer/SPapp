@@ -16,7 +16,10 @@ export function montoCuotaPeriodo(
   }
 }
 
-export function calcMotoPayment(bike: BikeRow, frecuencia: FrecuenciaPago) {
+export function calcMotoPayment(
+  bike: Pick<BikeRow, "cuota_inicial" | "cuota_diaria">,
+  frecuencia: FrecuenciaPago,
+) {
   const monto_cuota_periodo = montoCuotaPeriodo(bike.cuota_diaria, frecuencia);
   return {
     cuota_inicial_monto: bike.cuota_inicial,

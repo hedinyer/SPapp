@@ -48,14 +48,7 @@ export async function selectMotoFromContract(input: z.infer<typeof selectSchema>
     throw new Error("La moto seleccionada ya no está disponible.");
   }
 
-  const payment = calcMotoPayment(
-    {
-      ...bike,
-      imagen_url: null,
-      descripcion: null,
-    },
-    parsed.frecuencia,
-  );
+  const payment = calcMotoPayment(bike, parsed.frecuencia);
 
   const { error: insertError } = await supabase.from("user_moto_compra").insert({
     user_id: userId,
