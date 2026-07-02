@@ -746,7 +746,7 @@ export async function searchProductos(
     .limit(limit);
 
   if (error) throw new Error(error.message);
-  return (data as InventarioProductoRow[]) ?? [];
+  return ((data ?? []) as unknown as InventarioProductoRow[]);
 }
 
 export async function getAllSolicitudesTaller(): Promise<SolicitudTallerRow[]> {
