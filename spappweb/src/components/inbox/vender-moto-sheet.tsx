@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Bike, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { saveVentaMoto } from "@/lib/actions/venta-moto-actions";
@@ -32,11 +32,31 @@ export function VenderMotoSheet({
 }: VenderMotoSheetProps) {
   const [pending, startTransition] = useTransition();
   const [bikeId, setBikeId] = useState("");
+  const [valorVenta, setValorVenta] = useState("");
+  const [montoPagado, setMontoPagado] = useState("");
   const activeBikes = bikes.filter((b) => b.activo);
   const selected = activeBikes.find((b) => String(b.id) === bikeId);
 
+  const valorNum = Number(valorVenta.replace(/\D/g, ""));
+  const pagadoNum = Number(montoPagado.replace(/\D/g, ""));
+  const saldo =
+    valorNum > 0 && pagadoNum >= 0 ? Math.max(0, valorNum - pagadoNum) : null;
+
+  useEffect(() => {
+    if (selected) {
+      setValorVenta(String(selected.cuota_inicial));
+    }
+  }, [selected]);
+
   function resetForm() {
     setBikeId("");
+    setValorVenta("");
+    setMontoPagado("");
+  }
+
+  function parseCopInput(raw: string): number | undefined {
+    const n = Number(raw.replace(/\D/g, ""));
+    return Number.isFinite(n) && n > 0 ? n : undefined;
   }
 
   function onBikeChange(id: string) {
@@ -78,6 +98,8 @@ export function VenderMotoSheet({
                   clienteCelular: String(fd.get("clienteCelular")),
                   chasis: String(fd.get("chasis") || "") || undefined,
                   cuotaInicial: selected?.cuota_inicial,
+                  valorVenta: parseCopInput(valorVenta),
+                  montoPagado: parseCopInput(montoPagado) ?? 0,
                   notas: String(fd.get("notas") || "") || undefined,
                 });
                 await printVentaMotoReceipt(venta);
@@ -105,9 +127,56 @@ export function VenderMotoSheet({
             />
             {selected && (
               <p className="text-sm text-neutral-500">
-                Cuota inicial: {formatCop(selected.cuota_inicial)}
+                Cuota inicial referencia: {formatCop(selected.cuota_inicial)}
               </p>
             )}
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+            <p className="text-sm font-medium">Pago</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="valorVenta">Valor total</Label>
+                <Input
+                  id="valorVenta"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={valorVenta}
+                  onChange={(e) => setValorVenta(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="montoPagado">Pagado hoy</Label>
+                <Input
+                  id="montoPagado"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={montoPagado}
+                  onChange={(e) => setMontoPagado(e.target.value)}
+                />
+              </div>
+            </div>
+            {saldo != null && valorNum > 0 && (
+              <p className="text-sm text-neutral-600">
+                {pagadoNum >= valorNum
+                  ? "Pago de contado."
+                  : pagadoNum > 0
+                    ? `Abono parcial. Saldo: ${formatCop(saldo)}`
+                    : `Sin pago hoy. Saldo: ${formatCop(valorNum)}`}
+              </p>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                if (valorNum > 0) setMontoPagado(String(valorNum));
+              }}
+              disabled={valorNum <= 0}
+            >
+              Marcar pago de contado
+            </Button>
           </div>
 
           {!selected && (

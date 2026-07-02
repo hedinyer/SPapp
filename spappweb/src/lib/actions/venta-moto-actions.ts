@@ -14,7 +14,25 @@ const ventaMotoSchema = z.object({
   clienteCelular: z.string().trim().min(10, "Celular inválido"),
   chasis: z.string().trim().optional(),
   cuotaInicial: z.number().int().nonnegative().optional(),
+  valorVenta: z.number().int().positive().optional(),
+  montoPagado: z.number().int().nonnegative().optional(),
   notas: z.string().trim().optional(),
+}).superRefine((data, ctx) => {
+  const pagado = data.montoPagado ?? 0;
+  if (pagado > 0 && !data.valorVenta) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Indica el valor total de la venta.",
+      path: ["valorVenta"],
+    });
+  }
+  if (data.valorVenta != null && pagado > data.valorVenta) {
+    ctx.addIssue({
+      code: "custom",
+      message: "El pago no puede superar el valor de venta.",
+      path: ["montoPagado"],
+    });
+  }
 });
 
 export type VentaMotoInput = z.infer<typeof ventaMotoSchema>;
@@ -30,6 +48,8 @@ export interface VentaMotoRow {
   clienteCedula: string;
   clienteCelular: string;
   cuotaInicial: number | null;
+  valorVenta: number | null;
+  montoPagado: number;
   notas: string | null;
   createdAt: string;
 }
@@ -46,6 +66,8 @@ function toRow(raw: Record<string, unknown>): VentaMotoRow {
     clienteCedula: String(raw.cliente_cedula),
     clienteCelular: String(raw.cliente_celular),
     cuotaInicial: raw.cuota_inicial != null ? Number(raw.cuota_inicial) : null,
+    valorVenta: raw.valor_venta != null ? Number(raw.valor_venta) : null,
+    montoPagado: Number(raw.monto_pagado ?? 0),
     notas: raw.notas ? String(raw.notas) : null,
     createdAt: String(raw.created_at),
   };
@@ -68,10 +90,12 @@ export async function saveVentaMoto(input: VentaMotoInput): Promise<VentaMotoRow
       cliente_cedula: parsed.clienteCedula,
       cliente_celular: parsed.clienteCelular,
       cuota_inicial: parsed.cuotaInicial ?? null,
+      valor_venta: parsed.valorVenta ?? null,
+      monto_pagado: parsed.montoPagado ?? 0,
       notas: parsed.notas || null,
     })
     .select(
-      "id, bike_id, modelo, color, placa, chasis, cliente_nombre, cliente_cedula, cliente_celular, cuota_inicial, notas, created_at",
+      "id, bike_id, modelo, color, placa, chasis, cliente_nombre, cliente_cedula, cliente_celular, cuota_inicial, valor_venta, monto_pagado, notas, created_at",
     )
     .single();
 

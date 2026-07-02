@@ -35,8 +35,14 @@ export function buildVentaMotoReceiptHtml(venta: VentaMotoRow): string {
   ];
 
   if (venta.chasis) lines.push(`Chasis: ${venta.chasis}`);
-  if (venta.cuotaInicial != null) {
-    lines.push(`Cuota inicial: ${formatCop(venta.cuotaInicial)}`);
+  if (venta.valorVenta != null) {
+    lines.push(`Valor venta: ${formatCop(venta.valorVenta)}`);
+    lines.push(`Pagado: ${formatCop(venta.montoPagado)}`);
+    const saldo = venta.valorVenta - venta.montoPagado;
+    if (saldo > 0) lines.push(`Saldo: ${formatCop(saldo)}`);
+    else lines.push("Pago: CONTADO");
+  } else if (venta.cuotaInicial != null) {
+    lines.push(`Cuota inicial ref.: ${formatCop(venta.cuotaInicial)}`);
   }
   if (venta.notas) lines.push(`Notas: ${venta.notas}`);
 
@@ -109,11 +115,13 @@ if (typeof process !== "undefined" && process.argv[1]?.includes("venta-moto-rece
     clienteCedula: "1234567890",
     clienteCelular: "3001234567",
     cuotaInicial: 500000,
+    valorVenta: 5_000_000,
+    montoPagado: 2_000_000,
     notas: null,
     createdAt: new Date().toISOString(),
   };
   const html = buildVentaMotoReceiptHtml(sample);
-  if (!html.includes("Juan Pérez") || !html.includes("CH123")) {
+  if (!html.includes("Juan Pérez") || !html.includes("Saldo:")) {
     throw new Error("buildVentaMotoReceiptHtml sample failed");
   }
 }
