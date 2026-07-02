@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { emitPipelineEvent } from "@/lib/agent/pipeline-events";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   hojaVidaFormSchema,
@@ -137,6 +138,16 @@ export async function submitPublicApplication(
 
     if (contractError) throw new Error(contractError.message);
 
+    await emitPipelineEvent({
+      userId,
+      kind: "solicitud_recibida",
+      payload: {
+        displayName: hojaVida.nombre_completo,
+        celular: hojaVida.celular,
+        cedula,
+      },
+    });
+
     revalidatePath("/inbox");
     revalidatePath(`/clientes/${userId}`);
     return { ok: true, userId, updated: true };
@@ -172,6 +183,16 @@ export async function submitPublicApplication(
     .eq("id", contract.id);
 
   if (contractError) throw new Error(contractError.message);
+
+  await emitPipelineEvent({
+    userId,
+    kind: "solicitud_recibida",
+    payload: {
+      displayName: hojaVida.nombre_completo,
+      celular: hojaVida.celular,
+      cedula,
+    },
+  });
 
   revalidatePath("/inbox");
   revalidatePath(`/clientes/${userId}`);

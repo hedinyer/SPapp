@@ -14,6 +14,7 @@ const loadAdminActions = () => import("@/lib/actions/admin-actions");
 const loadPaymentActions = () =>
   import("@/lib/actions/payment-comprobante-actions");
 const loadClientActions = () => import("@/lib/actions/client-actions");
+const loadPipelineEvents = () => import("@/lib/agent/pipeline-events");
 
 const INBOX_QUEUE_IDS = [
   "creditos",
@@ -29,6 +30,7 @@ const INBOX_QUEUE_IDS = [
 
 export type AgentToolCategory =
   | "lectura"
+  | "notificaciones"
   | "credito"
   | "visitas"
   | "pagos"
@@ -96,6 +98,36 @@ export const AGENT_TOOLS = {
       userId: z.number().int().positive(),
     }),
     handler: async ({ userId }) => (await loadQueries()).getClientPipeline(userId),
+  }),
+  list_pipeline_events: tool({
+    category: "notificaciones",
+    description:
+      "Cola de eventos del pipeline (crédito→moto→contrato→pago→visita→entrega) pendientes de WhatsApp. Cada evento incluye celular, paso, payload y whatsappHint sugerido. Consulta periódicamente y envía mensajes al cliente.",
+    input: z.object({
+      limit: z.number().int().min(1).max(200).optional(),
+      since: z.string().optional().describe("ISO timestamp; solo eventos posteriores"),
+      includeAcked: z
+        .boolean()
+        .optional()
+        .describe("Si true, incluye eventos ya procesados"),
+    }),
+    handler: async ({ limit, since, includeAcked }) =>
+      (await loadPipelineEvents()).listPipelineEvents({
+        limit,
+        since,
+        pendingOnly: !includeAcked,
+      }),
+  }),
+  ack_pipeline_events: tool({
+    category: "notificaciones",
+    description:
+      "Marca eventos del pipeline como procesados tras enviar el WhatsApp al cliente.",
+    input: z.object({
+      eventIds: z.array(z.string().uuid()).min(1),
+      ackedBy: z.string().optional().describe("Identificador del agente, ej. hermes"),
+    }),
+    handler: async ({ eventIds, ackedBy }) =>
+      (await loadPipelineEvents()).ackPipelineEvents(eventIds, ackedBy),
   }),
   list_bikes: tool({
     category: "catalogo",

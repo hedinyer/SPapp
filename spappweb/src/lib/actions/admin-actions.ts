@@ -6,6 +6,10 @@ import { z } from "zod";
 import { requireAdminSession } from "@/lib/auth/session";
 import { approveCreditOp, rejectCreditOp } from "@/lib/admin/credit-ops";
 import { assignMotoByAdminOp } from "@/lib/admin/moto-contract-ops";
+import {
+  emitPagoCompletoOnTransition,
+  emitPipelineEvent,
+} from "@/lib/agent/pipeline-events";
 import { canChooseFlowOrder } from "@/lib/pipeline/step-logic";
 import type { VisitaRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -113,7 +117,7 @@ const assignMotoSchema = z.object({
   documentId: z.number().int().positive(),
   bikeId: z.number().int().positive(),
   frecuencia: z.enum(["diario", "semanal", "quincenal", "mensual"]),
-  placa: z.string().trim().min(1),
+  placa: z.string().trim().optional(),
   chasis: z.string().trim().min(1),
   referencia: z.string().trim().optional(),
 });
@@ -147,6 +151,22 @@ export async function assignVisit(input: z.infer<typeof assignVisitSchema>) {
     .eq("id", parsed.visitaId);
 
   if (error) throw new Error(error.message);
+
+  const { data: visitador } = await supabase
+    .from("visitadores")
+    .select("nombre")
+    .eq("id", parsed.visitadorId)
+    .maybeSingle();
+
+  await emitPipelineEvent({
+    userId: parsed.userId,
+    kind: "visita_asignada",
+    payload: {
+      fechaProgramada: parsed.fechaProgramada,
+      visitadorNombre: (visitador?.nombre as string | undefined) ?? null,
+    },
+  });
+
   revalidateClient(parsed.userId);
   return { ok: true };
 }
@@ -159,6 +179,9 @@ export async function completeVisit(visitaId: string, userId: number) {
     .eq("id", visitaId);
 
   if (error) throw new Error(error.message);
+
+  await emitPipelineEvent({ userId, kind: "visita_completada" });
+
   revalidateClient(userId);
   return { ok: true };
 }
@@ -171,6 +194,9 @@ export async function cancelVisit(visitaId: string, userId: number) {
     .eq("id", visitaId);
 
   if (error) throw new Error(error.message);
+
+  await emitPipelineEvent({ userId, kind: "visita_cancelada" });
+
   revalidateClient(userId);
   return { ok: true };
 }
@@ -185,6 +211,13 @@ const paymentSchema = z.object({
 export async function confirmPayment(input: z.infer<typeof paymentSchema>) {
   const parsed = paymentSchema.parse(input);
   const supabase = await assertAdmin();
+
+  const { data: compraBefore } = await supabase
+    .from("user_moto_compra")
+    .select("estado")
+    .eq("id", parsed.compraId)
+    .maybeSingle();
+
   const update =
     parsed.field === "inicial"
       ? { pago_inicial_confirmado: parsed.value }
@@ -196,6 +229,13 @@ export async function confirmPayment(input: z.infer<typeof paymentSchema>) {
     .eq("id", parsed.compraId);
 
   if (error) throw new Error(error.message);
+
+  await emitPagoCompletoOnTransition(
+    parsed.userId,
+    parsed.compraId,
+    compraBefore?.estado as string | null,
+  );
+
   revalidateClient(parsed.userId);
   return { ok: true };
 }
@@ -229,12 +269,35 @@ export async function updateDelivery(input: z.infer<typeof deliverySchema>) {
 
 export async function markDelivered(compraId: string, userId: number) {
   const supabase = await assertAdmin();
+
+  const { data: compra } = await supabase
+    .from("user_moto_compra")
+    .select("modelo, color, placa, chasis")
+    .eq("id", compraId)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("user_moto_compra")
     .update({ estado: "entregada" })
     .eq("id", compraId);
 
   if (error) throw new Error(error.message);
+
+  await emitPipelineEvent({
+    userId,
+    kind: "entrega_marcada",
+    payload: compra
+      ? {
+          moto: {
+            modelo: String(compra.modelo ?? ""),
+            color: String(compra.color ?? ""),
+            placa: (compra.placa as string | null) ?? null,
+            chasis: (compra.chasis as string | null) ?? null,
+          },
+        }
+      : undefined,
+  });
+
   revalidateClient(userId);
   revalidatePath("/catalogo");
   return { ok: true };
@@ -293,6 +356,9 @@ export async function cancelCompra(compraId: string, userId: number) {
     .eq("id", compraId);
 
   if (error) throw new Error(error.message);
+
+  await emitPipelineEvent({ userId, kind: "compra_cancelada" });
+
   revalidateClient(userId);
   return { ok: true };
 }

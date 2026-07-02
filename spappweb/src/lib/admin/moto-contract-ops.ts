@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { emitPipelineEvent } from "@/lib/agent/pipeline-events";
 import { calcMotoPayment } from "@/lib/moto-payment";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -239,6 +240,22 @@ export async function assignMotoByAdminOp(
       parsed.documentId,
       compraId,
     );
+  }
+
+  if (placa && chasis) {
+    await emitPipelineEvent({
+      userId: parsed.userId,
+      kind: "moto_asignada",
+      payload: {
+        contractId: contractId ?? undefined,
+        moto: {
+          modelo: bike.modelo as string,
+          color: bike.color as string,
+          placa,
+          chasis,
+        },
+      },
+    });
   }
 
   return { ok: true as const, compraId, contractId };

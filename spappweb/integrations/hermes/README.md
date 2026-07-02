@@ -58,9 +58,21 @@ El modelo ya puede llamar las tools por su nombre (`get_client_pipeline`,
 | --- | --- | --- |
 | `GET` | `/api/agent/tools` | Catálogo de tools (schemas function-calling) |
 | `POST` | `/api/agent/tools` | Ejecuta una tool. Body: `{ "tool": "...", "args": { ... } }` |
+| `GET` | `/api/agent/events` | Cola de eventos del pipeline para WhatsApp (ver abajo) |
+| `POST` | `/api/agent/events` | Confirma eventos procesados. Body: `{ "eventIds": [...] }` |
 
 En modo abierto no requieren auth; si configuraste `AGENT_API_KEY`, añade
 `Authorization: Bearer <AGENT_API_KEY>`.
+
+### Notificaciones WhatsApp del pipeline
+
+Cuando avanzas un cliente en el stepper (Crédito → Moto → Contrato → Pago → Visita →
+Entrega), SPapp encola eventos para que Hermes envíe WhatsApp. Tools:
+
+- `list_pipeline_events` — cola pendiente con `celular` y `whatsappHint`
+- `ack_pipeline_events` — marcar como enviados
+
+Guía completa: [`PIPELINE_EVENTS.md`](PIPELINE_EVENTS.md)
 
 ### Ejemplo manual (modo abierto)
 

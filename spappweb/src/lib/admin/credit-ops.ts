@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import { emitPipelineEvent } from "@/lib/agent/pipeline-events";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CreditOpResult =
@@ -41,6 +42,8 @@ export async function approveCreditOp(
     return { ok: false, error: "Solicitud no encontrada o sin permisos." };
   }
 
+  await emitPipelineEvent({ userId: uid, kind: "credito_aprobado" });
+
   return { ok: true };
 }
 
@@ -79,6 +82,12 @@ export async function rejectCreditOp(
   if (!updated) {
     return { ok: false, error: "Solicitud no encontrada o sin permisos." };
   }
+
+  await emitPipelineEvent({
+    userId: parsed.data.userId,
+    kind: "credito_rechazado",
+    payload: { motivo: parsed.data.motivo.trim() },
+  });
 
   return { ok: true };
 }

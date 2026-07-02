@@ -52,8 +52,7 @@ export function AdminMotoAssignPanel({
       <CardHeader>
         <CardTitle className="text-lg">Asignar moto y placa</CardTitle>
         <p className="text-sm text-neutral-500">
-          Elige la moto del catálogo, registra placa y chasis. Al guardar se
-          genera el contrato para que el cliente firme.
+          Elige la moto del catálogo y registra el chasis. La placa es opcional.
         </p>
       </CardHeader>
       <CardContent>
@@ -74,7 +73,7 @@ export function AdminMotoAssignPanel({
                   documentId,
                   bikeId: parsedBikeId,
                   frecuencia,
-                  placa: String(fd.get("placa")),
+                  placa: String(fd.get("placa") || "").trim() || undefined,
                   chasis: String(fd.get("chasis")),
                   referencia: String(fd.get("referencia") || "") || undefined,
                 });
@@ -120,13 +119,13 @@ export function AdminMotoAssignPanel({
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="placa">Placa</Label>
+              <Label htmlFor="placa">Placa (opcional)</Label>
               <Input
                 id="placa"
                 name="placa"
-                required
                 defaultValue={compra?.placa ?? ""}
                 placeholder="ABC123"
+                className="uppercase"
               />
             </div>
             <div className="space-y-2">

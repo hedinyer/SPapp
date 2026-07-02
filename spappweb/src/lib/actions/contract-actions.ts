@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { emitPipelineEvent } from "@/lib/agent/pipeline-events";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   buildContratoComercial,
@@ -169,6 +170,20 @@ export async function signContract(input: z.infer<typeof signSchema>) {
     .eq("id", contract.id);
 
   if (updateError) throw new Error(updateError.message);
+
+  await emitPipelineEvent({
+    userId,
+    kind: "contrato_firmado",
+    payload: {
+      contractId: contract.id as string,
+      moto: {
+        modelo: compra.modelo as string,
+        color: compra.color as string,
+        placa: compra.placa as string,
+        chasis: compra.chasis as string,
+      },
+    },
+  });
 
   revalidatePath("/inbox");
   revalidatePath(`/clientes/${userId}`);

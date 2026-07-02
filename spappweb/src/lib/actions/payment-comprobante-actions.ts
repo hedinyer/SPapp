@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { emitPagoCompletoOnTransition } from "@/lib/agent/pipeline-events";
 import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
@@ -303,6 +304,12 @@ export async function confirmPagoConComprobante(
     .filter(Boolean)
     .join(" · ") || null;
 
+  const { data: compraBefore } = await supabase
+    .from("user_moto_compra")
+    .select("estado")
+    .eq("id", parsed.compraId)
+    .maybeSingle();
+
   const { error: insertError } = await supabase.from("pagos").insert({
     user_moto_compra_id: parsed.compraId,
     user_id: parsed.userId,
@@ -328,6 +335,12 @@ export async function confirmPagoConComprobante(
     }
     throw new Error(insertError.message);
   }
+
+  await emitPagoCompletoOnTransition(
+    parsed.userId,
+    parsed.compraId,
+    compraBefore?.estado as string | null,
+  );
 
   revalidateClient(parsed.userId);
   return { ok: true };

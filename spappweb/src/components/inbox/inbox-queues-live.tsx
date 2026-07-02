@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Bike } from "lucide-react";
 import { refreshInboxQueues } from "@/lib/actions/inbox-actions";
 import { createAnonClient } from "@/lib/supabase/anon";
-import type { InboxQueue } from "@/lib/pipeline/types";
+import type { BikeRow, InboxQueue } from "@/lib/pipeline/types";
 import { QueueCards } from "@/components/inbox/queue-cards";
+import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
+import { Button } from "@/components/ui/button";
 
 const INBOX_REALTIME_TABLES = [
   "users_documents",
@@ -17,6 +20,7 @@ const INBOX_REALTIME_TABLES = [
 
 interface InboxQueuesLiveProps {
   initialQueues: InboxQueue[];
+  bikes: BikeRow[];
 }
 
 function pendingSummary(total: number) {
@@ -24,8 +28,9 @@ function pendingSummary(total: number) {
   return `${total} tarea${total === 1 ? "" : "s"} pendiente${total === 1 ? "" : "s"}.`;
 }
 
-export function InboxQueuesLive({ initialQueues }: InboxQueuesLiveProps) {
+export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) {
   const [queues, setQueues] = useState(initialQueues);
+  const [venderOpen, setVenderOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const refreshingRef = useRef(false);
 
@@ -73,11 +78,27 @@ export function InboxQueuesLive({ initialQueues }: InboxQueuesLiveProps) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold sm:text-2xl">Bandeja</h1>
-        <p className="mt-1 text-neutral-500">{pendingSummary(totalPending)}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold sm:text-2xl">Bandeja</h1>
+          <p className="mt-1 text-neutral-500">{pendingSummary(totalPending)}</p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-2"
+          onClick={() => setVenderOpen(true)}
+        >
+          <Bike className="h-4 w-4" />
+          Vender moto
+        </Button>
       </div>
       <QueueCards queues={queues} />
+      <VenderMotoSheet
+        bikes={bikes}
+        open={venderOpen}
+        onOpenChange={setVenderOpen}
+      />
     </div>
   );
 }

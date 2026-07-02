@@ -55,6 +55,8 @@ Hermes Agent ──HTTP(Bearer AGENT_API_KEY)──▶ /api/agent/tools ──�
 
 - `GET /api/agent/tools` → catálogo de herramientas (schemas function-calling).
 - `POST /api/agent/tools` con `{ tool, args }` → ejecuta la herramienta.
+- `GET /api/agent/events` → cola de eventos del pipeline para WhatsApp.
+- `POST /api/agent/events` con `{ eventIds }` → confirma eventos procesados.
 - Auth: **abierta por defecto** (sin key). Si se define `AGENT_API_KEY` en el
   servidor, se exige `Authorization: Bearer <AGENT_API_KEY>`. El agente actúa como
   **admin** (vía contexto request-scoped, no debilita el resto de la app).
@@ -89,12 +91,32 @@ Cada paso tiene estado visual: `completado | actual | pendiente | bloqueado | er
 | **entrega** | `user_moto_compra.estado = 'entregada'` (error si `cancelada`) | no pagado y no `lista_retiro` |
 | **visita** | `visitas.estado = 'completada'` (error si `cancelada`) | no entregada |
 
-> La **visita domiciliaria ocurre después de la entrega** (verificación post-venta).
+> La **visita domiciliaria** puede ir antes o después de la entrega según
+> `admin_data.entrega_antes_visita` en la compra.
 
 `getClientPipeline(userId)` (tool `get_client_pipeline`) devuelve el agregado 360°
 con: user, document, contract, visita, compra, tracking, tarifas, moroso, recoger,
 atraso, resumen de renting, historial de pagos y los `steps`. **Úsalo siempre antes
 de actuar sobre un cliente.**
+
+### 4.1 Notificaciones WhatsApp (Hermes)
+
+Cada avance relevante del pipeline inserta una fila en `pipeline_events` con el
+celular del cliente, el paso (`stepId`) y un `whatsappHint` sugerido.
+
+**Flujo:** `list_pipeline_events` → enviar WhatsApp → `ack_pipeline_events`.
+
+| kind | Disparador |
+| --- | --- |
+| `solicitud_recibida` | Nueva solicitud pública |
+| `credito_aprobado` / `credito_rechazado` | Aprobar/rechazar crédito |
+| `moto_asignada` | Asignar moto (placa + chasis) |
+| `contrato_firmado` | Cliente firma contrato |
+| `pago_completo` | Primer pago completo → `lista_retiro` |
+| `visita_asignada` / `visita_completada` / `visita_cancelada` | Gestión de visitas |
+| `entrega_marcada` / `compra_cancelada` | Entrega o cancelación |
+
+Detalle: [`integrations/hermes/PIPELINE_EVENTS.md`](integrations/hermes/PIPELINE_EVENTS.md).
 
 ---
 
@@ -294,6 +316,8 @@ La bandeja `/inbox` tiene 9 colas: `creditos`, `pagos`, `retiro`, `entrega`,
 | `inbox_list` | `queueId` | Items pendientes de una cola |
 | `search_clients` | `query` (≥2) | Clientes que coinciden |
 | `get_client_pipeline` | `userId` | Vista 360° del cliente |
+| `list_pipeline_events` | `limit?`, `since?`, `includeAcked?` | Cola WhatsApp del pipeline |
+| `ack_pipeline_events` | `eventIds`, `ackedBy?` | Marcar eventos como enviados |
 | `list_bikes` | — | Catálogo de motos |
 | `list_categorias` / `list_productos` | — | Inventario |
 | `list_solicitudes_taller` | — | Solicitudes de taller |

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { getInboxListItems, getInboxQueues } from "@/lib/pipeline/queries";
+import { getAllBikes, getInboxListItems, getInboxQueues } from "@/lib/pipeline/queries";
 import { InboxQueueList } from "@/components/inbox/inbox-queue-list";
 import { InboxQueuesLive } from "@/components/inbox/inbox-queues-live";
 import { queueTitle } from "@/components/inbox/queue-cards";
@@ -33,13 +33,14 @@ export default async function InboxPage({
 }) {
   const params = await searchParams;
   const queueId = parseQueue(params.cola);
-  const [queues, items] = await Promise.all([
+  const [queues, bikes, items] = await Promise.all([
     getInboxQueues(),
+    getAllBikes(),
     queueId ? getInboxListItems(queueId) : Promise.resolve([]),
   ]);
 
   if (!queueId) {
-    return <InboxQueuesLive initialQueues={queues} />;
+    return <InboxQueuesLive initialQueues={queues} bikes={bikes} />;
   }
 
   return (
