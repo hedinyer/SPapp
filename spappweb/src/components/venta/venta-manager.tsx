@@ -9,7 +9,6 @@ import {
   useState,
   useTransition,
 } from "react";
-import { flushSync } from "react-dom";
 import { Camera, CameraOff, MessageCircle, ShoppingCart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { lookupProductoBySku } from "@/lib/actions/venta-actions";
@@ -38,7 +37,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { startQrScanner } from "@/lib/venta/start-qr-scanner";
+import {
+  cameraErrorMessage,
+  startQrScanner,
+} from "@/lib/venta/start-qr-scanner";
 
 type CartLine = VentaCartLine & { productoId: number };
 
@@ -159,14 +161,11 @@ export function VentaManager() {
     setCameraOn(false);
   }, []);
 
-  const toggleCamera = useCallback(async () => {
-    if (cameraOn) {
-      stopCamera();
-      return;
-    }
+  const startCamera = useCallback(async () => {
+    if (stopScannerRef.current) return;
 
-    flushSync(() => setCameraOn(true));
     scannerInputRef.current?.blur();
+    setCameraOn(true);
 
     const container = scannerContainerRef.current;
     if (!container) {
@@ -181,11 +180,19 @@ export function VentaManager() {
         (code) => onCodeRef.current(code),
         () => scanLockRef.current,
       );
-    } catch {
-      toast.error("No se pudo acceder a la cámara.");
+    } catch (err) {
+      toast.error(cameraErrorMessage(err));
       setCameraOn(false);
     }
-  }, [cameraOn, stopCamera]);
+  }, []);
+
+  const toggleCamera = useCallback(async () => {
+    if (cameraOn) {
+      stopCamera();
+      return;
+    }
+    await startCamera();
+  }, [cameraOn, startCamera, stopCamera]);
 
   const resolveSkuManual = useCallback(
     (raw: string) => {
@@ -273,29 +280,43 @@ export function VentaManager() {
         </Button>
       </div>
 
-      {cameraOn && (
-        <div className="relative mx-auto mt-4 w-full max-w-[320px]">
+      <div className="relative mx-auto mt-4 w-full max-w-[320px]">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-neutral-200 bg-black">
           <div
             id={SCANNER_ID}
             ref={scannerContainerRef}
-            className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-neutral-200 bg-black [&_#qr-shaded-region]:hidden [&_video]:!absolute [&_video]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
+            className="absolute inset-0 [&_#qr-shaded-region]:hidden [&_video]:!absolute [&_video]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover"
           />
+          {!cameraOn ? (
+            <button
+              type="button"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+              onClick={() => void startCamera()}
+            >
+              <Camera className="h-10 w-10" />
+              <span className="text-sm font-medium">
+                Toca para activar la cámara
+              </span>
+            </button>
+          ) : null}
           {cooldownSec > 0 && (
-            <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center rounded-lg bg-black/60 text-white">
+            <div className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 text-white">
               <span className="text-5xl font-bold tabular-nums">{cooldownSec}</span>
               <span className="mt-1 text-sm">Espera para escanear de nuevo</span>
             </div>
           )}
-          {pending && cooldownSec === 0 && (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/30 text-xs text-white">
+          {pending && cooldownSec === 0 && cameraOn && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-xs text-white">
               Buscando producto…
             </div>
           )}
+        </div>
+        {cameraOn ? (
           <p className="mt-2 text-center text-xs text-neutral-500">
             Apunta a la etiqueta completa dentro del marco. El nombre y el precio no afectan la lectura.
           </p>
-        </div>
-      )}
+        ) : null}
+      </div>
 
       <div className="mt-3 flex gap-2">
         <Input

@@ -1,3 +1,8 @@
+import {
+  Html5Qrcode,
+  Html5QrcodeSupportedFormats,
+} from "html5-qrcode";
+
 export type QrScannerStop = () => void;
 
 type BarcodeDetectorLike = {
@@ -22,6 +27,33 @@ function isCoarsePointer(): boolean {
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches
   );
+}
+
+export function isMobileTouchDevice(): boolean {
+  return isCoarsePointer();
+}
+
+export function cameraErrorMessage(err: unknown): string {
+  const name =
+    err instanceof DOMException
+      ? err.name
+      : err instanceof Error
+        ? err.name
+        : "";
+  const msg = err instanceof Error ? err.message : String(err);
+  if (
+    name === "NotAllowedError" ||
+    /not allowed|permission denied/i.test(msg)
+  ) {
+    return "Permite el acceso a la cámara cuando el navegador lo pida.";
+  }
+  if (!window.isSecureContext) {
+    return "La cámara solo funciona con HTTPS (o localhost).";
+  }
+  if (name === "NotFoundError" || /not found|no camera/i.test(msg)) {
+    return "No se encontró cámara en este dispositivo.";
+  }
+  return "No se pudo acceder a la cámara. Toca Cámara e intenta de nuevo.";
 }
 
 async function getCameraStream(): Promise<MediaStream> {
@@ -78,6 +110,19 @@ function addScanOverlay(container: HTMLElement): HTMLElement {
   return overlay;
 }
 
+function styleScannerVideo(container: HTMLElement): void {
+  const video = container.querySelector("video");
+  if (video instanceof HTMLVideoElement) {
+    Object.assign(video.style, {
+      position: "absolute",
+      inset: "0",
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    });
+  }
+}
+
 function drawFullFrame(
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
@@ -113,6 +158,7 @@ async function startNative(
   const video = document.createElement("video");
   video.playsInline = true;
   video.setAttribute("playsinline", "true");
+  video.setAttribute("webkit-playsinline", "true");
   video.muted = true;
   video.autoplay = true;
   Object.assign(video.style, {
@@ -180,58 +226,71 @@ async function startHtml5(
   onCode: (code: string) => void,
   locked: () => boolean,
 ): Promise<QrScannerStop> {
-  const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import(
-    "html5-qrcode"
-  );
-  if (!container.id) container.id = `qr-${crypto.randomUUID()}`;
-
-  const scanner = new Html5Qrcode(container.id, {
-    formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
-    verbose: false,
-    useBarCodeDetectorIfSupported: false,
-  });
-
-  const mobile = isCoarsePointer();
-
-  await scanner.start(
-    {
-      facingMode: { ideal: "environment" },
-      aspectRatio: mobile ? 1.333333 : 1.777778,
-    },
-    {
-      fps: mobile ? 15 : 20,
-      disableFlip: false,
-      qrbox: (viewfinderWidth, viewfinderHeight) => {
-        const w = Math.floor(Math.min(viewfinderWidth * 0.82, mobile ? 280 : 240));
-        const h = Math.floor(Math.min(viewfinderHeight * 0.55, mobile ? 200 : 160));
-        return { width: w, height: h };
-      },
-    },
-    (text) => {
-      const raw = text.trim();
-      if (raw && !locked()) onCode(raw);
-    },
-    () => {},
-  );
-
-  const video = container.querySelector("video");
-  if (video instanceof HTMLVideoElement) {
-    Object.assign(video.style, {
-      position: "absolute",
-      inset: "0",
-      width: "100%",
-      height: "100%",
-      objectFit: "cover",
-    });
+  if (!window.isSecureContext) {
+    throw new DOMException("Secure context required", "SecurityError");
   }
 
-  addScanOverlay(container);
-
-  return () => {
-    void scanner.stop().catch(() => {});
-    scanner.clear();
-    container.replaceChildren();
+  const mobile = isCoarsePointer();
+  const scanConfig = {
+    fps: mobile ? 10 : 15,
+    disableFlip: false,
+    qrbox: mobile
+      ? { width: 220, height: 220 }
+      : (viewfinderWidth: number, viewfinderHeight: number) => ({
+          width: Math.floor(Math.min(viewfinderWidth * 0.8, 240)),
+          height: Math.floor(Math.min(viewfinderHeight * 0.5, 180)),
+        }),
   };
+
+  const cameraAttempts: MediaTrackConstraints[] = [
+    { facingMode: "environment" },
+    { facingMode: "user" },
+  ];
+
+  let lastError: unknown;
+
+  for (const camera of cameraAttempts) {
+    container.replaceChildren();
+    const id = `qr-${crypto.randomUUID()}`;
+    container.id = id;
+
+    const scanner = new Html5Qrcode(id, {
+      formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
+      verbose: false,
+      useBarCodeDetectorIfSupported: false,
+    });
+
+    try {
+      await scanner.start(
+        camera,
+        scanConfig,
+        (text) => {
+          const raw = text.trim();
+          if (raw && !locked()) onCode(raw);
+        },
+        () => {},
+      );
+
+      styleScannerVideo(container);
+      addScanOverlay(container);
+
+      return () => {
+        void scanner.stop().catch(() => {});
+        scanner.clear();
+        container.replaceChildren();
+      };
+    } catch (error) {
+      lastError = error;
+      try {
+        await scanner.stop();
+      } catch {
+        // ignore
+      }
+      scanner.clear();
+    }
+  }
+
+  throw lastError ?? new Error("Camera start failed");
 }
 
 export async function startQrScanner(
@@ -239,9 +298,30 @@ export async function startQrScanner(
   onCode: (code: string) => void,
   locked: () => boolean,
 ): Promise<QrScannerStop> {
-  // Móvil: html5-qrcode suele ir más estable en WebView y Safari
+  if (!window.isSecureContext) {
+    throw new DOMException("Secure context required", "SecurityError");
+  }
+
+  // ponytail: sin await antes de getUserMedia — iOS exige gesto del usuario
   if (isCoarsePointer()) {
-    return startHtml5(container, onCode, locked);
+    try {
+      return await startHtml5(container, onCode, locked);
+    } catch {
+      container.replaceChildren();
+    }
+
+    if (window.BarcodeDetector) {
+      try {
+        const formats = await window.BarcodeDetector.getSupportedFormats();
+        if (formats.includes("qr_code")) {
+          return await startNative(container, onCode, locked);
+        }
+      } catch {
+        container.replaceChildren();
+      }
+    }
+
+    throw new Error("Camera unavailable on mobile");
   }
 
   if (window.BarcodeDetector) {
@@ -258,9 +338,6 @@ export async function startQrScanner(
       container.replaceChildren();
     }
   }
-  return startHtml5(container, onCode, locked);
-}
 
-export function isMobileTouchDevice(): boolean {
-  return isCoarsePointer();
+  return startHtml5(container, onCode, locked);
 }
