@@ -73,6 +73,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
               <TableHead>Modelo</TableHead>
               <TableHead>Color</TableHead>
               <TableHead>Stock</TableHead>
+              <TableHead>Precio venta</TableHead>
               <TableHead>Cuota inicial</TableHead>
               <TableHead>Cuota diaria</TableHead>
               <TableHead>Estado</TableHead>
@@ -85,6 +86,11 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                 <TableCell className="font-medium">{bike.modelo}</TableCell>
                 <TableCell>{bike.color}</TableCell>
                 <TableCell>{bike.stock}</TableCell>
+                <TableCell>
+                  {bike.precio_venta != null
+                    ? formatCop(bike.precio_venta)
+                    : "—"}
+                </TableCell>
                 <TableCell>{formatCop(bike.cuota_inicial)}</TableCell>
                 <TableCell>{formatCop(bike.cuota_diaria)}</TableCell>
                 <TableCell>
@@ -168,6 +174,14 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
               <div className="flex justify-between gap-2">
                 <dt className="text-neutral-500">Stock</dt>
                 <dd>{bike.stock}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-neutral-500">Precio venta</dt>
+                <dd>
+                  {bike.precio_venta != null
+                    ? formatCop(bike.precio_venta)
+                    : "—"}
+                </dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-neutral-500">Cuota inicial</dt>
@@ -288,6 +302,7 @@ function BikeDialog({
     stock: number;
     cuotaInicial: number;
     cuotaDiaria: number;
+    precioVenta: number | null;
     descripcion: string;
     activo: boolean;
   }) => void;
@@ -299,6 +314,7 @@ function BikeDialog({
   const [stock, setStock] = useState("0");
   const [cuotaInicial, setCuotaInicial] = useState("0");
   const [cuotaDiaria, setCuotaDiaria] = useState("38000");
+  const [precioVenta, setPrecioVenta] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [activo, setActivo] = useState(true);
 
@@ -313,6 +329,9 @@ function BikeDialog({
       setStock(String(editing.stock));
       setCuotaInicial(String(editing.cuota_inicial));
       setCuotaDiaria(String(editing.cuota_diaria));
+      setPrecioVenta(
+        editing.precio_venta != null ? String(editing.precio_venta) : "",
+      );
       setDescripcion(editing.descripcion ?? "");
       setActivo(editing.activo);
       return;
@@ -325,6 +344,7 @@ function BikeDialog({
     setStock("");
     setCuotaInicial("");
     setCuotaDiaria("");
+    setPrecioVenta("");
     setDescripcion("");
     setActivo(true);
   }, [open, editing]);
@@ -342,6 +362,12 @@ function BikeDialog({
             label="Stock"
             value={stock}
             onChange={setStock}
+            type="number"
+          />
+          <Field
+            label="Precio de venta (total moto)"
+            value={precioVenta}
+            onChange={setPrecioVenta}
             type="number"
           />
           <Field
@@ -397,6 +423,9 @@ function BikeDialog({
                 stock: Number(stock),
                 cuotaInicial: Number(cuotaInicial),
                 cuotaDiaria: Number(cuotaDiaria),
+                precioVenta: precioVenta.trim()
+                  ? Number(precioVenta)
+                  : null,
                 descripcion,
                 activo,
               })

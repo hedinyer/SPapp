@@ -603,6 +603,7 @@ const bikeSchema = z.object({
   stock: z.number().int().min(0),
   cuotaInicial: z.number().int().min(0),
   cuotaDiaria: z.number().int().min(0),
+  precioVenta: z.number().int().positive().optional().nullable(),
   descripcion: z.string().optional(),
   activo: z.boolean(),
 });
@@ -618,6 +619,7 @@ export async function saveBike(input: z.infer<typeof bikeSchema>) {
     stock: parsed.stock,
     cuota_inicial: parsed.cuotaInicial,
     cuota_diaria: parsed.cuotaDiaria,
+    precio_venta: parsed.precioVenta ?? null,
     descripcion: parsed.descripcion?.trim() || null,
     activo: parsed.activo,
   };

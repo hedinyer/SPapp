@@ -379,6 +379,7 @@ export interface BikeRow {
   stock: number;
   cuota_inicial: number;
   cuota_diaria: number;
+  precio_venta: number | null;
   descripcion: string | null;
   activo: boolean;
 }

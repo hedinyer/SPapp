@@ -43,8 +43,10 @@ export function VenderMotoSheet({
     valorNum > 0 && pagadoNum >= 0 ? Math.max(0, valorNum - pagadoNum) : null;
 
   useEffect(() => {
-    if (selected) {
-      setValorVenta(String(selected.cuota_inicial));
+    if (selected?.precio_venta != null && selected.precio_venta > 0) {
+      setValorVenta(String(selected.precio_venta));
+    } else if (selected) {
+      setValorVenta("");
     }
   }, [selected]);
 
@@ -102,8 +104,10 @@ export function VenderMotoSheet({
                   montoPagado: parseCopInput(montoPagado) ?? 0,
                   notas: String(fd.get("notas") || "") || undefined,
                 });
-                await printVentaMotoReceipt(venta);
-                toast.success("Venta guardada e impresa.");
+                printVentaMotoReceipt(venta);
+                toast.success(
+                  "Venta guardada. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
+                );
                 resetForm();
                 onOpenChange(false);
               } catch (err) {
@@ -127,7 +131,9 @@ export function VenderMotoSheet({
             />
             {selected && (
               <p className="text-sm text-neutral-500">
-                Cuota inicial referencia: {formatCop(selected.cuota_inicial)}
+                {selected.precio_venta != null && selected.precio_venta > 0
+                  ? `Precio de la moto: ${formatCop(selected.precio_venta)}`
+                  : "Sin precio de venta en catálogo — ingrésalo abajo o configúralo en Catálogo."}
               </p>
             )}
           </div>
@@ -136,7 +142,7 @@ export function VenderMotoSheet({
             <p className="text-sm font-medium">Pago</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="valorVenta">Valor total</Label>
+                <Label htmlFor="valorVenta">Precio total de la moto</Label>
                 <Input
                   id="valorVenta"
                   inputMode="numeric"

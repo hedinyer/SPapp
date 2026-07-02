@@ -761,7 +761,7 @@ export async function getAllBikes(): Promise<BikeRow[]> {
   const { data } = await supabase
     .from("bike_table")
     .select(
-      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, descripcion, activo",
+      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, precio_venta, descripcion, activo",
     )
     .order("modelo")
     .order("color");
@@ -773,7 +773,7 @@ export async function getAvailableBikes(): Promise<BikeRow[]> {
   const { data } = await supabase
     .from("bike_table")
     .select(
-      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, descripcion, activo",
+      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, precio_venta, descripcion, activo",
     )
     .eq("activo", true)
     .gt("stock", 0)

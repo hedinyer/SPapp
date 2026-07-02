@@ -13,11 +13,19 @@ function folio(id: string): string {
 }
 
 function fechaLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) {
+    return new Intl.DateTimeFormat("es-CO", {
+      dateStyle: "short",
+      timeStyle: "short",
+      timeZone: "America/Bogota",
+    }).format(new Date());
+  }
   return new Intl.DateTimeFormat("es-CO", {
     dateStyle: "short",
     timeStyle: "short",
     timeZone: "America/Bogota",
-  }).format(new Date(iso));
+  }).format(d);
 }
 
 export function buildVentaMotoReceiptHtml(venta: VentaMotoRow): string {
@@ -36,7 +44,7 @@ export function buildVentaMotoReceiptHtml(venta: VentaMotoRow): string {
 
   if (venta.chasis) lines.push(`Chasis: ${venta.chasis}`);
   if (venta.valorVenta != null) {
-    lines.push(`Valor venta: ${formatCop(venta.valorVenta)}`);
+    lines.push(`Precio moto: ${formatCop(venta.valorVenta)}`);
     lines.push(`Pagado: ${formatCop(venta.montoPagado)}`);
     const saldo = venta.valorVenta - venta.montoPagado;
     if (saldo > 0) lines.push(`Saldo: ${formatCop(saldo)}`);
@@ -50,57 +58,55 @@ export function buildVentaMotoReceiptHtml(venta: VentaMotoRow): string {
 
   const body = lines.map((l) => `<div>${esc(l)}</div>`).join("");
 
+  // ponytail: sin @page size raro — Chrome lanza "Error interno" al imprimir
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venta moto</title>
 <style>
-@page { size: 80mm auto; margin: 4mm; }
-body { font-family: monospace; font-size: 12px; width: 72mm; margin: 0; }
-div { white-space: pre-wrap; word-break: break-word; }
+@media print { body { margin: 0; } }
+body { font-family: monospace; font-size: 12px; max-width: 72mm; margin: 8px auto; padding: 4px; }
+div { white-space: pre-wrap; word-break: break-word; line-height: 1.35; }
 </style></head><body>${body}</body></html>`;
 }
 
-/** Imprime ticket 80mm vía diálogo del navegador (impresora POS). */
-export function printVentaMotoReceipt(venta: VentaMotoRow): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const html = buildVentaMotoReceiptHtml(venta);
-    const iframe = document.createElement("iframe");
-    Object.assign(iframe.style, {
-      position: "fixed",
-      right: "0",
-      bottom: "0",
-      width: "0",
-      height: "0",
-      border: "0",
-    });
-    document.body.appendChild(iframe);
-
-    const cleanup = () => iframe.remove();
-
-    iframe.onerror = () => {
-      cleanup();
-      reject(new Error("No se pudo abrir la impresión."));
-    };
-
-    iframe.onload = () => {
-      const win = iframe.contentWindow;
-      if (!win) {
-        cleanup();
-        reject(new Error("No se pudo abrir la impresión."));
-        return;
-      }
-      win.onafterprint = () => {
-        cleanup();
-        resolve();
-      };
+function triggerPrint(win: Window): void {
+  window.setTimeout(() => {
+    try {
       win.focus();
       win.print();
-      window.setTimeout(() => {
-        cleanup();
-        resolve();
-      }, 120_000);
-    };
+    } catch {
+      // el usuario imprime con Ctrl+P desde la pestaña abierta
+    }
+  }, 400);
+}
 
-    iframe.srcdoc = html;
-  });
+/** Abre el ticket en pestaña nueva e intenta el diálogo de impresión. */
+export function printVentaMotoReceipt(venta: VentaMotoRow): void {
+  const html = buildVentaMotoReceiptHtml(venta);
+  const popup = window.open("", "_blank", "noopener,noreferrer");
+  if (popup) {
+    popup.document.open();
+    popup.document.write(html);
+    popup.document.close();
+    triggerPrint(popup);
+    return;
+  }
+
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute(
+    "style",
+    "position:fixed;right:0;bottom:0;width:1px;height:1px;border:0",
+  );
+  iframe.src = url;
+  iframe.onload = () => {
+    const win = iframe.contentWindow;
+    if (win) triggerPrint(win);
+    window.setTimeout(() => {
+      URL.revokeObjectURL(url);
+      iframe.remove();
+    }, 120_000);
+  };
+  document.body.appendChild(iframe);
 }
 
 if (typeof process !== "undefined" && process.argv[1]?.includes("venta-moto-receipt")) {
@@ -123,5 +129,8 @@ if (typeof process !== "undefined" && process.argv[1]?.includes("venta-moto-rece
   const html = buildVentaMotoReceiptHtml(sample);
   if (!html.includes("Juan Pérez") || !html.includes("Saldo:")) {
     throw new Error("buildVentaMotoReceiptHtml sample failed");
+  }
+  if (html.includes("80mm auto")) {
+    throw new Error("invalid @page must stay removed");
   }
 }
