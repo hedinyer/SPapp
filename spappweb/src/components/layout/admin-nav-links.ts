@@ -1,4 +1,5 @@
 import {
+  Banknote,
   Bike,
   ClipboardList,
   CreditCard,
@@ -29,6 +30,7 @@ export const adminNavLinks: AdminNavLink[] = [
   { href: "/productos-credito", label: "Prod. crédito", icon: CreditCard },
   { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/venta", label: "Venta", icon: ShoppingCart },
+  { href: "/venta-contado", label: "Venta contado", icon: Banknote },
   { href: "/garaje", label: "Garaje", icon: Warehouse },
   { href: "/vendidas", label: "Vendidas", icon: ShoppingBag },
   { href: "/solicitudes", label: "Solicitudes", icon: Wrench },

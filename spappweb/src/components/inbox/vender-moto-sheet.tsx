@@ -23,12 +23,14 @@ interface VenderMotoSheetProps {
   bikes: BikeRow[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSaved?: () => void;
 }
 
 export function VenderMotoSheet({
   bikes,
   open,
   onOpenChange,
+  onSaved,
 }: VenderMotoSheetProps) {
   const [pending, startTransition] = useTransition();
   const [bikeId, setBikeId] = useState("");
@@ -105,6 +107,7 @@ export function VenderMotoSheet({
                   notas: String(fd.get("notas") || "") || undefined,
                 });
                 printVentaMotoReceipt(venta);
+                onSaved?.();
                 toast.success(
                   "Venta guardada. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
                 );

@@ -102,5 +102,22 @@ export async function saveVentaMoto(input: VentaMotoInput): Promise<VentaMotoRow
   if (error) throw new Error(error.message);
 
   revalidatePath("/inbox");
+  revalidatePath("/venta-contado");
   return toRow(data as Record<string, unknown>);
+}
+
+const VENTA_MOTO_SELECT =
+  "id, bike_id, modelo, color, placa, chasis, cliente_nombre, cliente_cedula, cliente_celular, cuota_inicial, valor_venta, monto_pagado, notas, created_at";
+
+export async function getVentasContado(): Promise<VentaMotoRow[]> {
+  await requireAdminSession();
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("ventas_moto")
+    .select(VENTA_MOTO_SELECT)
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as Record<string, unknown>[]).map(toRow);
 }
