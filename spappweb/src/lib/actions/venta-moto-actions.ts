@@ -121,3 +121,56 @@ export async function getVentasContado(): Promise<VentaMotoRow[]> {
   if (error) throw new Error(error.message);
   return ((data ?? []) as Record<string, unknown>[]).map(toRow);
 }
+
+const abonoSchema = z.object({
+  id: z.string().uuid(),
+  monto: z.number().int().positive("El abono debe ser mayor a cero."),
+});
+
+export async function addAbonoVentaMoto(
+  id: string,
+  monto: number,
+): Promise<VentaMotoRow> {
+  await requireAdminSession();
+  const parsed = abonoSchema.parse({ id, monto });
+  const supabase = createAdminClient();
+
+  const { data: current, error: fetchError } = await supabase
+    .from("ventas_moto")
+    .select(VENTA_MOTO_SELECT)
+    .eq("id", parsed.id)
+    .single();
+
+  if (fetchError || !current) {
+    throw new Error(fetchError?.message ?? "Venta no encontrada.");
+  }
+
+  const row = toRow(current as Record<string, unknown>);
+  if (row.valorVenta == null) {
+    throw new Error("Esta venta no tiene precio definido.");
+  }
+
+  const nuevoPagado = row.montoPagado + parsed.monto;
+  if (nuevoPagado > row.valorVenta) {
+    const saldo = row.valorVenta - row.montoPagado;
+    throw new Error(
+      `El abono supera el saldo pendiente (${saldo.toLocaleString("es-CO")}).`,
+    );
+  }
+
+  const abonoNota = `Abono ${new Intl.DateTimeFormat("es-CO", { dateStyle: "short", timeStyle: "short", timeZone: "America/Bogota" }).format(new Date())}: $${parsed.monto.toLocaleString("es-CO")}`;
+  const notas = row.notas ? `${row.notas}\n${abonoNota}` : abonoNota;
+
+  const { data, error } = await supabase
+    .from("ventas_moto")
+    .update({ monto_pagado: nuevoPagado, notas })
+    .eq("id", parsed.id)
+    .select(VENTA_MOTO_SELECT)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/inbox");
+  revalidatePath("/venta-contado");
+  return toRow(data as Record<string, unknown>);
+}

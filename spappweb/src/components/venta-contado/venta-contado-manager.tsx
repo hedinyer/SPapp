@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Printer } from "lucide-react";
+import { CircleDollarSign, Plus, Printer } from "lucide-react";
 import type { VentaMotoRow } from "@/lib/actions/venta-moto-actions";
+import { AbonoVentaDialog } from "@/components/venta-contado/abono-venta-dialog";
 import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
 import { printVentaMotoReceipt } from "@/lib/printing/venta-moto-receipt";
 import type { BikeRow } from "@/lib/pipeline/types";
@@ -17,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 function saldo(venta: VentaMotoRow): number | null {
   if (venta.valorVenta == null) return null;
@@ -30,6 +32,27 @@ function pagoLabel(venta: VentaMotoRow): string {
   return "Pendiente";
 }
 
+function puedeAbonar(venta: VentaMotoRow): boolean {
+  return venta.valorVenta != null && venta.montoPagado < venta.valorVenta;
+}
+
+function EstadoBadge({ venta }: { venta: VentaMotoRow }) {
+  const label = pagoLabel(venta);
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
+        label === "Contado" && "bg-green-100 text-green-800",
+        label === "Abono" && "bg-amber-100 text-amber-800",
+        label === "Pendiente" && "bg-red-100 text-red-800",
+        label === "—" && "bg-neutral-100 text-neutral-600",
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
 export function VentaContadoManager({
   ventas,
   bikes,
@@ -39,12 +62,49 @@ export function VentaContadoManager({
 }) {
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [abonoVenta, setAbonoVenta] = useState<VentaMotoRow | null>(null);
+
+  const ventasFiltradas = useMemo(() => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return ventas;
+    return ventas.filter((v) => {
+      return (
+        v.clienteNombre.toLowerCase().includes(q) ||
+        v.clienteCedula.toLowerCase().includes(q) ||
+        v.clienteCelular.toLowerCase().includes(q) ||
+        v.modelo.toLowerCase().includes(q) ||
+        v.color.toLowerCase().includes(q) ||
+        (v.chasis ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [ventas, busqueda]);
+
+  async function handlePrint(venta: VentaMotoRow) {
+    try {
+      await printVentaMotoReceipt(venta);
+    } catch {
+      // el recibo abre en pestaña; errores raros no bloquean la UI
+    }
+  }
 
   return (
     <>
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex-1">
+          <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+            Buscar
+          </label>
+          <input
+            type="search"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Cliente, cédula, celular, modelo, chasis…"
+            className="flex h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-neutral-400"
+          />
+        </div>
         <Button
-          className="gap-2 bg-black text-white hover:bg-neutral-800"
+          className="gap-2 bg-black text-white hover:bg-neutral-800 sm:shrink-0"
           onClick={() => setSheetOpen(true)}
         >
           <Plus className="h-4 w-4" />
@@ -55,6 +115,10 @@ export function VentaContadoManager({
       {ventas.length === 0 ? (
         <p className="rounded-lg border border-dashed border-neutral-200 py-12 text-center text-neutral-500">
           No hay ventas de contado registradas.
+        </p>
+      ) : ventasFiltradas.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-neutral-200 py-12 text-center text-neutral-500">
+          Sin resultados para &ldquo;{busqueda.trim()}&rdquo;.
         </p>
       ) : (
         <>
@@ -69,11 +133,11 @@ export function VentaContadoManager({
                   <TableHead>Pagado</TableHead>
                   <TableHead>Saldo</TableHead>
                   <TableHead>Estado</TableHead>
-                  <TableHead className="w-12" />
+                  <TableHead className="w-24" />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ventas.map((v) => (
+                {ventasFiltradas.map((v) => (
                   <TableRow key={v.id}>
                     <TableCell className="whitespace-nowrap">
                       {formatDate(v.createdAt)}
@@ -99,17 +163,33 @@ export function VentaContadoManager({
                     <TableCell>
                       {saldo(v) != null ? formatCop(saldo(v)!) : "—"}
                     </TableCell>
-                    <TableCell>{pagoLabel(v)}</TableCell>
                     <TableCell>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Reimprimir recibo"
-                        onClick={() => printVentaMotoReceipt(v)}
-                      >
-                        <Printer className="h-4 w-4" />
-                      </Button>
+                      <EstadoBadge venta={v} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        {puedeAbonar(v) ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1 px-2 text-xs"
+                            onClick={() => setAbonoVenta(v)}
+                          >
+                            <CircleDollarSign className="h-3.5 w-3.5" />
+                            Abonar
+                          </Button>
+                        ) : null}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Reimprimir recibo"
+                          onClick={() => handlePrint(v)}
+                        >
+                          <Printer className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -118,7 +198,7 @@ export function VentaContadoManager({
           </div>
 
           <div className="space-y-3 lg:hidden">
-            {ventas.map((v) => (
+            {ventasFiltradas.map((v) => (
               <div
                 key={v.id}
                 className="rounded-lg border border-neutral-200 p-4 text-sm"
@@ -130,10 +210,11 @@ export function VentaContadoManager({
                       {v.modelo} · {v.color}
                     </p>
                   </div>
-                  <span className="text-xs text-neutral-500">
-                    {formatDate(v.createdAt)}
-                  </span>
+                  <EstadoBadge venta={v} />
                 </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  {formatDate(v.createdAt)}
+                </p>
                 <dl className="mt-3 space-y-1">
                   <div className="flex justify-between">
                     <dt className="text-neutral-500">Precio</dt>
@@ -152,16 +233,30 @@ export function VentaContadoManager({
                     </dd>
                   </div>
                 </dl>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-3 w-full gap-2"
-                  onClick={() => printVentaMotoReceipt(v)}
-                >
-                  <Printer className="h-4 w-4" />
-                  Reimprimir
-                </Button>
+                <div className="mt-3 flex gap-2">
+                  {puedeAbonar(v) ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2"
+                      onClick={() => setAbonoVenta(v)}
+                    >
+                      <CircleDollarSign className="h-4 w-4" />
+                      Abonar
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={cn("gap-2", puedeAbonar(v) ? "flex-1" : "w-full")}
+                    onClick={() => handlePrint(v)}
+                  >
+                    <Printer className="h-4 w-4" />
+                    Reimprimir
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -173,6 +268,14 @@ export function VentaContadoManager({
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         onSaved={() => router.refresh()}
+      />
+
+      <AbonoVentaDialog
+        venta={abonoVenta}
+        open={abonoVenta != null}
+        onOpenChange={(open) => {
+          if (!open) setAbonoVenta(null);
+        }}
       />
     </>
   );

@@ -106,7 +106,7 @@ export function VenderMotoSheet({
                   montoPagado: parseCopInput(montoPagado) ?? 0,
                   notas: String(fd.get("notas") || "") || undefined,
                 });
-                printVentaMotoReceipt(venta);
+                printVentaMotoReceipt(venta).catch(() => {});
                 onSaved?.();
                 toast.success(
                   "Venta guardada. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
