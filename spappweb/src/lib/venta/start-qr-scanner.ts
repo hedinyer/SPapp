@@ -191,11 +191,21 @@ async function startHtml5(
     useBarCodeDetectorIfSupported: false,
   });
 
+  const mobile = isCoarsePointer();
+
   await scanner.start(
-    { facingMode: "environment" },
     {
-      fps: 20,
+      facingMode: { ideal: "environment" },
+      aspectRatio: mobile ? 1.333333 : 1.777778,
+    },
+    {
+      fps: mobile ? 15 : 20,
       disableFlip: false,
+      qrbox: (viewfinderWidth, viewfinderHeight) => {
+        const w = Math.floor(Math.min(viewfinderWidth * 0.82, mobile ? 280 : 240));
+        const h = Math.floor(Math.min(viewfinderHeight * 0.55, mobile ? 200 : 160));
+        return { width: w, height: h };
+      },
     },
     (text) => {
       const raw = text.trim();
@@ -215,9 +225,12 @@ async function startHtml5(
     });
   }
 
+  addScanOverlay(container);
+
   return () => {
     void scanner.stop().catch(() => {});
     scanner.clear();
+    container.replaceChildren();
   };
 }
 
@@ -226,7 +239,12 @@ export async function startQrScanner(
   onCode: (code: string) => void,
   locked: () => boolean,
 ): Promise<QrScannerStop> {
-  if (!isCoarsePointer() && window.BarcodeDetector) {
+  // Móvil: html5-qrcode suele ir más estable en WebView y Safari
+  if (isCoarsePointer()) {
+    return startHtml5(container, onCode, locked);
+  }
+
+  if (window.BarcodeDetector) {
     try {
       const formats = await window.BarcodeDetector.getSupportedFormats();
       if (formats.includes("qr_code")) {
@@ -241,4 +259,8 @@ export async function startQrScanner(
     }
   }
   return startHtml5(container, onCode, locked);
+}
+
+export function isMobileTouchDevice(): boolean {
+  return isCoarsePointer();
 }

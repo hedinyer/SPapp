@@ -1,0 +1,769 @@
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import { flushSync } from "react-dom";
+import {
+  Camera,
+  CameraOff,
+  Minus,
+  Package,
+  Plus,
+  Printer,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  lookupProductoBySku,
+  searchProductosVenta,
+} from "@/lib/actions/venta-actions";
+import { saveVentaProducto } from "@/lib/actions/venta-producto-actions";
+import type { InventarioProductoRow } from "@/lib/pipeline/types";
+import { printVentaProductoReceipt } from "@/lib/printing/venta-producto-receipt";
+import { formatCop } from "@/lib/utils/format";
+import {
+  isMobileTouchDevice,
+  startQrScanner,
+} from "@/lib/venta/start-qr-scanner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+
+const SCAN_COOLDOWN_SEC = 2;
+const SCANNER_ID = "venta-productos-scanner";
+
+type CartLine = {
+  productoId: number;
+  sku: string;
+  nombre: string;
+  precioUnitario: number;
+  cantidad: number;
+  stock: number;
+};
+
+type CartAction =
+  | { type: "add"; producto: InventarioProductoRow }
+  | { type: "inc"; productoId: number }
+  | { type: "dec"; productoId: number }
+  | { type: "remove"; productoId: number }
+  | { type: "clear" };
+
+function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
+  switch (action.type) {
+    case "clear":
+      return [];
+    case "remove":
+      return state.filter((l) => l.productoId !== action.productoId);
+    case "add": {
+      const existing = state.find((l) => l.productoId === action.producto.id);
+      if (existing) {
+        if (existing.cantidad >= action.producto.stock) {
+          return state;
+        }
+        return state.map((l) =>
+          l.productoId === action.producto.id
+            ? { ...l, cantidad: l.cantidad + 1 }
+            : l,
+        );
+      }
+      if (action.producto.stock <= 0) return state;
+      return [
+        ...state,
+        {
+          productoId: action.producto.id,
+          sku: action.producto.sku,
+          nombre: action.producto.nombre,
+          precioUnitario: action.producto.precio,
+          cantidad: 1,
+          stock: action.producto.stock,
+        },
+      ];
+    }
+    case "inc":
+      return state.map((l) => {
+        if (l.productoId !== action.productoId) return l;
+        if (l.cantidad >= l.stock) return l;
+        return { ...l, cantidad: l.cantidad + 1 };
+      });
+    case "dec":
+      return state
+        .map((l) =>
+          l.productoId === action.productoId
+            ? { ...l, cantidad: l.cantidad - 1 }
+            : l,
+        )
+        .filter((l) => l.cantidad > 0);
+    default:
+      return state;
+  }
+}
+
+interface VenderProductosSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSaved?: () => void;
+}
+
+export function VenderProductosSheet({
+  open,
+  onOpenChange,
+  onSaved,
+}: VenderProductosSheetProps) {
+  const [pending, startTransition] = useTransition();
+  const [searchPending, startSearchTransition] = useTransition();
+  const [lines, dispatch] = useReducer(cartReducer, []);
+  const [busqueda, setBusqueda] = useState("");
+  const [resultados, setResultados] = useState<InventarioProductoRow[]>([]);
+  const [listaAbierta, setListaAbierta] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState("");
+  const [clienteCedula, setClienteCedula] = useState("");
+  const [clienteCelular, setClienteCelular] = useState("");
+  const [montoPagado, setMontoPagado] = useState("");
+  const [notas, setNotas] = useState("");
+  const [cameraOn, setCameraOn] = useState(false);
+  const [cooldownSec, setCooldownSec] = useState(0);
+  const [sheetSide, setSheetSide] = useState<"bottom" | "right">("right");
+  const busquedaRef = useRef<HTMLInputElement>(null);
+  const scannerInputRef = useRef<HTMLInputElement>(null);
+  const scannerContainerRef = useRef<HTMLDivElement>(null);
+  const scanLockRef = useRef(false);
+  const stopScannerRef = useRef<(() => void) | null>(null);
+  const onCodeRef = useRef<(code: string) => void>(() => {});
+  const cooldownTimerRef = useRef<number | null>(null);
+  const cameraStartedRef = useRef(false);
+  const linesRef = useRef(lines);
+  linesRef.current = lines;
+
+  const total = useMemo(
+    () => lines.reduce((sum, l) => sum + l.precioUnitario * l.cantidad, 0),
+    [lines],
+  );
+
+  function resetForm() {
+    stopCamera();
+    dispatch({ type: "clear" });
+    setBusqueda("");
+    setResultados([]);
+    setListaAbierta(false);
+    setClienteNombre("");
+    setClienteCedula("");
+    setClienteCelular("");
+    setMontoPagado("");
+    setNotas("");
+    cameraStartedRef.current = false;
+  }
+
+  const stopCamera = useCallback(() => {
+    stopScannerRef.current?.();
+    stopScannerRef.current = null;
+    setCameraOn(false);
+  }, []);
+
+  const startCooldown = useCallback(() => {
+    if (cooldownTimerRef.current) {
+      window.clearInterval(cooldownTimerRef.current);
+    }
+    scanLockRef.current = true;
+    setCooldownSec(SCAN_COOLDOWN_SEC);
+    cooldownTimerRef.current = window.setInterval(() => {
+      setCooldownSec((prev) => {
+        if (prev <= 1) {
+          if (cooldownTimerRef.current) {
+            window.clearInterval(cooldownTimerRef.current);
+            cooldownTimerRef.current = null;
+          }
+          scanLockRef.current = false;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  const lookupAndAdd = useCallback(
+    (sku: string) => {
+      startTransition(async () => {
+        try {
+          const producto = await lookupProductoBySku(sku);
+          if (!producto.activo) {
+            toast.error("Producto inactivo.");
+            return;
+          }
+          if (producto.stock <= 0) {
+            toast.error("Sin stock disponible.");
+            return;
+          }
+          const inCart = linesRef.current.find((l) => l.productoId === producto.id);
+          if (inCart && inCart.cantidad >= producto.stock) {
+            toast.error("Ya agregaste todo el stock disponible.");
+            return;
+          }
+          dispatch({ type: "add", producto });
+          toast.success(`${producto.nombre} agregado`);
+          setBusqueda("");
+          setResultados([]);
+          setListaAbierta(false);
+        } catch (e) {
+          toast.error(
+            e instanceof Error ? e.message : "Producto no encontrado.",
+          );
+        }
+      });
+    },
+    [],
+  );
+
+  const resolveSkuFromCamera = useCallback(
+    (raw: string) => {
+      const sku = raw.trim();
+      if (!sku || scanLockRef.current) return;
+      startCooldown();
+      lookupAndAdd(sku);
+    },
+    [lookupAndAdd, startCooldown],
+  );
+  onCodeRef.current = resolveSkuFromCamera;
+
+  const startCamera = useCallback(async () => {
+    if (cameraOn || stopScannerRef.current) return;
+
+    flushSync(() => setCameraOn(true));
+    scannerInputRef.current?.blur();
+    busquedaRef.current?.blur();
+
+    const container = scannerContainerRef.current;
+    if (!container) {
+      toast.error("No se pudo acceder a la cámara.");
+      setCameraOn(false);
+      return;
+    }
+
+    try {
+      stopScannerRef.current = await startQrScanner(
+        container,
+        (code) => onCodeRef.current(code),
+        () => scanLockRef.current,
+      );
+    } catch {
+      toast.error("No se pudo acceder a la cámara.");
+      setCameraOn(false);
+    }
+  }, [cameraOn]);
+
+  const toggleCamera = useCallback(async () => {
+    if (cameraOn) {
+      stopCamera();
+      return;
+    }
+    await startCamera();
+  }, [cameraOn, startCamera, stopCamera]);
+
+  function parseCopInput(raw: string): number | undefined {
+    const n = Number(raw.replace(/\D/g, ""));
+    return Number.isFinite(n) && n >= 0 ? n : undefined;
+  }
+
+  function addProducto(producto: InventarioProductoRow) {
+    if (!producto.activo) {
+      toast.error("Producto inactivo.");
+      return;
+    }
+    if (producto.stock <= 0) {
+      toast.error("Sin stock disponible.");
+      return;
+    }
+    const inCart = lines.find((l) => l.productoId === producto.id);
+    if (inCart && inCart.cantidad >= producto.stock) {
+      toast.error("Ya agregaste todo el stock disponible.");
+      return;
+    }
+    dispatch({ type: "add", producto });
+    toast.success(`${producto.nombre} agregado`);
+    setBusqueda("");
+    setResultados([]);
+    setListaAbierta(false);
+    busquedaRef.current?.focus();
+  }
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const update = () => setSheetSide(mq.matches ? "bottom" : "right");
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        window.clearInterval(cooldownTimerRef.current);
+      }
+      stopScannerRef.current?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      stopCamera();
+      cameraStartedRef.current = false;
+      return;
+    }
+
+    let cancelled = false;
+    if (isMobileTouchDevice() && !cameraStartedRef.current) {
+      cameraStartedRef.current = true;
+      void startCamera().then(() => {
+        if (cancelled) stopCamera();
+      });
+    } else if (!isMobileTouchDevice()) {
+      scannerInputRef.current?.focus();
+    }
+
+    return () => {
+      cancelled = true;
+      stopCamera();
+      cameraStartedRef.current = false;
+    };
+  }, [open, startCamera, stopCamera]);
+
+  useEffect(() => {
+    const q = busqueda.trim();
+    if (q.length < 2) {
+      setResultados([]);
+      setListaAbierta(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      startSearchTransition(async () => {
+        try {
+          const items = await searchProductosVenta(q);
+          setResultados(items);
+          setListaAbierta(true);
+        } catch {
+          setResultados([]);
+        }
+      });
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [busqueda]);
+
+  function resolverBusqueda() {
+    const trimmed = busqueda.trim();
+    if (!trimmed) return;
+
+    startTransition(async () => {
+      try {
+        const producto = await lookupProductoBySku(trimmed);
+        addProducto(producto);
+        return;
+      } catch {
+        // no es SKU exacto; sigue con sugerencias
+      }
+
+      if (resultados.length === 1) {
+        addProducto(resultados[0]);
+        return;
+      }
+
+      if (resultados.length > 1) {
+        setListaAbierta(true);
+        toast.error("Selecciona un producto de la lista.");
+        return;
+      }
+
+      toast.error("Sin resultados.");
+    });
+  }
+
+  function submit() {
+    if (lines.length === 0) {
+      toast.error("Agrega al menos un producto.");
+      return;
+    }
+    if (!clienteNombre.trim()) {
+      toast.error("Indica el nombre del cliente.");
+      return;
+    }
+    if (clienteCelular.trim().length < 10) {
+      toast.error("Indica un celular válido.");
+      return;
+    }
+
+    const pagado = parseCopInput(montoPagado) ?? total;
+    if (pagado > total) {
+      toast.error("El pago no puede superar el total.");
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        const venta = await saveVentaProducto({
+          clienteNombre: clienteNombre.trim(),
+          clienteCedula: clienteCedula.trim() || undefined,
+          clienteCelular: clienteCelular.trim(),
+          montoPagado: pagado,
+          notas: notas.trim() || undefined,
+          items: lines.map((l) => ({
+            productoId: l.productoId,
+            cantidad: l.cantidad,
+          })),
+        });
+        await printVentaProductoReceipt(venta);
+        toast.success(
+          "Venta guardada. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
+        );
+        resetForm();
+        onOpenChange(false);
+        onSaved?.();
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "No se pudo guardar.");
+      }
+    });
+  }
+
+  return (
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) resetForm();
+        onOpenChange(next);
+      }}
+    >
+      <SheetContent
+        side={sheetSide}
+        className={cn(
+          "overflow-y-auto p-0 sm:max-w-md",
+          sheetSide === "bottom" && "max-h-[92dvh] rounded-t-2xl",
+        )}
+      >
+        <input
+          ref={scannerInputRef}
+          type="text"
+          autoComplete="off"
+          inputMode="none"
+          tabIndex={-1}
+          aria-label="Escaneo con pistola lectora"
+          className="pointer-events-none absolute h-0 w-0 opacity-0"
+          onKeyDown={(e) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            const input = e.currentTarget;
+            const sku = input.value.trim();
+            if (sku) lookupAndAdd(sku);
+            input.value = "";
+            if (!isMobileTouchDevice()) input.focus();
+          }}
+        />
+
+        <SheetHeader className="border-b border-neutral-200 px-4 pb-3 pt-4">
+          <SheetTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Venta productos
+          </SheetTitle>
+        </SheetHeader>
+
+        <div className="space-y-4 px-4 py-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium text-neutral-700">
+                Escanear etiqueta
+              </p>
+              <Button
+                type="button"
+                variant={cameraOn ? "default" : "outline"}
+                size="sm"
+                className="gap-1.5"
+                onClick={() => void toggleCamera()}
+              >
+                {cameraOn ? (
+                  <>
+                    <CameraOff className="h-4 w-4" />
+                    Apagar
+                  </>
+                ) : (
+                  <>
+                    <Camera className="h-4 w-4" />
+                    Cámara
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div
+              className={cn(
+                "relative w-full overflow-hidden rounded-xl border border-neutral-200 bg-black",
+                cameraOn
+                  ? "aspect-[4/3] max-h-[min(45dvh,320px)]"
+                  : "flex min-h-[5.5rem] items-center justify-center bg-neutral-100",
+              )}
+            >
+              {!cameraOn ? (
+                <p className="px-4 text-center text-xs text-neutral-500">
+                  Pulsa Cámara para escanear la etiqueta
+                </p>
+              ) : null}
+              <div
+                id={SCANNER_ID}
+                ref={scannerContainerRef}
+                className={cn(
+                  "absolute inset-0 [&_#qr-shaded-region]:hidden [&_video]:!absolute [&_video]:!inset-0 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover",
+                  !cameraOn && "pointer-events-none opacity-0",
+                )}
+              />
+              {cooldownSec > 0 && (
+                <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/60 text-white">
+                  <span className="text-4xl font-bold tabular-nums">
+                    {cooldownSec}
+                  </span>
+                  <span className="mt-1 text-xs">Listo para otro scan</span>
+                </div>
+              )}
+              {pending && cooldownSec === 0 && (
+                <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 text-xs text-white">
+                  Agregando…
+                </div>
+              )}
+            </div>
+
+            {cameraOn ? (
+              <p className="text-center text-xs text-neutral-500">
+                Centra el QR de la etiqueta en el recuadro blanco.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="relative">
+            <div className="flex gap-2">
+              <Input
+                ref={busquedaRef}
+                type="search"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por nombre o SKU…"
+                autoComplete="off"
+                onFocus={() => {
+                  if (resultados.length > 0) setListaAbierta(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    resolverBusqueda();
+                  }
+                  if (e.key === "Escape") {
+                    setListaAbierta(false);
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={resolverBusqueda}
+                disabled={pending || searchPending}
+              >
+                Agregar
+              </Button>
+            </div>
+
+            {listaAbierta && busqueda.trim().length >= 2 ? (
+              <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg">
+                {searchPending && resultados.length === 0 ? (
+                  <p className="px-3 py-2 text-sm text-neutral-500">
+                    Buscando…
+                  </p>
+                ) : null}
+                {!searchPending && resultados.length === 0 ? (
+                  <p className="px-3 py-2 text-sm text-neutral-500">
+                    Sin resultados
+                  </p>
+                ) : null}
+                {resultados.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={cn(
+                      "flex w-full flex-col gap-0.5 border-b border-neutral-100 px-3 py-2.5 text-left last:border-0 hover:bg-neutral-50",
+                      p.stock <= 0 && "opacity-50",
+                    )}
+                    disabled={p.stock <= 0}
+                    onClick={() => addProducto(p)}
+                  >
+                    <span className="text-sm font-medium">{p.nombre}</span>
+                    <span className="text-xs text-neutral-500">
+                      {p.sku} · {formatCop(p.precio)} · stock {p.stock}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          {lines.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-neutral-200 py-8 text-center text-sm text-neutral-500">
+              Busca por nombre, escanea QR o ingresa el SKU.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {lines.map((line) => (
+                <div
+                  key={line.productoId}
+                  className="rounded-lg border border-neutral-200 p-3 text-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium">{line.nombre}</p>
+                      <p className="text-xs text-neutral-500">{line.sku}</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      aria-label="Quitar"
+                      onClick={() =>
+                        dispatch({ type: "remove", productoId: line.productoId })
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() =>
+                          dispatch({ type: "dec", productoId: line.productoId })
+                        }
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </Button>
+                      <span className="w-8 text-center font-medium">
+                        {line.cantidad}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        disabled={line.cantidad >= line.stock}
+                        onClick={() =>
+                          dispatch({ type: "inc", productoId: line.productoId })
+                        }
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <span className="font-semibold">
+                      {formatCop(line.precioUnitario * line.cantidad)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              <p className="text-right text-base font-bold">
+                Total: {formatCop(total)}
+              </p>
+            </div>
+          )}
+
+          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+            <p className="text-sm font-medium">Cliente</p>
+            <div className="space-y-2">
+              <Label htmlFor="prod-cliente-nombre">Nombre</Label>
+              <Input
+                id="prod-cliente-nombre"
+                value={clienteNombre}
+                onChange={(e) => setClienteNombre(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="prod-cliente-cedula">Cédula</Label>
+                <Input
+                  id="prod-cliente-cedula"
+                  inputMode="numeric"
+                  value={clienteCedula}
+                  onChange={(e) => setClienteCedula(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="prod-cliente-celular">Celular</Label>
+                <Input
+                  id="prod-cliente-celular"
+                  inputMode="tel"
+                  value={clienteCelular}
+                  onChange={(e) => setClienteCelular(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+            <p className="text-sm font-medium">Pago</p>
+            <div className="space-y-2">
+              <Label htmlFor="prod-monto-pagado">Pagado hoy</Label>
+              <Input
+                id="prod-monto-pagado"
+                inputMode="numeric"
+                placeholder={total > 0 ? String(total) : "0"}
+                value={montoPagado}
+                onChange={(e) => setMontoPagado(e.target.value)}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={total <= 0}
+              onClick={() => setMontoPagado(String(total))}
+            >
+              Marcar pago de contado
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="prod-notas">Notas</Label>
+            <Input
+              id="prod-notas"
+              value={notas}
+              onChange={(e) => setNotas(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <SheetFooter className="border-t border-neutral-200 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+          <Button
+            type="button"
+            className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+            disabled={pending || lines.length === 0}
+            onClick={submit}
+          >
+            <Printer className="h-4 w-4" />
+            {pending ? "Guardando…" : "Guardar e imprimir"}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}

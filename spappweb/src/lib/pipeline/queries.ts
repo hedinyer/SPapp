@@ -725,6 +725,30 @@ export async function getProductoBySku(
   return (data as InventarioProductoRow | null) ?? null;
 }
 
+export async function searchProductos(
+  q: string,
+  limit = 8,
+): Promise<InventarioProductoRow[]> {
+  const trimmed = q.trim();
+  if (trimmed.length < 2) return [];
+
+  const safe = trimmed.replace(/[%_\\]/g, "");
+  if (!safe) return [];
+
+  const pattern = `%${safe}%`;
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("inventario_productos")
+    .select(productoSelect)
+    .eq("activo", true)
+    .or(`nombre.ilike."${pattern}",sku.ilike."${pattern}"`)
+    .order("nombre")
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data as InventarioProductoRow[]) ?? [];
+}
+
 export async function getAllSolicitudesTaller(): Promise<SolicitudTallerRow[]> {
   const supabase = createAdminClient();
   const { data } = await supabase

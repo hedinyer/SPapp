@@ -1,7 +1,7 @@
 "use server";
 
 import { requireAdminSession } from "@/lib/auth/session";
-import { getProductoBySku } from "@/lib/pipeline/queries";
+import { getProductoBySku, searchProductos } from "@/lib/pipeline/queries";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 
 export async function lookupProductoBySku(
@@ -13,4 +13,11 @@ export async function lookupProductoBySku(
     throw new Error(`Producto no encontrado: ${sku.trim() || "(vacío)"}`);
   }
   return producto;
+}
+
+export async function searchProductosVenta(
+  q: string,
+): Promise<InventarioProductoRow[]> {
+  await requireAdminSession();
+  return searchProductos(q);
 }
