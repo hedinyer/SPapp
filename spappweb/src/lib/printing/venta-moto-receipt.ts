@@ -77,6 +77,10 @@ export async function buildVentaMotoReceiptHtml(
     ? `<div class="sub">Chasis ${esc(venta.chasis)}</div>`
     : "";
 
+  const placaHtml = venta.placa
+    ? `<div class="sub">Placa ${esc(venta.placa)}</div>`
+    : "";
+
   // ponytail: sin @page size raro — Chrome lanza "Error interno" al imprimir
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Venta moto ${esc(f)}</title>
 <style>
@@ -218,6 +222,7 @@ body {
 <div class="section">
   <div class="label">Moto</div>
   <div class="value">${esc(venta.modelo)} · ${esc(venta.color)}</div>
+  ${placaHtml}
   ${chasisHtml}
 </div>
 ${totalesHtml}

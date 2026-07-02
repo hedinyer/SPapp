@@ -36,7 +36,7 @@ export function VenderMotoSheet({
   const [bikeId, setBikeId] = useState("");
   const [valorVenta, setValorVenta] = useState("");
   const [montoPagado, setMontoPagado] = useState("");
-  const activeBikes = bikes.filter((b) => b.activo);
+  const activeBikes = bikes.filter((b) => b.activo && b.stock > 0);
   const selected = activeBikes.find((b) => String(b.id) === bikeId);
 
   const valorNum = Number(valorVenta.replace(/\D/g, ""));
@@ -88,15 +88,18 @@ export function VenderMotoSheet({
           className="mt-6 space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
+            if (!bikeId || !selected) {
+              toast.error("Selecciona una moto del catálogo.");
+              return;
+            }
             const fd = new FormData(e.currentTarget);
-            const parsedBikeId = bikeId ? Number(bikeId) : undefined;
 
             startTransition(async () => {
               try {
                 const venta = await saveVentaMoto({
-                  bikeId: parsedBikeId,
-                  modelo: selected?.modelo ?? String(fd.get("modelo")),
-                  color: selected?.color ?? String(fd.get("color")),
+                  bikeId: Number(bikeId),
+                  modelo: selected.modelo,
+                  color: selected.color,
                   clienteNombre: String(fd.get("clienteNombre")),
                   clienteCedula: String(fd.get("clienteCedula")),
                   clienteCelular: String(fd.get("clienteCelular")),
@@ -132,6 +135,11 @@ export function VenderMotoSheet({
                 label: `${b.modelo} — ${b.color} (stock ${b.stock})`,
               }))}
             />
+            {activeBikes.length === 0 ? (
+              <p className="text-sm text-amber-700">
+                No hay motos con stock en catálogo.
+              </p>
+            ) : null}
             {selected && (
               <p className="text-sm text-neutral-500">
                 {selected.precio_venta != null && selected.precio_venta > 0
@@ -188,19 +196,6 @@ export function VenderMotoSheet({
             </Button>
           </div>
 
-          {!selected && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="modelo">Modelo</Label>
-                <Input id="modelo" name="modelo" required={!selected} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
-                <Input id="color" name="color" required={!selected} />
-              </div>
-            </>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="clienteNombre">Nombre del cliente</Label>
             <Input id="clienteNombre" name="clienteNombre" required />
@@ -239,7 +234,7 @@ export function VenderMotoSheet({
           <Button
             type="submit"
             form="vender-moto-form"
-            disabled={pending}
+            disabled={pending || !bikeId || activeBikes.length === 0}
             className="w-full gap-2"
           >
             <Printer className="h-4 w-4" />

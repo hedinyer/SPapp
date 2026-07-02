@@ -1,9 +1,9 @@
 import { getVentasContado } from "@/lib/actions/venta-moto-actions";
-import { getAllBikes } from "@/lib/pipeline/queries";
+import { getAvailableBikes } from "@/lib/pipeline/queries";
 import { VentaContadoManager } from "@/components/venta-contado/venta-contado-manager";
 
 export default async function VentaContadoPage() {
-  const [ventas, bikes] = await Promise.all([getVentasContado(), getAllBikes()]);
+  const [ventas, bikes] = await Promise.all([getVentasContado(), getAvailableBikes()]);
 
   return (
     <div className="space-y-6">

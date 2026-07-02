@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircleDollarSign, Plus, Printer } from "lucide-react";
+import { CircleDollarSign, Plus, Printer, Tag } from "lucide-react";
 import type { VentaMotoRow } from "@/lib/actions/venta-moto-actions";
 import { AbonoVentaDialog } from "@/components/venta-contado/abono-venta-dialog";
+import { PlacaVentaDialog } from "@/components/venta-contado/placa-venta-dialog";
 import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
 import { printVentaMotoReceipt } from "@/lib/printing/venta-moto-receipt";
 import type { BikeRow } from "@/lib/pipeline/types";
@@ -64,6 +65,7 @@ export function VentaContadoManager({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [abonoVenta, setAbonoVenta] = useState<VentaMotoRow | null>(null);
+  const [placaVenta, setPlacaVenta] = useState<VentaMotoRow | null>(null);
 
   const ventasFiltradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
@@ -75,7 +77,8 @@ export function VentaContadoManager({
         v.clienteCelular.toLowerCase().includes(q) ||
         v.modelo.toLowerCase().includes(q) ||
         v.color.toLowerCase().includes(q) ||
-        (v.chasis ?? "").toLowerCase().includes(q)
+        (v.chasis ?? "").toLowerCase().includes(q) ||
+        (v.placa ?? "").toLowerCase().includes(q)
       );
     });
   }, [ventas, busqueda]);
@@ -99,7 +102,7 @@ export function VentaContadoManager({
             type="search"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Cliente, cédula, celular, modelo, chasis…"
+            placeholder="Cliente, cédula, celular, placa, modelo, chasis…"
             className="flex h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-neutral-400"
           />
         </div>
@@ -133,7 +136,7 @@ export function VentaContadoManager({
                   <TableHead>Pagado</TableHead>
                   <TableHead>Saldo</TableHead>
                   <TableHead>Estado</TableHead>
-                  <TableHead className="w-24" />
+                  <TableHead className="w-40" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -150,6 +153,11 @@ export function VentaContadoManager({
                     </TableCell>
                     <TableCell>
                       {v.modelo} · {v.color}
+                      {v.placa ? (
+                        <div className="text-xs font-medium text-neutral-700">
+                          Placa {v.placa}
+                        </div>
+                      ) : null}
                       {v.chasis ? (
                         <div className="text-xs text-neutral-500">
                           Chasis {v.chasis}
@@ -167,7 +175,19 @@ export function VentaContadoManager({
                       <EstadoBadge venta={v} />
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center justify-end gap-1">
+                        {!v.placa ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1 px-2 text-xs"
+                            onClick={() => setPlacaVenta(v)}
+                          >
+                            <Tag className="h-3.5 w-3.5" />
+                            Agregar placa
+                          </Button>
+                        ) : null}
                         {puedeAbonar(v) ? (
                           <Button
                             type="button"
@@ -208,6 +228,7 @@ export function VentaContadoManager({
                     <p className="font-medium">{v.clienteNombre}</p>
                     <p className="text-neutral-500">
                       {v.modelo} · {v.color}
+                      {v.placa ? ` · Placa ${v.placa}` : ""}
                     </p>
                   </div>
                   <EstadoBadge venta={v} />
@@ -233,7 +254,19 @@ export function VentaContadoManager({
                     </dd>
                   </div>
                 </dl>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {!v.placa ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2"
+                      onClick={() => setPlacaVenta(v)}
+                    >
+                      <Tag className="h-4 w-4" />
+                      Agregar placa
+                    </Button>
+                  ) : null}
                   {puedeAbonar(v) ? (
                     <Button
                       type="button"
@@ -275,6 +308,14 @@ export function VentaContadoManager({
         open={abonoVenta != null}
         onOpenChange={(open) => {
           if (!open) setAbonoVenta(null);
+        }}
+      />
+
+      <PlacaVentaDialog
+        venta={placaVenta}
+        open={placaVenta != null}
+        onOpenChange={(open) => {
+          if (!open) setPlacaVenta(null);
         }}
       />
     </>

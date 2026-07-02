@@ -6,7 +6,7 @@ import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const ventaMotoSchema = z.object({
-  bikeId: z.number().int().positive().optional(),
+  bikeId: z.number().int().positive("Selecciona una moto del catálogo."),
   modelo: z.string().trim().min(1, "Modelo obligatorio"),
   color: z.string().trim().min(1, "Color obligatorio"),
   clienteNombre: z.string().trim().min(1, "Nombre del cliente obligatorio"),
@@ -78,10 +78,24 @@ export async function saveVentaMoto(input: VentaMotoInput): Promise<VentaMotoRow
   const parsed = ventaMotoSchema.parse(input);
   const supabase = createAdminClient();
 
+  const { data: bike, error: bikeError } = await supabase
+    .from("bike_table")
+    .select("id, stock, activo")
+    .eq("id", parsed.bikeId)
+    .maybeSingle();
+
+  if (bikeError) throw new Error(bikeError.message);
+  if (!bike?.activo) {
+    throw new Error("La moto seleccionada no está disponible en catálogo.");
+  }
+  if (bike.stock <= 0) {
+    throw new Error("La moto seleccionada no tiene stock.");
+  }
+
   const { data, error } = await supabase
     .from("ventas_moto")
     .insert({
-      bike_id: parsed.bikeId ?? null,
+      bike_id: parsed.bikeId,
       modelo: parsed.modelo,
       color: parsed.color,
       placa: null,
@@ -101,8 +115,22 @@ export async function saveVentaMoto(input: VentaMotoInput): Promise<VentaMotoRow
 
   if (error) throw new Error(error.message);
 
+  const { data: updatedBike, error: stockError } = await supabase
+    .from("bike_table")
+    .update({ stock: bike.stock - 1 })
+    .eq("id", parsed.bikeId)
+    .eq("stock", bike.stock)
+    .select("id")
+    .maybeSingle();
+
+  if (stockError || !updatedBike) {
+    await supabase.from("ventas_moto").delete().eq("id", data.id);
+    throw new Error("No se pudo descontar el stock. Intenta de nuevo.");
+  }
+
   revalidatePath("/inbox");
   revalidatePath("/venta-contado");
+  revalidatePath("/catalogo");
   return toRow(data as Record<string, unknown>);
 }
 
@@ -164,6 +192,38 @@ export async function addAbonoVentaMoto(
   const { data, error } = await supabase
     .from("ventas_moto")
     .update({ monto_pagado: nuevoPagado, notas })
+    .eq("id", parsed.id)
+    .select(VENTA_MOTO_SELECT)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/inbox");
+  revalidatePath("/venta-contado");
+  return toRow(data as Record<string, unknown>);
+}
+
+const placaSchema = z.object({
+  id: z.string().uuid(),
+  placa: z
+    .string()
+    .trim()
+    .min(5, "Placa inválida.")
+    .max(10, "Placa inválida.")
+    .transform((s) => s.toUpperCase()),
+});
+
+export async function setPlacaVentaMoto(
+  id: string,
+  placa: string,
+): Promise<VentaMotoRow> {
+  await requireAdminSession();
+  const parsed = placaSchema.parse({ id, placa });
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("ventas_moto")
+    .update({ placa: parsed.placa })
     .eq("id", parsed.id)
     .select(VENTA_MOTO_SELECT)
     .single();
