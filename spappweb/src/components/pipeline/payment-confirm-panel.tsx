@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ExternalLink, Printer, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { removePagoAbono } from "@/lib/actions/payment-comprobante-actions";
+import {
+  printCreditoPagoReceipt,
+  type CreditoPagoReceiptData,
+} from "@/lib/printing/credito-pago-receipt";
 import {
   abonosPorConcepto,
   conceptoCompleto,
@@ -27,6 +31,8 @@ interface PaymentConfirmPanelProps {
   pagos: PagoRow[];
   userId: number;
   referenciasUsadas?: string[];
+  clienteNombre?: string;
+  clienteCedula?: string;
 }
 
 export function PaymentConfirmPanel({
@@ -34,6 +40,8 @@ export function PaymentConfirmPanel({
   pagos,
   userId,
   referenciasUsadas = [],
+  clienteNombre = "Cliente",
+  clienteCedula = "",
 }: PaymentConfirmPanelProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContexto, setDialogContexto] =
@@ -72,8 +80,8 @@ export function PaymentConfirmPanel({
         <CardHeader>
           <CardTitle className="text-lg">Confirmar pagos</CardTitle>
           <p className="text-sm text-neutral-500">
-            Registra uno o varios abonos por concepto (Nequi Nicolás o
-            Davivienda).
+            Registra abonos por concepto. Medios: Nequi, Davivienda, efectivo o
+            datáfono. Efectivo y datáfono generan recibo para impresora.
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -94,6 +102,8 @@ export function PaymentConfirmPanel({
             contexto="inicial"
             userId={userId}
             canEdit={canEditAbonos}
+            clienteNombre={clienteNombre}
+            clienteCedula={clienteCedula}
             onAddAbono={() => openAbonoDialog("inicial")}
           />
           <ConceptoAbonoSection
@@ -102,6 +112,8 @@ export function PaymentConfirmPanel({
             contexto="cuota_adelantada"
             userId={userId}
             canEdit={canEditAbonos}
+            clienteNombre={clienteNombre}
+            clienteCedula={clienteCedula}
             onAddAbono={() => openAbonoDialog("cuota_adelantada")}
           />
         </CardContent>
@@ -116,6 +128,10 @@ export function PaymentConfirmPanel({
         montoEsperado={montoEsperadoConcepto(compra, dialogContexto)}
         montoFaltante={faltanteConcepto(compra, pagos, dialogContexto)}
         referenciasUsadas={referenciasUsadas}
+        clienteNombre={clienteNombre}
+        clienteCedula={clienteCedula}
+        motoModelo={compra.modelo}
+        motoColor={compra.color}
       />
     </>
   );
@@ -127,6 +143,8 @@ function ConceptoAbonoSection({
   contexto,
   userId,
   canEdit,
+  clienteNombre,
+  clienteCedula,
   onAddAbono,
 }: {
   compra: UserMotoCompraRow;
@@ -134,6 +152,8 @@ function ConceptoAbonoSection({
   contexto: PrimerPagoConcepto;
   userId: number;
   canEdit: boolean;
+  clienteNombre: string;
+  clienteCedula: string;
   onAddAbono: () => void;
 }) {
   const [pending, startTransition] = useTransition();
@@ -143,6 +163,27 @@ function ConceptoAbonoSection({
   const completo = conceptoCompleto(compra, pagos, contexto);
   const abonos = abonosPorConcepto(pagos, contexto);
   const pct = esperado > 0 ? Math.min(100, (recibido / esperado) * 100) : 0;
+
+  function handleReprint(abono: PagoRow) {
+    if (abono.contexto_pago !== "inicial" && abono.contexto_pago !== "cuota_adelantada") {
+      return;
+    }
+    const recibo: CreditoPagoReceiptData = {
+      pagoId: abono.id,
+      clienteNombre,
+      clienteCedula,
+      motoModelo: compra.modelo,
+      motoColor: compra.color,
+      concepto: abono.contexto_pago,
+      monto: abono.monto,
+      medioPago: abono.medio_pago_admin ?? "efectivo",
+      referencia: abono.referencia,
+      confirmadoAt: abono.confirmado_at ?? abono.created_at,
+    };
+    printCreditoPagoReceipt(recibo).catch(() => {
+      toast.error("No se pudo abrir la impresión del recibo.");
+    });
+  }
 
   function handleRemove(pagoId: string) {
     startTransition(async () => {
@@ -203,6 +244,15 @@ function ConceptoAbonoSection({
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => handleReprint(abono)}
+                  title="Imprimir recibo"
+                >
+                  <Printer className="h-4 w-4" />
+                </Button>
                 {abono.comprobante_url && (
                   <a
                     href={abono.comprobante_url}

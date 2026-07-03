@@ -10,10 +10,15 @@ import {
 import { ocrReceiptFile } from "@/lib/payments/receipt-ocr-client";
 import { isReferenciaDuplicada } from "@/lib/payments/referencia";
 import {
+  printCreditoPagoReceipt,
+  type CreditoPagoReceiptData,
+} from "@/lib/printing/credito-pago-receipt";
+import {
   BANCO_ORIGEN_LABELS,
   CONTEXTO_PAGO_LABELS,
   MEDIO_PAGO_ADMIN_LABELS,
   MEDIO_PAGO_ADMIN_OPTIONS,
+  PRIMER_PAGO_MEDIO_OPTIONS,
   type BancoOrigen,
   type ContextoPago,
   type MedioPagoAdmin,
@@ -43,7 +48,19 @@ interface PaymentComprobanteDialogProps {
   montoEsperado?: number;
   montoFaltante?: number;
   referenciasUsadas?: string[];
+  clienteNombre?: string;
+  clienteCedula?: string;
+  motoModelo?: string;
+  motoColor?: string;
   onSuccess?: () => void;
+}
+
+function isPrimerPagoContexto(contexto: ContextoPago): boolean {
+  return contexto === "inicial" || contexto === "cuota_adelantada";
+}
+
+function isPresencialMedio(medio: MedioPagoAdmin): boolean {
+  return medio === "efectivo" || medio === "datafono";
 }
 
 function toDatetimeLocal(iso: string | null): string {
@@ -62,6 +79,10 @@ function datetimeLocalToIso(value: string): string {
   return d.toISOString();
 }
 
+function nowDatetimeLocal(): string {
+  return toDatetimeLocal(new Date().toISOString());
+}
+
 export function PaymentComprobanteDialog({
   open,
   onOpenChange,
@@ -72,9 +93,18 @@ export function PaymentComprobanteDialog({
   montoEsperado,
   montoFaltante,
   referenciasUsadas = [],
+  clienteNombre = "Cliente",
+  clienteCedula = "",
+  motoModelo = "",
+  motoColor = "",
   onSuccess,
 }: PaymentComprobanteDialogProps) {
   const sugeridoMonto = montoFaltante ?? montoEsperado;
+  const primerPago = isPrimerPagoContexto(contexto);
+  const medioOptions = primerPago
+    ? PRIMER_PAGO_MEDIO_OPTIONS
+    : MEDIO_PAGO_ADMIN_OPTIONS;
+
   const [pending, startTransition] = useTransition();
   const [ocrPending, startOcrTransition] = useTransition();
   const [file, setFile] = useState<File | null>(null);
@@ -89,6 +119,8 @@ export function PaymentComprobanteDialog({
   const [referenciaDuplicada, setReferenciaDuplicada] = useState(false);
   const [checkingReferencia, setCheckingReferencia] = useState(false);
 
+  const presencial = isPresencialMedio(medioPagoAdmin);
+
   const referenciaDuplicadaLocal = useMemo(
     () => isReferenciaDuplicada(referencia, referenciasUsadas),
     [referencia, referenciasUsadas],
@@ -102,7 +134,7 @@ export function PaymentComprobanteDialog({
 
   useEffect(() => {
     const value = referencia.trim();
-    if (!value) {
+    if (!value || presencial) {
       setReferenciaDuplicada(false);
       setCheckingReferencia(false);
       return;
@@ -123,7 +155,7 @@ export function PaymentComprobanteDialog({
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [referencia, referenciaDuplicadaLocal, userId]);
+  }, [referencia, referenciaDuplicadaLocal, presencial, userId]);
 
   useEffect(() => {
     if (!open) return;
@@ -137,11 +169,26 @@ export function PaymentComprobanteDialog({
     setEntradaManual(false);
   }, [open, sugeridoMonto]);
 
+  useEffect(() => {
+    if (!open || !presencial) return;
+    if (!fecha) setFecha(nowDatetimeLocal());
+  }, [open, presencial, fecha]);
+
   function handleBancoChange(value: BancoOrigen) {
     setBancoOrigen(value);
     if (value === "otro") {
       setEntradaManual(true);
       setConfidence(null);
+    }
+  }
+
+  function handleMedioChange(value: MedioPagoAdmin) {
+    setMedioPagoAdmin(value);
+    if (isPresencialMedio(value)) {
+      setFile(null);
+      setBancoOrigen("nequi");
+      setConfidence(null);
+      if (!fecha) setFecha(nowDatetimeLocal());
     }
   }
 
@@ -179,15 +226,19 @@ export function PaymentComprobanteDialog({
   }
 
   function submit() {
-    if (!file) {
+    if (!presencial && !file) {
       toast.error("Sube el comprobante de pago.");
       return;
     }
-    if (!referencia.trim()) {
+    if (!presencial && !referencia.trim()) {
       toast.error("Ingresa la referencia.");
       return;
     }
-    if (referencia.trim() && referenciaDuplicada) {
+    if (
+      !presencial &&
+      referencia.trim() &&
+      referenciaDuplicada
+    ) {
       toast.error("Esta referencia ya fue usada en otro pago de este cliente.");
       return;
     }
@@ -196,7 +247,7 @@ export function PaymentComprobanteDialog({
       toast.error("Ingresa un monto válido.");
       return;
     }
-    if (!fecha) {
+    if (!presencial && !fecha) {
       toast.error("Ingresa la fecha del comprobante.");
       return;
     }
@@ -216,13 +267,40 @@ export function PaymentComprobanteDialog({
         formData.set("bancoOrigen", bancoOrigen);
         formData.set(
           "entradaManual",
-          String(entradaManual || bancoOrigen === "otro"),
+          String(entradaManual || bancoOrigen === "otro" || presencial),
         );
 
-        await confirmPagoConComprobante(formData);
+        const result = await confirmPagoConComprobante(formData);
         toast.success("Abono registrado.");
         onOpenChange(false);
         onSuccess?.();
+
+        if (
+          primerPago &&
+          (contexto === "inicial" || contexto === "cuota_adelantada")
+        ) {
+          const recibo: CreditoPagoReceiptData = {
+            pagoId: result.pagoId,
+            clienteNombre,
+            clienteCedula,
+            motoModelo,
+            motoColor,
+            concepto: contexto,
+            monto: montoNum,
+            medioPago: medioPagoAdmin,
+            referencia: result.referencia,
+            confirmadoAt: result.confirmadoAt,
+          };
+          if (presencial) {
+            try {
+              await printCreditoPagoReceipt(recibo);
+            } catch {
+              toast.message(
+                "Pago guardado. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
+              );
+            }
+          }
+        }
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Error al confirmar.");
       }
@@ -230,6 +308,7 @@ export function PaymentComprobanteDialog({
   }
 
   const showOcrWarning =
+    !presencial &&
     bancoOrigen !== "otro" &&
     confidence !== null &&
     confidence < 3;
@@ -254,64 +333,73 @@ export function PaymentComprobanteDialog({
               aria-label="Medio de pago"
               value={medioPagoAdmin}
               disabled={pending || ocrPending}
-              onChange={(v) => setMedioPagoAdmin(v as MedioPagoAdmin)}
-              options={MEDIO_PAGO_ADMIN_OPTIONS.map((key) => ({
+              onChange={(v) => handleMedioChange(v as MedioPagoAdmin)}
+              options={medioOptions.map((key) => ({
                 value: key,
                 label: MEDIO_PAGO_ADMIN_LABELS[key],
               }))}
             />
           </div>
 
-          <ImageFileField
-            label="Comprobante de pago"
-            file={file}
-            onFileChange={setFile}
-            disabled={pending || ocrPending}
-            enableDialogPaste
-            enableCamera
-            fileInputId="pago-comprobante-file"
-            cameraInputId="pago-comprobante-camera"
-          />
-
-          <div className="space-y-2">
-            <Label>Banco de origen</Label>
-            <TouchSelect
-              aria-label="Banco de origen"
-              value={bancoOrigen}
-              disabled={pending || ocrPending}
-              onChange={(v) => handleBancoChange(v as BancoOrigen)}
-              options={(Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]).map(
-                (key) => ({
-                  value: key,
-                  label: BANCO_ORIGEN_LABELS[key],
-                }),
-              )}
-            />
-          </div>
-
-          {bancoOrigen === "otro" && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              Comprobante de otro banco: sube la foto e ingresa referencia,
-              monto y fecha manualmente.
+          {presencial ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+              Pago presencial ({MEDIO_PAGO_ADMIN_LABELS[medioPagoAdmin]}). No
+              requiere comprobante digital; al guardar se imprime el recibo.
             </div>
-          )}
+          ) : (
+            <>
+              <ImageFileField
+                label="Comprobante de pago"
+                file={file}
+                onFileChange={setFile}
+                disabled={pending || ocrPending}
+                enableDialogPaste
+                enableCamera
+                fileInputId="pago-comprobante-file"
+                cameraInputId="pago-comprobante-camera"
+              />
 
-          {file && bancoOrigen !== "otro" && (
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending || ocrPending}
-              onClick={analyzeComprobante}
-            >
-              {ocrPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analizando…
-                </>
-              ) : (
-                "Analizar comprobante"
+              <div className="space-y-2">
+                <Label>Banco de origen</Label>
+                <TouchSelect
+                  aria-label="Banco de origen"
+                  value={bancoOrigen}
+                  disabled={pending || ocrPending}
+                  onChange={(v) => handleBancoChange(v as BancoOrigen)}
+                  options={(
+                    Object.keys(BANCO_ORIGEN_LABELS) as BancoOrigen[]
+                  ).map((key) => ({
+                    value: key,
+                    label: BANCO_ORIGEN_LABELS[key],
+                  }))}
+                />
+              </div>
+
+              {bancoOrigen === "otro" && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                  Comprobante de otro banco: sube la foto e ingresa referencia,
+                  monto y fecha manualmente.
+                </div>
               )}
-            </Button>
+
+              {file && bancoOrigen !== "otro" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={pending || ocrPending}
+                  onClick={analyzeComprobante}
+                >
+                  {ocrPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analizando…
+                    </>
+                  ) : (
+                    "Analizar comprobante"
+                  )}
+                </Button>
+              )}
+            </>
           )}
 
           {showOcrWarning && (
@@ -322,7 +410,9 @@ export function PaymentComprobanteDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="referencia">Referencia</Label>
+            <Label htmlFor="referencia">
+              {presencial ? "Referencia (opcional)" : "Referencia"}
+            </Label>
             <Input
               id="referencia"
               value={referencia}
@@ -330,7 +420,13 @@ export function PaymentComprobanteDialog({
                 setReferencia(e.target.value);
                 setEntradaManual(true);
               }}
-              placeholder="Ej. M12636825"
+              placeholder={
+                presencial
+                  ? medioPagoAdmin === "datafono"
+                    ? "Voucher datáfono (opcional)"
+                    : "Se genera automáticamente si queda vacío"
+                  : "Ej. M12636825"
+              }
               disabled={pending || ocrPending}
               aria-invalid={referenciaDuplicada}
               className={
@@ -339,10 +435,13 @@ export function PaymentComprobanteDialog({
                   : undefined
               }
             />
-            {checkingReferencia && referencia.trim() && !referenciaDuplicadaLocal && (
-              <p className="text-xs text-neutral-500">Verificando referencia…</p>
-            )}
-            {referenciaDuplicada && (
+            {checkingReferencia &&
+              referencia.trim() &&
+              !referenciaDuplicadaLocal &&
+              !presencial && (
+                <p className="text-xs text-neutral-500">Verificando referencia…</p>
+              )}
+            {referenciaDuplicada && !presencial && (
               <p className="text-xs font-medium text-red-600">
                 Esta referencia ya fue usada en otro pago de este cliente.
               </p>
@@ -366,7 +465,9 @@ export function PaymentComprobanteDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fecha">Fecha del comprobante</Label>
+            <Label htmlFor="fecha">
+              {presencial ? "Fecha del pago" : "Fecha del comprobante"}
+            </Label>
             <Input
               id="fecha"
               type="datetime-local"
@@ -392,8 +493,8 @@ export function PaymentComprobanteDialog({
             disabled={
               pending ||
               ocrPending ||
-              referenciaDuplicada ||
-              checkingReferencia
+              (!presencial && referenciaDuplicada) ||
+              (!presencial && checkingReferencia)
             }
             onClick={submit}
           >
@@ -402,6 +503,8 @@ export function PaymentComprobanteDialog({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Guardando…
               </>
+            ) : presencial ? (
+              "Registrar e imprimir recibo"
             ) : (
               "Registrar abono"
             )}

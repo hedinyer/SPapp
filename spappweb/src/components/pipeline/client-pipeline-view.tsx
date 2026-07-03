@@ -105,6 +105,8 @@ export function ClientPipelineView({
                 pagos={pipeline.pagos}
                 userId={userId}
                 referenciasUsadas={referenciasUsadas}
+                clienteNombre={pipeline.displayName}
+                clienteCedula={pipeline.user.user}
               />
             </>
           )}

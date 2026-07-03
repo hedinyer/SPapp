@@ -415,18 +415,28 @@ export const TARIFA_ESTADO_LABELS: Record<TarifaEstado, string> = {
 };
 
 export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada";
-export type MedioPagoAdmin = "nequi_nicolas" | "davivienda";
+export type MedioPagoAdmin =
+  | "nequi_nicolas"
+  | "davivienda"
+  | "efectivo"
+  | "datafono";
 
 export type MedioPagoAdminLegacy =
   | "nequi_pedro"
-  | "nequi_marisol"
-  | "efectivo";
+  | "nequi_marisol";
 
 export type MedioPagoAdminStored = MedioPagoAdmin | MedioPagoAdminLegacy;
 
 export const MEDIO_PAGO_ADMIN_OPTIONS: MedioPagoAdmin[] = [
   "nequi_nicolas",
   "davivienda",
+];
+
+export const PRIMER_PAGO_MEDIO_OPTIONS: MedioPagoAdmin[] = [
+  "nequi_nicolas",
+  "davivienda",
+  "efectivo",
+  "datafono",
 ];
 export type BancoOrigen = "nequi" | "davivienda" | "otro";
 export type PagoEstado = "pendiente_confirmacion" | "confirmado" | "rechazado";
@@ -437,7 +447,7 @@ export interface PagoRow {
   user_id: number;
   monto: number;
   dias_cubiertos: number | null;
-  medio_pago_usuario: "nequi" | "davivienda" | "efectivo";
+  medio_pago_usuario: "nequi" | "davivienda" | "efectivo" | "datafono";
   medio_pago_admin: MedioPagoAdminStored | null;
   referencia: string | null;
   comprobante_url: string | null;
@@ -466,6 +476,7 @@ export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdminStored, string> = {
   nequi_marisol: "Nequi — Marisol",
   davivienda: "Davivienda",
   efectivo: "Efectivo",
+  datafono: "Datáfono",
 };
 
 export const BANCO_ORIGEN_LABELS: Record<BancoOrigen, string> = {

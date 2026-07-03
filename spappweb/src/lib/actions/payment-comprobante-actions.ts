@@ -26,7 +26,27 @@ import type {
 const MAX_BYTES = 5 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-const MEDIO_PAGO_ADMIN_VALUES = ["nequi_nicolas", "davivienda"] as const;
+const MEDIO_PAGO_ADMIN_VALUES = [
+  "nequi_nicolas",
+  "davivienda",
+  "efectivo",
+  "datafono",
+] as const;
+
+function isPresencialMedio(medio: MedioPagoAdmin): boolean {
+  return medio === "efectivo" || medio === "datafono";
+}
+
+function resolveReferenciaPresencial(
+  medio: MedioPagoAdmin,
+  referencia: string,
+): string {
+  const trimmed = referencia.trim();
+  if (trimmed) return normalizeReferencia(trimmed);
+  if (medio === "efectivo") return `EF-${Date.now()}`;
+  if (medio === "datafono") return `DF-${Date.now()}`;
+  return trimmed;
+}
 
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
@@ -70,8 +90,10 @@ function optionalImageFile(file: unknown): File | null {
 
 function medioPagoUsuarioFromAdmin(
   medio: MedioPagoAdmin,
-): "nequi" | "davivienda" {
+): "nequi" | "davivienda" | "efectivo" | "datafono" {
   if (medio === "davivienda") return "davivienda";
+  if (medio === "efectivo") return "efectivo";
+  if (medio === "datafono") return "datafono";
   return "nequi";
 }
 
@@ -191,7 +213,7 @@ const confirmPagoSchema = z.object({
 
 export async function confirmPagoConComprobante(
   formData: FormData,
-): Promise<{ ok: true }> {
+): Promise<{ ok: true; pagoId: string; referencia: string; confirmadoAt: string }> {
   const supabase = await assertAdmin();
 
   const parsed = confirmPagoSchema.parse({
@@ -220,6 +242,7 @@ export async function confirmPagoConComprobante(
 
   const isPrimerPago =
     parsed.contexto === "inicial" || parsed.contexto === "cuota_adelantada";
+  const presencial = isPresencialMedio(parsed.medioPagoAdmin);
   const file = optionalImageFile(formData.get("file"));
 
   if (parsed.contexto === "tarifa" && !parsed.tarifaId) {
@@ -230,8 +253,12 @@ export async function confirmPagoConComprobante(
     throw new Error("Sube el comprobante de pago.");
   }
 
-  if (isPrimerPago && !file) {
+  if (isPrimerPago && !file && !presencial) {
     throw new Error("Sube el comprobante de pago.");
+  }
+
+  if (parsed.contexto === "tarifa" && presencial) {
+    throw new Error("Para tarifas de renting usa Nequi o Davivienda.");
   }
 
   if (isPrimerPago) {
@@ -256,7 +283,10 @@ export async function confirmPagoConComprobante(
     }
   }
 
-  const referencia = parsed.referencia?.trim() ?? "";
+  let referencia = parsed.referencia?.trim() ?? "";
+  if (presencial) {
+    referencia = resolveReferenciaPresencial(parsed.medioPagoAdmin, referencia);
+  }
   if (!referencia) {
     throw new Error("Ingresa la referencia.");
   }
@@ -292,9 +322,13 @@ export async function confirmPagoConComprobante(
     }
   }
 
-  const fechaComprobante = parsed.fechaComprobante?.trim() ?? "";
+  let fechaComprobante = parsed.fechaComprobante?.trim() ?? "";
   if (!fechaComprobante) {
-    throw new Error("Ingresa la fecha del comprobante.");
+    if (presencial) {
+      fechaComprobante = new Date().toISOString();
+    } else {
+      throw new Error("Ingresa la fecha del comprobante.");
+    }
   }
 
   const notasAdmin = [
@@ -311,24 +345,28 @@ export async function confirmPagoConComprobante(
     .eq("id", parsed.compraId)
     .maybeSingle();
 
-  const { error: insertError } = await supabase.from("pagos").insert({
-    user_moto_compra_id: parsed.compraId,
-    user_id: parsed.userId,
-    monto: parsed.monto,
-    medio_pago_usuario: medioPagoUsuarioFromAdmin(parsed.medioPagoAdmin),
-    medio_pago_admin: parsed.medioPagoAdmin,
-    referencia: normalizeReferencia(referencia),
-    comprobante_url: comprobanteUrl,
-    origen: "admin",
-    estado: "confirmado",
-    confirmado_at: new Date().toISOString(),
-    confirmado_por: "admin",
-    fecha_comprobante: fechaComprobante,
-    tarifa_objetivo_id:
-      parsed.contexto === "tarifa" ? parsed.tarifaId! : null,
-    contexto_pago: parsed.contexto,
-    notas_admin: notasAdmin,
-  });
+  const { data: inserted, error: insertError } = await supabase
+    .from("pagos")
+    .insert({
+      user_moto_compra_id: parsed.compraId,
+      user_id: parsed.userId,
+      monto: parsed.monto,
+      medio_pago_usuario: medioPagoUsuarioFromAdmin(parsed.medioPagoAdmin),
+      medio_pago_admin: parsed.medioPagoAdmin,
+      referencia: normalizeReferencia(referencia),
+      comprobante_url: comprobanteUrl,
+      origen: "admin",
+      estado: "confirmado",
+      confirmado_at: new Date().toISOString(),
+      confirmado_por: "admin",
+      fecha_comprobante: fechaComprobante,
+      tarifa_objetivo_id:
+        parsed.contexto === "tarifa" ? parsed.tarifaId! : null,
+      contexto_pago: parsed.contexto,
+      notas_admin: notasAdmin,
+    })
+    .select("id")
+    .single();
 
   if (insertError) {
     if (insertError.code === "23505") {
@@ -344,7 +382,12 @@ export async function confirmPagoConComprobante(
   );
 
   revalidateClient(parsed.userId);
-  return { ok: true };
+  return {
+    ok: true,
+    pagoId: inserted.id as string,
+    referencia: normalizeReferencia(referencia),
+    confirmadoAt: new Date().toISOString(),
+  };
 }
 
 export async function removePagoAbono(
