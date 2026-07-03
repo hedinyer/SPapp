@@ -1,11 +1,11 @@
 import assert from "node:assert";
-import type { HojaVidaFormData } from "./hoja-vida-schema.ts";
+import type { HojaVidaFormData } from "./hoja-vida-schema";
 import {
   blocksNewDocumentSubmission,
   formatBirthDateInput,
   isFullName,
   isHojaVidaComplete,
-} from "./hoja-vida-validation.ts";
+} from "./hoja-vida-validation";
 
 const base: HojaVidaFormData = {
   nombre_completo: "Juan Perez Lopez",

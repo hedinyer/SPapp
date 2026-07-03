@@ -1,4 +1,4 @@
-import { contratoClausulasSelfCheck } from "./contrato-renting-clausulas.ts";
+import { contratoClausulasSelfCheck } from "./contrato-renting-clausulas";
 
 contratoClausulasSelfCheck();
 

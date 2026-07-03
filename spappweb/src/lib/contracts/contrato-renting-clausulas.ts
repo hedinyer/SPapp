@@ -3,9 +3,9 @@
  * la asignación de moto al firmar.
  */
 
-import type { FrecuenciaPago } from "../pipeline/types.ts";
-import { FRECUENCIA_LABELS } from "../pipeline/types.ts";
-import { formatCop } from "../utils/format-cop.ts";
+import type { FrecuenciaPago } from "../pipeline/types";
+import { FRECUENCIA_LABELS } from "../pipeline/types";
+import { formatCop } from "../utils/format-cop";
 
 export const EMPRESA_PROPIETARIA = {
   razonSocial: "SOLUCIONES GARRIDO S.A.S.",
