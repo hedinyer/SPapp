@@ -313,7 +313,7 @@ export function VentaManager() {
         </div>
         {cameraOn ? (
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
+            Apunta al QR desde cualquier ángulo; si hay brillo en el sticker, inclínalo un poco.
           </p>
         ) : null}
       </div>

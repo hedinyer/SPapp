@@ -564,7 +564,7 @@ export function VenderProductosSheet({
 
             {cameraOn && !mobileCamera ? (
               <p className="text-center text-xs text-neutral-500">
-                Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
+                Apunta al QR desde cualquier ángulo; si hay brillo en el sticker, inclínalo un poco.
               </p>
             ) : null}
           </div>
@@ -813,7 +813,7 @@ export function VenderProductosSheet({
             {renderScannerOverlays()}
           </div>
           <p className="shrink-0 px-4 py-3 text-center text-xs text-white/70">
-            Apunta al QR dentro del marco. Puedes alejar el celular; detecta aunque haya texto alrededor.
+            Apunta al QR desde cualquier ángulo; si hay brillo en el sticker, inclínalo un poco.
           </p>
         </div>,
         document.body,
