@@ -41,6 +41,6 @@ export function toPriceLabelData(
   return {
     nombre,
     sku: product.sku,
-    precioFormatted: formatCop(product.precio),
+    precioFormatted: formatCop(product.costo ?? 0),
   };
 }

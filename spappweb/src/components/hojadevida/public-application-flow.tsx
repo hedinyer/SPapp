@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   CheckCircle2,
   Camera,
@@ -23,25 +23,41 @@ import {
   StepCard,
   type FlowPhase,
 } from "@/components/hojadevida/flow-shell";
+import { retryAsync } from "@/lib/client/retry-async";
+import {
+  clearHojadevidaDraft,
+  getStableUploadFolder,
+  readHojadevidaDraft,
+  writeHojadevidaDraft,
+  type HojadevidaPhotoUrls,
+} from "@/lib/client/hojadevida-draft";
 
-type Step = "welcome" | "photos" | "hoja" | "sending" | "success";
+type Step = "welcome" | "photos" | "uploading" | "hoja" | "sending" | "success";
 
 export function PublicApplicationFlow() {
-  const reactId = useId();
-  const uploadFolder = useMemo(
-    () => `pending/${reactId.replace(/:/g, "")}`,
-    [reactId],
-  );
+  const uploadFolder = useMemo(() => getStableUploadFolder(), []);
   const [step, setStep] = useState<Step>("welcome");
-  const [photos, setPhotos] = useState<IdentityPhotoFiles | null>(null);
+  const [photoUrls, setPhotoUrls] = useState<HojadevidaPhotoUrls | null>(null);
   const [pending, startTransition] = useTransition();
+  const [restoredForm, setRestoredForm] = useState<HojaVidaFormData | undefined>();
+  const [restoredFormStep, setRestoredFormStep] = useState<number | undefined>();
 
   const phase: FlowPhase =
-    step === "welcome" || step === "photos"
+    step === "welcome" || step === "photos" || step === "uploading"
       ? "fotos"
       : step === "hoja" || step === "sending"
         ? "datos"
         : "listo";
+
+  useEffect(() => {
+    const draft = readHojadevidaDraft();
+    if (!draft?.resumeStep || !draft.photoUrls) return;
+
+    setPhotoUrls(draft.photoUrls);
+    if (draft.form) setRestoredForm(draft.form);
+    if (draft.formStepIndex != null) setRestoredFormStep(draft.formStepIndex);
+    setStep(draft.resumeStep === "hoja" ? "hoja" : "photos");
+  }, []);
 
   useEffect(() => {
     if (step !== "success") return;
@@ -57,16 +73,37 @@ export function PublicApplicationFlow() {
         return;
       }
       setStep("welcome");
-      setPhotos(null);
+      setPhotoUrls(null);
     }
 
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, [step]);
 
+  function persistDraft(
+    partial: Partial<{
+      photoUrls: HojadevidaPhotoUrls;
+      form: HojaVidaFormData;
+      formStepIndex: number;
+      resumeStep: "photos" | "hoja";
+    }>,
+  ) {
+    const prev = readHojadevidaDraft();
+    writeHojadevidaDraft({
+      uploadFolder,
+      photoUrls: partial.photoUrls ?? prev?.photoUrls ?? photoUrls ?? undefined,
+      form: partial.form ?? prev?.form,
+      formStepIndex: partial.formStepIndex ?? prev?.formStepIndex,
+      resumeStep: partial.resumeStep ?? prev?.resumeStep ?? "hoja",
+    });
+  }
+
   function resetToWelcome() {
     setStep("welcome");
-    setPhotos(null);
+    setPhotoUrls(null);
+    setRestoredForm(undefined);
+    setRestoredFormStep(undefined);
+    clearHojadevidaDraft();
     window.history.replaceState(
       { hojadevida: "welcome" },
       "",
@@ -74,41 +111,93 @@ export function PublicApplicationFlow() {
     );
   }
 
+  function onPhotosComplete(files: IdentityPhotoFiles) {
+    setStep("uploading");
+    startTransition(async () => {
+      try {
+        const urls = await retryAsync(
+          async () => {
+            const [front, back, selfie] = await Promise.all([
+              uploadDocumentPhotoFromBrowser(
+                uploadFolder,
+                "document_front",
+                files.document_front,
+              ),
+              uploadDocumentPhotoFromBrowser(
+                uploadFolder,
+                "document_back",
+                files.document_back,
+              ),
+              uploadDocumentPhotoFromBrowser(
+                uploadFolder,
+                "selfie",
+                files.selfie,
+              ),
+            ]);
+            return {
+              documentFrontUrl: front,
+              documentBackUrl: back,
+              selfieUrl: selfie,
+            };
+          },
+          {
+            onRetry: () => {
+              toast.message("Reintentando subida de fotos…");
+            },
+          },
+        );
+
+        setPhotoUrls(urls);
+        persistDraft({ photoUrls: urls, resumeStep: "hoja" });
+        setStep("hoja");
+      } catch (e) {
+        setStep("photos");
+        toast.error(
+          e instanceof Error
+            ? e.message
+            : "No se pudieron subir las fotos. Revisa tu conexión e intenta de nuevo.",
+        );
+      }
+    });
+  }
+
+  function onFormDraftChange(form: HojaVidaFormData, formStepIndex: number) {
+    persistDraft({ form, formStepIndex, resumeStep: "hoja" });
+  }
+
   function onHojaComplete(form: HojaVidaFormData) {
-    if (!photos) return;
+    if (!photoUrls) {
+      toast.error("Faltan las fotos. Vuelve al paso anterior.");
+      setStep("photos");
+      return;
+    }
 
     setStep("sending");
     startTransition(async () => {
       try {
-        const [front, back, selfie] = await Promise.all([
-          uploadDocumentPhotoFromBrowser(
-            uploadFolder,
-            "document_front",
-            photos.document_front,
-          ),
-          uploadDocumentPhotoFromBrowser(
-            uploadFolder,
-            "document_back",
-            photos.document_back,
-          ),
-          uploadDocumentPhotoFromBrowser(
-            uploadFolder,
-            "selfie",
-            photos.selfie,
-          ),
-        ]);
+        await retryAsync(
+          () =>
+            submitPublicApplication({
+              documentFrontUrl: photoUrls.documentFrontUrl,
+              documentBackUrl: photoUrls.documentBackUrl,
+              selfieUrl: photoUrls.selfieUrl,
+              hojaVida: form,
+            }),
+          {
+            onRetry: () => {
+              toast.message("Reintentando envío…");
+            },
+          },
+        );
 
-        await submitPublicApplication({
-          documentFrontUrl: front,
-          documentBackUrl: back,
-          selfieUrl: selfie,
-          hojaVida: form,
-        });
-
+        clearHojadevidaDraft();
         setStep("success");
-      } catch (e) {
+      } catch {
         setStep("hoja");
-        toast.error(e instanceof Error ? e.message : "No se pudo enviar.");
+        persistDraft({ form, resumeStep: "hoja" });
+        toast.error(
+          "Sin conexión estable. Tus datos están guardados; toca Enviar de nuevo.",
+        );
       }
     });
   }
@@ -117,6 +206,21 @@ export function PublicApplicationFlow() {
     return (
       <div>
         {step !== "success" && <FlowPhaseBar active={phase} />}
+
+        {step === "uploading" && (
+          <StepCard
+            title="Subiendo tus fotos"
+            instruction="No cierres esta página. Espera un momento."
+          >
+            <div className="flex flex-col items-center gap-4 py-8">
+              <Loader2 className="h-12 w-12 animate-spin text-black" />
+              <p className="text-center text-base text-neutral-600">
+                Guardando fotos de tu cédula…
+              </p>
+            </div>
+          </StepCard>
+        )}
+
         {step === "sending" && (
           <StepCard
             title="Enviando tu solicitud"
@@ -125,7 +229,7 @@ export function PublicApplicationFlow() {
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="h-12 w-12 animate-spin text-black" />
               <p className="text-center text-base text-neutral-600">
-                Subiendo fotos y guardando tus datos…
+                Guardando tus datos…
               </p>
             </div>
           </StepCard>
@@ -167,6 +271,9 @@ export function PublicApplicationFlow() {
 
         {step === "hoja" && (
           <HojaVidaForm
+            initial={restoredForm}
+            initialStepIndex={restoredFormStep}
+            onDraftChange={onFormDraftChange}
             onComplete={onHojaComplete}
             onBack={() => setStep("photos")}
             pending={pending}
@@ -175,12 +282,7 @@ export function PublicApplicationFlow() {
         )}
 
         {step === "photos" && (
-          <IdentityUploadFlow
-            onComplete={(files) => {
-              setPhotos(files);
-              setStep("hoja");
-            }}
-          />
+          <IdentityUploadFlow onComplete={onPhotosComplete} />
         )}
       </div>
     );

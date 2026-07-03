@@ -12,6 +12,16 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { signContract } from "@/lib/actions/contract-actions";
 import {
+  clearDraft,
+  readDraft,
+  writeDraft,
+} from "@/lib/client/form-draft-storage";
+import {
+  contratoDraftKey,
+  type ContratoSignDraft,
+} from "@/lib/client/hojadevida-draft";
+import { retryAsync } from "@/lib/client/retry-async";
+import {
   EMPRESA_PROPIETARIA,
   blocks,
   colombiaDateParts,
@@ -85,7 +95,54 @@ export function ContractSignFlow({
   const [aceptaFirma, setAceptaFirma] = useState(false);
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [hydrated, setHydrated] = useState(false);
   const sigRef = useRef<SignaturePadHandle>(null);
+  const draftKey = contratoDraftKey(contractId);
+  const signatureStep = TOTAL_STEPS - 1;
+
+  useEffect(() => {
+    const draft = readDraft<ContratoSignDraft>(draftKey);
+    if (draft) {
+      setStep(draft.step);
+      setNombre(draft.nombre);
+      setCedula(draft.cedula);
+      setDireccion(draft.direccion);
+      setDepartamento(draft.departamento);
+      setCiudad(draft.ciudad);
+      setAceptaClausulas(draft.aceptaClausulas);
+      setAceptaFirma(draft.aceptaFirma);
+      if (draft.step === signatureStep) {
+        toast.message("Debes volver a firmar en el recuadro.");
+      }
+    }
+    setHydrated(true);
+  }, [draftKey, signatureStep]);
+
+  useEffect(() => {
+    if (!hydrated || done) return;
+    writeDraft<ContratoSignDraft>(draftKey, {
+      step,
+      nombre,
+      cedula,
+      direccion,
+      departamento,
+      ciudad,
+      aceptaClausulas,
+      aceptaFirma,
+    });
+  }, [
+    hydrated,
+    done,
+    draftKey,
+    step,
+    nombre,
+    cedula,
+    direccion,
+    departamento,
+    ciudad,
+    aceptaClausulas,
+    aceptaFirma,
+  ]);
 
   const fecha = colombiaDateParts();
   const ciudadOptions = listCiudades(departamento).map((c) => ({
@@ -143,15 +200,24 @@ export function ContractSignFlow({
     }
     startTransition(async () => {
       try {
-        await signContract({
-          contractId,
-          nombre: nombre.trim(),
-          cedula: cedula.trim(),
-          direccion: direccion.trim(),
-          departamento,
-          ciudad,
-          firmaPngBase64: dataUrl,
-        });
+        await retryAsync(
+          () =>
+            signContract({
+              contractId,
+              nombre: nombre.trim(),
+              cedula: cedula.trim(),
+              direccion: direccion.trim(),
+              departamento,
+              ciudad,
+              firmaPngBase64: dataUrl,
+            }),
+          {
+            onRetry: () => {
+              toast.message("Reintentando envío…");
+            },
+          },
+        );
+        clearDraft(draftKey);
         setDone(true);
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "No se pudo firmar.");

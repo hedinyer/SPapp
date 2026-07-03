@@ -30,6 +30,7 @@ const MEDIO_PAGO_ADMIN_VALUES = ["nequi_nicolas", "davivienda"] as const;
 
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
+  revalidatePath("/caja");
   revalidatePath(`/clientes/${userId}`);
 }
 

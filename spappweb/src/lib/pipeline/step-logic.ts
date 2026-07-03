@@ -374,7 +374,7 @@ export function visitaEstadoLabel(estado: VisitaEstado | undefined): string {
   }
 }
 
-function selfCheck() {
+export function runPipelineSelfCheck(): void {
   const docAceptada = { estado_solicitud: "aceptada" } as UserDocumentRow;
   const contractFirmado = { status: "firmado" } as DigitalContractRow;
   const compraLista: UserMotoCompraRow = {
@@ -447,6 +447,3 @@ function selfCheck() {
   }
 }
 
-if (typeof process !== "undefined" && process.argv[1]?.includes("step-logic")) {
-  selfCheck();
-}

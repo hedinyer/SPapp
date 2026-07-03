@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Printer, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -29,6 +30,7 @@ function parseCopInput(raw: string): number | undefined {
 }
 
 export function CajaProductosManager() {
+  const router = useRouter();
   const [codeInput, setCodeInput] = useState("");
   const [draft, setDraft] = useState<VentaCarritoDraftLoaded | null>(null);
   const [clienteNombre, setClienteNombre] = useState("");
@@ -115,6 +117,7 @@ export function CajaProductosManager() {
         await printVentaProductoReceipt(venta);
         toast.success("Venta facturada e impresa.");
         clearDraft();
+        router.refresh();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "No se pudo facturar.");
       }

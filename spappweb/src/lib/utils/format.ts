@@ -1,14 +1,6 @@
-export function formatCop(amount: number): string {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+export { formatCop } from "./format-cop";
 
-export function formatDate(date: string | Date | null | undefined): string {
-  if (!date) return "—";
+export function formatDate(date: string | Date | null | undefined): string {  if (!date) return "—";
   const d = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat("es-CO", {
     dateStyle: "medium",

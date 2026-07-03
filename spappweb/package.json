@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:hoja-vida": "node --experimental-strip-types src/lib/contracts/hoja-vida.check.ts",
+    "check:contrato": "node --experimental-strip-types src/lib/contracts/contrato.check.ts",
+    "check:pipeline": "node --experimental-strip-types src/lib/pipeline/pipeline.check.ts",
+    "check:all": "node scripts/check-all.mjs",
+    "test:e2e": "playwright test",
+    "test": "npm run check:all && npm run test:e2e"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",
@@ -36,6 +42,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",

@@ -90,7 +90,7 @@ function validateStep(id: HojaStepId, form: HojaVidaFormData): string | null {
     case "nombre":
       return isFullName(form.nombre_completo)
         ? null
-        : "Escribe nombre y los dos apellidos.";
+        : "Escribe tu nombre y al menos un apellido.";
     case "tipo_id":
       return form.tipo_identificacion ? null : "Elige un tipo de documento.";
     case "numero_id":
@@ -127,21 +127,21 @@ function validateStep(id: HojaStepId, form: HojaVidaFormData): string | null {
       return form.estado_civil ? null : "Elige tu estado civil.";
     case "conyuge":
       if (!isFullName(form.nombre_conyuge)) {
-        return "Escribe el nombre completo de tu pareja.";
+        return "Escribe nombre y apellido de tu pareja.";
       }
       return form.celular_conyuge.trim().length >= 10
         ? null
         : "Escribe el celular de tu pareja (10 números).";
     case "referencia_1": {
       const r = form.referencias[0];
-      if (!isFullName(r.nombre)) return "Nombre completo de la referencia 1.";
+      if (!isFullName(r.nombre)) return "Nombre y apellido de la referencia 1.";
       return r.celular.trim().length >= 10
         ? null
         : "Celular de la referencia 1 (10 números).";
     }
     case "referencia_2": {
       const r = form.referencias[1];
-      if (!isFullName(r.nombre)) return "Nombre completo de la referencia 2.";
+      if (!isFullName(r.nombre)) return "Nombre y apellido de la referencia 2.";
       return r.celular.trim().length >= 10
         ? null
         : "Celular de la referencia 2 (10 números).";
@@ -153,8 +153,10 @@ function validateStep(id: HojaStepId, form: HojaVidaFormData): string | null {
 
 interface HojaVidaFormProps {
   initial?: HojaVidaFormData;
+  initialStepIndex?: number;
   readOnly?: boolean;
   onComplete?: (form: HojaVidaFormData) => void;
+  onDraftChange?: (form: HojaVidaFormData, stepIndex: number) => void;
   onBack?: () => void;
   pending?: boolean;
   submitLabel?: string;
@@ -162,8 +164,10 @@ interface HojaVidaFormProps {
 
 export function HojaVidaForm({
   initial,
+  initialStepIndex = 0,
   readOnly = false,
   onComplete,
+  onDraftChange,
   onBack,
   pending = false,
   submitLabel = "Enviar mi solicitud",
@@ -171,7 +175,7 @@ export function HojaVidaForm({
   const [form, setForm] = useState<HojaVidaFormData>(
     initial ?? emptyHojaVidaForm(),
   );
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(initialStepIndex);
 
   const steps = useMemo(() => buildSteps(form), [form]);
   const currentId = steps[stepIndex] ?? steps[0];
@@ -182,6 +186,11 @@ export function HojaVidaForm({
       setStepIndex(Math.max(0, steps.length - 1));
     }
   }, [stepIndex, steps.length]);
+
+  useEffect(() => {
+    if (readOnly || !onDraftChange) return;
+    onDraftChange(form, stepIndex);
+  }, [form, stepIndex, readOnly, onDraftChange]);
 
   function patch(partial: Partial<HojaVidaFormData>) {
     setForm((prev) => ({ ...prev, ...partial }));
@@ -236,13 +245,13 @@ export function HojaVidaForm({
           <FieldBlock
             label="Nombre y apellidos"
             hint="Como aparece en tu cédula."
-            example="María Fernanda López García"
+            example="Juan Pérez"
           >
             <Input
               className={fieldInputClass}
               value={form.nombre_completo}
               autoComplete="name"
-              placeholder="Nombre y dos apellidos"
+              placeholder="Nombre y apellido"
               onChange={(e) => patch({ nombre_completo: e.target.value })}
             />
           </FieldBlock>
