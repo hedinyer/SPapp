@@ -9,19 +9,23 @@ import {
   useState,
   useTransition,
 } from "react";
-import { Camera, CameraOff, MessageCircle, ShoppingCart, Trash2 } from "lucide-react";
+import { Camera, CameraOff, Send, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { publishVentaCarritoDraft } from "@/lib/actions/venta-carrito-draft-actions";
 import { lookupProductoBySku } from "@/lib/actions/venta-actions";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
-import {
-  cartTotal,
-  shareCotizacionWhatsApp,
-  type VentaCartLine,
-} from "@/lib/printing/print-venta-cotizacion-client";
+import { cartTotal, type VentaCartLine } from "@/lib/printing/print-venta-cotizacion-client";
 import { formatCop } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -84,10 +88,11 @@ export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
   const [cartOpen, setCartOpen] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
-  const [celular, setCelular] = useState("");
   const [manualSku, setManualSku] = useState("");
   const [cooldownSec, setCooldownSec] = useState(0);
+  const [cajaCode, setCajaCode] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [publishPending, startPublishTransition] = useTransition();
 
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
@@ -230,14 +235,36 @@ export function VentaManager() {
     if (!isTouchDevice()) input.focus();
   }
 
-  function onWhatsApp() {
-    startTransition(async () => {
+  function formatCajaCode(code: string): string {
+    return `${code.slice(0, 3)} ${code.slice(3)}`;
+  }
+
+  function sendToPc() {
+    if (lines.length === 0) {
+      toast.error("Agrega al menos un producto.");
+      return;
+    }
+    startPublishTransition(async () => {
       try {
-        await shareCotizacionWhatsApp(lines, celular);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "No se pudo enviar.");
+        const { code } = await publishVentaCarritoDraft(
+          lines.map((l) => ({
+            productoId: l.productoId,
+            cantidad: l.cantidad,
+          })),
+        );
+        setCajaCode(code);
+        setCartOpen(false);
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : "No se pudo enviar a PC.",
+        );
       }
     });
+  }
+
+  function closeCajaDialog() {
+    setCajaCode(null);
+    dispatch({ type: "clear" });
   }
 
   return (
@@ -456,41 +483,45 @@ export function VentaManager() {
             </>
           )}
 
-          <SheetFooter className="gap-3">
-            <div className="w-full space-y-2">
-              <Label htmlFor="venta-celular">Celular del cliente</Label>
-              <Input
-                id="venta-celular"
-                type="tel"
-                inputMode="numeric"
-                placeholder="3001234567"
-                value={celular}
-                onChange={(e) => setCelular(e.target.value)}
-              />
-            </div>
-            <div className="flex w-full flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={lines.length === 0 || pending}
-                onClick={() => dispatch({ type: "clear" })}
-              >
-                <Trash2 className="mr-1.5 h-4 w-4" />
-                Vaciar
-              </Button>
-              <Button
-                type="button"
-                className="flex-1 bg-green-600 text-white hover:bg-green-700"
-                disabled={lines.length === 0 || pending}
-                onClick={onWhatsApp}
-              >
-                <MessageCircle className="mr-1.5 h-4 w-4" />
-                Enviar por WhatsApp
-              </Button>
-            </div>
+          <SheetFooter>
+            <Button
+              type="button"
+              className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+              disabled={lines.length === 0 || publishPending}
+              onClick={sendToPc}
+            >
+              <Send className="h-4 w-4" />
+              {publishPending ? "Enviando…" : "Enviar a PC"}
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <Dialog
+        open={cajaCode !== null}
+        onOpenChange={(next) => {
+          if (!next) closeCajaDialog();
+        }}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Código para caja</DialogTitle>
+            <DialogDescription>
+              Ingresa este código en el escritorio (/caja) para facturar.
+            </DialogDescription>
+          </DialogHeader>
+          {cajaCode ? (
+            <p className="py-4 text-center text-5xl font-bold tracking-widest tabular-nums">
+              {formatCajaCode(cajaCode)}
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button type="button" className="w-full" onClick={closeCajaDialog}>
+              Listo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
