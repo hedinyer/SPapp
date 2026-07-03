@@ -1,14 +1,14 @@
 import type { PagoRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 
-export type PrimerPagoConcepto = "inicial" | "cuota_adelantada";
+export type PrimerPagoConcepto = "inicial" | "cuota_adelantada" | "visita";
 
 export function montoEsperadoConcepto(
   compra: UserMotoCompraRow,
   contexto: PrimerPagoConcepto,
 ): number {
-  return contexto === "inicial"
-    ? compra.cuota_inicial_monto
-    : compra.monto_cuota_periodo;
+  if (contexto === "inicial") return compra.cuota_inicial_monto;
+  if (contexto === "cuota_adelantada") return compra.monto_cuota_periodo;
+  return compra.monto_visita_monto ?? 0;
 }
 
 export function abonosPorConcepto(
@@ -33,6 +33,7 @@ export function faltanteConcepto(
   contexto: PrimerPagoConcepto,
 ): number {
   const esperado = montoEsperadoConcepto(compra, contexto);
+  if (esperado <= 0) return 0;
   const recibido = sumAbonos(pagos, contexto);
   return Math.max(0, esperado - recibido);
 }
@@ -43,4 +44,8 @@ export function conceptoCompleto(
   contexto: PrimerPagoConcepto,
 ): boolean {
   return faltanteConcepto(compra, pagos, contexto) === 0;
+}
+
+export function conceptoAplica(compra: UserMotoCompraRow, contexto: PrimerPagoConcepto): boolean {
+  return montoEsperadoConcepto(compra, contexto) > 0;
 }

@@ -144,10 +144,12 @@ export interface UserMotoCompraRow {
   frecuencia_pago: FrecuenciaPago;
   cuota_inicial_monto: number;
   monto_cuota_periodo: number;
+  monto_visita_monto: number;
   monto_total_primer_pago: number;
   estado: MotoCompraEstado;
   pago_inicial_confirmado: boolean;
   pago_cuota_confirmado: boolean;
+  pago_visita_confirmado: boolean;
   placa: string | null;
   chasis: string | null;
   referencia: string | null;
@@ -362,6 +364,19 @@ export interface InboxListItem {
   createdAt?: string;
 }
 
+export interface ClienteFacturacion {
+  userId: number;
+  clienteNombre: string;
+  clienteCedula: string;
+  compraId: string | null;
+  motoModelo: string | null;
+  motoColor: string | null;
+  cuotaInicial: number | null;
+  cuotaAdelantada: number | null;
+  montoVisita: number | null;
+  totalPrimerPago: number | null;
+}
+
 export interface ClientSearchResult {
   userId: number;
   username: string;
@@ -382,6 +397,7 @@ export interface BikeRow {
   stock: number;
   cuota_inicial: number;
   cuota_diaria: number;
+  monto_visita: number;
   precio_venta: number | null;
   descripcion: string | null;
   activo: boolean;
@@ -414,7 +430,7 @@ export const TARIFA_ESTADO_LABELS: Record<TarifaEstado, string> = {
   vencida: "Vencida",
 };
 
-export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada";
+export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada" | "visita";
 export type MedioPagoAdmin =
   | "nequi_nicolas"
   | "davivienda"
@@ -468,6 +484,7 @@ export const CONTEXTO_PAGO_LABELS: Record<ContextoPago, string> = {
   tarifa: "Tarifa de renting",
   inicial: "Cuota inicial",
   cuota_adelantada: "Cuota adelantada",
+  visita: "Visita domiciliaria",
 };
 
 export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdminStored, string> = {

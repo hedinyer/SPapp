@@ -1,22 +1,23 @@
 import {
   CONTEXTO_PAGO_LABELS,
-  MEDIO_PAGO_ADMIN_LABELS,
   type ContextoPago,
-  type MedioPagoAdminStored,
 } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 
-export interface CreditoPagoReceiptData {
-  pagoId: string;
+export type FacturaConcepto = Extract<
+  ContextoPago,
+  "inicial" | "cuota_adelantada" | "visita"
+>;
+
+export interface CreditoFacturaReceiptData {
+  facturaId: string;
   clienteNombre: string;
   clienteCedula: string;
-  motoModelo: string;
-  motoColor: string;
-  concepto: Extract<ContextoPago, "inicial" | "cuota_adelantada" | "visita">;
+  motoModelo: string | null;
+  motoColor: string | null;
+  concepto: FacturaConcepto;
   monto: number;
-  medioPago: MedioPagoAdminStored;
-  referencia: string | null;
-  confirmadoAt: string;
+  emitidaAt: string;
 }
 
 function esc(s: string): string {
@@ -56,21 +57,24 @@ async function qrDataUrl(text: string): Promise<string> {
   });
 }
 
-export async function buildCreditoPagoReceiptHtml(
-  recibo: CreditoPagoReceiptData,
+export async function buildCreditoFacturaReceiptHtml(
+  factura: CreditoFacturaReceiptData,
   origin = "",
 ): Promise<string> {
-  const f = folio(recibo.pagoId);
+  const f = folio(factura.facturaId);
   const qrSrc = await qrDataUrl(f);
   const beraLogo = `${origin}/beralogo.jpg`;
   const sgLogo = `${origin}/logosolucionesgarrido.jpg`;
-  const medioLabel = MEDIO_PAGO_ADMIN_LABELS[recibo.medioPago] ?? recibo.medioPago;
-  const conceptoLabel = CONTEXTO_PAGO_LABELS[recibo.concepto];
-  const refHtml = recibo.referencia
-    ? `<div class="sub">Ref. ${esc(recibo.referencia)}</div>`
-    : "";
+  const conceptoLabel = CONTEXTO_PAGO_LABELS[factura.concepto];
+  const motoHtml =
+    factura.motoModelo && factura.motoColor
+      ? `<div class="section">
+  <div class="label">Moto</div>
+  <div class="value">${esc(factura.motoModelo)} · ${esc(factura.motoColor)}</div>
+</div>`
+      : "";
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Recibo ${esc(f)}</title>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Factura ${esc(f)}</title>
 <style>
 @media print { body { margin: 0; } }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -120,12 +124,6 @@ body {
   font-size: 11px;
 }
 .totals .amount { font-weight: 700; }
-.status-ok {
-  margin-top: 8px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 11px;
-}
 .qr-block { text-align: center; margin-top: 8px; }
 .qr-block img { width: 88px; height: 88px; }
 .folio-qr { font-size: 9px; color: #666; margin-top: 4px; letter-spacing: 0.08em; }
@@ -136,38 +134,29 @@ body {
   <img src="${esc(sgLogo)}" alt="Soluciones Garrido" />
 </div>
 <div class="header">
-  <h1>RECIBO DE PAGO</h1>
+  <h1>FACTURA DE COBRO</h1>
   <p>Crédito moto · ${esc(conceptoLabel)}</p>
-  <p>${esc(fechaLabel(recibo.confirmadoAt))}</p>
+  <p>${esc(fechaLabel(factura.emitidaAt))}</p>
 </div>
 <hr class="divider" />
 <div class="section">
   <div class="label">Cliente</div>
-  <div class="value">${esc(recibo.clienteNombre)}</div>
-  <div class="sub">C.C. ${esc(recibo.clienteCedula)}</div>
+  <div class="value">${esc(factura.clienteNombre)}</div>
+  <div class="sub">C.C. ${esc(factura.clienteCedula || "—")}</div>
 </div>
-<div class="section">
-  <div class="label">Moto</div>
-  <div class="value">${esc(recibo.motoModelo)} · ${esc(recibo.motoColor)}</div>
-</div>
-<div class="section">
-  <div class="label">Medio de pago</div>
-  <div class="value">${esc(medioLabel)}</div>
-  ${refHtml}
-</div>
+${motoHtml}
 <div class="totals">
   <div class="row">
     <span>${esc(conceptoLabel)}</span>
-    <span class="amount">${esc(formatCop(recibo.monto))}</span>
+    <span class="amount">${esc(formatCop(factura.monto))}</span>
   </div>
-  <div class="status-ok">✓ PAGO RECIBIDO</div>
 </div>
 <hr class="divider" />
 <div class="qr-block">
   <img src="${qrSrc}" alt="QR ${esc(f)}" />
   <div class="folio-qr">${esc(f)}</div>
 </div>
-<div class="footer">Conserve este recibo</div>
+<div class="footer">Documento informativo · valor según acuerdo</div>
 </body></html>`;
 }
 
@@ -182,11 +171,11 @@ function triggerPrint(win: Window): void {
   }, 400);
 }
 
-export async function printCreditoPagoReceipt(
-  recibo: CreditoPagoReceiptData,
+export async function printCreditoFacturaReceipt(
+  factura: CreditoFacturaReceiptData,
 ): Promise<void> {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const html = await buildCreditoPagoReceiptHtml(recibo, origin);
+  const html = await buildCreditoFacturaReceiptHtml(factura, origin);
   const popup = window.open("", "_blank", "noopener,noreferrer");
   if (popup) {
     popup.document.open();

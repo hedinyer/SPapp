@@ -39,7 +39,7 @@ export async function selectMotoFromContract(input: z.infer<typeof selectSchema>
 
   const { data: bike, error: bikeError } = await supabase
     .from("bike_table")
-    .select("id, modelo, color, stock, activo, cuota_inicial, cuota_diaria")
+    .select("id, modelo, color, stock, activo, cuota_inicial, cuota_diaria, monto_visita")
     .eq("id", parsed.bikeId)
     .maybeSingle();
 

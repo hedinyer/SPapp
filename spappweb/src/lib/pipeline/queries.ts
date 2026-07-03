@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { buildClientPipeline } from "@/lib/pipeline/step-logic";
 import type {
   BikeRow,
+  ClienteFacturacion,
   ClientPipeline,
   ClientSearchResult,
   DigitalContractRow,
@@ -115,7 +116,7 @@ export async function getClientPipeline(
   const { data: compra } = await supabase
     .from("user_moto_compra")
     .select(
-      "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, seleccionado_at, admin_data",
+      "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_visita_monto, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, pago_visita_confirmado, placa, chasis, referencia, fecha_entrega, seleccionado_at, admin_data",
     )
     .eq("user_id", userId)
     .maybeSingle();
@@ -801,7 +802,7 @@ export async function getAllBikes(): Promise<BikeRow[]> {
   const { data } = await supabase
     .from("bike_table")
     .select(
-      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, precio_venta, descripcion, activo",
+      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, monto_visita, precio_venta, descripcion, activo",
     )
     .order("modelo")
     .order("color");
@@ -813,7 +814,7 @@ export async function getAvailableBikes(): Promise<BikeRow[]> {
   const { data } = await supabase
     .from("bike_table")
     .select(
-      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, precio_venta, descripcion, activo",
+      "id, modelo, color, imagen_url, stock, cuota_inicial, cuota_diaria, monto_visita, precio_venta, descripcion, activo",
     )
     .eq("activo", true)
     .gt("stock", 0)
@@ -1102,4 +1103,58 @@ export async function searchClients(
   return results.sort((a, b) =>
     a.displayName.localeCompare(b.displayName, "es"),
   );
+}
+
+export async function getClienteFacturacion(
+  userId: number,
+): Promise<ClienteFacturacion | null> {
+  const supabase = createAdminClient();
+
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select(
+      "id, user, visitas(cliente_nombre), digital_contracts(hoja_vida_data, contrato_data, created_at), user_moto_compra(id, modelo, color, cuota_inicial_monto, monto_cuota_periodo, monto_visita_monto, monto_total_primer_pago)",
+    )
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (userError) throw new Error(userError.message);
+  if (!user) return null;
+
+  const compraRaw = user.user_moto_compra;
+  const compra = Array.isArray(compraRaw) ? compraRaw[0] : compraRaw;
+
+  const contracts = user.digital_contracts ?? [];
+  const latestContract = [...contracts].sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  )[0];
+
+  const hoja = latestContract?.hoja_vida_data ?? null;
+  const contrato = latestContract?.contrato_data ?? null;
+  const visitaRaw = user.visitas;
+  const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
+
+  const cedula =
+    (hoja?.numero_identificacion as string | undefined)?.trim() ||
+    (contrato?.cedula_contratante as string | undefined)?.trim() ||
+    "";
+
+  const clienteNombre =
+    (hoja?.nombre_completo as string | undefined)?.trim() ||
+    visita?.cliente_nombre?.trim() ||
+    user.user;
+
+  return {
+    userId: user.id as number,
+    clienteNombre,
+    clienteCedula: cedula,
+    compraId: (compra?.id as string | undefined) ?? null,
+    motoModelo: (compra?.modelo as string | undefined) ?? null,
+    motoColor: (compra?.color as string | undefined) ?? null,
+    cuotaInicial: (compra?.cuota_inicial_monto as number | undefined) ?? null,
+    cuotaAdelantada: (compra?.monto_cuota_periodo as number | undefined) ?? null,
+    montoVisita: (compra?.monto_visita_monto as number | undefined) ?? null,
+    totalPrimerPago: (compra?.monto_total_primer_pago as number | undefined) ?? null,
+  };
 }

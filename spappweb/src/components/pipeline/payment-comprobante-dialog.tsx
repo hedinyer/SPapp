@@ -56,7 +56,11 @@ interface PaymentComprobanteDialogProps {
 }
 
 function isPrimerPagoContexto(contexto: ContextoPago): boolean {
-  return contexto === "inicial" || contexto === "cuota_adelantada";
+  return (
+    contexto === "inicial" ||
+    contexto === "cuota_adelantada" ||
+    contexto === "visita"
+  );
 }
 
 function isPresencialMedio(medio: MedioPagoAdmin): boolean {

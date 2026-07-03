@@ -49,6 +49,7 @@ export function AdminMotoAssignPanel({
   );
   const [cuotaInicial, setCuotaInicial] = useState("");
   const [cuotaDiaria, setCuotaDiaria] = useState("");
+  const [montoVisita, setMontoVisita] = useState("");
 
   const activeBikes = bikes.filter((b) => b.activo);
   const selectedBike = activeBikes.find((b) => String(b.id) === bikeId);
@@ -65,22 +66,28 @@ export function AdminMotoAssignPanel({
           ),
         ),
       );
+      setMontoVisita(String(compra.monto_visita_monto));
       return;
     }
     setCuotaInicial(String(selectedBike.cuota_inicial));
     setCuotaDiaria(String(selectedBike.cuota_diaria));
+    setMontoVisita(String(selectedBike.monto_visita ?? 50000));
   }, [bikeId, selectedBike, compra]);
 
   const parsedInicial = Number(cuotaInicial);
   const parsedDiaria = Number(cuotaDiaria);
+  const parsedVisita = Number(montoVisita);
   const paymentPreview =
     selectedBike &&
     Number.isFinite(parsedInicial) &&
     Number.isFinite(parsedDiaria) &&
-    parsedDiaria > 0
+    Number.isFinite(parsedVisita) &&
+    parsedDiaria > 0 &&
+    parsedVisita >= 0
       ? calcMotoPayment(selectedBike, frecuencia, {
           cuotaInicial: parsedInicial,
           cuotaDiaria: parsedDiaria,
+          montoVisita: parsedVisita,
         })
       : null;
 
@@ -121,6 +128,10 @@ export function AdminMotoAssignPanel({
               toast.error("Indica una cuota diaria válida.");
               return;
             }
+            if (!Number.isFinite(parsedVisita) || parsedVisita < 0) {
+              toast.error("Indica un monto de visita válido.");
+              return;
+            }
             startTransition(async () => {
               try {
                 await assignMotoByAdmin({
@@ -133,6 +144,7 @@ export function AdminMotoAssignPanel({
                   referencia: String(fd.get("referencia") || "") || undefined,
                   cuotaInicial: parsedInicial,
                   cuotaDiaria: parsedDiaria,
+                  montoVisita: parsedVisita,
                 });
                 toast.success("Moto asignada. Envía el link de contrato al cliente.");
               } catch (err) {
@@ -173,7 +185,8 @@ export function AdminMotoAssignPanel({
               <>
                 <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
                   Catálogo: inicial {formatCop(selectedBike.cuota_inicial)} ·{" "}
-                  {formatCop(selectedBike.cuota_diaria)}/día
+                  {formatCop(selectedBike.cuota_diaria)}/día · visita{" "}
+                  {formatCop(selectedBike.monto_visita ?? 50000)}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cuota-inicial">Cuota inicial negociada</Label>
@@ -203,6 +216,19 @@ export function AdminMotoAssignPanel({
                     según frecuencia).
                   </p>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="monto-visita">Monto visita domiciliaria</Label>
+                  <Input
+                    id="monto-visita"
+                    inputMode="numeric"
+                    value={montoVisita}
+                    onChange={(e) => setMontoVisita(e.target.value)}
+                    placeholder={String(selectedBike.monto_visita ?? 50000)}
+                  />
+                  <p className="text-xs text-neutral-500">
+                    Valor de la visita al domicilio (catálogo o negociado).
+                  </p>
+                </div>
                 {paymentPreview && (
                   <div className="sm:col-span-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm">
                     <p className="font-medium text-emerald-900">
@@ -210,7 +236,10 @@ export function AdminMotoAssignPanel({
                     </p>
                     <p className="mt-1 text-emerald-800">
                       Inicial {formatCop(paymentPreview.cuota_inicial_monto)} +{" "}
-                      adelantada {formatCop(paymentPreview.monto_cuota_periodo)}{" "}
+                      adelantada {formatCop(paymentPreview.monto_cuota_periodo)}
+                      {paymentPreview.monto_visita_monto > 0 && (
+                        <> + visita {formatCop(paymentPreview.monto_visita_monto)}</>
+                      )}{" "}
                       ({formatCop(parsedDiaria)}/día ×{" "}
                       {FRECUENCIA_LABELS[frecuencia].toLowerCase()}) ={" "}
                       <span className="font-semibold">

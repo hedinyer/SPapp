@@ -32,7 +32,9 @@ export function AdminMobileNav() {
 
     function syncScrollLock() {
       if (!checkbox) return;
-      document.body.style.overflow = checkbox.checked ? "hidden" : "";
+      const locked = checkbox.checked;
+      document.body.style.overflow = locked ? "hidden" : "";
+      document.documentElement.style.overflow = locked ? "hidden" : "";
     }
 
     syncScrollLock();
@@ -40,6 +42,7 @@ export function AdminMobileNav() {
     return () => {
       checkbox.removeEventListener("change", syncScrollLock);
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, []);
 

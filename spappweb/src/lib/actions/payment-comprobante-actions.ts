@@ -133,7 +133,7 @@ async function assertConceptoNoCubierto(
   const { data: compra, error: compraError } = await supabase
     .from("user_moto_compra")
     .select(
-      "id, cuota_inicial_monto, monto_cuota_periodo, estado, pago_inicial_confirmado, pago_cuota_confirmado",
+      "id, cuota_inicial_monto, monto_cuota_periodo, monto_visita_monto, estado, pago_inicial_confirmado, pago_cuota_confirmado, pago_visita_confirmado",
     )
     .eq("id", compraId)
     .maybeSingle();
@@ -162,11 +162,12 @@ async function assertConceptoNoCubierto(
   );
 
   if (faltante <= 0) {
-    throw new Error(
-      contexto === "inicial"
-        ? "La cuota inicial ya está cubierta."
-        : "La cuota adelantada ya está cubierta.",
-    );
+    const msg: Record<PrimerPagoConcepto, string> = {
+      inicial: "La cuota inicial ya está cubierta.",
+      cuota_adelantada: "La cuota adelantada ya está cubierta.",
+      visita: "La visita domiciliaria ya está cubierta.",
+    };
+    throw new Error(msg[contexto]);
   }
 
   return { compra: compra as UserMotoCompraRow, faltante };
@@ -200,7 +201,7 @@ export async function checkReferenciaPagoUsada(input: {
 const confirmPagoSchema = z.object({
   userId: z.number(),
   compraId: z.string().uuid(),
-  contexto: z.enum(["tarifa", "inicial", "cuota_adelantada"]),
+  contexto: z.enum(["tarifa", "inicial", "cuota_adelantada", "visita"]),
   tarifaId: z.string().uuid().optional(),
   referencia: z.string().optional(),
   monto: z.number().int().positive("El monto debe ser mayor a 0"),
@@ -241,7 +242,9 @@ export async function confirmPagoConComprobante(
   });
 
   const isPrimerPago =
-    parsed.contexto === "inicial" || parsed.contexto === "cuota_adelantada";
+    parsed.contexto === "inicial" ||
+    parsed.contexto === "cuota_adelantada" ||
+    parsed.contexto === "visita";
   const presencial = isPresencialMedio(parsed.medioPagoAdmin);
   const file = optionalImageFile(formData.get("file"));
 
@@ -407,7 +410,8 @@ export async function removePagoAbono(
 
   if (
     pago.contexto_pago !== "inicial" &&
-    pago.contexto_pago !== "cuota_adelantada"
+    pago.contexto_pago !== "cuota_adelantada" &&
+    pago.contexto_pago !== "visita"
   ) {
     throw new Error("Solo se pueden eliminar abonos del primer pago.");
   }

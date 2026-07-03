@@ -137,6 +137,7 @@ const assignMotoSchema = z.object({
   referencia: z.string().trim().optional(),
   cuotaInicial: z.number().int().min(0).optional(),
   cuotaDiaria: z.number().int().positive().optional(),
+  montoVisita: z.number().int().min(0).optional(),
 });
 
 export async function assignMotoByAdminOp(
@@ -158,7 +159,7 @@ export async function assignMotoByAdminOp(
 
   const { data: bike, error: bikeError } = await supabase
     .from("bike_table")
-    .select("id, modelo, color, stock, activo, cuota_inicial, cuota_diaria")
+    .select("id, modelo, color, stock, activo, cuota_inicial, cuota_diaria, monto_visita")
     .eq("id", parsed.bikeId)
     .maybeSingle();
 
@@ -169,6 +170,7 @@ export async function assignMotoByAdminOp(
 
   const cuotaInicial = parsed.cuotaInicial ?? (bike.cuota_inicial as number);
   const cuotaDiaria = parsed.cuotaDiaria ?? (bike.cuota_diaria as number);
+  const montoVisita = parsed.montoVisita ?? (bike.monto_visita as number);
 
   if (cuotaInicial < (bike.cuota_inicial as number)) {
     throw new Error(
@@ -178,10 +180,14 @@ export async function assignMotoByAdminOp(
   if (cuotaDiaria <= 0) {
     throw new Error("La cuota diaria debe ser mayor a cero.");
   }
+  if (montoVisita < 0) {
+    throw new Error("El monto de visita no puede ser negativo.");
+  }
 
   const payment = calcMotoPayment(bike, parsed.frecuencia, {
     cuotaInicial,
     cuotaDiaria,
+    montoVisita,
   });
 
   const placa = parsed.placa?.trim().toUpperCase() || null;

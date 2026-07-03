@@ -33,17 +33,24 @@ export function cuotaDiariaFromPeriodo(
 }
 
 export function calcMotoPayment(
-  bike: Pick<BikeRow, "cuota_inicial" | "cuota_diaria">,
+  bike: Pick<BikeRow, "cuota_inicial" | "cuota_diaria" | "monto_visita">,
   frecuencia: FrecuenciaPago,
-  overrides?: { cuotaInicial?: number; cuotaDiaria?: number },
+  overrides?: {
+    cuotaInicial?: number;
+    cuotaDiaria?: number;
+    montoVisita?: number;
+  },
 ) {
   const cuota_inicial_monto = overrides?.cuotaInicial ?? bike.cuota_inicial;
   const cuotaDiaria = overrides?.cuotaDiaria ?? bike.cuota_diaria;
+  const monto_visita_monto = overrides?.montoVisita ?? bike.monto_visita ?? 0;
   const monto_cuota_periodo = montoCuotaPeriodo(cuotaDiaria, frecuencia);
   return {
     cuota_inicial_monto,
     monto_cuota_periodo,
-    monto_total_primer_pago: cuota_inicial_monto + monto_cuota_periodo,
+    monto_visita_monto,
+    monto_total_primer_pago:
+      cuota_inicial_monto + monto_cuota_periodo + monto_visita_monto,
   };
 }
 

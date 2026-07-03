@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} min-h-full antialiased`}
     >
       <head>
         {/* Evita que extensiones crypto rotas (sin window.ethereum) tumben la app */}

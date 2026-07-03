@@ -486,6 +486,7 @@ export const AGENT_TOOLS = {
       stock: z.number().int().min(0),
       cuotaInicial: z.number().int().min(0),
       cuotaDiaria: z.number().int().min(0),
+      montoVisita: z.number().int().min(0).default(50000),
       precioVenta: z.number().int().positive().optional().nullable(),
       descripcion: z.string().optional(),
       activo: z.boolean(),

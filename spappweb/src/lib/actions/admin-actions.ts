@@ -122,6 +122,7 @@ const assignMotoSchema = z.object({
   referencia: z.string().trim().optional(),
   cuotaInicial: z.number().int().min(0).optional(),
   cuotaDiaria: z.number().int().positive().optional(),
+  montoVisita: z.number().int().min(0).optional(),
 });
 
 export async function assignMotoByAdmin(
@@ -605,6 +606,7 @@ const bikeSchema = z.object({
   stock: z.number().int().min(0),
   cuotaInicial: z.number().int().min(0),
   cuotaDiaria: z.number().int().min(0),
+  montoVisita: z.number().int().min(0).default(50000),
   precioVenta: z.number().int().positive().optional().nullable(),
   descripcion: z.string().optional(),
   activo: z.boolean(),
@@ -621,6 +623,7 @@ export async function saveBike(input: z.infer<typeof bikeSchema>) {
     stock: parsed.stock,
     cuota_inicial: parsed.cuotaInicial,
     cuota_diaria: parsed.cuotaDiaria,
+    monto_visita: parsed.montoVisita,
     precio_venta: parsed.precioVenta ?? null,
     descripcion: parsed.descripcion?.trim() || null,
     activo: parsed.activo,

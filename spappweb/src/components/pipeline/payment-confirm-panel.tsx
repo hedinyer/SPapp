@@ -93,6 +93,9 @@ export function PaymentConfirmPanel({
             <p className="mt-2 text-sm text-neutral-600">
               Inicial {formatCop(compra.cuota_inicial_monto)} + adelantada{" "}
               {formatCop(compra.monto_cuota_periodo)}
+              {compra.monto_visita_monto > 0 && (
+                <> + visita {formatCop(compra.monto_visita_monto)}</>
+              )}
             </p>
           </div>
 
@@ -116,6 +119,18 @@ export function PaymentConfirmPanel({
             clienteCedula={clienteCedula}
             onAddAbono={() => openAbonoDialog("cuota_adelantada")}
           />
+          {compra.monto_visita_monto > 0 && (
+            <ConceptoAbonoSection
+              compra={compra}
+              pagos={pagos}
+              contexto="visita"
+              userId={userId}
+              canEdit={canEditAbonos}
+              clienteNombre={clienteNombre}
+              clienteCedula={clienteCedula}
+              onAddAbono={() => openAbonoDialog("visita")}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -165,7 +180,11 @@ function ConceptoAbonoSection({
   const pct = esperado > 0 ? Math.min(100, (recibido / esperado) * 100) : 0;
 
   function handleReprint(abono: PagoRow) {
-    if (abono.contexto_pago !== "inicial" && abono.contexto_pago !== "cuota_adelantada") {
+    if (
+      abono.contexto_pago !== "inicial" &&
+      abono.contexto_pago !== "cuota_adelantada" &&
+      abono.contexto_pago !== "visita"
+    ) {
       return;
     }
     const recibo: CreditoPagoReceiptData = {
