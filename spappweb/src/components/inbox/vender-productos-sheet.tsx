@@ -507,7 +507,7 @@ export function VenderProductosSheet({
       <SheetContent
         side={sheetSide}
         className={cn(
-          "overflow-y-auto p-0 sm:max-w-md",
+          "flex flex-col gap-0 p-0 sm:max-w-md",
           sheetSide === "bottom" && "max-h-[92dvh] rounded-t-2xl",
         )}
       >
@@ -537,6 +537,7 @@ export function VenderProductosSheet({
           </SheetTitle>
         </SheetHeader>
 
+        <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="space-y-4 px-4 py-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
@@ -749,85 +750,106 @@ export function VenderProductosSheet({
             </div>
           )}
 
-          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-            <p className="text-sm font-medium">Cliente</p>
-            <div className="space-y-2">
-              <Label htmlFor="prod-cliente-nombre">Nombre</Label>
-              <Input
-                id="prod-cliente-nombre"
-                value={clienteNombre}
-                onChange={(e) => setClienteNombre(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+          {!mobileCamera ? (
+            <>
+              <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                <p className="text-sm font-medium">Cliente</p>
+                <div className="space-y-2">
+                  <Label htmlFor="prod-cliente-nombre">Nombre</Label>
+                  <Input
+                    id="prod-cliente-nombre"
+                    value={clienteNombre}
+                    onChange={(e) => setClienteNombre(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-cliente-cedula">Cédula</Label>
+                    <Input
+                      id="prod-cliente-cedula"
+                      inputMode="numeric"
+                      value={clienteCedula}
+                      onChange={(e) => setClienteCedula(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prod-cliente-celular">Celular</Label>
+                    <Input
+                      id="prod-cliente-celular"
+                      inputMode="tel"
+                      value={clienteCelular}
+                      onChange={(e) => setClienteCelular(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+                <p className="text-sm font-medium">Pago</p>
+                <div className="space-y-2">
+                  <Label htmlFor="prod-monto-pagado">Pagado hoy</Label>
+                  <Input
+                    id="prod-monto-pagado"
+                    inputMode="numeric"
+                    placeholder={total > 0 ? String(total) : "0"}
+                    value={montoPagado}
+                    onChange={(e) => setMontoPagado(e.target.value)}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={total <= 0}
+                  onClick={() => setMontoPagado(String(total))}
+                >
+                  Marcar pago de contado
+                </Button>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="prod-cliente-cedula">Cédula</Label>
+                <Label htmlFor="prod-notas">Notas</Label>
                 <Input
-                  id="prod-cliente-cedula"
-                  inputMode="numeric"
-                  value={clienteCedula}
-                  onChange={(e) => setClienteCedula(e.target.value)}
+                  id="prod-notas"
+                  value={notas}
+                  onChange={(e) => setNotas(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="prod-cliente-celular">Celular</Label>
-                <Input
-                  id="prod-cliente-celular"
-                  inputMode="tel"
-                  value={clienteCelular}
-                  onChange={(e) => setClienteCelular(e.target.value)}
-                  required
-                />
-              </div>
+            </>
+          ) : lines.length > 0 ? (
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-center text-sm text-neutral-600">
+              {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
+              <span className="font-semibold text-neutral-900">
+                {formatCop(total)}
+              </span>
+              <p className="mt-1 text-xs text-neutral-500">
+                Usa &quot;Enviar a caja&quot; abajo para facturar en el
+                escritorio.
+              </p>
             </div>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-            <p className="text-sm font-medium">Pago</p>
-            <div className="space-y-2">
-              <Label htmlFor="prod-monto-pagado">Pagado hoy</Label>
-              <Input
-                id="prod-monto-pagado"
-                inputMode="numeric"
-                placeholder={total > 0 ? String(total) : "0"}
-                value={montoPagado}
-                onChange={(e) => setMontoPagado(e.target.value)}
-              />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="w-full"
-              disabled={total <= 0}
-              onClick={() => setMontoPagado(String(total))}
-            >
-              Marcar pago de contado
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="prod-notas">Notas</Label>
-            <Input
-              id="prod-notas"
-              value={notas}
-              onChange={(e) => setNotas(e.target.value)}
-            />
-          </div>
+          ) : null}
+        </div>
         </div>
 
-        <SheetFooter className="flex flex-col gap-2 border-t border-neutral-200 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+        <SheetFooter className="shrink-0 border-t border-neutral-200 bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex w-full flex-col gap-2">
           <Button
             type="button"
-            variant="outline"
-            className="w-full gap-2"
+            variant={mobileCamera ? "default" : "outline"}
+            className={cn(
+              "w-full gap-2",
+              mobileCamera && "bg-black text-white hover:bg-neutral-800",
+            )}
             disabled={publishPending || pending || lines.length === 0}
             onClick={sendToCaja}
           >
             <Send className="h-4 w-4" />
             {publishPending ? "Enviando…" : "Enviar a caja"}
           </Button>
+          {!mobileCamera ? (
           <Button
             type="button"
             className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
@@ -837,6 +859,8 @@ export function VenderProductosSheet({
             <Printer className="h-4 w-4" />
             {pending ? "Guardando…" : "Guardar e imprimir"}
           </Button>
+          ) : null}
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -893,9 +917,27 @@ export function VenderProductosSheet({
             />
             {renderScannerOverlays()}
           </div>
+          {lines.length > 0 ? (
+            <div className="shrink-0 space-y-2 border-t border-white/20 bg-black/80 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <p className="text-center text-sm text-white/90">
+                {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
+                {formatCop(total)}
+              </p>
+              <Button
+                type="button"
+                className="w-full gap-2 bg-white text-black hover:bg-white/90"
+                disabled={publishPending}
+                onClick={sendToCaja}
+              >
+                <Send className="h-4 w-4" />
+                {publishPending ? "Enviando…" : "Enviar a caja"}
+              </Button>
+            </div>
+          ) : (
           <p className="shrink-0 px-4 py-3 text-center text-xs text-white/70">
-            Apunta al QR dentro del marco. Puedes alejar el celular; detecta aunque haya texto alrededor.
+            Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
           </p>
+          )}
         </div>,
         document.body,
       )}
