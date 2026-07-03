@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircleDollarSign, Plus, Printer, Tag } from "lucide-react";
+import { CircleDollarSign, Pencil, Plus, Printer, Tag } from "lucide-react";
 import type { VentaMotoRow } from "@/lib/actions/venta-moto-actions";
 import { AbonoVentaDialog } from "@/components/venta-contado/abono-venta-dialog";
+import { EditarVentaContadoDialog } from "@/components/venta-contado/editar-venta-contado-dialog";
 import { PlacaVentaDialog } from "@/components/venta-contado/placa-venta-dialog";
 import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
 import { printVentaMotoReceipt } from "@/lib/printing/venta-moto-receipt";
@@ -66,6 +67,7 @@ export function VentaContadoManager({
   const [busqueda, setBusqueda] = useState("");
   const [abonoVenta, setAbonoVenta] = useState<VentaMotoRow | null>(null);
   const [placaVenta, setPlacaVenta] = useState<VentaMotoRow | null>(null);
+  const [editVenta, setEditVenta] = useState<VentaMotoRow | null>(null);
 
   const ventasFiltradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();
@@ -136,7 +138,7 @@ export function VentaContadoManager({
                   <TableHead>Pagado</TableHead>
                   <TableHead>Saldo</TableHead>
                   <TableHead>Estado</TableHead>
-                  <TableHead className="w-40" />
+                  <TableHead className="w-48" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -176,6 +178,16 @@ export function VentaContadoManager({
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap items-center justify-end gap-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 gap-1 px-2 text-xs"
+                          onClick={() => setEditVenta(v)}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Editar
+                        </Button>
                         {!v.placa ? (
                           <Button
                             type="button"
@@ -255,6 +267,16 @@ export function VentaContadoManager({
                   </div>
                 </dl>
                 <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2"
+                    onClick={() => setEditVenta(v)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Editar
+                  </Button>
                   {!v.placa ? (
                     <Button
                       type="button"
@@ -316,6 +338,14 @@ export function VentaContadoManager({
         open={placaVenta != null}
         onOpenChange={(open) => {
           if (!open) setPlacaVenta(null);
+        }}
+      />
+
+      <EditarVentaContadoDialog
+        venta={editVenta}
+        open={editVenta != null}
+        onOpenChange={(open) => {
+          if (!open) setEditVenta(null);
         }}
       />
     </>

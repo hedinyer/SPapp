@@ -214,6 +214,83 @@ const placaSchema = z.object({
     .transform((s) => s.toUpperCase()),
 });
 
+const updateVentaMotoSchema = z
+  .object({
+    id: z.string().uuid(),
+    clienteNombre: z.string().trim().min(1, "Nombre del cliente obligatorio"),
+    clienteCedula: z.string().trim().min(5, "Cédula inválida"),
+    clienteCelular: z.string().trim().min(10, "Celular inválido"),
+    chasis: z.string().trim().optional(),
+    valorVenta: z.number().int().positive().optional(),
+    montoPagado: z.number().int().nonnegative(),
+    placa: z
+      .string()
+      .trim()
+      .max(10, "Placa inválida.")
+      .transform((s) => (s ? s.toUpperCase() : null)),
+    notas: z.string().trim().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const pagado = data.montoPagado;
+    if (pagado > 0 && !data.valorVenta) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Indica el valor total de la venta.",
+        path: ["valorVenta"],
+      });
+    }
+    if (data.valorVenta != null && pagado > data.valorVenta) {
+      ctx.addIssue({
+        code: "custom",
+        message: "El pago no puede superar el valor de venta.",
+        path: ["montoPagado"],
+      });
+    }
+  });
+
+export type UpdateVentaMotoInput = z.infer<typeof updateVentaMotoSchema>;
+
+export async function updateVentaMoto(
+  input: UpdateVentaMotoInput,
+): Promise<VentaMotoRow> {
+  await requireAdminSession();
+  const parsed = updateVentaMotoSchema.parse(input);
+  const supabase = createAdminClient();
+
+  const { data: current, error: fetchError } = await supabase
+    .from("ventas_moto")
+    .select(VENTA_MOTO_SELECT)
+    .eq("id", parsed.id)
+    .single();
+
+  if (fetchError || !current) {
+    throw new Error(fetchError?.message ?? "Venta no encontrada.");
+  }
+
+  const { data, error } = await supabase
+    .from("ventas_moto")
+    .update({
+      cliente_nombre: parsed.clienteNombre,
+      cliente_cedula: parsed.clienteCedula,
+      cliente_celular: parsed.clienteCelular,
+      chasis: parsed.chasis || null,
+      valor_venta: parsed.valorVenta ?? null,
+      monto_pagado: parsed.montoPagado,
+      placa: parsed.placa,
+      notas: parsed.notas || null,
+    })
+    .eq("id", parsed.id)
+    .select(VENTA_MOTO_SELECT)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/inbox");
+  revalidatePath("/venta-contado");
+  revalidatePath("/caja");
+  return toRow(data as Record<string, unknown>);
+}
+
 export async function setPlacaVentaMoto(
   id: string,
   placa: string,
