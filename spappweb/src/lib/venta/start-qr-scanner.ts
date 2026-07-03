@@ -14,7 +14,11 @@ function isCoarsePointer(): boolean {
 }
 
 export function isMobileTouchDevice(): boolean {
-  return isCoarsePointer();
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia("(pointer: coarse)").matches ||
+    window.matchMedia("(max-width: 639px)").matches
+  );
 }
 
 export function cameraErrorMessage(err: unknown): string {
@@ -228,15 +232,10 @@ function scanLoop(
 ): () => void {
   let active = true;
   let busy = false;
-  const schedule =
-    typeof video.requestVideoFrameCallback === "function"
-      ? (cb: () => void) => video.requestVideoFrameCallback(() => cb())
-      : (cb: () => void) => requestAnimationFrame(() => cb());
+  const SCAN_INTERVAL_MS = 100;
 
-  const tick = () => {
-    if (!active) return;
-    schedule(tick);
-    if (busy || video.readyState < 2 || locked()) return;
+  const id = window.setInterval(() => {
+    if (!active || busy || video.readyState < 2 || locked()) return;
     busy = true;
     void decode()
       .then((raw) => {
@@ -245,10 +244,11 @@ function scanLoop(
       .finally(() => {
         busy = false;
       });
-  };
-  schedule(tick);
+  }, SCAN_INTERVAL_MS);
+
   return () => {
     active = false;
+    window.clearInterval(id);
   };
 }
 
@@ -307,7 +307,7 @@ async function startQrScannerImpl(
       },
       {
         returnDetailedScanResult: true,
-        maxScansPerSecond: mobile ? 12 : 18,
+        maxScansPerSecond: 10,
         calculateScanRegion: fullFrameRegion,
         onDecodeError: (e) => {
           if (e === QrScanner.NO_QR_CODE_FOUND) return;

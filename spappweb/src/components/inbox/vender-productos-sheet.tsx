@@ -149,7 +149,8 @@ export function VenderProductosSheet({
   const [notas, setNotas] = useState("");
   const [cameraOn, setCameraOn] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
-  const [sheetSide, setSheetSide] = useState<"bottom" | "right">("right");
+  const [mobileLayout, setMobileLayout] = useState(false);
+  const sheetSide = mobileLayout ? "bottom" : "right";
   const [cajaCode, setCajaCode] = useState<string | null>(null);
   const busquedaRef = useRef<HTMLInputElement>(null);
   const scannerInputRef = useRef<HTMLInputElement>(null);
@@ -319,7 +320,7 @@ export function VenderProductosSheet({
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
-    const update = () => setSheetSide(mq.matches ? "bottom" : "right");
+    const update = () => setMobileLayout(mq.matches);
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
@@ -473,8 +474,6 @@ export function VenderProductosSheet({
     dispatch({ type: "clear" });
   }
 
-  const mobileCamera = isMobileTouchDevice();
-
   function renderScannerOverlays() {
     return (
       <>
@@ -537,7 +536,12 @@ export function VenderProductosSheet({
           </SheetTitle>
         </SheetHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div
+          className={cn(
+            "min-h-0 flex-1 overflow-y-auto",
+            mobileLayout && "pb-28",
+          )}
+        >
         <div className="space-y-4 px-4 py-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
@@ -565,7 +569,7 @@ export function VenderProductosSheet({
               </Button>
             </div>
 
-            {mobileCamera && !cameraOn ? (
+            {mobileLayout && !cameraOn ? (
               <button
                 type="button"
                 className="flex min-h-[12rem] w-full flex-col items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
@@ -579,7 +583,7 @@ export function VenderProductosSheet({
                   Apunta al QR de la etiqueta
                 </span>
               </button>
-            ) : !mobileCamera ? (
+            ) : !mobileLayout ? (
               <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
                 <div
                   id={SCANNER_ID}
@@ -608,7 +612,7 @@ export function VenderProductosSheet({
               </div>
             ) : null}
 
-            {cameraOn && !mobileCamera ? (
+            {cameraOn && !mobileLayout ? (
               <p className="text-center text-xs text-neutral-500">
                 Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
               </p>
@@ -750,7 +754,7 @@ export function VenderProductosSheet({
             </div>
           )}
 
-          {!mobileCamera ? (
+          {!mobileLayout ? (
             <>
               <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
                 <p className="text-sm font-medium">Cliente</p>
@@ -826,7 +830,7 @@ export function VenderProductosSheet({
                 {formatCop(total)}
               </span>
               <p className="mt-1 text-xs text-neutral-500">
-                Usa &quot;Enviar a caja&quot; abajo para facturar en el
+                Usa &quot;Enviar a PC&quot; abajo para facturar en el
                 escritorio.
               </p>
             </div>
@@ -834,22 +838,19 @@ export function VenderProductosSheet({
         </div>
         </div>
 
+        {!mobileLayout ? (
         <SheetFooter className="shrink-0 border-t border-neutral-200 bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
           <div className="flex w-full flex-col gap-2">
           <Button
             type="button"
-            variant={mobileCamera ? "default" : "outline"}
-            className={cn(
-              "w-full gap-2",
-              mobileCamera && "bg-black text-white hover:bg-neutral-800",
-            )}
+            variant="outline"
+            className="w-full gap-2"
             disabled={publishPending || pending || lines.length === 0}
             onClick={sendToCaja}
           >
             <Send className="h-4 w-4" />
-            {publishPending ? "Enviando…" : "Enviar a caja"}
+            {publishPending ? "Enviando…" : "Enviar a PC"}
           </Button>
-          {!mobileCamera ? (
           <Button
             type="button"
             className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
@@ -859,9 +860,9 @@ export function VenderProductosSheet({
             <Printer className="h-4 w-4" />
             {pending ? "Guardando…" : "Guardar e imprimir"}
           </Button>
-          ) : null}
           </div>
         </SheetFooter>
+        ) : null}
       </SheetContent>
     </Sheet>
 
@@ -891,7 +892,7 @@ export function VenderProductosSheet({
       </DialogContent>
     </Dialog>
 
-    {mobileCamera &&
+    {mobileLayout &&
       cameraOn &&
       typeof document !== "undefined" &&
       createPortal(
@@ -917,27 +918,39 @@ export function VenderProductosSheet({
             />
             {renderScannerOverlays()}
           </div>
-          {lines.length > 0 ? (
-            <div className="shrink-0 space-y-2 border-t border-white/20 bg-black/80 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-              <p className="text-center text-sm text-white/90">
-                {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
-                {formatCop(total)}
-              </p>
-              <Button
-                type="button"
-                className="w-full gap-2 bg-white text-black hover:bg-white/90"
-                disabled={publishPending}
-                onClick={sendToCaja}
-              >
-                <Send className="h-4 w-4" />
-                {publishPending ? "Enviando…" : "Enviar a caja"}
-              </Button>
-            </div>
-          ) : (
-          <p className="shrink-0 px-4 py-3 text-center text-xs text-white/70">
-            Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
+          <p className="shrink-0 px-4 py-3 pb-[max(5rem,env(safe-area-inset-bottom))] text-center text-xs text-white/70">
+            Apunta al QR. El botón &quot;Enviar a PC&quot; está abajo.
           </p>
+        </div>,
+        document.body,
+      )}
+
+    {open &&
+      mobileLayout &&
+      typeof document !== "undefined" &&
+      createPortal(
+        <div className="fixed inset-x-0 bottom-0 z-[300] border-t border-neutral-200 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.18)]">
+          {lines.length > 0 ? (
+            <p className="mb-2 text-center text-sm text-neutral-600">
+              {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
+              <span className="font-semibold text-neutral-900">
+                {formatCop(total)}
+              </span>
+            </p>
+          ) : (
+            <p className="mb-2 text-center text-xs text-neutral-500">
+              Escanea productos para habilitar el envío
+            </p>
           )}
+          <Button
+            type="button"
+            className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+            disabled={publishPending || pending || lines.length === 0}
+            onClick={sendToCaja}
+          >
+            <Send className="h-4 w-4" />
+            {publishPending ? "Enviando…" : "Enviar a PC"}
+          </Button>
         </div>,
         document.body,
       )}
