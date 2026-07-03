@@ -8,12 +8,39 @@ import {
 
 export interface CajaPagoConfirmadoRow {
   id: string;
+  userId?: number;
+  clienteNombre?: string;
   monto: number;
   medio: MedioPagoAdminStored | "efectivo";
   medioLabel: string;
   contexto: string | null;
   contextoLabel: string;
   confirmadoAt: string;
+}
+
+export interface CajaVisitaPendiente {
+  userId: number;
+  compraId: string;
+  clienteNombre: string;
+  montoEsperado: number;
+  montoRecibido: number;
+  faltante: number;
+}
+
+export interface CajaVisitaCobrada {
+  pagoId: string;
+  userId: number;
+  clienteNombre: string;
+  monto: number;
+  medioLabel: string;
+  confirmadoAt: string;
+}
+
+export interface CajaVisitasResumen {
+  cobradas: CajaVisitaCobrada[];
+  pendientes: CajaVisitaPendiente[];
+  totalCobradoSesion: number;
+  totalPendiente: number;
 }
 
 export interface CajaEgresoRow {
@@ -41,6 +68,7 @@ export interface CajaInformeIngresos {
     ventasProducto: number;
     ventasMoto: number;
     pagosCredito: number;
+    pagosVisitaEfectivo: number;
     entradasManuales: number;
     salidasManuales: number;
     pagosSalida: number;
@@ -62,6 +90,10 @@ export interface CajaInformeIngresos {
   egresosDia: number;
   netoDia: number;
   totalRecaudado: number;
+  visitas: {
+    monto: number;
+    cantidad: number;
+  };
   pagos: CajaPagoConfirmadoRow[];
   egresos: CajaInformeEgresos;
   egresosDetalle: CajaEgresoRow[];
@@ -86,6 +118,8 @@ export function buildCajaInforme(input: {
   salidas: number;
   pagosRaw: Array<{
     id: string;
+    user_id?: number;
+    cliente_nombre?: string | null;
     monto: number;
     medio_pago_admin: string | null;
     contexto_pago: string | null;
@@ -109,6 +143,8 @@ export function buildCajaInforme(input: {
         : "Pago crédito";
     return {
       id: p.id,
+      userId: p.user_id,
+      clienteNombre: p.cliente_nombre ?? undefined,
       monto: p.monto,
       medio: (p.medio_pago_admin ?? "efectivo") as MedioPagoAdminStored | "efectivo",
       medioLabel: medioLabel(p.medio_pago_admin),
@@ -130,15 +166,29 @@ export function buildCajaInforme(input: {
   }));
 
   let pagosEfectivo = 0;
+  let pagosCreditoEfectivo = 0;
+  let pagosVisitaEfectivo = 0;
   let pagosNequi = 0;
   let pagosDavivienda = 0;
+  let pagosVisita = 0;
+  let countVisita = 0;
   let countNequi = 0;
   let countDavivienda = 0;
 
   for (const p of pagos) {
     const kind = classifyMedioPago(p.medio);
-    if (kind === "efectivo") pagosEfectivo += p.monto;
-    else if (kind === "nequi") {
+    const isVisita = p.contexto === "visita";
+
+    if (isVisita) {
+      pagosVisita += p.monto;
+      countVisita += 1;
+      if (kind === "efectivo") pagosVisitaEfectivo += p.monto;
+    }
+
+    if (kind === "efectivo") {
+      pagosEfectivo += p.monto;
+      if (!isVisita) pagosCreditoEfectivo += p.monto;
+    } else if (kind === "nequi") {
       pagosNequi += p.monto;
       countNequi += 1;
     } else if (kind === "davivienda") {
@@ -146,6 +196,7 @@ export function buildCajaInforme(input: {
       countDavivienda += 1;
     } else {
       pagosEfectivo += p.monto;
+      if (!isVisita) pagosCreditoEfectivo += p.monto;
     }
   }
 
@@ -185,7 +236,8 @@ export function buildCajaInforme(input: {
       apertura: input.montoApertura,
       ventasProducto: input.ventasProducto,
       ventasMoto: input.ventasMoto,
-      pagosCredito: pagosEfectivo,
+      pagosCredito: pagosCreditoEfectivo,
+      pagosVisitaEfectivo,
       entradasManuales: input.entradas,
       salidasManuales: input.salidas,
       pagosSalida: egresoEfectivo,
@@ -207,6 +259,10 @@ export function buildCajaInforme(input: {
     egresosDia,
     netoDia: ingresosDia - egresosDia,
     totalRecaudado: ingresosDia + input.montoApertura,
+    visitas: {
+      monto: pagosVisita,
+      cantidad: countVisita,
+    },
     pagos,
     egresos: {
       efectivo: egresoEfectivo,

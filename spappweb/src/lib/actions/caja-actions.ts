@@ -6,7 +6,12 @@ import {
   buildCajaInforme,
   type CajaEgresoRow,
   type CajaInformeIngresos,
+  type CajaVisitasResumen,
 } from "@/lib/caja/caja-informe";
+import { MEDIO_PAGO_ADMIN_LABELS } from "@/lib/pipeline/types";
+import type { MedioPagoAdmin, MedioPagoAdminStored } from "@/lib/pipeline/types";
+import { faltanteConcepto } from "@/lib/payments/primer-pago-progress";
+import type { PagoRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import {
   CAJA_MEDIO_EGRESO_VALUES,
 } from "@/lib/caja/caja-medios";
@@ -20,6 +25,15 @@ function todayBogota(): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Bogota",
   }).format(new Date());
+}
+
+function dayStartBogota(fecha: string): string {
+  return new Date(`${fecha}T00:00:00-05:00`).toISOString();
+}
+
+function pagosDesde(openedAt: string, fecha: string): string {
+  const inicioDia = dayStartBogota(fecha);
+  return openedAt > inicioDia ? openedAt : inicioDia;
 }
 
 export interface CajaMovimientoRow {
@@ -53,8 +67,158 @@ export interface CajaSesionState {
   movimientos: CajaMovimientoRow[];
   egresos: CajaEgresoRow[];
   informe: CajaInformeIngresos;
+  visitasResumen: CajaVisitasResumen;
   efectivoEsperado: number;
   diferencia: number | null;
+}
+
+function medioLabel(medio: string | null): string {
+  if (!medio) return "Efectivo";
+  if (medio in MEDIO_PAGO_ADMIN_LABELS) {
+    return MEDIO_PAGO_ADMIN_LABELS[medio as MedioPagoAdminStored];
+  }
+  return medio;
+}
+
+function resolveClienteNombre(raw: {
+  users?:
+    | {
+        user: string;
+        visitas?:
+          | { cliente_nombre: string | null; estado?: string | null }
+          | { cliente_nombre: string | null; estado?: string | null }[]
+          | null;
+      }
+    | {
+        user: string;
+        visitas?:
+          | { cliente_nombre: string | null; estado?: string | null }
+          | { cliente_nombre: string | null; estado?: string | null }[]
+          | null;
+      }[]
+    | null;
+  visitas?:
+    | { cliente_nombre: string | null; estado?: string | null }
+    | { cliente_nombre: string | null; estado?: string | null }[]
+    | null;
+}): string {
+  const userRaw = raw.users;
+  const user = Array.isArray(userRaw) ? userRaw[0] : userRaw;
+  const visitaRaw = user?.visitas ?? raw.visitas;
+  const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
+  return visita?.cliente_nombre?.trim() || user?.user || "Cliente";
+}
+
+function resolveVisitaEstado(raw: {
+  users?:
+    | {
+        visitas?:
+          | { estado?: string | null }
+          | { estado?: string | null }[]
+          | null;
+      }
+    | {
+        visitas?:
+          | { estado?: string | null }
+          | { estado?: string | null }[]
+          | null;
+      }[]
+    | null;
+  visitas?:
+    | { estado?: string | null }
+    | { estado?: string | null }[]
+    | null;
+}): string | null {
+  const userRaw = raw.users;
+  const user = Array.isArray(userRaw) ? userRaw[0] : userRaw;
+  const visitaRaw = user?.visitas ?? raw.visitas;
+  const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
+  return visita?.estado ?? null;
+}
+
+async function fetchVisitasForCaja(
+  pagosInicio: string,
+  until: string,
+): Promise<CajaVisitasResumen> {
+  const supabase = createAdminClient();
+
+  const [cobradasRes, comprasRes, abonosRes] = await Promise.all([
+    supabase
+      .from("pagos")
+      .select(
+        "id, user_id, monto, medio_pago_admin, confirmado_at, users(user, visitas(cliente_nombre))",
+      )
+      .eq("estado", "confirmado")
+      .eq("contexto_pago", "visita")
+      .gte("confirmado_at", pagosInicio)
+      .lte("confirmado_at", until)
+      .not("confirmado_at", "is", null)
+      .order("confirmado_at", { ascending: false }),
+    supabase
+      .from("user_moto_compra")
+      .select(
+        "id, user_id, monto_visita_monto, users(user, visitas(cliente_nombre, estado))",
+      )
+      .gt("monto_visita_monto", 0)
+      .eq("pago_visita_confirmado", false)
+      .neq("estado", "cancelada")
+      .order("seleccionado_at", { ascending: false }),
+    supabase
+      .from("pagos")
+      .select("user_moto_compra_id, monto")
+      .eq("estado", "confirmado")
+      .eq("contexto_pago", "visita")
+      .not("user_moto_compra_id", "is", null),
+  ]);
+
+  if (cobradasRes.error) throw new Error(cobradasRes.error.message);
+  if (comprasRes.error) throw new Error(comprasRes.error.message);
+  if (abonosRes.error) throw new Error(abonosRes.error.message);
+
+  const recibidoPorCompra = new Map<string, number>();
+  for (const row of abonosRes.data ?? []) {
+    const compraId = String(row.user_moto_compra_id);
+    recibidoPorCompra.set(
+      compraId,
+      (recibidoPorCompra.get(compraId) ?? 0) + Number(row.monto),
+    );
+  }
+
+  const cobradas = (cobradasRes.data ?? []).map((row) => ({
+    pagoId: String(row.id),
+    userId: Number(row.user_id),
+    clienteNombre: resolveClienteNombre(row),
+    monto: Number(row.monto),
+    medioLabel: medioLabel(
+      row.medio_pago_admin ? String(row.medio_pago_admin) : null,
+    ),
+    confirmadoAt: String(row.confirmado_at),
+  }));
+
+  const pendientes = (comprasRes.data ?? [])
+    .filter((row) => resolveVisitaEstado(row) === "completada")
+    .map((row) => {
+      const compraId = String(row.id);
+      const montoEsperado = Number(row.monto_visita_monto);
+      const montoRecibido = recibidoPorCompra.get(compraId) ?? 0;
+      const faltante = Math.max(0, montoEsperado - montoRecibido);
+      return {
+        userId: Number(row.user_id),
+        compraId,
+        clienteNombre: resolveClienteNombre(row),
+        montoEsperado,
+        montoRecibido,
+        faltante,
+      };
+    })
+    .filter((row) => row.faltante > 0);
+
+  return {
+    cobradas,
+    pendientes,
+    totalCobradoSesion: cobradas.reduce((s, row) => s + row.monto, 0),
+    totalPendiente: pendientes.reduce((s, row) => s + row.faltante, 0),
+  };
 }
 
 async function fetchSesionData(
@@ -62,16 +226,20 @@ async function fetchSesionData(
   closedAt: string | null,
   sesionId: string,
   montoApertura: number,
+  fecha: string,
 ): Promise<{
   resumen: CajaResumen;
   movimientos: CajaMovimientoRow[];
   egresos: CajaEgresoRow[];
   informe: CajaInformeIngresos;
+  visitasResumen: CajaVisitasResumen;
 }> {
   const supabase = createAdminClient();
   const until = closedAt ?? new Date().toISOString();
+  const inicioPagos = pagosDesde(openedAt, fecha);
 
-  const [vpRes, vmRes, movRes, pagosRes, egresosRes] = await Promise.all([
+  const [vpRes, vmRes, movRes, pagosRes, egresosRes, visitasResumen] =
+    await Promise.all([
     supabase
       .from("ventas_producto")
       .select("monto_pagado")
@@ -89,9 +257,11 @@ async function fetchSesionData(
       .order("created_at", { ascending: true }),
     supabase
       .from("pagos")
-      .select("id, monto, medio_pago_admin, contexto_pago, confirmado_at")
+      .select(
+        "id, user_id, monto, medio_pago_admin, contexto_pago, confirmado_at, users(user, visitas(cliente_nombre))",
+      )
       .eq("estado", "confirmado")
-      .gte("confirmado_at", openedAt)
+      .gte("confirmado_at", inicioPagos)
       .lte("confirmado_at", until)
       .not("confirmado_at", "is", null),
     supabase
@@ -99,6 +269,7 @@ async function fetchSesionData(
       .select("id, concepto, beneficiario, monto, medio_pago, notas, created_at")
       .eq("sesion_id", sesionId)
       .order("created_at", { ascending: true }),
+    fetchVisitasForCaja(inicioPagos, until),
   ]);
 
   if (vpRes.error) throw new Error(vpRes.error.message);
@@ -139,6 +310,8 @@ async function fetchSesionData(
     salidas,
     pagosRaw: (pagosRes.data ?? []).map((p) => ({
       id: String(p.id),
+      user_id: Number(p.user_id),
+      cliente_nombre: resolveClienteNombre(p),
       monto: Number(p.monto),
       medio_pago_admin: p.medio_pago_admin ? String(p.medio_pago_admin) : null,
       contexto_pago: p.contexto_pago ? String(p.contexto_pago) : null,
@@ -167,6 +340,7 @@ async function fetchSesionData(
     movimientos,
     egresos: informe.egresosDetalle,
     informe,
+    visitasResumen,
   };
 }
 
@@ -176,6 +350,7 @@ function toSesionState(
   movimientos: CajaMovimientoRow[],
   egresos: CajaEgresoRow[],
   informe: CajaInformeIngresos,
+  visitasResumen: CajaVisitasResumen,
 ): CajaSesionState {
   const montoApertura = Number(raw.monto_apertura);
   const montoCierre =
@@ -197,6 +372,7 @@ function toSesionState(
     movimientos,
     egresos,
     informe,
+    visitasResumen,
     efectivoEsperado,
     diferencia: montoCierre != null ? montoCierre - efectivoEsperado : null,
   };
@@ -219,17 +395,33 @@ export async function getCajaSesionHoy(): Promise<CajaSesionState | null> {
   const raw = data as Record<string, unknown>;
   const storedInforme = raw.informe_cierre as CajaInformeIngresos | null;
 
-  const { resumen, movimientos, egresos, informe } = await fetchSesionData(
-    String(raw.opened_at),
-    raw.closed_at ? String(raw.closed_at) : null,
-    String(raw.id),
-    Number(raw.monto_apertura),
-  );
+  const { resumen, movimientos, egresos, informe, visitasResumen } =
+    await fetchSesionData(
+      String(raw.opened_at),
+      raw.closed_at ? String(raw.closed_at) : null,
+      String(raw.id),
+      Number(raw.monto_apertura),
+      String(raw.fecha),
+    );
 
   const informeFinal =
-    raw.closed_at && storedInforme ? storedInforme : informe;
+    raw.closed_at && storedInforme
+      ? {
+          ...storedInforme,
+          visitas:
+            storedInforme.visitas ??
+            informe.visitas,
+        }
+      : informe;
 
-  return toSesionState(raw, resumen, movimientos, egresos, informeFinal);
+  return toSesionState(
+    raw,
+    resumen,
+    movimientos,
+    egresos,
+    informeFinal,
+    visitasResumen,
+  );
 }
 
 const aperturaSchema = z.object({
@@ -300,6 +492,7 @@ export async function cerrarCaja(input: z.infer<typeof cierreSchema>) {
     null,
     parsed.sesionId,
     Number(raw.monto_apertura),
+    String(raw.fecha),
   );
 
   const efectivoEsperado = informe.efectivo.esperadoEnCaja;
@@ -405,5 +598,104 @@ export async function registrarEgresoCaja(input: z.infer<typeof egresoSchema>) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/caja");
+  return getCajaSesionHoy();
+}
+
+const cobroVisitaSchema = z.object({
+  sesionId: z.string().uuid(),
+  compraId: z.string().uuid(),
+  userId: z.number().int().positive(),
+  medioPagoAdmin: z
+    .enum(["efectivo", "datafono", "nequi_nicolas", "davivienda"])
+    .optional()
+    .default("efectivo"),
+});
+
+function medioPagoUsuarioFromAdmin(
+  medio: MedioPagoAdmin,
+): "nequi" | "davivienda" | "efectivo" | "datafono" {
+  if (medio === "davivienda") return "davivienda";
+  if (medio === "efectivo") return "efectivo";
+  if (medio === "datafono") return "datafono";
+  return "nequi";
+}
+
+export async function registrarCobroVisitaDesdeCaja(
+  input: z.infer<typeof cobroVisitaSchema>,
+): Promise<CajaSesionState | null> {
+  await requireAdminSession();
+  const parsed = cobroVisitaSchema.parse(input);
+  const supabase = createAdminClient();
+
+  const { data: sesion, error: sesionError } = await supabase
+    .from("caja_sesiones")
+    .select("id, closed_at")
+    .eq("id", parsed.sesionId)
+    .maybeSingle();
+
+  if (sesionError) throw new Error(sesionError.message);
+  if (!sesion) throw new Error("Sesión de caja no encontrada.");
+  if (sesion.closed_at) throw new Error("La caja está cerrada.");
+
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "id, user_id, monto_visita_monto, estado, cuota_inicial_monto, monto_cuota_periodo",
+    )
+    .eq("id", parsed.compraId)
+    .eq("user_id", parsed.userId)
+    .maybeSingle();
+
+  if (compraError) throw new Error(compraError.message);
+  if (!compra) throw new Error("Compra no encontrada.");
+  if (compra.estado === "cancelada") {
+    throw new Error("No se puede registrar la visita en este estado.");
+  }
+
+  const { data: pagos, error: pagosError } = await supabase
+    .from("pagos")
+    .select(
+      "id, monto, contexto_pago, estado, medio_pago_admin, user_moto_compra_id, user_id, referencia, comprobante_url, origen, reportado_at, confirmado_at, confirmado_por, fecha_comprobante, tarifa_objetivo_id, notas_admin, created_at, updated_at, dias_cubiertos, medio_pago_usuario",
+    )
+    .eq("user_moto_compra_id", parsed.compraId)
+    .eq("estado", "confirmado");
+
+  if (pagosError) throw new Error(pagosError.message);
+
+  const faltante = faltanteConcepto(
+    compra as UserMotoCompraRow,
+    (pagos ?? []) as PagoRow[],
+    "visita",
+  );
+
+  if (faltante <= 0) {
+    throw new Error("La visita de este cliente ya está registrada como cobrada.");
+  }
+
+  const now = new Date().toISOString();
+  const referencia = `VIS-${Date.now()}`;
+
+  const { error: insertError } = await supabase.from("pagos").insert({
+    user_moto_compra_id: parsed.compraId,
+    user_id: parsed.userId,
+    monto: faltante,
+    medio_pago_usuario: medioPagoUsuarioFromAdmin(parsed.medioPagoAdmin),
+    medio_pago_admin: parsed.medioPagoAdmin,
+    referencia,
+    comprobante_url: null,
+    origen: "admin",
+    estado: "confirmado",
+    confirmado_at: now,
+    confirmado_por: "admin",
+    fecha_comprobante: now,
+    contexto_pago: "visita",
+    notas_admin: "Cobro visita · registrado en caja",
+  });
+
+  if (insertError) throw new Error(insertError.message);
+
+  revalidatePath("/caja");
+  revalidatePath(`/clientes/${parsed.userId}`);
+  revalidatePath("/inbox");
   return getCajaSesionHoy();
 }

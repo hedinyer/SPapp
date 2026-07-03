@@ -42,7 +42,7 @@ export default async function VisitaDetallePage({
           Volver
         </Link>
       </Button>
-      <VisitaEjecucionForm visita={visita} />
+      <VisitaEjecucionForm visita={visita} visitadorId={session.visitadorId} />
     </div>
   );
 }

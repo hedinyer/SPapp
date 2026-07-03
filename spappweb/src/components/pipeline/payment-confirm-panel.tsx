@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import { ExternalLink, Printer, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { removePagoAbono } from "@/lib/actions/payment-comprobante-actions";
+import {
+  removePagoAbono,
+  updateMontoVisitaCompra,
+} from "@/lib/actions/payment-comprobante-actions";
 import {
   printCreditoPagoReceipt,
   type CreditoPagoReceiptData,
@@ -13,9 +17,12 @@ import {
   conceptoCompleto,
   faltanteConcepto,
   montoEsperadoConcepto,
+  puedeEditarAbonoConcepto,
+  puedeEditarMontoVisita,
   sumAbonos,
   type PrimerPagoConcepto,
 } from "@/lib/payments/primer-pago-progress";
+import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
 import type { ContextoPago, PagoRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import {
   CONTEXTO_PAGO_LABELS,
@@ -24,6 +31,8 @@ import {
 import { formatCop, formatDate } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PaymentComprobanteDialog } from "@/components/pipeline/payment-comprobante-dialog";
 
 interface PaymentConfirmPanelProps {
@@ -43,6 +52,7 @@ export function PaymentConfirmPanel({
   clienteNombre = "Cliente",
   clienteCedula = "",
 }: PaymentConfirmPanelProps) {
+  const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContexto, setDialogContexto] =
     useState<PrimerPagoConcepto>("inicial");
@@ -67,7 +77,9 @@ export function PaymentConfirmPanel({
     );
   }
 
-  const canEditAbonos = compra.estado === "pendiente_pago";
+  const canEditMontoVisita = puedeEditarMontoVisita(compra, pagos);
+  const showVisitaSection =
+    compra.monto_visita_monto > 0 || canEditMontoVisita;
 
   function openAbonoDialog(contexto: PrimerPagoConcepto) {
     setDialogContexto(contexto);
@@ -99,12 +111,20 @@ export function PaymentConfirmPanel({
             </p>
           </div>
 
+          {canEditMontoVisita && (
+            <VisitaMontoEditor
+              compra={compra}
+              userId={userId}
+              onSaved={() => router.refresh()}
+            />
+          )}
+
           <ConceptoAbonoSection
             compra={compra}
             pagos={pagos}
             contexto="inicial"
             userId={userId}
-            canEdit={canEditAbonos}
+            canEdit={puedeEditarAbonoConcepto(compra, pagos, "inicial")}
             clienteNombre={clienteNombre}
             clienteCedula={clienteCedula}
             onAddAbono={() => openAbonoDialog("inicial")}
@@ -114,18 +134,18 @@ export function PaymentConfirmPanel({
             pagos={pagos}
             contexto="cuota_adelantada"
             userId={userId}
-            canEdit={canEditAbonos}
+            canEdit={puedeEditarAbonoConcepto(compra, pagos, "cuota_adelantada")}
             clienteNombre={clienteNombre}
             clienteCedula={clienteCedula}
             onAddAbono={() => openAbonoDialog("cuota_adelantada")}
           />
-          {compra.monto_visita_monto > 0 && (
+          {showVisitaSection && (
             <ConceptoAbonoSection
               compra={compra}
               pagos={pagos}
               contexto="visita"
               userId={userId}
-              canEdit={canEditAbonos}
+              canEdit={puedeEditarAbonoConcepto(compra, pagos, "visita")}
               clienteNombre={clienteNombre}
               clienteCedula={clienteCedula}
               onAddAbono={() => openAbonoDialog("visita")}
@@ -149,6 +169,81 @@ export function PaymentConfirmPanel({
         motoColor={compra.color}
       />
     </>
+  );
+}
+
+function VisitaMontoEditor({
+  compra,
+  userId,
+  onSaved,
+}: {
+  compra: UserMotoCompraRow;
+  userId: number;
+  onSaved: () => void;
+}) {
+  const [montoVisita, setMontoVisita] = useState(
+    String(compra.monto_visita_monto || MONTO_VISITA_DEFAULT),
+  );
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setMontoVisita(
+      String(compra.monto_visita_monto || MONTO_VISITA_DEFAULT),
+    );
+  }, [compra.monto_visita_monto]);
+
+  function handleSave() {
+    const parsed = Number(montoVisita.replace(/\D/g, ""));
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      toast.error("Indica un monto de visita válido.");
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        await updateMontoVisitaCompra({
+          userId,
+          compraId: compra.id,
+          montoVisita: parsed,
+        });
+        toast.success("Monto de visita actualizado.");
+        onSaved();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "No se pudo guardar.");
+      }
+    });
+  }
+
+  return (
+    <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-4">
+      <p className="text-sm font-medium text-amber-950">
+        Visita domiciliaria · monto según zona
+      </p>
+      <p className="mt-1 text-xs text-amber-900/80">
+        Ajusta el valor antes de cobrar. Referencia catálogo:{" "}
+        {formatCop(MONTO_VISITA_DEFAULT)}.
+      </p>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-2">
+          <Label htmlFor="monto-visita-compra">Monto acordado</Label>
+          <Input
+            id="monto-visita-compra"
+            inputMode="numeric"
+            value={montoVisita}
+            onChange={(e) => setMontoVisita(e.target.value)}
+          />
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={pending}
+          onClick={handleSave}
+        >
+          {pending ? "Guardando…" : "Guardar monto"}
+        </Button>
+      </div>
+    </div>
   );
 }
 

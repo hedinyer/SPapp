@@ -46,6 +46,31 @@ export function conceptoCompleto(
   return faltanteConcepto(compra, pagos, contexto) === 0;
 }
 
-export function conceptoAplica(compra: UserMotoCompraRow, contexto: PrimerPagoConcepto): boolean {
-  return montoEsperadoConcepto(compra, contexto) > 0;
+export function puedeEditarAbonoConcepto(
+  compra: UserMotoCompraRow,
+  pagos: PagoRow[],
+  contexto: PrimerPagoConcepto,
+): boolean {
+  if (compra.estado === "entregada" || compra.estado === "cancelada") {
+    return false;
+  }
+  if (compra.estado === "pendiente_pago") return true;
+  if (compra.estado === "lista_retiro" && contexto === "visita") {
+    return !conceptoCompleto(compra, pagos, "visita");
+  }
+  return false;
+}
+
+export function puedeEditarMontoVisita(
+  compra: UserMotoCompraRow,
+  pagos: PagoRow[],
+): boolean {
+  if (compra.estado === "entregada" || compra.estado === "cancelada") {
+    return false;
+  }
+  if (compra.estado === "pendiente_pago") return true;
+  if (compra.estado === "lista_retiro") {
+    return !conceptoCompleto(compra, pagos, "visita");
+  }
+  return false;
 }

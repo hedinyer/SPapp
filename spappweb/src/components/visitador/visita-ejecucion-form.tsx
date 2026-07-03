@@ -3,36 +3,97 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Camera, Loader2, MapPin, Phone, Upload, Video } from "lucide-react";
 import {
-  completeVisitaVisitador,
-  uploadVisitaPhoto,
-  uploadVisitaVideo,
-} from "@/lib/actions/visitador-actions";
+  Camera,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  Phone,
+  Upload,
+  Video,
+  VideoIcon,
+} from "lucide-react";
+import { completeVisitaVisitador } from "@/lib/actions/visitador-actions";
 import type {
   VisitaEvidenciaFoto,
   VisitaEvidenciaVideo,
   VisitaRow,
   VisitaUbicacionVerificada,
 } from "@/lib/pipeline/types";
+import {
+  uploadVisitaPhotoFromBrowser,
+  uploadVisitaVideoFromBrowser,
+} from "@/lib/utils/upload-visita-evidencia-client";
 import { formatDate } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 function mapsUrl(direccion: string, barrio?: string | null) {
   const query = [direccion, barrio].filter(Boolean).join(", ");
   return `https://maps.apple.com/?q=${encodeURIComponent(query)}`;
 }
 
-export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
+function UploadProgressBar({ value }: { value: number }) {
+  return (
+    <div className="space-y-1">
+      <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+        <div
+          className="h-full rounded-full bg-black transition-[width] duration-200"
+          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        />
+      </div>
+      <p className="text-center text-xs text-neutral-500">Subiendo… {value}%</p>
+    </div>
+  );
+}
+
+function MediaActionButton({
+  icon: Icon,
+  label,
+  disabled,
+  onClick,
+}: {
+  icon: typeof Camera;
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "inline-flex min-h-11 flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 text-sm font-medium transition-colors active:bg-neutral-50",
+        disabled && "pointer-events-none opacity-50",
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      {label}
+    </button>
+  );
+}
+
+export function VisitaEjecucionForm({
+  visita,
+  visitadorId,
+}: {
+  visita: VisitaRow;
+  visitadorId: number;
+}) {
   const router = useRouter();
-  const photoInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
+  const photoCameraRef = useRef<HTMLInputElement>(null);
+  const photoGalleryRef = useRef<HTMLInputElement>(null);
+  const videoCameraRef = useRef<HTMLInputElement>(null);
+  const videoGalleryRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [photoProgress, setPhotoProgress] = useState<number | null>(null);
+  const [videoProgress, setVideoProgress] = useState<number | null>(null);
   const [fotos, setFotos] = useState<VisitaEvidenciaFoto[]>([]);
   const [videos, setVideos] = useState<VisitaEvidenciaVideo[]>([]);
   const [ubicacion, setUbicacion] = useState<VisitaUbicacionVerificada | null>(
@@ -47,29 +108,69 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
   const canComplete =
     fotos.length >= 1 && videos.length >= 1 && ubicacion?.lat != null;
 
+  const isBusy = pending || uploadingPhoto || uploadingVideo;
+
   async function handlePhotoUpload(file: File) {
     setUploadingPhoto(true);
+    setPhotoProgress(0);
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      const foto = await uploadVisitaPhoto(visita.id, fd);
+      const foto = await uploadVisitaPhotoFromBrowser(
+        visitadorId,
+        visita.id,
+        file,
+        setPhotoProgress,
+      );
       setFotos((prev) => [...prev, foto]);
       toast.success("Foto subida.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Error al subir foto.",
+      );
+      throw err;
     } finally {
       setUploadingPhoto(false);
+      setPhotoProgress(null);
     }
   }
 
   async function handleVideoUpload(file: File) {
     setUploadingVideo(true);
+    setVideoProgress(0);
     try {
-      const fd = new FormData();
-      fd.set("file", file);
-      const video = await uploadVisitaVideo(visita.id, fd);
+      const video = await uploadVisitaVideoFromBrowser(
+        visitadorId,
+        visita.id,
+        file,
+        setVideoProgress,
+      );
       setVideos((prev) => [...prev, video]);
       toast.success("Video subido.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Error al subir video.",
+      );
+      throw err;
     } finally {
       setUploadingVideo(false);
+      setVideoProgress(null);
+    }
+  }
+
+  async function onPhotoSelected(file: File | undefined) {
+    if (!file) return;
+    try {
+      await handlePhotoUpload(file);
+    } catch {
+      // toast ya mostrado
+    }
+  }
+
+  async function onVideoSelected(file: File | undefined) {
+    if (!file) return;
+    try {
+      await handleVideoUpload(file);
+    } catch {
+      // toast ya mostrado
     }
   }
 
@@ -80,22 +181,39 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
     }
 
     setCapturingLocation(true);
+
+    const save = (pos: GeolocationPosition) => {
+      setUbicacion({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        captured_at: new Date().toISOString(),
+      });
+      setCapturingLocation(false);
+      toast.success("Ubicación capturada.");
+    };
+
+    const fail = (err: GeolocationPositionError, retried: boolean) => {
+      if (!retried) {
+        navigator.geolocation.getCurrentPosition(
+          save,
+          (retryErr) => fail(retryErr, true),
+          { enableHighAccuracy: false, timeout: 25000, maximumAge: 120_000 },
+        );
+        return;
+      }
+      setCapturingLocation(false);
+      toast.error(
+        err.code === 1
+          ? "Activa el permiso de ubicación en tu celular."
+          : err.message || "No se pudo obtener la ubicación.",
+      );
+    };
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUbicacion({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-          captured_at: new Date().toISOString(),
-        });
-        setCapturingLocation(false);
-        toast.success("Ubicación capturada.");
-      },
-      (err) => {
-        setCapturingLocation(false);
-        toast.error(err.message || "No se pudo obtener la ubicación.");
-      },
-      { enableHighAccuracy: true, timeout: 15000 },
+      save,
+      (err) => fail(err, false),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60_000 },
     );
   }
 
@@ -171,44 +289,51 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
           <CardHeader>
             <CardTitle className="text-base">Fotos de evidencia</CardTitle>
             <p className="text-sm text-neutral-500">
-              Mínimo 1 foto del domicilio o moto.
+              Mínimo 1 foto del domicilio o moto. Se comprimen automáticamente
+              para subir más rápido.
             </p>
           </CardHeader>
           <CardContent className="space-y-3">
             <input
-              ref={photoInputRef}
+              ref={photoCameraRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/*"
               capture="environment"
               className="hidden"
-              disabled={pending || uploadingPhoto}
+              disabled={isBusy}
               onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                try {
-                  await handlePhotoUpload(file);
-                } catch (err) {
-                  toast.error(
-                    err instanceof Error ? err.message : "Error al subir foto.",
-                  );
-                }
+                await onPhotoSelected(e.target.files?.[0]);
                 e.target.value = "";
               }}
             />
-            <Button
-              type="button"
-              variant="outline"
-              className="min-h-11 w-full"
-              disabled={pending || uploadingPhoto}
-              onClick={() => photoInputRef.current?.click()}
-            >
-              {uploadingPhoto ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="mr-2 h-4 w-4" />
-              )}
-              {uploadingPhoto ? "Subiendo foto…" : "Tomar o elegir foto"}
-            </Button>
+            <input
+              ref={photoGalleryRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={isBusy}
+              onChange={async (e) => {
+                await onPhotoSelected(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <div className="flex gap-2">
+              <MediaActionButton
+                icon={Camera}
+                label={uploadingPhoto ? "Subiendo…" : "Tomar foto"}
+                disabled={isBusy}
+                onClick={() => photoCameraRef.current?.click()}
+              />
+              <MediaActionButton
+                icon={ImagePlus}
+                label="Galería"
+                disabled={isBusy}
+                onClick={() => photoGalleryRef.current?.click()}
+              />
+            </div>
+            {uploadingPhoto && photoProgress != null && (
+              <UploadProgressBar value={photoProgress} />
+            )}
             {fotos.length > 0 && (
               <div className="grid grid-cols-2 gap-2">
                 {fotos.map((foto, i) => (
@@ -224,6 +349,8 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
                       src={foto.url}
                       alt={`Evidencia ${i + 1}`}
                       className="aspect-square w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </a>
                 ))}
@@ -235,43 +362,52 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
         <Card className="border-neutral-200 shadow-none">
           <CardHeader>
             <CardTitle className="text-base">Video de evidencia</CardTitle>
-            <p className="text-sm text-neutral-500">Mínimo 1 video corto.</p>
+            <p className="text-sm text-neutral-500">
+              Mínimo 1 video corto (máx. 50 MB). Sube directo, ideal para
+              internet lento.
+            </p>
           </CardHeader>
           <CardContent className="space-y-3">
             <input
-              ref={videoInputRef}
+              ref={videoCameraRef}
               type="file"
-              accept="video/mp4,video/webm,video/quicktime"
+              accept="video/*"
               capture="environment"
               className="hidden"
-              disabled={pending || uploadingVideo}
+              disabled={isBusy}
               onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                try {
-                  await handleVideoUpload(file);
-                } catch (err) {
-                  toast.error(
-                    err instanceof Error ? err.message : "Error al subir video.",
-                  );
-                }
+                await onVideoSelected(e.target.files?.[0]);
                 e.target.value = "";
               }}
             />
-            <Button
-              type="button"
-              variant="outline"
-              className="min-h-11 w-full"
-              disabled={pending || uploadingVideo}
-              onClick={() => videoInputRef.current?.click()}
-            >
-              {uploadingVideo ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Video className="mr-2 h-4 w-4" />
-              )}
-              {uploadingVideo ? "Subiendo video…" : "Grabar o elegir video"}
-            </Button>
+            <input
+              ref={videoGalleryRef}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              disabled={isBusy}
+              onChange={async (e) => {
+                await onVideoSelected(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <div className="flex gap-2">
+              <MediaActionButton
+                icon={Video}
+                label={uploadingVideo ? "Subiendo…" : "Grabar video"}
+                disabled={isBusy}
+                onClick={() => videoCameraRef.current?.click()}
+              />
+              <MediaActionButton
+                icon={VideoIcon}
+                label="Galería"
+                disabled={isBusy}
+                onClick={() => videoGalleryRef.current?.click()}
+              />
+            </div>
+            {uploadingVideo && videoProgress != null && (
+              <UploadProgressBar value={videoProgress} />
+            )}
             {videos.length > 0 && (
               <div className="space-y-3">
                 {videos.map((video, i) => (
@@ -279,6 +415,8 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
                     key={`${video.url}-${i}`}
                     src={video.url}
                     controls
+                    playsInline
+                    preload="metadata"
                     className="w-full rounded-lg border border-neutral-200"
                   />
                 ))}
@@ -297,8 +435,8 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
           <CardContent className="space-y-3">
             <Button
               variant="outline"
-              className="min-h-11 w-full"
-              disabled={pending || capturingLocation}
+              className="min-h-11 w-full touch-manipulation"
+              disabled={isBusy || capturingLocation}
               onClick={captureLocation}
             >
               <MapPin className="mr-2 h-4 w-4" />
@@ -328,8 +466,8 @@ export function VisitaEjecucionForm({ visita }: { visita: VisitaRow }) {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-neutral-200 bg-white p-4 safe-area-bottom">
         <Button
           size="lg"
-          className="min-h-11 w-full bg-black text-white hover:bg-neutral-800"
-          disabled={pending || !canComplete || uploadingPhoto || uploadingVideo}
+          className="min-h-11 w-full touch-manipulation bg-black text-white hover:bg-neutral-800"
+          disabled={isBusy || !canComplete}
           onClick={handleComplete}
         >
           {pending ? (

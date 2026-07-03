@@ -439,3 +439,68 @@ export async function removePagoAbono(
   revalidateClient(userId);
   return { ok: true };
 }
+
+export async function updateMontoVisitaCompra(input: {
+  userId: number;
+  compraId: string;
+  montoVisita: number;
+}): Promise<{ ok: true }> {
+  const parsed = z
+    .object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      montoVisita: z.number().int().min(0),
+    })
+    .parse(input);
+
+  const supabase = await assertAdmin();
+
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "id, estado, cuota_inicial_monto, monto_cuota_periodo, monto_visita_monto",
+    )
+    .eq("id", parsed.compraId)
+    .eq("user_id", parsed.userId)
+    .maybeSingle();
+
+  if (compraError) throw new Error(compraError.message);
+  if (!compra) throw new Error("Compra no encontrada.");
+  if (compra.estado !== "pendiente_pago" && compra.estado !== "lista_retiro") {
+    throw new Error("No se puede cambiar el monto de visita en este estado.");
+  }
+
+  const { data: pagos, error: pagosError } = await supabase
+    .from("pagos")
+    .select("monto, contexto_pago, estado")
+    .eq("user_moto_compra_id", parsed.compraId)
+    .eq("contexto_pago", "visita")
+    .eq("estado", "confirmado");
+
+  if (pagosError) throw new Error(pagosError.message);
+
+  const recibido = (pagos ?? []).reduce((s, p) => s + Number(p.monto), 0);
+  if (parsed.montoVisita < recibido) {
+    throw new Error(
+      `Ya se recibieron ${recibido.toLocaleString("es-CO")} por visita; el monto no puede ser menor.`,
+    );
+  }
+
+  const montoTotal =
+    Number(compra.cuota_inicial_monto) +
+    Number(compra.monto_cuota_periodo) +
+    parsed.montoVisita;
+
+  const { error: updateError } = await supabase
+    .from("user_moto_compra")
+    .update({
+      monto_visita_monto: parsed.montoVisita,
+      monto_total_primer_pago: montoTotal,
+    })
+    .eq("id", parsed.compraId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  revalidateClient(parsed.userId);
+  return { ok: true };
+}

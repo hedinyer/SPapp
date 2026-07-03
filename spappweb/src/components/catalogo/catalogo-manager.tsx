@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteBike, saveBike } from "@/lib/actions/admin-actions";
+import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
 import type { BikeRow } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
@@ -94,7 +95,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                 </TableCell>
                 <TableCell>{formatCop(bike.cuota_inicial)}</TableCell>
                 <TableCell>{formatCop(bike.cuota_diaria)}</TableCell>
-                <TableCell>{formatCop(bike.monto_visita ?? 50000)}</TableCell>
+                <TableCell>{formatCop(bike.monto_visita ?? MONTO_VISITA_DEFAULT)}</TableCell>
                 <TableCell>
                   <Badge variant={bike.activo ? "outline" : "secondary"}>
                     {bike.activo ? "Activo" : "Inactivo"}
@@ -195,7 +196,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-neutral-500">Visita</dt>
-                <dd>{formatCop(bike.monto_visita ?? 50000)}</dd>
+                <dd>{formatCop(bike.monto_visita ?? MONTO_VISITA_DEFAULT)}</dd>
               </div>
             </dl>
             <div className="mt-3 flex gap-2">
@@ -321,7 +322,7 @@ function BikeDialog({
   const [stock, setStock] = useState("0");
   const [cuotaInicial, setCuotaInicial] = useState("0");
   const [cuotaDiaria, setCuotaDiaria] = useState("38000");
-  const [montoVisita, setMontoVisita] = useState("50000");
+  const [montoVisita, setMontoVisita] = useState(String(MONTO_VISITA_DEFAULT));
   const [precioVenta, setPrecioVenta] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [activo, setActivo] = useState(true);
@@ -337,7 +338,7 @@ function BikeDialog({
       setStock(String(editing.stock));
       setCuotaInicial(String(editing.cuota_inicial));
       setCuotaDiaria(String(editing.cuota_diaria));
-      setMontoVisita(String(editing.monto_visita ?? 50000));
+      setMontoVisita(String(editing.monto_visita ?? MONTO_VISITA_DEFAULT));
       setPrecioVenta(
         editing.precio_venta != null ? String(editing.precio_venta) : "",
       );
@@ -353,7 +354,7 @@ function BikeDialog({
     setStock("");
     setCuotaInicial("");
     setCuotaDiaria("");
-    setMontoVisita("50000");
+    setMontoVisita(String(MONTO_VISITA_DEFAULT));
     setPrecioVenta("");
     setDescripcion("");
     setActivo(true);

@@ -11,6 +11,7 @@ import {
   emitPipelineEvent,
 } from "@/lib/agent/pipeline-events";
 import { canChooseFlowOrder } from "@/lib/pipeline/step-logic";
+import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
 import type { VisitaRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
@@ -606,7 +607,7 @@ const bikeSchema = z.object({
   stock: z.number().int().min(0),
   cuotaInicial: z.number().int().min(0),
   cuotaDiaria: z.number().int().min(0),
-  montoVisita: z.number().int().min(0).default(50000),
+  montoVisita: z.number().int().min(0).default(MONTO_VISITA_DEFAULT),
   precioVenta: z.number().int().positive().optional().nullable(),
   descripcion: z.string().optional(),
   activo: z.boolean(),

@@ -16,6 +16,7 @@ import {
 } from "@/lib/actions/caja-actions";
 import { CajaInformePanel } from "@/components/caja/caja-informe-panel";
 import { CajaPagosPanel } from "@/components/caja/caja-pagos-panel";
+import { CajaVisitasPanel } from "@/components/caja/caja-visitas-panel";
 import { formatCop, formatDate } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -275,8 +276,10 @@ export function CajaCuadrePanel({
 
             <CajaInformePanel
               informe={sesion.informe}
+              visitasResumen={sesion.visitasResumen}
               title={sesion.abierta ? "Vista previa del informe" : "Informe de cierre"}
             />
+            <CajaVisitasPanel sesion={sesion} onUpdated={setSesion} />
             <CuadreEfectivo sesion={sesion} />
 
             {sesion.abierta ? (
@@ -438,7 +441,11 @@ export function CajaCuadrePanel({
                 {formatDate(sesion.openedAt)}
                 {sesion.closedAt ? ` — ${formatDate(sesion.closedAt)}` : null}
               </p>
-              <CajaInformePanel informe={sesion.informe} title="" />
+              <CajaInformePanel
+                informe={sesion.informe}
+                visitasResumen={sesion.visitasResumen}
+                title=""
+              />
               <CuadreEfectivo sesion={sesion} />
             </>
           ) : null}

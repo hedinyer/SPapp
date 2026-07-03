@@ -12,7 +12,7 @@ export function classifyMedioPago(
   medio: string | null,
 ): "efectivo" | "nequi" | "davivienda" | "otro" {
   if (!medio || medio === "efectivo") return "efectivo";
-  if (medio === "datafono") return "otro";
+  if (medio === "datafono") return "efectivo";
   if (medio === "davivienda") return "davivienda";
   if (medio.startsWith("nequi")) return "nequi";
   return "otro";

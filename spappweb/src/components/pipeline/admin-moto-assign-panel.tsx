@@ -7,11 +7,8 @@ import {
   calcMotoPayment,
   cuotaDiariaFromPeriodo,
 } from "@/lib/moto-payment";
-import type {
-  BikeRow,
-  FrecuenciaPago,
-  UserMotoCompraRow,
-} from "@/lib/pipeline/types";
+import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
+import type { BikeRow, FrecuenciaPago, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { FRECUENCIA_LABELS } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
@@ -71,7 +68,7 @@ export function AdminMotoAssignPanel({
     }
     setCuotaInicial(String(selectedBike.cuota_inicial));
     setCuotaDiaria(String(selectedBike.cuota_diaria));
-    setMontoVisita(String(selectedBike.monto_visita ?? 50000));
+    setMontoVisita(String(selectedBike.monto_visita ?? MONTO_VISITA_DEFAULT));
   }, [bikeId, selectedBike, compra]);
 
   const parsedInicial = Number(cuotaInicial);
@@ -186,7 +183,7 @@ export function AdminMotoAssignPanel({
                 <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
                   Catálogo: inicial {formatCop(selectedBike.cuota_inicial)} ·{" "}
                   {formatCop(selectedBike.cuota_diaria)}/día · visita{" "}
-                  {formatCop(selectedBike.monto_visita ?? 50000)}
+                  {formatCop(selectedBike.monto_visita ?? MONTO_VISITA_DEFAULT)}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cuota-inicial">Cuota inicial negociada</Label>
@@ -223,7 +220,7 @@ export function AdminMotoAssignPanel({
                     inputMode="numeric"
                     value={montoVisita}
                     onChange={(e) => setMontoVisita(e.target.value)}
-                    placeholder={String(selectedBike.monto_visita ?? 50000)}
+                    placeholder={String(selectedBike.monto_visita ?? MONTO_VISITA_DEFAULT)}
                   />
                   <p className="text-xs text-neutral-500">
                     Valor de la visita al domicilio (catálogo o negociado).

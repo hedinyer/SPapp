@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { hojaVidaFormSchema } from "@/lib/contracts/hoja-vida-schema";
+import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
 
 /**
  * Cargadores perezosos (dynamic import) de las capas de negocio. Mantienen el
@@ -486,7 +487,7 @@ export const AGENT_TOOLS = {
       stock: z.number().int().min(0),
       cuotaInicial: z.number().int().min(0),
       cuotaDiaria: z.number().int().min(0),
-      montoVisita: z.number().int().min(0).default(50000),
+      montoVisita: z.number().int().min(0).default(MONTO_VISITA_DEFAULT),
       precioVenta: z.number().int().positive().optional().nullable(),
       descripcion: z.string().optional(),
       activo: z.boolean(),

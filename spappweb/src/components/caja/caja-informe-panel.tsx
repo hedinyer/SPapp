@@ -39,14 +39,24 @@ function Line({
 
 export function CajaInformePanel({
   informe,
+  visitasResumen,
   title = "Informe de ingresos",
   compact = false,
 }: {
   informe: CajaInformeIngresos;
+  visitasResumen?: {
+    totalPendiente: number;
+    pendientes: { length: number };
+  };
   title?: string;
   compact?: boolean;
 }) {
   const { efectivo, nequi, davivienda, egresos } = informe;
+  const visitasPendientes = visitasResumen?.totalPendiente ?? 0;
+  const showVisitasLine =
+    informe.visitas.monto > 0 ||
+    informe.visitas.cantidad > 0 ||
+    visitasPendientes > 0;
   const tieneTransferenciasIn =
     nequi.monto > 0 || davivienda.monto > 0;
   const tieneTransferenciasOut =
@@ -64,6 +74,28 @@ export function CajaInformePanel({
         <Line label="Ventas productos (mostrador)" value={efectivo.ventasProducto} sign="+" />
         <Line label="Ventas motos (mostrador)" value={efectivo.ventasMoto} sign="+" />
         <Line label="Pagos crédito en efectivo" value={efectivo.pagosCredito} sign="+" />
+        {showVisitasLine ? (
+          <>
+            <Line
+              label="Visitas cobradas (efectivo/datáfono)"
+              value={efectivo.pagosVisitaEfectivo ?? 0}
+              sign="+"
+            />
+            <Line
+              label="Visitas cobradas (total medios)"
+              value={informe.visitas.monto}
+              count={informe.visitas.cantidad}
+              sign="+"
+            />
+            {visitasPendientes > 0 ? (
+              <Line
+                label="Completadas · falta registrar"
+                value={visitasPendientes}
+                muted
+              />
+            ) : null}
+          </>
+        ) : null}
         <Line label="Entradas manuales" value={efectivo.entradasManuales} sign="+" />
         <Line label="Salidas manuales" value={efectivo.salidasManuales} sign="−" negative />
         <Line label="Pagos registrados (efectivo)" value={efectivo.pagosSalida} sign="−" negative />
@@ -157,7 +189,7 @@ export function CajaInformePanel({
       {!compact && informe.pagos.length > 0 ? (
         <div className="space-y-1">
           <p className="text-xs font-medium text-neutral-500">
-            Cobros crédito confirmados
+            Cobros crédito y visitas confirmados
           </p>
           <ul className="max-h-32 space-y-1 overflow-y-auto text-sm">
             {informe.pagos.map((p) => (
@@ -166,6 +198,7 @@ export function CajaInformePanel({
                 className="flex items-center justify-between rounded border border-neutral-100 px-2 py-1"
               >
                 <span className="truncate">
+                  {p.clienteNombre ? `${p.clienteNombre} · ` : ""}
                   {p.contextoLabel} · {p.medioLabel}
                 </span>
                 <span className="shrink-0 tabular-nums font-medium text-green-700">
