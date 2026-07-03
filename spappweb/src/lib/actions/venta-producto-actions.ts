@@ -231,6 +231,7 @@ export async function saveVentaProducto(
   revalidatePath("/inbox");
   revalidatePath("/inventario");
   revalidatePath("/venta");
+  revalidatePath("/caja");
 
   return toVentaRow(ventaRaw as Record<string, unknown>, itemRows);
 }

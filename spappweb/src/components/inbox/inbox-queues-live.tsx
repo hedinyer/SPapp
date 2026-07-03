@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Bike, ShoppingBag } from "lucide-react";
+import Link from "next/link";
+import { Bike, ShoppingBag, Store } from "lucide-react";
 import { refreshInboxQueues } from "@/lib/actions/inbox-actions";
 import { createAnonClient } from "@/lib/supabase/anon";
 import type { BikeRow, InboxQueue } from "@/lib/pipeline/types";
 import { QueueCards } from "@/components/inbox/queue-cards";
 import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
 import { VenderProductosSheet } from "@/components/inbox/vender-productos-sheet";
+import { isMobileTouchDevice } from "@/lib/venta/start-qr-scanner";
 import { Button } from "@/components/ui/button";
 
 const INBOX_REALTIME_TABLES = [
@@ -77,6 +79,7 @@ export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) 
   }, [refreshQueues]);
 
   const totalPending = queues.reduce((sum, queue) => sum + queue.count, 0);
+  const desktop = !isMobileTouchDevice();
 
   return (
     <div className="space-y-8">
@@ -86,6 +89,14 @@ export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) 
           <p className="mt-1 text-neutral-500">{pendingSummary(totalPending)}</p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {desktop ? (
+            <Button type="button" variant="outline" className="gap-2" asChild>
+              <Link href="/caja">
+                <Store className="h-4 w-4" />
+                Abrir caja
+              </Link>
+            </Button>
+          ) : null}
           <Button
             type="button"
             variant="outline"

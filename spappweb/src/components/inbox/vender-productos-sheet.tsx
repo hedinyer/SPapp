@@ -17,6 +17,7 @@ import {
   Package,
   Plus,
   Printer,
+  Send,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import {
   lookupProductoBySku,
   searchProductosVenta,
 } from "@/lib/actions/venta-actions";
+import { publishVentaCarritoDraft } from "@/lib/actions/venta-carrito-draft-actions";
 import { saveVentaProducto } from "@/lib/actions/venta-producto-actions";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import { printVentaProductoReceipt } from "@/lib/printing/venta-producto-receipt";
@@ -34,6 +36,14 @@ import {
   startQrScanner,
 } from "@/lib/venta/start-qr-scanner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -126,6 +136,7 @@ export function VenderProductosSheet({
   onSaved,
 }: VenderProductosSheetProps) {
   const [pending, startTransition] = useTransition();
+  const [publishPending, startPublishTransition] = useTransition();
   const [searchPending, startSearchTransition] = useTransition();
   const [lines, dispatch] = useReducer(cartReducer, []);
   const [busqueda, setBusqueda] = useState("");
@@ -139,6 +150,7 @@ export function VenderProductosSheet({
   const [cameraOn, setCameraOn] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
   const [sheetSide, setSheetSide] = useState<"bottom" | "right">("right");
+  const [cajaCode, setCajaCode] = useState<string | null>(null);
   const busquedaRef = useRef<HTMLInputElement>(null);
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
@@ -165,6 +177,7 @@ export function VenderProductosSheet({
     setClienteCelular("");
     setMontoPagado("");
     setNotas("");
+    setCajaCode(null);
   }
 
   const stopCamera = useCallback(() => {
@@ -426,6 +439,38 @@ export function VenderProductosSheet({
         toast.error(err instanceof Error ? err.message : "No se pudo guardar.");
       }
     });
+  }
+
+  function formatCajaCode(code: string): string {
+    return `${code.slice(0, 3)} ${code.slice(3)}`;
+  }
+
+  function sendToCaja() {
+    if (lines.length === 0) {
+      toast.error("Agrega al menos un producto.");
+      return;
+    }
+    startPublishTransition(async () => {
+      try {
+        const { code } = await publishVentaCarritoDraft(
+          lines.map((l) => ({
+            productoId: l.productoId,
+            cantidad: l.cantidad,
+          })),
+        );
+        stopCamera();
+        setCajaCode(code);
+      } catch (err) {
+        toast.error(
+          err instanceof Error ? err.message : "No se pudo enviar a caja.",
+        );
+      }
+    });
+  }
+
+  function closeCajaDialog() {
+    setCajaCode(null);
+    dispatch({ type: "clear" });
   }
 
   const mobileCamera = isMobileTouchDevice();
@@ -772,11 +817,21 @@ export function VenderProductosSheet({
           </div>
         </div>
 
-        <SheetFooter className="border-t border-neutral-200 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+        <SheetFooter className="flex flex-col gap-2 border-t border-neutral-200 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            disabled={publishPending || pending || lines.length === 0}
+            onClick={sendToCaja}
+          >
+            <Send className="h-4 w-4" />
+            {publishPending ? "Enviando…" : "Enviar a caja"}
+          </Button>
           <Button
             type="button"
             className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
-            disabled={pending || lines.length === 0}
+            disabled={pending || publishPending || lines.length === 0}
             onClick={submit}
           >
             <Printer className="h-4 w-4" />
@@ -785,6 +840,32 @@ export function VenderProductosSheet({
         </SheetFooter>
       </SheetContent>
     </Sheet>
+
+    <Dialog
+      open={cajaCode !== null}
+      onOpenChange={(next) => {
+        if (!next) closeCajaDialog();
+      }}
+    >
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Código para caja</DialogTitle>
+          <DialogDescription>
+            Dicta este código en el escritorio para facturar.
+          </DialogDescription>
+        </DialogHeader>
+        {cajaCode ? (
+          <p className="py-4 text-center text-5xl font-bold tracking-widest tabular-nums">
+            {formatCajaCode(cajaCode)}
+          </p>
+        ) : null}
+        <DialogFooter>
+          <Button type="button" className="w-full" onClick={closeCajaDialog}>
+            Listo
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     {mobileCamera &&
       cameraOn &&
