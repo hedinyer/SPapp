@@ -473,8 +473,10 @@ export async function getInboxListItems(
       const [{ data }, { data: visitas }] = await Promise.all([
         supabase
           .from("users_documents")
-          .select("user_id, estado_solicitud, created_at, users(id, user)")
-          .order("created_at", { ascending: true }),
+          .select(
+            "user_id, estado_solicitud, created_at, selfie_url, users(id, user), digital_contracts(hoja_vida_data)",
+          )
+          .order("created_at", { ascending: false }),
         supabase.from("visitas").select("user_id"),
       ]);
 
@@ -488,10 +490,24 @@ export async function getInboxListItems(
         if (withVisita.has(uid) || seen.has(uid)) continue;
         seen.add(uid);
         const users = joinUser(row.users);
+        const cedula = users?.user ?? null;
+        const contractsRaw = row.digital_contracts as
+          | { hoja_vida_data: Record<string, unknown> }
+          | { hoja_vida_data: Record<string, unknown> }[]
+          | null;
+        const contract = Array.isArray(contractsRaw)
+          ? contractsRaw[0]
+          : contractsRaw;
+        const nombreHoja = String(
+          contract?.hoja_vida_data?.nombre_completo ?? "",
+        ).trim();
         items.push({
           userId: uid,
-          username: users?.user ?? `#${uid}`,
-          displayName: users?.user ?? `Cliente ${uid}`,
+          username: cedula ?? `#${uid}`,
+          displayName: nombreHoja || cedula || `Cliente ${uid}`,
+          cedula,
+          selfieUrl: (row.selfie_url as string | null) ?? null,
+          createdAt: row.created_at as string,
           subtitle: sinVisitaSubtitle(row.estado_solicitud as string),
           queueId,
         });

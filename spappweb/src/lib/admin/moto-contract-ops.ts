@@ -135,6 +135,8 @@ const assignMotoSchema = z.object({
   placa: z.string().trim().min(1).optional(),
   chasis: z.string().trim().min(1).optional(),
   referencia: z.string().trim().optional(),
+  cuotaInicial: z.number().int().min(0).optional(),
+  cuotaDiaria: z.number().int().positive().optional(),
 });
 
 export async function assignMotoByAdminOp(
@@ -165,7 +167,22 @@ export async function assignMotoByAdminOp(
     throw new Error("La moto seleccionada no está disponible.");
   }
 
-  const payment = calcMotoPayment(bike, parsed.frecuencia);
+  const cuotaInicial = parsed.cuotaInicial ?? (bike.cuota_inicial as number);
+  const cuotaDiaria = parsed.cuotaDiaria ?? (bike.cuota_diaria as number);
+
+  if (cuotaInicial < (bike.cuota_inicial as number)) {
+    throw new Error(
+      `La cuota inicial no puede ser menor a ${bike.cuota_inicial} (catálogo).`,
+    );
+  }
+  if (cuotaDiaria <= 0) {
+    throw new Error("La cuota diaria debe ser mayor a cero.");
+  }
+
+  const payment = calcMotoPayment(bike, parsed.frecuencia, {
+    cuotaInicial,
+    cuotaDiaria,
+  });
 
   const placa = parsed.placa?.trim().toUpperCase() || null;
   const chasis = parsed.chasis?.trim() || null;

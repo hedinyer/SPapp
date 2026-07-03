@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { deleteClienteSinVisita } from "@/lib/actions/admin-actions";
 import type { InboxListItem, InboxQueueId } from "@/lib/pipeline/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,12 +26,43 @@ interface InboxQueueListProps {
   queueId: InboxQueueId;
 }
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
+function matchesCreditosSearch(item: InboxListItem, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = [
+    item.displayName,
+    item.cedula,
+    item.username,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
 export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   const router = useRouter();
   const [list, setList] = useState(items);
+  const [search, setSearch] = useState("");
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<InboxListItem | null>(null);
   const canDelete = queueId === "creditos";
+  const isCreditos = queueId === "creditos";
+
+  const visibleList = useMemo(
+    () =>
+      isCreditos
+        ? list.filter((item) => matchesCreditosSearch(item, search))
+        : list,
+    [isCreditos, list, search],
+  );
 
   useEffect(() => {
     setList(items);
@@ -57,9 +90,28 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   }
 
   return (
-    <>
+    <div className={isCreditos ? "space-y-4" : undefined}>
+      {isCreditos ? (
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nombre o cédula…"
+            className="min-h-11 pl-9"
+          />
+        </div>
+      ) : null}
+
+      {visibleList.length === 0 ? (
+        <p className="text-sm text-neutral-500">
+          {isCreditos && search.trim()
+            ? `No hay clientes que coincidan con "${search.trim()}".`
+            : "No hay items en esta cola."}
+        </p>
+      ) : (
       <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
-        {list.map((item) => (
+        {visibleList.map((item) => (
           <li
             key={item.userId}
             className="flex items-stretch hover:bg-neutral-50"
@@ -68,11 +120,26 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
               href={`/clientes/${item.userId}`}
               className="flex min-w-0 flex-1 flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="min-w-0">
-                <p className="font-medium">{item.displayName}</p>
-                <p className="truncate text-sm text-neutral-500">
-                  @{item.username} · {item.subtitle}
-                </p>
+              <div className="flex min-w-0 items-center gap-3">
+                {isCreditos ? (
+                  <Avatar size="lg" className="size-12 shrink-0">
+                    {item.selfieUrl ? (
+                      <AvatarImage
+                        src={item.selfieUrl}
+                        alt={`Selfie de ${item.displayName}`}
+                      />
+                    ) : null}
+                    <AvatarFallback>{initials(item.displayName)}</AvatarFallback>
+                  </Avatar>
+                ) : null}
+                <div className="min-w-0">
+                  <p className="font-medium">{item.displayName}</p>
+                  <p className="truncate text-sm text-neutral-500">
+                    {isCreditos && item.cedula
+                      ? `C.C. ${item.cedula} · ${item.subtitle}`
+                      : `@${item.username} · ${item.subtitle}`}
+                  </p>
+                </div>
               </div>
               <span className="text-sm font-medium text-black sm:text-neutral-400">
                 Abrir →
@@ -96,6 +163,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
           </li>
         ))}
       </ul>
+      )}
 
       <AlertDialog
         open={toDelete !== null}
@@ -108,9 +176,9 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
             <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
             <AlertDialogDescription>
               {toDelete?.displayName}
-              {toDelete ? ` (@${toDelete.username})` : ""}. Se borrarán su
-              cuenta, solicitud, contrato y documentos de Supabase. Esta acción no
-              se puede deshacer.
+              {toDelete?.cedula ? ` (C.C. ${toDelete.cedula})` : toDelete ? ` (@${toDelete.username})` : ""}.
+              Se borrarán por completo su cuenta, solicitud, contrato, visitas,
+              pagos, moto y archivos en Supabase. Esta acción no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -127,6 +195,6 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

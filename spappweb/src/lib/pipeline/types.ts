@@ -357,6 +357,9 @@ export interface InboxListItem {
   displayName: string;
   subtitle: string;
   queueId: InboxQueueId;
+  cedula?: string | null;
+  selfieUrl?: string | null;
+  createdAt?: string;
 }
 
 export interface ClientSearchResult {

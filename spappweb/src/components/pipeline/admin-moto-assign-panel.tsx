@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { assignMotoByAdmin } from "@/lib/actions/admin-actions";
+import {
+  calcMotoPayment,
+  cuotaDiariaFromPeriodo,
+} from "@/lib/moto-payment";
 import type {
   BikeRow,
   FrecuenciaPago,
@@ -43,16 +47,50 @@ export function AdminMotoAssignPanel({
   const [frecuencia, setFrecuencia] = useState<FrecuenciaPago>(
     compra?.frecuencia_pago ?? "semanal",
   );
+  const [cuotaInicial, setCuotaInicial] = useState("");
+  const [cuotaDiaria, setCuotaDiaria] = useState("");
 
   const activeBikes = bikes.filter((b) => b.activo);
   const selectedBike = activeBikes.find((b) => String(b.id) === bikeId);
+
+  useEffect(() => {
+    if (!selectedBike) return;
+    if (compra && String(compra.bike_id) === bikeId) {
+      setCuotaInicial(String(compra.cuota_inicial_monto));
+      setCuotaDiaria(
+        String(
+          cuotaDiariaFromPeriodo(
+            compra.monto_cuota_periodo,
+            compra.frecuencia_pago,
+          ),
+        ),
+      );
+      return;
+    }
+    setCuotaInicial(String(selectedBike.cuota_inicial));
+    setCuotaDiaria(String(selectedBike.cuota_diaria));
+  }, [bikeId, selectedBike, compra]);
+
+  const parsedInicial = Number(cuotaInicial);
+  const parsedDiaria = Number(cuotaDiaria);
+  const paymentPreview =
+    selectedBike &&
+    Number.isFinite(parsedInicial) &&
+    Number.isFinite(parsedDiaria) &&
+    parsedDiaria > 0
+      ? calcMotoPayment(selectedBike, frecuencia, {
+          cuotaInicial: parsedInicial,
+          cuotaDiaria: parsedDiaria,
+        })
+      : null;
 
   return (
     <Card className="border-neutral-200 shadow-none">
       <CardHeader>
         <CardTitle className="text-lg">Asignar moto y placa</CardTitle>
         <p className="text-sm text-neutral-500">
-          Elige la moto del catálogo y registra el chasis. La placa es opcional.
+          Elige la moto, negocia cuotas si el cliente paga más inicial o acordaron
+          otra cuota diaria, y registra el chasis.
         </p>
       </CardHeader>
       <CardContent>
@@ -66,6 +104,23 @@ export function AdminMotoAssignPanel({
               toast.error("Selecciona una moto.");
               return;
             }
+            if (!Number.isFinite(parsedInicial) || parsedInicial < 0) {
+              toast.error("Indica una cuota inicial válida.");
+              return;
+            }
+            if (
+              selectedBike &&
+              parsedInicial < selectedBike.cuota_inicial
+            ) {
+              toast.error(
+                `La cuota inicial no puede ser menor a ${formatCop(selectedBike.cuota_inicial)} (catálogo).`,
+              );
+              return;
+            }
+            if (!Number.isFinite(parsedDiaria) || parsedDiaria <= 0) {
+              toast.error("Indica una cuota diaria válida.");
+              return;
+            }
             startTransition(async () => {
               try {
                 await assignMotoByAdmin({
@@ -76,6 +131,8 @@ export function AdminMotoAssignPanel({
                   placa: String(fd.get("placa") || "").trim() || undefined,
                   chasis: String(fd.get("chasis")),
                   referencia: String(fd.get("referencia") || "") || undefined,
+                  cuotaInicial: parsedInicial,
+                  cuotaDiaria: parsedDiaria,
                 });
                 toast.success("Moto asignada. Envía el link de contrato al cliente.");
               } catch (err) {
@@ -113,10 +170,56 @@ export function AdminMotoAssignPanel({
               />
             </div>
             {selectedBike && (
-              <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
-                Cuota inicial {formatCop(selectedBike.cuota_inicial)} · Cuota
-                diaria base {formatCop(selectedBike.cuota_diaria)}
-              </div>
+              <>
+                <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
+                  Catálogo: inicial {formatCop(selectedBike.cuota_inicial)} ·{" "}
+                  {formatCop(selectedBike.cuota_diaria)}/día
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cuota-inicial">Cuota inicial negociada</Label>
+                  <Input
+                    id="cuota-inicial"
+                    inputMode="numeric"
+                    value={cuotaInicial}
+                    onChange={(e) => setCuotaInicial(e.target.value)}
+                    placeholder={String(selectedBike.cuota_inicial)}
+                  />
+                  <p className="text-xs text-neutral-500">
+                    Mínimo {formatCop(selectedBike.cuota_inicial)}. Puede ser
+                    mayor si el cliente aporta más inicial.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cuota-diaria">Cuota diaria negociada</Label>
+                  <Input
+                    id="cuota-diaria"
+                    inputMode="numeric"
+                    value={cuotaDiaria}
+                    onChange={(e) => setCuotaDiaria(e.target.value)}
+                    placeholder={String(selectedBike.cuota_diaria)}
+                  />
+                  <p className="text-xs text-neutral-500">
+                    Base diaria acordada en persona (afecta la cuota adelantada
+                    según frecuencia).
+                  </p>
+                </div>
+                {paymentPreview && (
+                  <div className="sm:col-span-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm">
+                    <p className="font-medium text-emerald-900">
+                      Primer pago acordado
+                    </p>
+                    <p className="mt-1 text-emerald-800">
+                      Inicial {formatCop(paymentPreview.cuota_inicial_monto)} +{" "}
+                      adelantada {formatCop(paymentPreview.monto_cuota_periodo)}{" "}
+                      ({formatCop(parsedDiaria)}/día ×{" "}
+                      {FRECUENCIA_LABELS[frecuencia].toLowerCase()}) ={" "}
+                      <span className="font-semibold">
+                        {formatCop(paymentPreview.monto_total_primer_pago)}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </>
             )}
             <div className="space-y-2">
               <Label htmlFor="placa">Placa (opcional)</Label>

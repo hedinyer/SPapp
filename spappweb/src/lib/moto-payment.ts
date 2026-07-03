@@ -16,15 +16,34 @@ export function montoCuotaPeriodo(
   }
 }
 
+export function cuotaDiariaFromPeriodo(
+  montoCuotaPeriodo: number,
+  frecuencia: FrecuenciaPago,
+): number {
+  switch (frecuencia) {
+    case "diario":
+      return montoCuotaPeriodo;
+    case "semanal":
+      return Math.round(montoCuotaPeriodo / 7);
+    case "quincenal":
+      return Math.round(montoCuotaPeriodo / 15);
+    case "mensual":
+      return Math.round(montoCuotaPeriodo / 30);
+  }
+}
+
 export function calcMotoPayment(
   bike: Pick<BikeRow, "cuota_inicial" | "cuota_diaria">,
   frecuencia: FrecuenciaPago,
+  overrides?: { cuotaInicial?: number; cuotaDiaria?: number },
 ) {
-  const monto_cuota_periodo = montoCuotaPeriodo(bike.cuota_diaria, frecuencia);
+  const cuota_inicial_monto = overrides?.cuotaInicial ?? bike.cuota_inicial;
+  const cuotaDiaria = overrides?.cuotaDiaria ?? bike.cuota_diaria;
+  const monto_cuota_periodo = montoCuotaPeriodo(cuotaDiaria, frecuencia);
   return {
-    cuota_inicial_monto: bike.cuota_inicial,
+    cuota_inicial_monto,
     monto_cuota_periodo,
-    monto_total_primer_pago: bike.cuota_inicial + monto_cuota_periodo,
+    monto_total_primer_pago: cuota_inicial_monto + monto_cuota_periodo,
   };
 }
 

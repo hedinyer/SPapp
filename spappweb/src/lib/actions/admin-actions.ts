@@ -120,6 +120,8 @@ const assignMotoSchema = z.object({
   placa: z.string().trim().optional(),
   chasis: z.string().trim().min(1),
   referencia: z.string().trim().optional(),
+  cuotaInicial: z.number().int().min(0).optional(),
+  cuotaDiaria: z.number().int().positive().optional(),
 });
 
 export async function assignMotoByAdmin(
@@ -945,6 +947,24 @@ export async function updateVendidaEstadoFisico(
   return { ok: true };
 }
 
+function addStoragePath(
+  bucket: string,
+  paths: Set<string>,
+  value: string | null | undefined,
+) {
+  const path = storagePathFromPublicUrl(bucket, value);
+  if (path) paths.add(path);
+}
+
+async function removeStorageBucket(
+  supabase: SupabaseClient,
+  bucket: string,
+  paths: Set<string>,
+) {
+  if (paths.size === 0) return;
+  await supabase.storage.from(bucket).remove([...paths]);
+}
+
 export async function deleteClienteSinVisita(userId: number) {
   const parsed = z.number().int().positive().parse(userId);
   const supabase = await assertAdmin();
@@ -960,22 +980,13 @@ export async function deleteClienteSinVisita(userId: number) {
     throw new Error("Solo se pueden eliminar clientes.");
   }
 
-  const [{ data: visita }, { data: compra }] = await Promise.all([
-    supabase.from("visitas").select("id").eq("user_id", parsed).maybeSingle(),
-    supabase
-      .from("user_moto_compra")
-      .select("id")
-      .eq("user_id", parsed)
-      .maybeSingle(),
-  ]);
-  if (visita) {
-    throw new Error("No se puede eliminar: el cliente ya tiene visita.");
-  }
-  if (compra) {
-    throw new Error("No se puede eliminar: el cliente tiene una compra de moto.");
-  }
-
-  const [{ data: docs }, { data: contracts }] = await Promise.all([
+  const [
+    { data: docs },
+    { data: contracts },
+    { data: visitas },
+    { data: pagos },
+    { data: compras },
+  ] = await Promise.all([
     supabase
       .from("users_documents")
       .select("document_front_url, document_back_url, selfie_url")
@@ -984,7 +995,15 @@ export async function deleteClienteSinVisita(userId: number) {
       .from("digital_contracts")
       .select("signature_path, hoja_vida_pdf_path, contrato_pdf_path")
       .eq("user_id", parsed),
+    supabase
+      .from("visitas")
+      .select("evidencia_fotos, evidencia_videos")
+      .eq("user_id", parsed),
+    supabase.from("pagos").select("comprobante_url").eq("user_id", parsed),
+    supabase.from("user_moto_compra").select("id").eq("user_id", parsed),
   ]);
+
+  const compraIds = (compras ?? []).map((row) => row.id as string);
 
   const userDocPaths = new Set<string>();
   for (const doc of docs ?? []) {
@@ -993,11 +1012,7 @@ export async function deleteClienteSinVisita(userId: number) {
       doc.document_back_url,
       doc.selfie_url,
     ]) {
-      const path = storagePathFromPublicUrl(
-        STORAGE_BUCKETS.userDocuments,
-        url as string | null,
-      );
-      if (path) userDocPaths.add(path);
+      addStoragePath(STORAGE_BUCKETS.userDocuments, userDocPaths, url as string);
     }
   }
 
@@ -1012,6 +1027,45 @@ export async function deleteClienteSinVisita(userId: number) {
     }
   }
 
+  const visitaPaths = new Set<string>();
+  for (const visita of visitas ?? []) {
+    for (const foto of (visita.evidencia_fotos as { url?: string }[]) ?? []) {
+      addStoragePath(STORAGE_BUCKETS.visitaEvidencias, visitaPaths, foto.url);
+    }
+    for (const video of (visita.evidencia_videos as { url?: string }[]) ?? []) {
+      addStoragePath(STORAGE_BUCKETS.visitaEvidencias, visitaPaths, video.url);
+    }
+  }
+
+  const pagoPaths = new Set<string>();
+  for (const pago of pagos ?? []) {
+    addStoragePath(
+      STORAGE_BUCKETS.pagosComprobantes,
+      pagoPaths,
+      pago.comprobante_url as string | null,
+    );
+  }
+
+  const garajePaths = new Set<string>();
+  if (compraIds.length > 0) {
+    const { data: garajeRows } = await supabase
+      .from("garaje_motos")
+      .select("placa_foto_url")
+      .in("user_moto_compra_id", compraIds);
+    for (const row of garajeRows ?? []) {
+      addStoragePath(
+        STORAGE_BUCKETS.garajeImagenes,
+        garajePaths,
+        row.placa_foto_url as string | null,
+      );
+    }
+    const { error: garajeError } = await supabase
+      .from("garaje_motos")
+      .delete()
+      .in("user_moto_compra_id", compraIds);
+    if (garajeError) throw new Error(mapDbError(garajeError.message));
+  }
+
   const { error: contractsError } = await supabase
     .from("digital_contracts")
     .delete()
@@ -1024,25 +1078,16 @@ export async function deleteClienteSinVisita(userId: number) {
     .eq("user_id", parsed);
   if (docsError) throw new Error(mapDbError(docsError.message));
 
-  if (userDocPaths.size > 0) {
-    await supabase.storage
-      .from(STORAGE_BUCKETS.userDocuments)
-      .remove([...userDocPaths]);
-  }
-
-  const { data: folderFiles } = await supabase.storage
-    .from(STORAGE_BUCKETS.userDocuments)
-    .list(String(parsed));
-  if (folderFiles?.length) {
-    await supabase.storage
-      .from(STORAGE_BUCKETS.userDocuments)
-      .remove(folderFiles.map((f) => `${parsed}/${f.name}`));
-  }
-
-  if (contractPaths.size > 0) {
-    await supabase.storage
-      .from("contract-documents")
-      .remove([...contractPaths]);
+  const relatedDeletes = await Promise.all([
+    supabase.from("visitas").delete().eq("user_id", parsed),
+    supabase.from("user_moto_compra").delete().eq("user_id", parsed),
+    supabase.from("users_tracking").delete().eq("user_id", parsed),
+    supabase.from("pipeline_events").delete().eq("user_id", parsed),
+    supabase.from("solicitudes_taller").delete().eq("user_id", parsed),
+    supabase.from("compra_productos_credito").delete().eq("user_id", parsed),
+  ]);
+  for (const { error } of relatedDeletes) {
+    if (error) throw new Error(mapDbError(error.message));
   }
 
   const { data: deleted, error: userError } = await supabase
@@ -1053,7 +1098,25 @@ export async function deleteClienteSinVisita(userId: number) {
   if (userError) throw new Error(mapDbError(userError.message));
   if (!deleted?.length) throw new Error("Cliente no encontrado.");
 
+  await removeStorageBucket(supabase, STORAGE_BUCKETS.userDocuments, userDocPaths);
+  const { data: folderFiles } = await supabase.storage
+    .from(STORAGE_BUCKETS.userDocuments)
+    .list(String(parsed));
+  if (folderFiles?.length) {
+    await supabase.storage
+      .from(STORAGE_BUCKETS.userDocuments)
+      .remove(folderFiles.map((f) => `${parsed}/${f.name}`));
+  }
+
+  await removeStorageBucket(supabase, "contract-documents", contractPaths);
+  await removeStorageBucket(supabase, STORAGE_BUCKETS.visitaEvidencias, visitaPaths);
+  await removeStorageBucket(supabase, STORAGE_BUCKETS.pagosComprobantes, pagoPaths);
+  await removeStorageBucket(supabase, STORAGE_BUCKETS.garajeImagenes, garajePaths);
+
   revalidatePath("/inbox");
+  revalidatePath("/clientes");
+  revalidatePath("/vendidas");
+  revalidatePath("/garaje");
   revalidateClient(parsed);
   return { ok: true };
 }
