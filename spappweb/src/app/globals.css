@@ -136,4 +136,10 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  .touch-scroll {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
 }

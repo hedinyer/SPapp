@@ -9,7 +9,7 @@ import {
   useState,
   useTransition,
 } from "react";
-import { Camera, CameraOff, Send, ShoppingCart } from "lucide-react";
+import { Camera, CameraOff, ScanLine, Send, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { publishVentaCarritoDraft } from "@/lib/actions/venta-carrito-draft-actions";
 import { lookupProductoBySku } from "@/lib/actions/venta-actions";
@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/table";
 import {
   cameraErrorMessage,
+  isMobileTouchDevice,
   startQrScanner,
 } from "@/lib/venta/start-qr-scanner";
 
@@ -94,10 +95,12 @@ export function VentaManager() {
   const [pending, startTransition] = useTransition();
   const [publishPending, startPublishTransition] = useTransition();
 
+  const [scanPending, setScanPending] = useState(false);
   const scannerInputRef = useRef<HTMLInputElement>(null);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
   const scanLockRef = useRef(false);
   const stopScannerRef = useRef<(() => void) | null>(null);
+  const scanOnceRef = useRef<(() => Promise<string | null>) | null>(null);
   const onCodeRef = useRef<(code: string) => void>(() => {});
   const cooldownTimerRef = useRef<number | null>(null);
 
@@ -163,7 +166,9 @@ export function VentaManager() {
   const stopCamera = useCallback(() => {
     stopScannerRef.current?.();
     stopScannerRef.current = null;
+    scanOnceRef.current = null;
     setCameraOn(false);
+    setScanPending(false);
   }, []);
 
   const startCamera = useCallback(async () => {
@@ -180,11 +185,13 @@ export function VentaManager() {
     }
 
     try {
-      stopScannerRef.current = await startQrScanner(
+      const handle = await startQrScanner(
         container,
         (code) => onCodeRef.current(code),
         () => scanLockRef.current,
       );
+      stopScannerRef.current = handle.stop;
+      scanOnceRef.current = handle.scanOnce;
     } catch (err) {
       toast.error(cameraErrorMessage(err));
       setCameraOn(false);
@@ -198,6 +205,24 @@ export function VentaManager() {
     }
     await startCamera();
   }, [cameraOn, startCamera, stopCamera]);
+
+  const triggerScan = useCallback(async () => {
+    if (!cameraOn || scanLockRef.current || scanPending) return;
+    const scanOnce = scanOnceRef.current;
+    if (!scanOnce) return;
+
+    setScanPending(true);
+    try {
+      const code = await scanOnce();
+      if (code) {
+        resolveSkuFromCamera(code);
+      } else {
+        toast.error("No se detectó QR. Acerca el código y vuelve a intentar.");
+      }
+    } finally {
+      setScanPending(false);
+    }
+  }, [cameraOn, scanPending, resolveSkuFromCamera]);
 
   const resolveSkuManual = useCallback(
     (raw: string) => {
@@ -268,7 +293,7 @@ export function VentaManager() {
   }
 
   return (
-    <div className="flex min-h-[calc(100dvh-8rem)] flex-col pb-24">
+    <div className="flex flex-col pb-24">
       <input
         ref={scannerInputRef}
         type="text"
@@ -337,10 +362,32 @@ export function VentaManager() {
               Buscando producto…
             </div>
           )}
+          {scanPending && cooldownSec === 0 && cameraOn && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-xs text-white">
+              Escaneando…
+            </div>
+          )}
         </div>
-        {cameraOn ? (
+        {cameraOn && isMobileTouchDevice() ? (
+          <Button
+            type="button"
+            className="mt-3 w-full gap-2 bg-white text-black hover:bg-neutral-100"
+            size="lg"
+            disabled={scanPending || cooldownSec > 0 || pending}
+            onClick={() => void triggerScan()}
+          >
+            <ScanLine className="h-5 w-5" />
+            Escanear
+          </Button>
+        ) : null}
+        {cameraOn && !isMobileTouchDevice() ? (
           <p className="mt-2 text-center text-xs text-neutral-500">
             Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
+          </p>
+        ) : null}
+        {cameraOn && isMobileTouchDevice() ? (
+          <p className="mt-2 text-center text-xs text-neutral-500">
+            Apunta al QR y pulsa Escanear.
           </p>
         ) : null}
       </div>

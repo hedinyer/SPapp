@@ -17,6 +17,7 @@ import {
   Package,
   Plus,
   Printer,
+  ScanLine,
   Send,
   Trash2,
 } from "lucide-react";
@@ -148,6 +149,7 @@ export function VenderProductosSheet({
   const [montoPagado, setMontoPagado] = useState("");
   const [notas, setNotas] = useState("");
   const [cameraOn, setCameraOn] = useState(false);
+  const [scanPending, setScanPending] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
   const [mobileLayout, setMobileLayout] = useState(false);
   const sheetSide = mobileLayout ? "bottom" : "right";
@@ -157,6 +159,7 @@ export function VenderProductosSheet({
   const scannerContainerRef = useRef<HTMLDivElement>(null);
   const scanLockRef = useRef(false);
   const stopScannerRef = useRef<(() => void) | null>(null);
+  const scanOnceRef = useRef<(() => Promise<string | null>) | null>(null);
   const onCodeRef = useRef<(code: string) => void>(() => {});
   const cooldownTimerRef = useRef<number | null>(null);
   const linesRef = useRef(lines);
@@ -184,7 +187,9 @@ export function VenderProductosSheet({
   const stopCamera = useCallback(() => {
     stopScannerRef.current?.();
     stopScannerRef.current = null;
+    scanOnceRef.current = null;
     setCameraOn(false);
+    setScanPending(false);
   }, []);
 
   const startCooldown = useCallback(() => {
@@ -272,11 +277,13 @@ export function VenderProductosSheet({
     }
 
     try {
-      stopScannerRef.current = await startQrScanner(
+      const handle = await startQrScanner(
         container,
         (code) => onCodeRef.current(code),
         () => scanLockRef.current,
       );
+      stopScannerRef.current = handle.stop;
+      scanOnceRef.current = handle.scanOnce;
     } catch (err) {
       toast.error(cameraErrorMessage(err));
       setCameraOn(false);
@@ -290,6 +297,24 @@ export function VenderProductosSheet({
     }
     await startCamera();
   }, [cameraOn, startCamera, stopCamera]);
+
+  const triggerScan = useCallback(async () => {
+    if (!cameraOn || scanLockRef.current || scanPending) return;
+    const scanOnce = scanOnceRef.current;
+    if (!scanOnce) return;
+
+    setScanPending(true);
+    try {
+      const code = await scanOnce();
+      if (code) {
+        resolveSkuFromCamera(code);
+      } else {
+        toast.error("No se detectó QR. Acerca el código y vuelve a intentar.");
+      }
+    } finally {
+      setScanPending(false);
+    }
+  }, [cameraOn, scanPending, resolveSkuFromCamera]);
 
   function parseCopInput(raw: string): number | undefined {
     const n = Number(raw.replace(/\D/g, ""));
@@ -490,6 +515,11 @@ export function VenderProductosSheet({
             Agregando…
           </div>
         )}
+        {scanPending && cooldownSec === 0 && (
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/30 text-xs text-white">
+            Escaneando…
+          </div>
+        )}
       </>
     );
   }
@@ -507,7 +537,7 @@ export function VenderProductosSheet({
         side={sheetSide}
         className={cn(
           "flex flex-col gap-0 p-0 sm:max-w-md",
-          sheetSide === "bottom" && "max-h-[92dvh] rounded-t-2xl",
+          sheetSide === "bottom" && "h-[92dvh] max-h-[92dvh] rounded-t-2xl",
         )}
       >
         <input
@@ -538,7 +568,7 @@ export function VenderProductosSheet({
 
         <div
           className={cn(
-            "min-h-0 flex-1 overflow-y-auto",
+            "min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]",
             mobileLayout && "pb-28",
           )}
         >
@@ -584,32 +614,46 @@ export function VenderProductosSheet({
                 </span>
               </button>
             ) : !mobileLayout ? (
-              <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
-                <div
-                  id={SCANNER_ID}
-                  ref={scannerContainerRef}
-                  className={cn(
-                    "absolute inset-0",
-                    !cameraOn && "pointer-events-none opacity-0",
-                  )}
-                />
-                {!cameraOn ? (
-                  <button
+              <>
+                <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
+                  <div
+                    id={SCANNER_ID}
+                    ref={scannerContainerRef}
+                    className={cn(
+                      "absolute inset-0",
+                      !cameraOn && "pointer-events-none opacity-0",
+                    )}
+                  />
+                  {!cameraOn ? (
+                    <button
+                      type="button"
+                      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+                      onClick={() => void startCamera()}
+                    >
+                      <Camera className="h-10 w-10" />
+                      <span className="text-sm font-medium">
+                        Toca para activar la cámara
+                      </span>
+                      <span className="text-xs text-neutral-500">
+                        Apunta al QR de la etiqueta
+                      </span>
+                    </button>
+                  ) : null}
+                  {cameraOn ? renderScannerOverlays() : null}
+                </div>
+                {cameraOn && isMobileTouchDevice() ? (
+                  <Button
                     type="button"
-                    className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
-                    onClick={() => void startCamera()}
+                    className="w-full gap-2"
+                    size="lg"
+                    disabled={scanPending || cooldownSec > 0 || pending}
+                    onClick={() => void triggerScan()}
                   >
-                    <Camera className="h-10 w-10" />
-                    <span className="text-sm font-medium">
-                      Toca para activar la cámara
-                    </span>
-                    <span className="text-xs text-neutral-500">
-                      Apunta al QR de la etiqueta
-                    </span>
-                  </button>
+                    <ScanLine className="h-5 w-5" />
+                    Escanear
+                  </Button>
                 ) : null}
-                {cameraOn ? renderScannerOverlays() : null}
-              </div>
+              </>
             ) : null}
 
             {cameraOn && !mobileLayout ? (
@@ -918,9 +962,21 @@ export function VenderProductosSheet({
             />
             {renderScannerOverlays()}
           </div>
-          <p className="shrink-0 px-4 py-3 pb-[max(5rem,env(safe-area-inset-bottom))] text-center text-xs text-white/70">
-            Apunta al QR. El botón &quot;Enviar a PC&quot; está abajo.
-          </p>
+          <div className="shrink-0 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+            <Button
+              type="button"
+              className="w-full gap-2 bg-white text-black hover:bg-neutral-100"
+              size="lg"
+              disabled={scanPending || cooldownSec > 0 || pending}
+              onClick={() => void triggerScan()}
+            >
+              <ScanLine className="h-5 w-5" />
+              {scanPending ? "Escaneando…" : "Escanear"}
+            </Button>
+            <p className="mt-2 text-center text-xs text-white/70">
+              Apunta al QR y pulsa Escanear.
+            </p>
+          </div>
         </div>,
         document.body,
       )}
