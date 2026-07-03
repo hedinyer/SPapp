@@ -313,7 +313,7 @@ export function VentaManager() {
         </div>
         {cameraOn ? (
           <p className="mt-2 text-center text-xs text-neutral-500">
-            Apunta al QR dentro del marco. Puedes alejar la cámara; detecta aunque haya texto alrededor.
+            Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
           </p>
         ) : null}
       </div>
