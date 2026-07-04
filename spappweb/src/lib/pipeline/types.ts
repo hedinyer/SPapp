@@ -9,6 +9,7 @@ export type MotoCompraEstado =
   | "pendiente_pago"
   | "lista_retiro"
   | "entregada"
+  | "saldada"
   | "cancelada";
 export type VendidaEstadoFisico =
   | "activa"
@@ -421,6 +422,7 @@ export const COMPRA_ESTADO_LABELS: Record<MotoCompraEstado, string> = {
   pendiente_pago: "Pendiente de pago",
   lista_retiro: "Lista para retiro",
   entregada: "Entregada",
+  saldada: "Saldada",
   cancelada: "Cancelada",
 };
 
@@ -430,7 +432,12 @@ export const TARIFA_ESTADO_LABELS: Record<TarifaEstado, string> = {
   vencida: "Vencida",
 };
 
-export type ContextoPago = "tarifa" | "inicial" | "cuota_adelantada" | "visita";
+export type ContextoPago =
+  | "tarifa"
+  | "inicial"
+  | "cuota_adelantada"
+  | "visita"
+  | "liquidacion";
 export type MedioPagoAdmin =
   | "nequi_nicolas"
   | "davivienda"
@@ -444,11 +451,6 @@ export type MedioPagoAdminLegacy =
 export type MedioPagoAdminStored = MedioPagoAdmin | MedioPagoAdminLegacy;
 
 export const MEDIO_PAGO_ADMIN_OPTIONS: MedioPagoAdmin[] = [
-  "nequi_nicolas",
-  "davivienda",
-];
-
-export const PRIMER_PAGO_MEDIO_OPTIONS: MedioPagoAdmin[] = [
   "nequi_nicolas",
   "davivienda",
   "efectivo",
@@ -485,6 +487,7 @@ export const CONTEXTO_PAGO_LABELS: Record<ContextoPago, string> = {
   inicial: "Cuota inicial",
   cuota_adelantada: "Cuota adelantada",
   visita: "Visita domiciliaria",
+  liquidacion: "Liquidación de crédito",
 };
 
 export const MEDIO_PAGO_ADMIN_LABELS: Record<MedioPagoAdminStored, string> = {

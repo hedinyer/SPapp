@@ -51,7 +51,11 @@ export function puedeEditarAbonoConcepto(
   pagos: PagoRow[],
   contexto: PrimerPagoConcepto,
 ): boolean {
-  if (compra.estado === "entregada" || compra.estado === "cancelada") {
+  if (
+    compra.estado === "entregada" ||
+    compra.estado === "saldada" ||
+    compra.estado === "cancelada"
+  ) {
     return false;
   }
   if (compra.estado === "pendiente_pago") return true;
@@ -65,7 +69,11 @@ export function puedeEditarMontoVisita(
   compra: UserMotoCompraRow,
   pagos: PagoRow[],
 ): boolean {
-  if (compra.estado === "entregada" || compra.estado === "cancelada") {
+  if (
+    compra.estado === "entregada" ||
+    compra.estado === "saldada" ||
+    compra.estado === "cancelada"
+  ) {
     return false;
   }
   if (compra.estado === "pendiente_pago") return true;

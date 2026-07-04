@@ -252,16 +252,12 @@ export async function confirmPagoConComprobante(
     throw new Error("Falta la tarifa a confirmar.");
   }
 
-  if (parsed.contexto === "tarifa" && !file) {
+  if (parsed.contexto === "tarifa" && !file && !presencial) {
     throw new Error("Sube el comprobante de pago.");
   }
 
   if (isPrimerPago && !file && !presencial) {
     throw new Error("Sube el comprobante de pago.");
-  }
-
-  if (parsed.contexto === "tarifa" && presencial) {
-    throw new Error("Para tarifas de renting usa Nequi o Davivienda.");
   }
 
   if (isPrimerPago) {

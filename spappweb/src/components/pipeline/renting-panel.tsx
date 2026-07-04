@@ -97,9 +97,11 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
     );
   }, [tarifas]);
 
-  if (!compra || compra.estado !== "entregada") {
+  if (!compra || (compra.estado !== "entregada" && compra.estado !== "saldada")) {
     return null;
   }
+
+  const creditoSaldado = compra.estado === "saldada";
 
   function openConfirmDialog(tarifa: TarifaPagadaRow) {
     setSelectedTarifa(tarifa);
@@ -179,7 +181,14 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
         className="border-neutral-200 shadow-none"
       >
         <CardHeader className="space-y-3">
-          <CardTitle className="text-lg">Cartera de renting</CardTitle>
+          <CardTitle className="text-lg">
+            Cartera de renting
+            {creditoSaldado && (
+              <Badge className="ml-2 bg-green-700 text-white hover:bg-green-700">
+                Crédito saldado
+              </Badge>
+            )}
+          </CardTitle>
           <CardAction data-export-hide className="col-start-1 row-start-auto w-full sm:col-start-2 sm:w-auto">
             <Button
               type="button"
@@ -246,7 +255,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
             )}
           </div>
 
-          {moraResumen && (
+          {moraResumen && !creditoSaldado && (
             <div
               className={`rounded-lg border p-4 text-sm ${
                 mora.enMoraBandeja
@@ -284,7 +293,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
             </div>
           )}
 
-          {mora.paraRecoger && (
+          {mora.paraRecoger && !creditoSaldado && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm">
               <p className="font-medium text-red-900">Moto para recoger</p>
               <p className="mt-1 text-red-800">
@@ -356,7 +365,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right" data-export-hide>
-                          {tarifa.estado !== "pagada" ? (
+                          {!creditoSaldado && tarifa.estado !== "pagada" ? (
                             <Button
                               size="sm"
                               disabled={pending}
@@ -415,7 +424,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                         </div>
                       )}
                     </dl>
-                    {tarifa.estado !== "pagada" ? (
+                    {!creditoSaldado && tarifa.estado !== "pagada" ? (
                       <Button
                         size="sm"
                         className="mt-3 w-full"

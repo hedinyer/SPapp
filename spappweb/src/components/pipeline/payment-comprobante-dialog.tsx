@@ -18,7 +18,6 @@ import {
   CONTEXTO_PAGO_LABELS,
   MEDIO_PAGO_ADMIN_LABELS,
   MEDIO_PAGO_ADMIN_OPTIONS,
-  PRIMER_PAGO_MEDIO_OPTIONS,
   type BancoOrigen,
   type ContextoPago,
   type MedioPagoAdmin,
@@ -53,14 +52,6 @@ interface PaymentComprobanteDialogProps {
   motoModelo?: string;
   motoColor?: string;
   onSuccess?: () => void;
-}
-
-function isPrimerPagoContexto(contexto: ContextoPago): boolean {
-  return (
-    contexto === "inicial" ||
-    contexto === "cuota_adelantada" ||
-    contexto === "visita"
-  );
 }
 
 function isPresencialMedio(medio: MedioPagoAdmin): boolean {
@@ -104,10 +95,6 @@ export function PaymentComprobanteDialog({
   onSuccess,
 }: PaymentComprobanteDialogProps) {
   const sugeridoMonto = montoFaltante ?? montoEsperado;
-  const primerPago = isPrimerPagoContexto(contexto);
-  const medioOptions = primerPago
-    ? PRIMER_PAGO_MEDIO_OPTIONS
-    : MEDIO_PAGO_ADMIN_OPTIONS;
 
   const [pending, startTransition] = useTransition();
   const [ocrPending, startOcrTransition] = useTransition();
@@ -279,10 +266,7 @@ export function PaymentComprobanteDialog({
         onOpenChange(false);
         onSuccess?.();
 
-        if (
-          primerPago &&
-          (contexto === "inicial" || contexto === "cuota_adelantada")
-        ) {
+        if (presencial) {
           const recibo: CreditoPagoReceiptData = {
             pagoId: result.pagoId,
             clienteNombre,
@@ -295,14 +279,12 @@ export function PaymentComprobanteDialog({
             referencia: result.referencia,
             confirmadoAt: result.confirmadoAt,
           };
-          if (presencial) {
-            try {
-              await printCreditoPagoReceipt(recibo);
-            } catch {
-              toast.message(
-                "Pago guardado. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
-              );
-            }
+          try {
+            await printCreditoPagoReceipt(recibo);
+          } catch {
+            toast.message(
+              "Pago guardado. Si no ves impresión, permite ventanas emergentes o usa Ctrl+P en la pestaña del recibo.",
+            );
           }
         }
       } catch (e) {
@@ -338,7 +320,7 @@ export function PaymentComprobanteDialog({
               value={medioPagoAdmin}
               disabled={pending || ocrPending}
               onChange={(v) => handleMedioChange(v as MedioPagoAdmin)}
-              options={medioOptions.map((key) => ({
+              options={MEDIO_PAGO_ADMIN_OPTIONS.map((key) => ({
                 value: key,
                 label: MEDIO_PAGO_ADMIN_LABELS[key],
               }))}

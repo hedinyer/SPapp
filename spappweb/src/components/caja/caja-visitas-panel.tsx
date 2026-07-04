@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Loader2, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -8,6 +8,11 @@ import {
   type CajaSesionState,
 } from "@/lib/actions/caja-actions";
 import type { CajaVisitasResumen } from "@/lib/caja/caja-informe";
+import {
+  MEDIO_PAGO_ADMIN_LABELS,
+  MEDIO_PAGO_ADMIN_OPTIONS,
+  type MedioPagoAdmin,
+} from "@/lib/pipeline/types";
 import { formatCop, formatDate } from "@/lib/utils/format";
 import {
   Card,
@@ -17,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TouchSelect } from "@/components/ui/touch-select";
 
 export function CajaVisitasPanel({
   sesion,
@@ -26,6 +32,9 @@ export function CajaVisitasPanel({
   onUpdated: (next: CajaSesionState) => void;
 }) {
   const [pending, startTransition] = useTransition();
+  const [medioByCompra, setMedioByCompra] = useState<
+    Record<string, MedioPagoAdmin>
+  >({});
   const { visitasResumen: visitas } = sesion;
   const { cobradas, pendientes, totalCobradoSesion, totalPendiente } = visitas;
 
@@ -33,6 +42,7 @@ export function CajaVisitasPanel({
     compraId: string,
     userId: number,
     clienteNombre: string,
+    medioPagoAdmin: MedioPagoAdmin,
   ) {
     startTransition(async () => {
       try {
@@ -40,7 +50,7 @@ export function CajaVisitasPanel({
           sesionId: sesion.id,
           compraId,
           userId,
-          medioPagoAdmin: "efectivo",
+          medioPagoAdmin,
         });
         if (!next) return;
         onUpdated(next);
@@ -141,7 +151,23 @@ export function CajaVisitasPanel({
                       Visita {formatCop(row.montoEsperado)}
                     </p>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <TouchSelect
+                      aria-label={`Medio de pago para ${row.clienteNombre}`}
+                      value={medioByCompra[row.compraId] ?? "efectivo"}
+                      disabled={pending}
+                      onChange={(v) =>
+                        setMedioByCompra((prev) => ({
+                          ...prev,
+                          [row.compraId]: v as MedioPagoAdmin,
+                        }))
+                      }
+                      options={MEDIO_PAGO_ADMIN_OPTIONS.map((key) => ({
+                        value: key,
+                        label: MEDIO_PAGO_ADMIN_LABELS[key],
+                      }))}
+                      className="w-[min(100%,11rem)]"
+                    />
                     <span className="font-semibold tabular-nums text-amber-900">
                       {formatCop(row.faltante)}
                     </span>
@@ -157,6 +183,7 @@ export function CajaVisitasPanel({
                             row.compraId,
                             row.userId,
                             row.clienteNombre,
+                            medioByCompra[row.compraId] ?? "efectivo",
                           )
                         }
                       >

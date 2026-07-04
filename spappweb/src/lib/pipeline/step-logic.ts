@@ -97,7 +97,7 @@ function paymentDone(compra: UserMotoCompraRow | null): boolean {
 }
 
 function deliveryDone(compra: UserMotoCompraRow | null): boolean {
-  return compra?.estado === "entregada";
+  return compra?.estado === "entregada" || compra?.estado === "saldada";
 }
 
 function deliveryError(compra: UserMotoCompraRow | null): boolean {

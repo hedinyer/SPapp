@@ -12,7 +12,7 @@ export interface CreditoPagoReceiptData {
   clienteCedula: string;
   motoModelo: string;
   motoColor: string;
-  concepto: Extract<ContextoPago, "inicial" | "cuota_adelantada" | "visita">;
+  concepto: ContextoPago;
   monto: number;
   medioPago: MedioPagoAdminStored;
   referencia: string | null;

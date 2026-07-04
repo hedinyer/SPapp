@@ -9,7 +9,7 @@ import {
 } from "@/lib/pipeline/queries";
 import { ClientPipelineView } from "@/components/pipeline/client-pipeline-view";
 import { ClientInfoSummary } from "@/components/clientes/client-info-summary";
-import { Badge } from "@/components/ui/badge";
+import { ClientHeaderActions } from "@/components/clientes/client-header-actions";
 import { Button } from "@/components/ui/button";
 
 export default async function ClientPage({
@@ -46,18 +46,7 @@ export default async function ClientPage({
             Usuario @{pipeline.user.user} · ID {pipeline.user.id}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" asChild className="min-h-11">
-            <Link href="/hojadevida" target="_blank">
-              Formulario web
-            </Link>
-          </Button>
-          {pipeline.currentAdminStep && (
-            <Badge className="w-fit bg-black text-white hover:bg-black">
-              Acción requerida
-            </Badge>
-          )}
-        </div>
+        <ClientHeaderActions pipeline={pipeline} />
       </div>
 
       <ClientInfoSummary pipeline={pipeline} />
