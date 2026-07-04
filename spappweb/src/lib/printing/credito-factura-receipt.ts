@@ -203,3 +203,17 @@ export async function printCreditoFacturaReceipt(
   };
   document.body.appendChild(iframe);
 }
+
+/** ponytail: demo fija para pruebas de impresión */
+export async function printFakeFacturaDemo(): Promise<void> {
+  return printCreditoFacturaReceipt({
+    facturaId: crypto.randomUUID(),
+    clienteNombre: "Juan Guillermo Rojas Montoya",
+    clienteCedula: "71296301",
+    motoModelo: "Bera Sbr",
+    motoColor: "Morada",
+    concepto: "inicial",
+    monto: 1_200_000,
+    emitidaAt: new Date().toISOString(),
+  });
+}
