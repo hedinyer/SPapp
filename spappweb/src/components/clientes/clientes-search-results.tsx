@@ -1,12 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowRight, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { ArrowRight, FileText, X } from "lucide-react";
+import { toast } from "sonner";
+import { deleteClienteSinVisita } from "@/lib/actions/admin-actions";
 import {
   COMPRA_ESTADO_LABELS,
   type ClientSearchResult,
 } from "@/lib/pipeline/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GenerarFacturasDialog } from "@/components/clientes/generar-facturas-dialog";
@@ -18,10 +31,35 @@ export function ClientesSearchResults({
   results: ClientSearchResult[];
   query: string;
 }) {
+  const router = useRouter();
+  const [list, setList] = useState(results);
+  const [pending, startTransition] = useTransition();
+  const [toDelete, setToDelete] = useState<ClientSearchResult | null>(null);
   const [facturasUser, setFacturasUser] = useState<{
     userId: number;
     displayName: string;
   } | null>(null);
+
+  useEffect(() => {
+    setList(results);
+  }, [results]);
+
+  function confirmDelete() {
+    if (!toDelete) return;
+    const { userId, displayName } = toDelete;
+
+    startTransition(async () => {
+      try {
+        await deleteClienteSinVisita(userId);
+        setList((prev) => prev.filter((client) => client.userId !== userId));
+        toast.success(`${displayName} eliminado.`);
+        setToDelete(null);
+        router.refresh();
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "No se pudo eliminar.");
+      }
+    });
+  }
 
   if (results.length === 0) {
     return (
@@ -36,12 +74,12 @@ export function ClientesSearchResults({
     <>
       <div className="space-y-3">
         <p className="text-sm text-neutral-500">
-          {results.length} resultado{results.length === 1 ? "" : "s"}
+          {list.length} resultado{list.length === 1 ? "" : "s"}
         </p>
         <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
-          {results.map((client) => (
-            <li key={client.userId}>
-              <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          {list.map((client) => (
+            <li key={client.userId} className="flex items-stretch">
+              <div className="flex min-w-0 flex-1 flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <Link
                   href={`/clientes/${client.userId}`}
                   className="min-w-0 flex-1 hover:opacity-90"
@@ -103,6 +141,19 @@ export function ClientesSearchResults({
                   </Link>
                 </div>
               </div>
+              <div className="flex shrink-0 items-center pr-2 sm:pr-3">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-neutral-400 hover:text-red-600"
+                  aria-label={`Eliminar ${client.displayName}`}
+                  disabled={pending}
+                  onClick={() => setToDelete(client)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -118,6 +169,41 @@ export function ClientesSearchResults({
           }}
         />
       )}
+
+      <AlertDialog
+        open={toDelete !== null}
+        onOpenChange={(open) => {
+          if (!open && !pending) setToDelete(null);
+        }}
+      >
+        <AlertDialogContent className="bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {toDelete?.displayName}
+              {toDelete?.cedula
+                ? ` (C.C. ${toDelete.cedula})`
+                : toDelete
+                  ? ` (@${toDelete.username})`
+                  : ""}
+              . Se borrarán por completo su cuenta, solicitud, contrato, visitas,
+              pagos, moto y archivos en Supabase. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={pending}
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDelete();
+              }}
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
