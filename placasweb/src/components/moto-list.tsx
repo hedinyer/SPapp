@@ -6,6 +6,8 @@ import { Plus } from "lucide-react";
 import { createBrowserClient } from "@/lib/supabase/browser";
 import {
   CONDICION_LABELS,
+  UBICACION_LABELS,
+  UBICACION_ORDER,
   motoIdentificador,
   type MotoRow,
 } from "@/lib/motos/types";
@@ -81,46 +83,76 @@ export function MotoList() {
           </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {motos.map((moto) => (
-            <li key={moto.id}>
-              <Link
-                href={`/${moto.id}`}
-                className="flex min-h-20 touch-manipulation gap-3 rounded-lg border border-neutral-200 p-3 active:bg-neutral-50"
-              >
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-neutral-100">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={moto.foto_url}
-                    alt={motoIdentificador(moto)}
-                    className="h-full w-full object-cover"
-                  />
+        <div className="space-y-6">
+          {UBICACION_ORDER.map((ubicacion) => {
+            const grupo = motos.filter((moto) => moto.ubicacion === ubicacion);
+            if (grupo.length === 0) return null;
+
+            return (
+              <section key={ubicacion} className="space-y-3">
+                <div className="flex items-baseline justify-between gap-2 border-b border-neutral-200 pb-1">
+                  <h2 className="text-base font-semibold">
+                    {UBICACION_LABELS[ubicacion]}
+                  </h2>
+                  <span className="text-xs text-neutral-500">
+                    {grupo.length} moto{grupo.length === 1 ? "" : "s"}
+                  </span>
                 </div>
-                <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-                  <p className="truncate font-medium">
-                    {motoIdentificador(moto)}
-                  </p>
-                  <p className="text-xs text-neutral-500">
-                    {moto.placa?.trim()
-                      ? "Con placa"
-                      : "Número de serie"}
-                  </p>
-                </div>
-                <span
-                  className={cn(
-                    "self-center rounded-full px-2.5 py-1 text-xs font-medium",
-                    moto.condicion === "nueva"
-                      ? "bg-emerald-100 text-emerald-800"
-                      : "bg-amber-100 text-amber-800",
-                  )}
-                >
-                  {CONDICION_LABELS[moto.condicion]}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                <ul className="space-y-4">
+                  {grupo.map((moto) => (
+                    <li key={moto.id}>
+                      <MotoCard moto={moto} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
       )}
     </div>
+  );
+}
+
+function MotoCard({ moto }: { moto: MotoRow }) {
+  return (
+    <Link
+      href={`/${moto.id}`}
+      className="flex touch-manipulation gap-4 rounded-xl border border-neutral-200 p-4 active:bg-neutral-50"
+    >
+      <div className="aspect-[9/16] w-28 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={moto.foto_url}
+          alt={motoIdentificador(moto)}
+          className="h-full w-full object-cover"
+        />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-2 py-1">
+        <div className="flex items-start justify-between gap-2">
+          <p className="truncate text-lg font-semibold">
+            {motoIdentificador(moto)}
+          </p>
+          <span
+            className={cn(
+              "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium",
+              moto.condicion === "nueva"
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-amber-100 text-amber-800",
+            )}
+          >
+            {CONDICION_LABELS[moto.condicion]}
+          </span>
+        </div>
+        <p className="text-xs text-neutral-500">
+          {moto.placa?.trim() ? "Con placa" : "Número de serie"}
+        </p>
+        {moto.notas?.trim() ? (
+          <p className="line-clamp-4 text-sm text-neutral-600">
+            {moto.notas.trim()}
+          </p>
+        ) : null}
+      </div>
+    </Link>
   );
 }

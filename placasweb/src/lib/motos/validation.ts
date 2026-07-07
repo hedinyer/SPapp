@@ -2,12 +2,19 @@ import { z } from "zod";
 
 export const motoCondicionSchema = z.enum(["nueva", "usada"]);
 
+export const motoUbicacionSchema = z.enum([
+  "soluciones_pinilla",
+  "lavadero",
+  "parqueadero",
+]);
+
 export const motoCreateSchema = z
   .object({
     modo: z.enum(["placa", "serie"]),
     placa: z.string().trim(),
     numero_serie: z.string().trim(),
     condicion: motoCondicionSchema,
+    ubicacion: motoUbicacionSchema,
     notas: z.string().trim().optional(),
     tieneFoto: z.boolean(),
   })

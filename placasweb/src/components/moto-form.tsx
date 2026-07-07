@@ -12,8 +12,11 @@ import { createBrowserClient } from "@/lib/supabase/browser";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import {
   CONDICION_LABELS,
+  UBICACION_LABELS,
+  UBICACION_ORDER,
   type MotoCondicion,
   type MotoRow,
+  type MotoUbicacion,
 } from "@/lib/motos/types";
 import { duplicateMotoMessage, motoCreateSchema } from "@/lib/motos/validation";
 import {
@@ -44,6 +47,9 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
   const [condicion, setCondicion] = useState<MotoCondicion>(
     moto?.condicion ?? "nueva",
   );
+  const [ubicacion, setUbicacion] = useState<MotoUbicacion>(
+    moto?.ubicacion ?? "parqueadero",
+  );
   const [notas, setNotas] = useState(moto?.notas ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -58,6 +64,7 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
       placa: placa.trim().toUpperCase(),
       numero_serie: numeroSerie.trim(),
       condicion,
+      ubicacion,
       notas: notas.trim(),
       tieneFoto: Boolean(imageFile) || Boolean(moto?.foto_url),
     });
@@ -89,6 +96,7 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
           placa: modo === "placa" ? parsed.data.placa : null,
           numero_serie: modo === "serie" ? parsed.data.numero_serie : null,
           condicion: parsed.data.condicion,
+          ubicacion: parsed.data.ubicacion,
           foto_url: fotoUrl,
           notas: parsed.data.notas || null,
         };
@@ -227,6 +235,25 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
               onClick={() => setCondicion(value)}
             >
               {CONDICION_LABELS[value]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Ubicación</Label>
+        <div className="grid grid-cols-1 gap-2">
+          {UBICACION_ORDER.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={cn(
+                outlineBtnClass,
+                ubicacion === value && "border-black bg-neutral-100",
+              )}
+              onClick={() => setUbicacion(value)}
+            >
+              {UBICACION_LABELS[value]}
             </button>
           ))}
         </div>

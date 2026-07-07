@@ -9,6 +9,7 @@ const placaOk = motoCreateSchema.safeParse({
   placa: "ABC12D",
   numero_serie: "",
   condicion: "nueva",
+  ubicacion: "parqueadero",
   notas: "",
   tieneFoto: true,
 });
@@ -19,6 +20,7 @@ const serieOk = motoCreateSchema.safeParse({
   placa: "",
   numero_serie: "CH-12345",
   condicion: "usada",
+  ubicacion: "lavadero",
   notas: "",
   tieneFoto: true,
 });
@@ -29,6 +31,7 @@ const sinFoto = motoCreateSchema.safeParse({
   placa: "ABC12D",
   numero_serie: "",
   condicion: "nueva",
+  ubicacion: "parqueadero",
   notas: "",
   tieneFoto: false,
 });
@@ -39,6 +42,7 @@ const placaCorta = motoCreateSchema.safeParse({
   placa: "AB1",
   numero_serie: "",
   condicion: "nueva",
+  ubicacion: "parqueadero",
   notas: "",
   tieneFoto: true,
 });
