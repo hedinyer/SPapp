@@ -6,7 +6,6 @@ import { useEffect, useState, useTransition } from "react";
 import { LogOut, PanelLeft, PanelLeftClose } from "lucide-react";
 import { logoutAdminAction } from "@/lib/actions/auth-actions";
 import { adminNavLinks } from "@/components/layout/admin-nav-links";
-import { AdminFakeFacturaButton } from "@/components/layout/admin-fake-factura-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +99,6 @@ export function AdminSidebar({ className }: { className?: string }) {
             </Link>
           );
         })}
-        <AdminFakeFacturaButton collapsed={collapsed} />
       </nav>
 
       <div className="border-t border-neutral-200 p-3">

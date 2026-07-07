@@ -302,6 +302,15 @@ export interface RentingResumen {
   proximoVencimiento: string | null;
 }
 
+export interface CongelamientoActivo {
+  /** Días de la última congelación aplicada. */
+  dias: number;
+  /** Días que aún restan del periodo congelado (redondeado hacia arriba). */
+  diasRestantes: number;
+  /** Fecha ISO en la que expira el congelamiento. */
+  hasta: string;
+}
+
 export interface PagoHistorialRow {
   id: string;
   fecha: string;
@@ -327,6 +336,7 @@ export interface ClientPipeline {
   moroso: MorosoRow | null;
   recoger: MotoParaRecogerRow | null;
   atraso: AtrasoSnapshot | null;
+  congelamiento: CongelamientoActivo | null;
   rentingResumen: RentingResumen | null;
   pagosHistorial: PagoHistorialRow[];
   pagos: PagoRow[];

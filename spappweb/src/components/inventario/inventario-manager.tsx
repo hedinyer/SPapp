@@ -113,8 +113,8 @@ export function InventarioManager({
                 <TableHead>Producto</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Categoría</TableHead>
-                <TableHead>Precio</TableHead>
                 <TableHead>Costo</TableHead>
+                <TableHead>Precio</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="w-32" />

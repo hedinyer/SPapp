@@ -27,7 +27,7 @@ interface InboxQueueListProps {
   queueId: InboxQueueId;
 }
 
-type CreditoFiltro = "aceptada" | "rechazada";
+type CreditoFiltro = "pendiente" | "aceptada" | "rechazada";
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -54,7 +54,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   const router = useRouter();
   const [list, setList] = useState(items);
   const [search, setSearch] = useState("");
-  const [creditoFiltro, setCreditoFiltro] = useState<CreditoFiltro>("aceptada");
+  const [creditoFiltro, setCreditoFiltro] = useState<CreditoFiltro>("pendiente");
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<InboxListItem | null>(null);
   const canDelete = queueId === "creditos";
@@ -107,12 +107,15 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
               setCreditoFiltro(value as CreditoFiltro)
             }
           >
-            <TabsList className="w-full max-w-md">
+            <TabsList className="w-full max-w-lg">
+              <TabsTrigger value="pendiente" className="flex-1">
+                Pendiente
+              </TabsTrigger>
               <TabsTrigger value="aceptada" className="flex-1">
-                Crédito aprobado
+                Aprobado
               </TabsTrigger>
               <TabsTrigger value="rechazada" className="flex-1">
-                Crédito rechazado
+                Rechazado
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -133,9 +136,11 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
           {isCreditos && search.trim()
             ? `No hay clientes que coincidan con "${search.trim()}".`
             : isCreditos
-              ? creditoFiltro === "aceptada"
-                ? "No hay clientes con crédito aprobado sin visita."
-                : "No hay clientes con crédito rechazado sin visita."
+              ? creditoFiltro === "pendiente"
+                ? "No hay solicitudes pendientes sin visita."
+                : creditoFiltro === "aceptada"
+                  ? "No hay clientes con crédito aprobado sin visita."
+                  : "No hay clientes con crédito rechazado sin visita."
               : "No hay items en esta cola."}
         </p>
       ) : (

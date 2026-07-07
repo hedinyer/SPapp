@@ -76,7 +76,7 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
       productoId: action.producto.id,
       sku: action.producto.sku,
       nombre: action.producto.nombre,
-      precioUnitario: action.producto.precio,
+      precioUnitario: Math.max(action.producto.precio, action.producto.costo),
       cantidad: 1,
     },
   ];
@@ -526,7 +526,8 @@ export function VentaManager() {
               >
                 <span className="text-sm font-medium">{p.nombre}</span>
                 <span className="text-xs text-neutral-500">
-                  {p.sku} · {formatCop(p.precio)} · stock {p.stock}
+                  {p.sku} · {formatCop(Math.max(p.precio, p.costo))} · stock{" "}
+                  {p.stock}
                 </span>
               </button>
             ))}

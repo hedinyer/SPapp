@@ -87,6 +87,12 @@ export function ClientHeaderActions({ pipeline }: { pipeline: ClientPipeline }) 
           </Button>
         </>
       )}
+      {pipeline.congelamiento && (
+        <Badge className="w-fit bg-sky-100 text-sky-700 hover:bg-sky-100">
+          Crédito congelado · {pipeline.congelamiento.diasRestantes} día
+          {pipeline.congelamiento.diasRestantes === 1 ? "" : "s"}
+        </Badge>
+      )}
       {pipeline.currentAdminStep && (
         <Badge className="w-fit bg-black text-white hover:bg-black">
           Acción requerida

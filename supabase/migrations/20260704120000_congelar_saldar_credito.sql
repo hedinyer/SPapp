@@ -333,5 +333,5 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.congelar_cuotas_compra(uuid, integer, text, text) TO service_role;
-GRANT EXECUTE ON FUNCTION public.saldar_credito_compra(uuid, bigint, integer, text, text, text, text, text, timestamptz) TO service_role;
+GRANT EXECUTE ON FUNCTION public.congelar_cuotas_compra(uuid, integer, text, text) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.saldar_credito_compra(uuid, bigint, integer, text, text, text, text, text, timestamptz) TO anon, authenticated, service_role;

@@ -1,6 +1,5 @@
 import { searchClients } from "@/lib/pipeline/queries";
-import { ClientesSearchForm } from "@/components/clientes/clientes-search-form";
-import { ClientesSearchResults } from "@/components/clientes/clientes-search-results";
+import { ClientesSearchLive } from "@/components/clientes/clientes-search-live";
 
 export default async function ClientesPage({
   searchParams,
@@ -21,17 +20,7 @@ export default async function ClientesPage({
         </p>
       </div>
 
-      <ClientesSearchForm defaultQuery={query} />
-
-      {query.length > 0 && query.length < 2 && (
-        <p className="text-sm text-neutral-500">
-          Escribe al menos 2 caracteres para buscar.
-        </p>
-      )}
-
-      {query.length >= 2 && (
-        <ClientesSearchResults results={results} query={query} />
-      )}
+      <ClientesSearchLive initialQuery={query} initialResults={results} />
     </div>
   );
 }

@@ -101,6 +101,38 @@ function toVentaRow(
   };
 }
 
+export async function listVentasProductoHistorial(
+  limit = 200,
+): Promise<VentaProductoRow[]> {
+  await requireAdminSession();
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("ventas_producto")
+    .select(
+      "id, cliente_nombre, cliente_cedula, cliente_celular, total, monto_pagado, notas, created_at, venta_producto_items(id, producto_id, cantidad, precio_unitario, subtotal, inventario_productos(sku, nombre))",
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((raw) => {
+    const rawItems =
+      (raw.venta_producto_items as Record<string, unknown>[] | null) ?? [];
+    const items = rawItems.map((item) => {
+      const prod = item.inventario_productos as
+        | { sku?: string | null; nombre?: string | null }
+        | null;
+      return toItemRow(item, {
+        sku: prod?.sku ? String(prod.sku) : "—",
+        nombre: prod?.nombre ? String(prod.nombre) : "Producto eliminado",
+      });
+    });
+    return toVentaRow(raw as Record<string, unknown>, items);
+  });
+}
+
 export async function saveVentaProducto(
   input: VentaProductoInput,
 ): Promise<VentaProductoRow> {
@@ -111,7 +143,7 @@ export async function saveVentaProducto(
   const ids = [...new Set(parsed.items.map((i) => i.productoId))];
   const { data: productos, error: prodError } = await supabase
     .from("inventario_productos")
-    .select("id, sku, nombre, precio, stock, activo")
+    .select("id, sku, nombre, precio, costo, stock, activo")
     .in("id", ids);
 
   if (prodError) throw new Error(prodError.message);
@@ -140,7 +172,10 @@ export async function saveVentaProducto(
         `Stock insuficiente para ${String(raw.nombre)} (disponible: ${stock}).`,
       );
     }
-    const precioUnitario = Number(raw.precio);
+    const precioUnitario = Math.max(
+      Number(raw.precio) || 0,
+      Number(raw.costo) || 0,
+    );
     lines.push({
       productoId,
       sku: String(raw.sku),

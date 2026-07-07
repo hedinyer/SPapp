@@ -7,6 +7,7 @@ import type {
   ClienteFacturacion,
   ClientPipeline,
   ClientSearchResult,
+  CongelamientoActivo,
   DigitalContractRow,
   InboxListItem,
   InboxQueue,
@@ -161,6 +162,20 @@ export async function getClientPipeline(
         .maybeSingle()
     : { data: null };
 
+  const { data: congelamientoRow } = compra
+    ? await supabase
+        .from("congelamientos_cuotas")
+        .select("dias, created_at")
+        .eq("user_moto_compra_id", compra.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+
+  const congelamiento = buildCongelamientoActivo(
+    congelamientoRow as { dias: number; created_at: string } | null,
+  );
+
   const tarifaRows = (tarifas as TarifaPagadaRow[]) ?? [];
 
   const { data: pagos } = compra
@@ -211,12 +226,33 @@ export async function getClientPipeline(
     moroso: (moroso as MorosoRow | null) ?? null,
     recoger: (recoger as MotoParaRecogerRow | null) ?? null,
     atraso: (atrasoRow as AtrasoSnapshot | null) ?? null,
+    congelamiento,
     rentingResumen,
     pagosHistorial,
     pagos: (pagos as PagoRow[]) ?? [],
     compraProductosCredito:
       (compraProductosCredito as CompraProductoCreditoRow[]) ?? [],
   });
+}
+
+const MS_POR_DIA = 1000 * 60 * 60 * 24;
+
+/**
+ * Un congelamiento pospone los vencimientos `dias` días desde que se aplicó.
+ * Se considera "activo" mientras ese periodo de gracia no haya expirado.
+ */
+function buildCongelamientoActivo(
+  row: { dias: number; created_at: string } | null,
+): CongelamientoActivo | null {
+  if (!row) return null;
+
+  const fin = new Date(row.created_at);
+  fin.setDate(fin.getDate() + row.dias);
+
+  const diasRestantes = Math.ceil((fin.getTime() - Date.now()) / MS_POR_DIA);
+  if (diasRestantes <= 0) return null;
+
+  return { dias: row.dias, diasRestantes, hasta: fin.toISOString() };
 }
 
 function buildRentingResumen(

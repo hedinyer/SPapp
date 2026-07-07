@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { logoutAdminAction } from "@/lib/actions/auth-actions";
 import { adminNavLinks } from "@/components/layout/admin-nav-links";
-import { AdminFakeFacturaButton } from "@/components/layout/admin-fake-factura-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -129,10 +128,6 @@ export function AdminMobileNav() {
                 </Link>
               );
             })}
-            <AdminFakeFacturaButton
-              className="min-h-11 touch-manipulation"
-              onDone={closeMenu}
-            />
           </nav>
           <div className="border-t border-neutral-200 p-3 safe-area-bottom">
             <form action={logoutAdminAction}>

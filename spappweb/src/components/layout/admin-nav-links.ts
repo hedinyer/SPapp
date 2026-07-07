@@ -3,6 +3,7 @@ import {
   Bike,
   ClipboardList,
   CreditCard,
+  History,
   LogOut,
   Package,
   ShoppingBag,
@@ -35,6 +36,7 @@ export const adminNavLinks: AdminNavLink[] = [
   { href: "/venta-contado", label: "Venta contado", icon: Banknote },
   { href: "/garaje", label: "Garaje", icon: Warehouse },
   { href: "/vendidas", label: "Vendidas", icon: ShoppingBag },
+  { href: "/historial-ventas", label: "Historial de ventas", icon: History },
   { href: "/solicitudes", label: "Solicitudes", icon: Wrench },
 ];
 

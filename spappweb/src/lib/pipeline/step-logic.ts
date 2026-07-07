@@ -292,6 +292,7 @@ export function buildClientPipeline(input: {
   moroso?: import("@/lib/pipeline/types").MorosoRow | null;
   recoger?: import("@/lib/pipeline/types").MotoParaRecogerRow | null;
   atraso?: import("@/lib/pipeline/types").AtrasoSnapshot | null;
+  congelamiento?: import("@/lib/pipeline/types").CongelamientoActivo | null;
   rentingResumen?: import("@/lib/pipeline/types").RentingResumen | null;
   pagosHistorial?: import("@/lib/pipeline/types").PagoHistorialRow[];
   pagos?: import("@/lib/pipeline/types").PagoRow[];
@@ -310,6 +311,7 @@ export function buildClientPipeline(input: {
     moroso: input.moroso ?? null,
     recoger: input.recoger ?? null,
     atraso: input.atraso ?? null,
+    congelamiento: input.congelamiento ?? null,
     rentingResumen: input.rentingResumen ?? null,
     pagosHistorial: input.pagosHistorial ?? [],
     pagos: input.pagos ?? [],
