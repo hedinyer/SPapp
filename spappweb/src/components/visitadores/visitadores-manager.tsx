@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -371,7 +371,8 @@ function VisitadorDialog({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  function resetFromEditing() {
+  useEffect(() => {
+    if (!open) return;
     setNombre(editing?.nombre ?? "");
     setTelefono(editing?.telefono ?? "");
     setFotoUrl(editing?.foto_url ?? "");
@@ -379,16 +380,10 @@ function VisitadorDialog({
     setActivo(editing?.activo ?? true);
     setUsername(editing ? (visitadorUsername(editing) ?? "") : "");
     setPassword("");
-  }
+  }, [open, editing]);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(v) => {
-        onOpenChange(v);
-        if (v) resetFromEditing();
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle>

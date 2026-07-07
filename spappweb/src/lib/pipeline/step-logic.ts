@@ -206,7 +206,8 @@ export function detectAdminActionStep(
     if (
       !visita ||
       visita.estado === "pendiente_asignacion" ||
-      visita.estado === "asignada"
+      visita.estado === "asignada" ||
+      visita.estado === "cancelada"
     ) {
       return "visita";
     }
@@ -214,12 +215,7 @@ export function detectAdminActionStep(
       return "entrega";
     }
   }
-  if (
-    deliveryDone(compra) &&
-    visita &&
-    !visitDone(visita) &&
-    visita.estado !== "cancelada"
-  ) {
+  if (deliveryDone(compra) && visita && !visitDone(visita)) {
     return "visita";
   }
   return null;

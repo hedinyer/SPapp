@@ -509,6 +509,7 @@ export async function getInboxListItems(
           cedula,
           selfieUrl: (row.selfie_url as string | null) ?? null,
           createdAt: row.created_at as string,
+          estadoSolicitud: row.estado_solicitud as string,
           subtitle: sinVisitaSubtitle(row.estado_solicitud as string),
           queueId,
         });

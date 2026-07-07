@@ -88,7 +88,9 @@ export function VisitActionPanel({
             ? entregaAntesVisita(compra)
               ? "Programa la visita después de entregar la moto."
               : "Asigna visitador y fecha antes de entregar la moto al cliente."
-            : `Estado: ${visitaEstadoLabel(visita.estado)}`}
+            : visita.estado === "cancelada"
+              ? "Estado: Cancelada. Puedes volver a agendarla."
+              : `Estado: ${visitaEstadoLabel(visita.estado)}`}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -133,55 +135,77 @@ export function VisitActionPanel({
         )}
 
         {visita.estado === "asignada" && (
-          <div className="space-y-4 rounded-lg border border-neutral-200 p-4">
-            <p className="text-sm">
-              <span className="text-neutral-500">Visitador: </span>
-              {visita.visitadores?.nombre ?? "—"}
-            </p>
-            <p className="text-sm">
-              <span className="text-neutral-500">Fecha: </span>
-              {formatDate(visita.fecha_programada)}
-            </p>
-            {assignedVisitador && assignedUsername ? (
-              <ShareVisitadorLink
-                nombre={assignedVisitador.nombre}
-                username={assignedUsername}
-                telefono={assignedVisitador.telefono}
-              />
-            ) : (
-              <p className="text-sm text-neutral-600">
-                El visitador debe completar la visita desde la app o el portal
-                visitador, subiendo fotos, video y ubicación.
+          <div className="space-y-4">
+            <div className="space-y-4 rounded-lg border border-neutral-200 p-4">
+              <p className="text-sm">
+                <span className="text-neutral-500">Visitador: </span>
+                {visita.visitadores?.nombre ?? "—"}
               </p>
-            )}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button size="lg" variant="outline" disabled={pending}>
-                  Cancelar visita
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="bg-white">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>¿Cancelar visita?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    El cliente verá que debe contactar al concesionario.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Volver</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() =>
-                      run(
-                        () => cancelVisit(visita.id, userId),
-                        "Visita cancelada.",
-                      )
-                    }
-                  >
-                    Sí, cancelar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+              <p className="text-sm">
+                <span className="text-neutral-500">Fecha: </span>
+                {formatDate(visita.fecha_programada)}
+              </p>
+              {assignedVisitador && assignedUsername ? (
+                <ShareVisitadorLink
+                  nombre={assignedVisitador.nombre}
+                  username={assignedUsername}
+                  telefono={assignedVisitador.telefono}
+                />
+              ) : (
+                <p className="text-sm text-neutral-600">
+                  El visitador debe completar la visita desde la app o el portal
+                  visitador, subiendo fotos, video y ubicación.
+                </p>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="lg" variant="outline" disabled={pending}>
+                    Cancelar visita
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-white">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>¿Cancelar visita?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      El cliente verá que debe contactar al concesionario.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Volver</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() =>
+                        run(
+                          () => cancelVisit(visita.id, userId),
+                          "Visita cancelada.",
+                        )
+                      }
+                    >
+                      Sí, cancelar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+            <AssignForm
+              visitadores={visitadores}
+              pending={pending}
+              visita={visita}
+              defaultVisitadorId={visita.visitador_id}
+              title="Reprogramar visita"
+              submitLabel="Guardar cambios"
+              onAssign={(visitadorId, fecha) =>
+                run(
+                  () =>
+                    assignVisit({
+                      visitaId: visita.id,
+                      userId,
+                      visitadorId,
+                      fechaProgramada: fecha,
+                    }),
+                  "Visita reprogramada.",
+                )
+              }
+            />
           </div>
         )}
 
@@ -268,7 +292,33 @@ export function VisitActionPanel({
         )}
 
         {visita.estado === "cancelada" && (
-          <p className="text-sm text-neutral-600">Visita cancelada.</p>
+          <div className="space-y-4">
+            <p className="text-sm text-neutral-600">
+              Visita cancelada. Puedes volver a agendarla con otro visitador o
+              fecha.
+            </p>
+            <AssignForm
+              visitadores={visitadores}
+              pending={pending}
+              visita={visita}
+              highlight
+              defaultVisitadorId={visita.visitador_id}
+              title="Volver a agendar visita"
+              submitLabel="Volver a agendar"
+              onAssign={(visitadorId, fecha) =>
+                run(
+                  () =>
+                    assignVisit({
+                      visitaId: visita.id,
+                      userId,
+                      visitadorId,
+                      fechaProgramada: fecha,
+                    }),
+                  "Visita reagendada.",
+                )
+              }
+            />
+          </div>
         )}
       </CardContent>
     </Card>
@@ -280,15 +330,23 @@ function AssignForm({
   visitadores,
   pending,
   highlight = false,
+  defaultVisitadorId = null,
+  title = "Asignar visitador",
+  submitLabel = "Asignar visita",
   onAssign,
 }: {
   visita: VisitaRow;
   visitadores: VisitadorRow[];
   pending: boolean;
   highlight?: boolean;
+  defaultVisitadorId?: number | null;
+  title?: string;
+  submitLabel?: string;
   onAssign: (visitadorId: number, fecha: string) => void;
 }) {
-  const [visitadorId, setVisitadorId] = useState("");
+  const [visitadorId, setVisitadorId] = useState(() =>
+    defaultVisitadorId != null ? String(defaultVisitadorId) : "",
+  );
   const [fecha, setFecha] = useState(
     () => visita.fecha_programada?.slice(0, 16) ?? "",
   );
@@ -316,7 +374,9 @@ function AssignForm({
       }}
     >
       <p className="text-sm font-medium">
-        {highlight ? "Programar visita domiciliaria" : "Asignar visitador"}
+        {highlight && title === "Asignar visitador"
+          ? "Programar visita domiciliaria"
+          : title}
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -352,7 +412,7 @@ function AssignForm({
         className="bg-black text-white hover:bg-neutral-800"
         disabled={pending || visitadores.length === 0}
       >
-        Asignar visita
+        {submitLabel}
       </Button>
       {visitadores.length === 0 && (
         <p className="text-sm text-neutral-500">

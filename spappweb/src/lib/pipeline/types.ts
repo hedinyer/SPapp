@@ -363,6 +363,7 @@ export interface InboxListItem {
   cedula?: string | null;
   selfieUrl?: string | null;
   createdAt?: string;
+  estadoSolicitud?: string;
 }
 
 export interface ClienteFacturacion {

@@ -20,11 +20,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface InboxQueueListProps {
   items: InboxListItem[];
   queueId: InboxQueueId;
 }
+
+type CreditoFiltro = "aceptada" | "rechazada";
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -51,6 +54,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   const router = useRouter();
   const [list, setList] = useState(items);
   const [search, setSearch] = useState("");
+  const [creditoFiltro, setCreditoFiltro] = useState<CreditoFiltro>("aceptada");
   const [pending, startTransition] = useTransition();
   const [toDelete, setToDelete] = useState<InboxListItem | null>(null);
   const canDelete = queueId === "creditos";
@@ -59,9 +63,13 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   const visibleList = useMemo(
     () =>
       isCreditos
-        ? list.filter((item) => matchesCreditosSearch(item, search))
+        ? list.filter(
+            (item) =>
+              item.estadoSolicitud === creditoFiltro &&
+              matchesCreditosSearch(item, search),
+          )
         : list,
-    [isCreditos, list, search],
+    [isCreditos, list, search, creditoFiltro],
   );
 
   useEffect(() => {
@@ -92,14 +100,31 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   return (
     <div className={isCreditos ? "space-y-4" : undefined}>
       {isCreditos ? (
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nombre o cédula…"
-            className="min-h-11 pl-9"
-          />
+        <div className="space-y-3">
+          <Tabs
+            value={creditoFiltro}
+            onValueChange={(value) =>
+              setCreditoFiltro(value as CreditoFiltro)
+            }
+          >
+            <TabsList className="w-full max-w-md">
+              <TabsTrigger value="aceptada" className="flex-1">
+                Crédito aprobado
+              </TabsTrigger>
+              <TabsTrigger value="rechazada" className="flex-1">
+                Crédito rechazado
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nombre o cédula…"
+              className="min-h-11 pl-9"
+            />
+          </div>
         </div>
       ) : null}
 
@@ -107,7 +132,11 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
         <p className="text-sm text-neutral-500">
           {isCreditos && search.trim()
             ? `No hay clientes que coincidan con "${search.trim()}".`
-            : "No hay items en esta cola."}
+            : isCreditos
+              ? creditoFiltro === "aceptada"
+                ? "No hay clientes con crédito aprobado sin visita."
+                : "No hay clientes con crédito rechazado sin visita."
+              : "No hay items en esta cola."}
         </p>
       ) : (
       <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
