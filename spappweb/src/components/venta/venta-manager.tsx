@@ -12,10 +12,14 @@ import {
 import { Camera, CameraOff, ScanLine, Send, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { publishVentaCarritoDraft } from "@/lib/actions/venta-carrito-draft-actions";
-import { lookupProductoBySku } from "@/lib/actions/venta-actions";
+import {
+  lookupProductoBySku,
+  searchProductosVenta,
+} from "@/lib/actions/venta-actions";
 import type { InventarioProductoRow } from "@/lib/pipeline/types";
 import { cartTotal, type VentaCartLine } from "@/lib/printing/print-venta-cotizacion-client";
 import { formatCop } from "@/lib/utils/format";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -78,25 +82,20 @@ function cartReducer(state: CartLine[], action: CartAction): CartLine[] {
 const SCAN_COOLDOWN_SEC = 5;
 const SCANNER_ID = "venta-scanner";
 
-function isTouchDevice(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(pointer: coarse)").matches
-  );
-}
-
 export function VentaManager() {
   const [lines, dispatch] = useReducer(cartReducer, []);
   const [cartOpen, setCartOpen] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
-  const [manualSku, setManualSku] = useState("");
+  const [busqueda, setBusqueda] = useState("");
+  const [resultados, setResultados] = useState<InventarioProductoRow[]>([]);
+  const [listaAbierta, setListaAbierta] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
   const [cajaCode, setCajaCode] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [searchPending, startSearchTransition] = useTransition();
   const [publishPending, startPublishTransition] = useTransition();
 
   const [scanPending, setScanPending] = useState(false);
-  const scannerInputRef = useRef<HTMLInputElement>(null);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
   const scanLockRef = useRef(false);
   const stopScannerRef = useRef<(() => void) | null>(null);
@@ -110,9 +109,15 @@ export function VentaManager() {
     [lines],
   );
 
+  const busquedaRef = useRef<HTMLInputElement>(null);
+
   const addProduct = useCallback((producto: InventarioProductoRow) => {
     dispatch({ type: "add", producto });
     toast.success(`${producto.nombre} agregado`);
+    setBusqueda("");
+    setResultados([]);
+    setListaAbierta(false);
+    busquedaRef.current?.focus();
   }, []);
 
   const startCooldown = useCallback(() => {
@@ -174,7 +179,7 @@ export function VentaManager() {
   const startCamera = useCallback(async () => {
     if (stopScannerRef.current) return;
 
-    scannerInputRef.current?.blur();
+    busquedaRef.current?.blur();
     setCameraOn(true);
 
     const container = scannerContainerRef.current;
@@ -224,14 +229,38 @@ export function VentaManager() {
     }
   }, [cameraOn, scanPending, resolveSkuFromCamera]);
 
-  const resolveSkuManual = useCallback(
-    (raw: string) => {
-      const sku = raw.trim();
-      if (!sku) return;
-      lookupAndAdd(sku);
-    },
-    [lookupAndAdd],
-  );
+  const resolverBusqueda = useCallback(() => {
+    const trimmed = busqueda.trim();
+    if (!trimmed) return;
+
+    startTransition(async () => {
+      try {
+        const producto = await lookupProductoBySku(trimmed);
+        addProduct(producto);
+        return;
+      } catch {
+        // no es SKU exacto
+      }
+
+      try {
+        const items = await searchProductosVenta(trimmed);
+        if (items.length === 1) {
+          addProduct(items[0]);
+          return;
+        }
+        if (items.length > 1) {
+          setResultados(items);
+          setListaAbierta(true);
+          toast.error("Selecciona un producto de la lista.");
+          return;
+        }
+      } catch {
+        // sigue sin resultados
+      }
+
+      toast.error("Sin resultados.");
+    });
+  }, [busqueda, addProduct]);
 
   useEffect(() => {
     return () => {
@@ -243,22 +272,27 @@ export function VentaManager() {
   }, []);
 
   useEffect(() => {
-    if (!cameraOn && !isTouchDevice()) scannerInputRef.current?.focus();
-  }, [cameraOn]);
+    const q = busqueda.trim();
+    if (q.length < 2) {
+      setResultados([]);
+      setListaAbierta(false);
+      return;
+    }
 
-  function onManualSkuSubmit() {
-    resolveSkuManual(manualSku);
-    setManualSku("");
-  }
+    const timer = window.setTimeout(() => {
+      startSearchTransition(async () => {
+        try {
+          const items = await searchProductosVenta(q);
+          setResultados(items);
+          setListaAbierta(true);
+        } catch {
+          setResultados([]);
+        }
+      });
+    }, 250);
 
-  function onScannerKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-    const input = e.currentTarget;
-    resolveSkuManual(input.value);
-    input.value = "";
-    if (!isTouchDevice()) input.focus();
-  }
+    return () => window.clearTimeout(timer);
+  }, [busqueda]);
 
   function formatCajaCode(code: string): string {
     return `${code.slice(0, 3)} ${code.slice(3)}`;
@@ -294,23 +328,9 @@ export function VentaManager() {
 
   return (
     <div className="flex flex-col pb-24">
-      <input
-        ref={scannerInputRef}
-        type="text"
-        autoComplete="off"
-        inputMode="none"
-        tabIndex={-1}
-        aria-label="Escaneo con pistola lectora"
-        className="pointer-events-none absolute h-0 w-0 opacity-0"
-        onKeyDown={onScannerKeyDown}
-        onBlur={() => {
-          if (!cameraOn && !isTouchDevice()) scannerInputRef.current?.focus();
-        }}
-      />
-
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm text-neutral-500">
-          Escanea el QR de la etiqueta impresa o ingresa el SKU.
+          Escanea el QR de la etiqueta, busca por nombre o ingresa el SKU.
         </p>
         <Button
           type="button"
@@ -392,31 +412,72 @@ export function VentaManager() {
         ) : null}
       </div>
 
-      <div className="mt-3 flex gap-2">
-        <Input
-          value={manualSku}
-          onChange={(e) => setManualSku(e.target.value.toUpperCase())}
-          placeholder="SKU o pistola lectora"
-          className="font-mono"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              onManualSkuSubmit();
-            }
-          }}
-          onFocus={() => {
-            if (cameraOn) stopCamera();
-          }}
-        />
-        <Button type="button" variant="outline" onClick={onManualSkuSubmit}>
-          Agregar
-        </Button>
+      <div className="relative mt-3">
+        <div className="flex gap-2">
+          <Input
+            ref={busquedaRef}
+            type="search"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="SKU, nombre o pistola lectora"
+            autoComplete="off"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                resolverBusqueda();
+              }
+              if (e.key === "Escape") {
+                setListaAbierta(false);
+              }
+            }}
+            onFocus={() => {
+              if (cameraOn) stopCamera();
+              if (resultados.length > 0) setListaAbierta(true);
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={resolverBusqueda}
+            disabled={pending || searchPending}
+          >
+            Agregar
+          </Button>
+        </div>
+
+        {listaAbierta && busqueda.trim().length >= 2 ? (
+          <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg">
+            {searchPending && resultados.length === 0 ? (
+              <p className="px-3 py-2 text-sm text-neutral-500">Buscando…</p>
+            ) : null}
+            {!searchPending && resultados.length === 0 ? (
+              <p className="px-3 py-2 text-sm text-neutral-500">Sin resultados</p>
+            ) : null}
+            {resultados.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className={cn(
+                  "flex w-full flex-col gap-0.5 border-b border-neutral-100 px-3 py-2.5 text-left last:border-0 hover:bg-neutral-50",
+                  p.stock <= 0 && "opacity-50",
+                )}
+                disabled={p.stock <= 0}
+                onClick={() => addProduct(p)}
+              >
+                <span className="text-sm font-medium">{p.nombre}</span>
+                <span className="text-xs text-neutral-500">
+                  {p.sku} · {formatCop(p.precio)} · stock {p.stock}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 flex-1 space-y-2">
         {lines.length === 0 ? (
           <p className="rounded-lg border border-dashed border-neutral-200 px-4 py-8 text-center text-sm text-neutral-400">
-            El carrito está vacío. Escanea un producto para comenzar.
+            El carrito está vacío. Busca por nombre, escanea QR o ingresa el SKU.
           </p>
         ) : (
           lines.map((line) => (
