@@ -9,9 +9,11 @@ import {
   useState,
   useTransition,
 } from "react";
-import { Camera, CameraOff, ScanLine, Send, ShoppingCart } from "lucide-react";
+import { Camera, CameraOff, Printer, ScanLine, Send, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { publishVentaCarritoDraft } from "@/lib/actions/venta-carrito-draft-actions";
+import { saveVentaProducto } from "@/lib/actions/venta-producto-actions";
+import { printVentaProductoReceipt } from "@/lib/printing/venta-producto-receipt";
 import {
   lookupProductoBySku,
   searchProductosVenta,
@@ -30,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -91,9 +94,16 @@ export function VentaManager() {
   const [listaAbierta, setListaAbierta] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
   const [cajaCode, setCajaCode] = useState<string | null>(null);
+  const [isPc, setIsPc] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState("");
+  const [clienteCedula, setClienteCedula] = useState("");
+  const [clienteCelular, setClienteCelular] = useState("");
+  const [montoPagado, setMontoPagado] = useState("");
+  const [notas, setNotas] = useState("");
   const [pending, startTransition] = useTransition();
   const [searchPending, startSearchTransition] = useTransition();
   const [publishPending, startPublishTransition] = useTransition();
+  const [facturarPending, startFacturarTransition] = useTransition();
 
   const [scanPending, setScanPending] = useState(false);
   const scannerContainerRef = useRef<HTMLDivElement>(null);
@@ -263,6 +273,7 @@ export function VentaManager() {
   }, [busqueda, addProduct]);
 
   useEffect(() => {
+    setIsPc(!isMobileTouchDevice());
     return () => {
       if (cooldownTimerRef.current) {
         window.clearInterval(cooldownTimerRef.current);
@@ -317,6 +328,55 @@ export function VentaManager() {
         toast.error(
           err instanceof Error ? err.message : "No se pudo enviar a PC.",
         );
+      }
+    });
+  }
+
+  function facturarEnPc() {
+    if (lines.length === 0) {
+      toast.error("Agrega al menos un producto.");
+      return;
+    }
+    if (!clienteNombre.trim()) {
+      toast.error("Indica el nombre del cliente.");
+      return;
+    }
+    if (clienteCelular.trim().length < 10) {
+      toast.error("Indica un celular válido.");
+      return;
+    }
+    const pagado = montoPagado.trim()
+      ? Number(montoPagado.replace(/\D/g, ""))
+      : total;
+    if (pagado > total) {
+      toast.error("El pago no puede superar el total.");
+      return;
+    }
+
+    startFacturarTransition(async () => {
+      try {
+        const venta = await saveVentaProducto({
+          clienteNombre: clienteNombre.trim(),
+          clienteCedula: clienteCedula.trim() || undefined,
+          clienteCelular: clienteCelular.trim(),
+          montoPagado: pagado,
+          notas: notas.trim() || undefined,
+          items: lines.map((l) => ({
+            productoId: l.productoId,
+            cantidad: l.cantidad,
+          })),
+        });
+        await printVentaProductoReceipt(venta);
+        toast.success("Venta facturada e impresa.");
+        dispatch({ type: "clear" });
+        setClienteNombre("");
+        setClienteCedula("");
+        setClienteCelular("");
+        setMontoPagado("");
+        setNotas("");
+        setCartOpen(false);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "No se pudo facturar.");
       }
     });
   }
@@ -591,16 +651,77 @@ export function VentaManager() {
             </>
           )}
 
+          {isPc && lines.length > 0 ? (
+            <div className="grid gap-3 px-4 sm:grid-cols-2">
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="venta-cliente-nombre">Nombre</Label>
+                <Input
+                  id="venta-cliente-nombre"
+                  value={clienteNombre}
+                  onChange={(e) => setClienteNombre(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="venta-cliente-cedula">Cédula</Label>
+                <Input
+                  id="venta-cliente-cedula"
+                  inputMode="numeric"
+                  value={clienteCedula}
+                  onChange={(e) => setClienteCedula(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="venta-cliente-celular">Celular</Label>
+                <Input
+                  id="venta-cliente-celular"
+                  inputMode="tel"
+                  value={clienteCelular}
+                  onChange={(e) => setClienteCelular(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="venta-monto-pagado">Pagado hoy</Label>
+                <Input
+                  id="venta-monto-pagado"
+                  inputMode="numeric"
+                  placeholder={String(total)}
+                  value={montoPagado}
+                  onChange={(e) => setMontoPagado(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="venta-notas">Notas</Label>
+                <Input
+                  id="venta-notas"
+                  value={notas}
+                  onChange={(e) => setNotas(e.target.value)}
+                />
+              </div>
+            </div>
+          ) : null}
+
           <SheetFooter>
-            <Button
-              type="button"
-              className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
-              disabled={lines.length === 0 || publishPending}
-              onClick={sendToPc}
-            >
-              <Send className="h-4 w-4" />
-              {publishPending ? "Enviando…" : "Enviar a PC"}
-            </Button>
+            {isPc ? (
+              <Button
+                type="button"
+                className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+                disabled={lines.length === 0 || facturarPending}
+                onClick={facturarEnPc}
+              >
+                <Printer className="h-4 w-4" />
+                {facturarPending ? "Facturando…" : "Facturar e imprimir"}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+                disabled={lines.length === 0 || publishPending}
+                onClick={sendToPc}
+              >
+                <Send className="h-4 w-4" />
+                {publishPending ? "Enviando…" : "Enviar a PC"}
+              </Button>
+            )}
           </SheetFooter>
         </SheetContent>
       </Sheet>
