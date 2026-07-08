@@ -10,6 +10,9 @@ export type MotoRow = {
   foto_url: string;
   notas: string | null;
   ubicacion: MotoUbicacion;
+  pagos: number | null;
+  aliado: string | null;
+  veces_vendida: number | null;
   created_at: string;
   updated_at: string;
 };

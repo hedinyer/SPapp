@@ -51,6 +51,13 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
     moto?.ubicacion ?? "parqueadero",
   );
   const [notas, setNotas] = useState(moto?.notas ?? "");
+  const [pagos, setPagos] = useState(
+    moto?.pagos != null ? String(moto.pagos) : "",
+  );
+  const [aliado, setAliado] = useState(moto?.aliado ?? "");
+  const [vecesVendida, setVecesVendida] = useState(
+    moto?.veces_vendida != null ? String(moto.veces_vendida) : "",
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   function setModoIdentificador(next: ModoIdentificador) {
@@ -66,6 +73,9 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
       condicion,
       ubicacion,
       notas: notas.trim(),
+      pagos: pagos.trim() === "" ? null : pagos.trim(),
+      aliado: aliado.trim(),
+      veces_vendida: vecesVendida.trim() === "" ? null : vecesVendida.trim(),
       tieneFoto: Boolean(imageFile) || Boolean(moto?.foto_url),
     });
 
@@ -99,6 +109,9 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
           ubicacion: parsed.data.ubicacion,
           foto_url: fotoUrl,
           notas: parsed.data.notas || null,
+          pagos: parsed.data.pagos ?? null,
+          aliado: parsed.data.aliado || null,
+          veces_vendida: parsed.data.veces_vendida ?? null,
         };
 
         if (isEdit && moto) {
@@ -267,6 +280,43 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
         disabled={pending}
         enableCamera
       />
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="pagos">Días pagados</Label>
+          <Input
+            id="pagos"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            value={pagos}
+            placeholder="0"
+            onChange={(e) => setPagos(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="veces-vendida">Veces vendida</Label>
+          <Input
+            id="veces-vendida"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            value={vecesVendida}
+            placeholder="0"
+            onChange={(e) => setVecesVendida(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="aliado">Nombre aliado</Label>
+        <Input
+          id="aliado"
+          value={aliado}
+          placeholder="Nombre del aliado"
+          onChange={(e) => setAliado(e.target.value)}
+        />
+      </div>
 
       <div className="space-y-2">
         <Label htmlFor="notas">Notas (opcional)</Label>

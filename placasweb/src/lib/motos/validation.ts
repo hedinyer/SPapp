@@ -16,6 +16,9 @@ export const motoCreateSchema = z
     condicion: motoCondicionSchema,
     ubicacion: motoUbicacionSchema,
     notas: z.string().trim().optional(),
+    pagos: z.coerce.number().int().min(0).optional().nullable(),
+    aliado: z.string().trim().optional(),
+    veces_vendida: z.coerce.number().int().min(0).optional().nullable(),
     tieneFoto: z.boolean(),
   })
   .superRefine((data, ctx) => {

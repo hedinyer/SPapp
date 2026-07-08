@@ -1,0 +1,1274 @@
+{
+  "matched": [
+    {
+      "id": "df302de0-c55b-44a5-908e-6f96664a29e5",
+      "placa": "ALK59C",
+      "serie": null,
+      "pagos": 65,
+      "aliado": "PEDRO",
+      "source": "ALK59C",
+      "matchKey": "placa:ALK59C"
+    },
+    {
+      "id": "02fa9840-ddda-450d-a009-5d1bb366a787",
+      "placa": "JRM97H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "JORGE",
+      "source": "JRM97H",
+      "matchKey": "placa:JRM97H"
+    },
+    {
+      "id": "f4036510-17ea-4658-aff4-837d625247fa",
+      "placa": "OSD62H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "OSD62H",
+      "matchKey": "placa:OSD62H"
+    },
+    {
+      "id": "4ecd8348-488a-4cc9-87eb-b983adfa69d8",
+      "placa": "TSM49H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSM49H",
+      "matchKey": "placa:TSM49H"
+    },
+    {
+      "id": "8b34f25f-d7d1-4b26-ae20-d3618cf93c16",
+      "placa": "JRU72H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "MIGUEL F.",
+      "source": "JRU72H",
+      "matchKey": "placa:JRU72H"
+    },
+    {
+      "id": "08519667-8004-450c-b5a0-c88e20137745",
+      "placa": "OSE74H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "CRISTIAM A.",
+      "source": "OSE74H",
+      "matchKey": "placa:OSE74H"
+    },
+    {
+      "id": "9688f484-ea4b-48df-8760-21b7d5577a77",
+      "placa": "OSN71H",
+      "serie": null,
+      "pagos": 43,
+      "aliado": "ARSENIO",
+      "source": "OSN71H",
+      "matchKey": "placa:OSN71H"
+    },
+    {
+      "id": "83bc4ad6-8b2c-4d21-8d36-1f6738ce8311",
+      "placa": "TSK49H",
+      "serie": null,
+      "pagos": 122,
+      "aliado": "ALVARO B",
+      "source": "TSK49H",
+      "matchKey": "placa:TSK49H"
+    },
+    {
+      "id": "8e65d2a2-35e5-4de7-9210-145a8cef22cb",
+      "placa": "JRH78H",
+      "serie": null,
+      "pagos": 178,
+      "aliado": "DANIELA BA",
+      "source": "JRH78H",
+      "matchKey": "placa:JRH78H"
+    },
+    {
+      "id": "bfbbb002-d996-44a8-ae14-1f411c496a5b",
+      "placa": "TTD90H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TTD90H",
+      "matchKey": "placa:TTD90H"
+    },
+    {
+      "id": "3a06700f-7cd7-41c6-9da2-afdd2d70e99d",
+      "placa": null,
+      "serie": "OSP33H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "OSP33H",
+      "matchKey": "placa:OSP33H"
+    },
+    {
+      "id": "41645c9a-9717-4383-9eed-a59fdce156b9",
+      "placa": "RBJ50H",
+      "serie": null,
+      "pagos": 106,
+      "aliado": "HENRY A.",
+      "source": "RBJ50H",
+      "matchKey": "placa:RBJ50H"
+    },
+    {
+      "id": "185a2d1d-88f5-4be9-a2d8-a0da90a8ffe4",
+      "placa": "DXY38H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "MIGUEL F.",
+      "source": "DXY38H",
+      "matchKey": "placa:DXY38H"
+    },
+    {
+      "id": "c21c73cd-fd9f-4687-aa95-f1a77e6da511",
+      "placa": "TSC23H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSC23H",
+      "matchKey": "placa:TSC23H"
+    },
+    {
+      "id": "ce3f80d0-4ac4-4868-9b3c-8b17a4d9d84c",
+      "placa": "TSD09H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSD09H",
+      "matchKey": "placa:TSD09H"
+    },
+    {
+      "id": "2fd68279-215e-4a23-b4c5-48161a51c3b1",
+      "placa": "DXA96H",
+      "serie": null,
+      "pagos": 270,
+      "aliado": "OSCAR",
+      "source": "DYA96H",
+      "matchKey": "placa:DXA96H"
+    },
+    {
+      "id": "96b92d0a-e44c-4769-b0b4-3560b69fc7a7",
+      "placa": "TIB77H",
+      "serie": null,
+      "pagos": 104,
+      "aliado": "OLGA",
+      "source": "TIB77H",
+      "matchKey": "placa:TIB77H"
+    },
+    {
+      "id": "a0a726b5-ad80-4a4e-a08c-263d1644cde6",
+      "placa": "ZOJ11H",
+      "serie": null,
+      "pagos": 65,
+      "aliado": "IVAN APTO",
+      "source": "ZOJ11H",
+      "matchKey": "placa:ZOJ11H"
+    },
+    {
+      "id": "fad90e95-037a-487f-a61f-dc34d9750779",
+      "placa": "RBA70H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY A.",
+      "source": "RBA70H",
+      "matchKey": "placa:RBA70H"
+    },
+    {
+      "id": "2c422a18-f2a1-45f2-a34f-6618f6dd832a",
+      "placa": null,
+      "serie": "TSY81H",
+      "pagos": 90,
+      "aliado": "RODRIGO",
+      "source": "TSY81H",
+      "matchKey": "placa:TSY81H"
+    },
+    {
+      "id": "cb65c174-95a7-4acf-aa04-a876dc6dfc6c",
+      "placa": "RBA92H",
+      "serie": null,
+      "pagos": 204,
+      "aliado": "GABRIELA",
+      "source": "RBA92H",
+      "matchKey": "placa:RBA92H"
+    },
+    {
+      "id": "7984803a-6120-4f09-9764-ee21806789d2",
+      "placa": "OSC02H",
+      "serie": null,
+      "pagos": 162,
+      "aliado": "JAVIER S",
+      "source": "OSC02H",
+      "matchKey": "placa:OSC02H"
+    },
+    {
+      "id": "147ae4e6-3691-4294-9ae7-55dd4caaf940",
+      "placa": "TRS91H",
+      "serie": null,
+      "pagos": 68,
+      "aliado": "NELSON",
+      "source": "TRS91H",
+      "matchKey": "placa:TRS91H"
+    },
+    {
+      "id": "e7cdf314-9900-4a74-8d2a-1e8b75dd64c2",
+      "placa": "ZXU78G",
+      "serie": null,
+      "pagos": null,
+      "aliado": "IVONNE C.",
+      "source": "ZXU78G",
+      "matchKey": "placa:ZXU78G"
+    },
+    {
+      "id": "186cf3bd-903f-4ec9-a3b4-4dc14f57ba9f",
+      "placa": "THX42H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "THX42H",
+      "matchKey": "placa:THX42H"
+    },
+    {
+      "id": "721013e8-79c7-42bf-bea9-3fe1728f768e",
+      "placa": "TSV67H",
+      "serie": null,
+      "pagos": 31,
+      "aliado": "HENRY",
+      "source": "TSV67H",
+      "matchKey": "placa:TSV67H"
+    },
+    {
+      "id": "e52d5811-b3a0-4cc0-89f9-71f315956b0e",
+      "placa": "RBF33H",
+      "serie": null,
+      "pagos": 68,
+      "aliado": "JAVIER S",
+      "source": "RBF33H",
+      "matchKey": "placa:RBF33H"
+    },
+    {
+      "id": "bbfe068d-e645-4d0f-ad16-c2321cfb42fe",
+      "placa": "RBA98H",
+      "serie": null,
+      "pagos": 88,
+      "aliado": "MARTA S",
+      "source": "RBA98H",
+      "matchKey": "placa:RBA98H"
+    },
+    {
+      "id": "72f53dac-47ee-4627-971c-d16070a9d178",
+      "placa": "OSQ26H",
+      "serie": null,
+      "pagos": 83,
+      "aliado": "NELSON",
+      "source": "OSQ26H",
+      "matchKey": "placa:OSQ26H"
+    },
+    {
+      "id": "612c747f-b586-49de-8377-dbf3094f7fca",
+      "placa": "RBA90H",
+      "serie": null,
+      "pagos": 78,
+      "aliado": "GABRIELA",
+      "source": "RBA90H",
+      "matchKey": "placa:RBA90H"
+    },
+    {
+      "id": "a50887bb-82b9-419c-8807-92325438f38a",
+      "placa": "TTO91H",
+      "serie": null,
+      "pagos": 72,
+      "aliado": "YENNIFER",
+      "source": "TTO91H",
+      "matchKey": "placa:TTO91H"
+    },
+    {
+      "id": "1cda3a50-4f81-4a02-9a74-b8a72d58330c",
+      "placa": "TIR36H",
+      "serie": null,
+      "pagos": 125,
+      "aliado": "MIGUEL",
+      "source": "TIR36H",
+      "matchKey": "placa:TIR36H"
+    },
+    {
+      "id": "84367d5a-76ba-4db8-a03d-66a885d78862",
+      "placa": "TTO92H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TTO92H",
+      "matchKey": "placa:TTO92H"
+    },
+    {
+      "id": "6b5c30c3-82f8-48e9-b708-d99627d68d03",
+      "placa": "TIU83H",
+      "serie": null,
+      "pagos": 15,
+      "aliado": "JAIRO",
+      "source": "TIU83H",
+      "matchKey": "placa:TIU83H"
+    },
+    {
+      "id": "adf88ed8-ddb6-461c-9742-9b0eb22365d3",
+      "placa": "OSM74H",
+      "serie": null,
+      "pagos": 112,
+      "aliado": "KRIZIA",
+      "source": "OSM74H",
+      "matchKey": "placa:OSM74H"
+    },
+    {
+      "id": "cd6420e8-5471-4467-baee-9d7decce9cbe",
+      "placa": "ZPF94H",
+      "serie": null,
+      "pagos": 111,
+      "aliado": "HENRY",
+      "source": "ZPF94H",
+      "matchKey": "placa:ZPF94H"
+    },
+    {
+      "id": "8a547a4e-5cd3-451c-86ca-ada3fe32033d",
+      "placa": "TRS96H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TRS96H",
+      "matchKey": "placa:TRS96H"
+    },
+    {
+      "id": "359d9a84-e578-46db-a3ca-d38de8e4dafe",
+      "placa": "TRW46H",
+      "serie": null,
+      "pagos": 39,
+      "aliado": "OMAR",
+      "source": "TRW46H",
+      "matchKey": "placa:TRW46H"
+    },
+    {
+      "id": "a5177eea-09af-4fb1-bdb7-cfe822ccc8c2",
+      "placa": "TIQ85H",
+      "serie": null,
+      "pagos": 167,
+      "aliado": "DANA",
+      "source": "TIQ85H",
+      "matchKey": "placa:TIQ85H"
+    },
+    {
+      "id": "666db1b1-ed15-4814-bcf4-1f95cd1c8760",
+      "placa": "TIM88H",
+      "serie": null,
+      "pagos": 170,
+      "aliado": "CRIVON",
+      "source": "TIM88H",
+      "matchKey": "placa:TIM88H"
+    },
+    {
+      "id": "9294fff5-bd87-4b10-8c0e-21f164738c72",
+      "placa": "TRS92H",
+      "serie": null,
+      "pagos": 46,
+      "aliado": "MARTA S",
+      "source": "TRS92H",
+      "matchKey": "placa:TRS92H"
+    },
+    {
+      "id": "ac3b4413-0c91-47cd-b5d3-f0d55e18e935",
+      "placa": "TRW41H",
+      "serie": null,
+      "pagos": 8,
+      "aliado": "GUSTAVO",
+      "source": "TRW41H",
+      "matchKey": "placa:TRW41H"
+    },
+    {
+      "id": "aaa70c31-3af6-4878-ada4-7768b767982b",
+      "placa": "TTJ62H",
+      "serie": null,
+      "pagos": 1,
+      "aliado": "SANDRA",
+      "source": "TTJ62H",
+      "matchKey": "placa:TTJ62H"
+    },
+    {
+      "id": "33318556-84db-4a57-9ecf-ed4980779338",
+      "placa": "DXY78H",
+      "serie": null,
+      "pagos": 145,
+      "aliado": "OMAR",
+      "source": "DXZ78H",
+      "matchKey": "placa:DXY78H"
+    },
+    {
+      "id": "70484985-8d33-4cd6-8a91-3f093c240de1",
+      "placa": "MDC23H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "OLGA",
+      "source": "MDC23H",
+      "matchKey": "placa:MDC23H"
+    },
+    {
+      "id": "e53139fe-1f9a-4a47-8961-290cf0d6fb2f",
+      "placa": "TIK41H",
+      "serie": null,
+      "pagos": 18,
+      "aliado": "GUSTAVO",
+      "source": "TIK41H",
+      "matchKey": "placa:TIK41H"
+    },
+    {
+      "id": "33d83329-514f-4899-af22-374e4e8e6cdb",
+      "placa": "OSE80H",
+      "serie": null,
+      "pagos": 106,
+      "aliado": "HENRY",
+      "source": "OSE80H",
+      "matchKey": "placa:OSE80H"
+    },
+    {
+      "id": "8a2e4c12-b1d8-4337-ac46-3ce4b35642bd",
+      "placa": "RBE09H",
+      "serie": null,
+      "pagos": 51,
+      "aliado": "MIGUEL",
+      "source": "RBE09H",
+      "matchKey": "placa:RBE09H"
+    },
+    {
+      "id": "1212c54d-8362-4a3a-af71-809a34307d38",
+      "placa": "ZPL72H",
+      "serie": null,
+      "pagos": 48,
+      "aliado": "MIGUEL",
+      "source": "ZPL72H",
+      "matchKey": "placa:ZPL72H"
+    },
+    {
+      "id": "6d27565c-bc62-4cde-8057-51894ba5ee92",
+      "placa": "TIF32H",
+      "serie": null,
+      "pagos": 83,
+      "aliado": "OMAR",
+      "source": "TIF32H",
+      "matchKey": "placa:TIF32H"
+    },
+    {
+      "id": "0efe8b0e-d450-4f2f-a4e6-18fe246f844e",
+      "placa": "TTO96H",
+      "serie": null,
+      "pagos": 3,
+      "aliado": "IVONNE",
+      "source": "TTO96H",
+      "matchKey": "placa:TTO96H"
+    },
+    {
+      "id": "e141dac2-981b-465b-9938-ddbd2655c20f",
+      "placa": null,
+      "serie": "DTW18I",
+      "pagos": 43,
+      "aliado": "MIGUEL F",
+      "source": "DTW18I",
+      "matchKey": "placa:DTW18I"
+    },
+    {
+      "id": "2b1adc3d-380b-4384-adb4-6ff1e5fc283e",
+      "placa": "ZOQ10H",
+      "serie": null,
+      "pagos": 3,
+      "aliado": "YENNIFER",
+      "source": "ZOQ10H",
+      "matchKey": "placa:ZOQ10H"
+    },
+    {
+      "id": "cee2700d-6fa7-4207-853f-45f39b165abd",
+      "placa": null,
+      "serie": "TTJ70H",
+      "pagos": 24,
+      "aliado": "JAIRO",
+      "source": "TTJ70H",
+      "matchKey": "placa:TTJ70H"
+    },
+    {
+      "id": "2658bd25-7a37-4853-991b-4e958b619961",
+      "placa": "TIR35H",
+      "serie": null,
+      "pagos": 65,
+      "aliado": "JAIRO",
+      "source": "TIR35H",
+      "matchKey": "placa:TIR35H"
+    },
+    {
+      "id": "05845441-a9a1-4f89-ba4b-f64f1898bfa2",
+      "placa": "OSE78H",
+      "serie": null,
+      "pagos": 104,
+      "aliado": "HENRY",
+      "source": "OSE78H",
+      "matchKey": "placa:OSE78H"
+    },
+    {
+      "id": "a5dd6dc5-af37-431e-a486-2755b65d6105",
+      "placa": "JRP58H",
+      "serie": null,
+      "pagos": 167,
+      "aliado": "ESPERANZA",
+      "source": "JRP58H",
+      "matchKey": "placa:JRP58H"
+    },
+    {
+      "id": "d82cca1f-3cc6-4b8b-b222-d1680afe6dd8",
+      "placa": "ZOT02H",
+      "serie": null,
+      "pagos": 28,
+      "aliado": "HENRY",
+      "source": "ZOT02H",
+      "matchKey": "placa:ZOT02H"
+    },
+    {
+      "id": "c7de87f0-b2e3-4bbd-8975-4dd4aacf211c",
+      "placa": "TIK42H",
+      "serie": null,
+      "pagos": 84,
+      "aliado": "GUSTAVO",
+      "source": "TIK42H",
+      "matchKey": "placa:TIK42H"
+    },
+    {
+      "id": "d0f93cef-aa71-4c62-940d-d2e329eeadf2",
+      "placa": "RBH88H",
+      "serie": null,
+      "pagos": 54,
+      "aliado": "OSCAR",
+      "source": "RBH88H",
+      "matchKey": "placa:RBH88H"
+    },
+    {
+      "id": "71b8956a-b83c-4f27-9ffc-2bb97ff9d1ca",
+      "placa": "TSC71H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSC71H",
+      "matchKey": "placa:TSC71H"
+    },
+    {
+      "id": "5b468870-5f80-4127-b0d3-eae9d0839e25",
+      "placa": "OSQ28H",
+      "serie": null,
+      "pagos": 82,
+      "aliado": "NELSON",
+      "source": "OSQ28H",
+      "matchKey": "placa:OSQ28H"
+    },
+    {
+      "id": "28cd1aa2-2f0d-4eed-b3f1-2ef0f3115c73",
+      "placa": "TIQ84H",
+      "serie": null,
+      "pagos": 61,
+      "aliado": "JAIRO",
+      "source": "TIQ84H",
+      "matchKey": "placa:TIQ84H"
+    },
+    {
+      "id": "36e2def5-69b7-407e-895f-2ed103921548",
+      "placa": null,
+      "serie": "TSC25H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSC25H",
+      "matchKey": "placa:TSC25H"
+    },
+    {
+      "id": "c78718bc-3877-4046-9526-0859825186ef",
+      "placa": "TRS83H",
+      "serie": null,
+      "pagos": 40,
+      "aliado": "KRIZIA",
+      "source": "TRS83H",
+      "matchKey": "placa:TRS83H"
+    },
+    {
+      "id": "f06e5cd3-b539-41d2-835a-24e57f746b95",
+      "placa": "ZPL69H",
+      "serie": null,
+      "pagos": 71,
+      "aliado": "EIMMY",
+      "source": "ZPL69H",
+      "matchKey": "placa:ZPL69H"
+    },
+    {
+      "id": "a17e0b99-e881-4692-912a-411899c66ae1",
+      "placa": "OSQ65H",
+      "serie": null,
+      "pagos": 153,
+      "aliado": "ANTONIO V",
+      "source": "OSQ65H",
+      "matchKey": "placa:OSQ65H"
+    },
+    {
+      "id": "2e470045-4279-4652-ad5f-3c950f892884",
+      "placa": "OSR73H",
+      "serie": null,
+      "pagos": 86,
+      "aliado": "OLGA",
+      "source": "OSR73H",
+      "matchKey": "placa:OSR73H"
+    },
+    {
+      "id": "0bba2970-ec4e-4f9d-ba0f-e7d8b82d6c4b",
+      "placa": "OSP29H",
+      "serie": null,
+      "pagos": 70,
+      "aliado": "HENRY",
+      "source": "OSP29H",
+      "matchKey": "placa:OSP29H"
+    },
+    {
+      "id": "4fd21579-e552-4b47-8b50-61e61abd61aa",
+      "placa": "RBA93H",
+      "serie": null,
+      "pagos": 125,
+      "aliado": "MARTA S",
+      "source": "RBA93H",
+      "matchKey": "placa:RBA93H"
+    },
+    {
+      "id": "cdecd510-e6b5-4b1c-9905-709c5f9e3dfd",
+      "placa": "GAR68H",
+      "serie": null,
+      "pagos": 366,
+      "aliado": "GENNY",
+      "source": "GAR68H",
+      "matchKey": "placa:GAR68H"
+    },
+    {
+      "id": "f2822314-3686-4855-8a2f-68dca3b6773d",
+      "placa": "TIN92H",
+      "serie": null,
+      "pagos": 25,
+      "aliado": "FABIAN",
+      "source": "TIN92H",
+      "matchKey": "placa:TIN92H"
+    },
+    {
+      "id": "4c1daf16-49ac-4621-b3bc-c1c6a1ef05c1",
+      "placa": "TSC22H",
+      "serie": null,
+      "pagos": 187,
+      "aliado": "HENRY",
+      "source": "TSC22H",
+      "matchKey": "placa:TSC22H"
+    },
+    {
+      "id": "375a95de-d229-4b77-9f8d-0a2e8c8c2f97",
+      "placa": "RAU96H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "RAU96H",
+      "matchKey": "placa:RAU96H"
+    },
+    {
+      "id": "c596be92-e3f5-493b-9b6d-01c890a04526",
+      "placa": "OSE14H",
+      "serie": null,
+      "pagos": 75,
+      "aliado": "OSCAR",
+      "source": "OSE14H",
+      "matchKey": "placa:OSE14H"
+    },
+    {
+      "id": "a3c85353-de22-4f80-86da-a49f42d9dad7",
+      "placa": "RAZ51H",
+      "serie": null,
+      "pagos": 100,
+      "aliado": "HENRY",
+      "source": "RAZ51H",
+      "matchKey": "placa:RAZ51H"
+    },
+    {
+      "id": "27f44413-ef7a-4451-a3f0-4b1e4c4a1cd0",
+      "placa": "TIL53H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TIL53H",
+      "matchKey": "placa:TIL53H"
+    },
+    {
+      "id": "9a09dd61-bc6c-4d0b-8fec-c9aca2f5833e",
+      "placa": null,
+      "serie": "RBE07H",
+      "pagos": 42,
+      "aliado": "FABIAN",
+      "source": "RBE07H",
+      "matchKey": "placa:RBE07H"
+    },
+    {
+      "id": "75206277-b848-4b49-9959-b8c30d6bf7b6",
+      "placa": "RBJ55H",
+      "serie": null,
+      "pagos": 132,
+      "aliado": "KRIZIA",
+      "source": "RBJ55H",
+      "matchKey": "placa:RBJ55H"
+    },
+    {
+      "id": "e030c7cf-de5e-4396-8488-2882476b95e4",
+      "placa": null,
+      "serie": "TTE98H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TTE98H",
+      "matchKey": "placa:TTE98H"
+    },
+    {
+      "id": "63543084-3bd2-4e57-919d-9cbebc83b800",
+      "placa": "TIN95H",
+      "serie": null,
+      "pagos": 88,
+      "aliado": "HENRY",
+      "source": "TIN95H",
+      "matchKey": "placa:TIN95H"
+    },
+    {
+      "id": "351a4769-63a4-4d71-92cd-0c8a8226aab7",
+      "placa": null,
+      "serie": "ZPG03H",
+      "pagos": 7,
+      "aliado": "MARIA C",
+      "source": "ZPG03H",
+      "matchKey": "placa:ZPG03H"
+    },
+    {
+      "id": "40327f62-15ee-4074-9d32-13002ae268d3",
+      "placa": "RBF35H",
+      "serie": null,
+      "pagos": 61,
+      "aliado": "GUSTAVO",
+      "source": "RBF35H",
+      "matchKey": "placa:RBF35H"
+    },
+    {
+      "id": "93c4df54-0f00-4a24-a9cf-d210d75f070c",
+      "placa": null,
+      "serie": "ZPZ83H",
+      "pagos": 18,
+      "aliado": "DANA",
+      "source": "ZPZ83H",
+      "matchKey": "placa:ZPZ83H"
+    },
+    {
+      "id": "213dea29-7043-491d-a37b-026c0a90b2c0",
+      "placa": "TTO98H",
+      "serie": null,
+      "pagos": 24,
+      "aliado": "SANTI",
+      "source": "TTO98H",
+      "matchKey": "placa:TTO98H"
+    },
+    {
+      "id": "ccdd4fb5-1b55-40ce-869e-99bbae618106",
+      "placa": "RBH89H",
+      "serie": null,
+      "pagos": 177,
+      "aliado": "DANIELA BA",
+      "source": "RBH89H",
+      "matchKey": "placa:RBH89H"
+    },
+    {
+      "id": "e14e0f9f-c763-4696-9414-5807b7bf2d97",
+      "placa": "HLB79H",
+      "serie": null,
+      "pagos": 139,
+      "aliado": "GENNY",
+      "source": "HLB79H",
+      "matchKey": "placa:HLB79H"
+    },
+    {
+      "id": "0a527bba-0a1c-42b5-85ee-65e4f1d43514",
+      "placa": "TSC35H",
+      "serie": null,
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSC35H",
+      "matchKey": "placa:TSC35H"
+    }
+  ],
+  "unmatchedDb": [
+    {
+      "id": "b10e0f47-a38a-4063-a61a-1eb145da286a",
+      "placa": "JRM99H",
+      "serie": null,
+      "ident": "JRM99H"
+    },
+    {
+      "id": "85f984a6-2259-40b1-88f8-febc39f67132",
+      "placa": "HAE14I",
+      "serie": null,
+      "ident": "HAE14I"
+    },
+    {
+      "id": "c1e43647-c442-44af-b5fa-8e824717f454",
+      "placa": "HLR39H",
+      "serie": null,
+      "ident": "HLR39H"
+    },
+    {
+      "id": "c476fb9e-491e-4d01-a980-a79c73391688",
+      "placa": "HLF17H",
+      "serie": null,
+      "ident": "HLF17H"
+    },
+    {
+      "id": "e5614ca3-866e-4271-90a3-ccae90bfef90",
+      "placa": "GZJ25I",
+      "serie": null,
+      "ident": "GZJ25I"
+    },
+    {
+      "id": "83c53e71-72f8-422a-bfa7-46c357bdc64c",
+      "placa": "DUJ50I",
+      "serie": null,
+      "ident": "DUJ50I"
+    },
+    {
+      "id": "29ac75a8-aab0-4bf4-9766-eeaa3d9aede2",
+      "placa": "HAM88I",
+      "serie": null,
+      "ident": "HAM88I"
+    },
+    {
+      "id": "9ea1f8d9-c73f-49c7-bf6f-e9125f04f40c",
+      "placa": null,
+      "serie": "TRW51H",
+      "ident": "TRW51H"
+    },
+    {
+      "id": "32cdc1b6-d0bd-4b1f-b18d-e41217d5ca65",
+      "placa": "HAI32I",
+      "serie": null,
+      "ident": "HAI32I"
+    },
+    {
+      "id": "74726452-98a9-4c73-bab1-fdd2778a7a18",
+      "placa": "HAQ81I",
+      "serie": null,
+      "ident": "HAQ81I"
+    },
+    {
+      "id": "336483d9-6f32-4b38-9695-a65fb70bf62d",
+      "placa": "RSQ75F",
+      "serie": null,
+      "ident": "RSQ75F"
+    },
+    {
+      "id": "54f10c39-31e0-46e9-b2cd-42cd3606c4ac",
+      "placa": null,
+      "serie": "DVF19I",
+      "ident": "DVF19I"
+    },
+    {
+      "id": "77cd60cf-377d-4d11-9f24-1a5ed6ef0968",
+      "placa": null,
+      "serie": "JRI18H",
+      "ident": "JRI18H"
+    },
+    {
+      "id": "9582f7c7-4179-41e2-972e-3ffaba5620d9",
+      "placa": null,
+      "serie": "03943",
+      "ident": "03943"
+    },
+    {
+      "id": "f053242d-91ca-4748-8d45-767ba942c78b",
+      "placa": null,
+      "serie": "000455",
+      "ident": "000455"
+    },
+    {
+      "id": "4f5dc266-397a-4de5-b58a-8ec2c712c68e",
+      "placa": "HAI36I",
+      "serie": null,
+      "ident": "HAI36I"
+    },
+    {
+      "id": "fd767ab8-6090-4723-97cc-3a003b489210",
+      "placa": "TIR72H",
+      "serie": null,
+      "ident": "TIR72H"
+    },
+    {
+      "id": "2387573b-2708-45fa-b35e-2d8336577773",
+      "placa": "JRI15H",
+      "serie": null,
+      "ident": "JRI15H"
+    },
+    {
+      "id": "b0a39408-775f-46a8-97f9-937eb1c73b09",
+      "placa": "OFW45G",
+      "serie": null,
+      "ident": "OFW45G"
+    },
+    {
+      "id": "9ff4ba28-993d-4e84-9313-53f56cb592fe",
+      "placa": null,
+      "serie": "TIU01H",
+      "ident": "TIU01H"
+    },
+    {
+      "id": "5b64567b-87a8-4d28-9cba-de9a31c8c67d",
+      "placa": "HKY80H",
+      "serie": null,
+      "ident": "HKY80H"
+    },
+    {
+      "id": "12764375-4084-44e4-ae5d-504908fde3fc",
+      "placa": "TRE48H",
+      "serie": null,
+      "ident": "TRE48H"
+    },
+    {
+      "id": "cced86d3-8be6-4585-83e6-77ad861c1466",
+      "placa": "GZB65I",
+      "serie": null,
+      "ident": "GZB65I"
+    },
+    {
+      "id": "40437b7b-e4dd-46b0-987e-54a63187c445",
+      "placa": "TST80H",
+      "serie": null,
+      "ident": "TST80H"
+    },
+    {
+      "id": "0235dbe4-21b4-4bac-84d4-35b704615765",
+      "placa": "OSQ27H",
+      "serie": null,
+      "ident": "OSQ27H"
+    },
+    {
+      "id": "ddd0fa49-e91f-4820-accc-a634e83f0523",
+      "placa": "TST02H",
+      "serie": null,
+      "ident": "TST02H"
+    },
+    {
+      "id": "c72bbed4-9da4-4de9-8951-234a6826a173",
+      "placa": "OSP22H",
+      "serie": null,
+      "ident": "OSP22H"
+    },
+    {
+      "id": "5f6aab73-da19-412c-a631-afc7b0ca69ba",
+      "placa": null,
+      "serie": "16936",
+      "ident": "16936"
+    },
+    {
+      "id": "ce155f40-c87a-4cfe-b0f4-81c67d53a952",
+      "placa": "ODT34G",
+      "serie": null,
+      "ident": "ODT34G"
+    },
+    {
+      "id": "4bf90b83-93ea-4c44-9f17-5477d9eb87af",
+      "placa": "OSE81H",
+      "serie": null,
+      "ident": "OSE81H"
+    },
+    {
+      "id": "70815e5e-b98f-4b88-993b-d8d8ae033fb3",
+      "placa": null,
+      "serie": "029127",
+      "ident": "029127"
+    },
+    {
+      "id": "912871fc-58c4-4a96-87a4-f2ccce461738",
+      "placa": "DUM04I",
+      "serie": null,
+      "ident": "DUM04I"
+    },
+    {
+      "id": "995410c1-7d6c-4b76-a049-03b3b2ccc31e",
+      "placa": "TTE29H",
+      "serie": null,
+      "ident": "TTE29H"
+    },
+    {
+      "id": "4416bd36-01d2-4b16-ba0a-0556654df36a",
+      "placa": null,
+      "serie": "012524",
+      "ident": "012524"
+    },
+    {
+      "id": "f38f185a-cf9b-4bb7-99ab-2a0df52140e9",
+      "placa": "ZPF98H",
+      "serie": null,
+      "ident": "ZPF98H"
+    },
+    {
+      "id": "45bc89bd-fd6e-45ce-8e83-ac3fc616b66d",
+      "placa": null,
+      "serie": "025166",
+      "ident": "025166"
+    },
+    {
+      "id": "edb471cc-8518-4cb3-81ea-82fea1b0282b",
+      "placa": null,
+      "serie": "032775",
+      "ident": "032775"
+    },
+    {
+      "id": "4af71359-1efa-4daf-a023-584f4f8c199e",
+      "placa": null,
+      "serie": "17337",
+      "ident": "17337"
+    },
+    {
+      "id": "146a565d-d9af-4097-926f-ab73d425c9c2",
+      "placa": null,
+      "serie": "030174",
+      "ident": "030174"
+    },
+    {
+      "id": "7a148fdb-9b82-4546-a420-f99de5267f69",
+      "placa": null,
+      "serie": "07962",
+      "ident": "07962"
+    },
+    {
+      "id": "04b14bba-44bc-405d-b72b-bfe604a396af",
+      "placa": null,
+      "serie": "063428",
+      "ident": "063428"
+    },
+    {
+      "id": "5fc2f38b-7de1-41dc-a661-7443f5bfe2b8",
+      "placa": null,
+      "serie": "03378",
+      "ident": "03378"
+    },
+    {
+      "id": "97fd1607-a4c6-4edf-a74e-96ed3308c1d6",
+      "placa": null,
+      "serie": "03085",
+      "ident": "03085"
+    },
+    {
+      "id": "45c5ce33-94a4-44da-a596-f87d4faf5953",
+      "placa": null,
+      "serie": "06326",
+      "ident": "06326"
+    }
+  ],
+  "unmatchedCsv": [
+    {
+      "key": "placa:TIF43H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TIF43H"
+    },
+    {
+      "key": "placa:ZQC07H",
+      "pagos": 16,
+      "aliado": "OSCAR",
+      "source": "ZQC07H"
+    },
+    {
+      "key": "placa:TIF35H",
+      "pagos": 93,
+      "aliado": "HENRY",
+      "source": "TIF35H"
+    },
+    {
+      "key": "placa:RBF40H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "RBF40H"
+    },
+    {
+      "key": "placa:OSP25H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "OSP25H"
+    },
+    {
+      "key": "placa:TIJ42H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TIJ42H"
+    },
+    {
+      "key": "placa:OSB58H",
+      "pagos": 101,
+      "aliado": "OSCAR",
+      "source": "OSB58H"
+    },
+    {
+      "key": "placa:JRM96H",
+      "pagos": 168,
+      "aliado": "ALBERTO",
+      "source": "JRM96H"
+    },
+    {
+      "key": "placa:MCQ22H",
+      "pagos": 290,
+      "aliado": "MARTA S",
+      "source": "MCQ22H"
+    },
+    {
+      "key": "placa:JRP64H",
+      "pagos": 7,
+      "aliado": "ARCENIO",
+      "source": "JRP64H"
+    },
+    {
+      "key": "placa:TSY86H",
+      "pagos": 149,
+      "aliado": "HENRY",
+      "source": "TSY86H"
+    },
+    {
+      "key": "placa:TTD89H",
+      "pagos": 92,
+      "aliado": "KEVIN A",
+      "source": "TTD89H"
+    },
+    {
+      "key": "placa:ZOY40H",
+      "pagos": 12,
+      "aliado": "HENRY",
+      "source": "ZOY40H"
+    },
+    {
+      "key": "placa:DUP79I",
+      "pagos": 37,
+      "aliado": "HENRY",
+      "source": "DUP79I"
+    },
+    {
+      "key": "placa:TIO22H",
+      "pagos": 156,
+      "aliado": "HENRY",
+      "source": "TIO22H"
+    },
+    {
+      "key": "placa:TRT06H",
+      "pagos": 202,
+      "aliado": "HENRY",
+      "source": "TRT06H"
+    },
+    {
+      "key": "placa:TTE17H",
+      "pagos": 130,
+      "aliado": "CRIVON",
+      "source": "TTE17H"
+    },
+    {
+      "key": "placa:TTE15H",
+      "pagos": 10,
+      "aliado": "HENRY A.",
+      "source": "TTE15H"
+    },
+    {
+      "key": "placa:TTE21H",
+      "pagos": 34,
+      "aliado": "HENRY",
+      "source": "TTE21H"
+    },
+    {
+      "key": "placa:TIJ77H",
+      "pagos": 208,
+      "aliado": "CRIVON",
+      "source": "TIJ77H"
+    },
+    {
+      "key": "placa:TSI95H",
+      "pagos": null,
+      "aliado": "HENRY",
+      "source": "TSI95H"
+    },
+    {
+      "key": "placa:TSQ51H",
+      "pagos": 91,
+      "aliado": "HENRY",
+      "source": "TSQ51H"
+    },
+    {
+      "key": "placa:TIO23H",
+      "pagos": 120,
+      "aliado": "HENRY",
+      "source": "TIO23H"
+    },
+    {
+      "key": "placa:TTL24H",
+      "pagos": 42,
+      "aliado": "CRIVON",
+      "source": "TTL24H"
+    },
+    {
+      "key": "placa:TTA07H",
+      "pagos": 41,
+      "aliado": "HENRY",
+      "source": "TTA07H"
+    },
+    {
+      "key": "placa:TTL01H",
+      "pagos": 63,
+      "aliado": "HENRY",
+      "source": "TTL01H"
+    },
+    {
+      "key": "placa:DUP88I",
+      "pagos": 36,
+      "aliado": "HENRY",
+      "source": "DUP88I"
+    },
+    {
+      "key": "placa:TIK76H",
+      "pagos": 54,
+      "aliado": "CRIVON",
+      "source": "TIK76H"
+    },
+    {
+      "key": "placa:ZOK39H",
+      "pagos": 12,
+      "aliado": "HENRY",
+      "source": "ZOK39H"
+    },
+    {
+      "key": "placa:TSD61H",
+      "pagos": 138,
+      "aliado": "CRIVON",
+      "source": "TSD61H"
+    },
+    {
+      "key": "placa:TST05H",
+      "pagos": 52,
+      "aliado": "CRIVON",
+      "source": "TST05H"
+    },
+    {
+      "key": "placa:TTE22H",
+      "pagos": 121,
+      "aliado": "HENRY",
+      "source": "TTE22H"
+    },
+    {
+      "key": "placa:ZOK42H",
+      "pagos": 111,
+      "aliado": "HENRY A.",
+      "source": "ZOK42H"
+    },
+    {
+      "key": "placa:TRY78H",
+      "pagos": 7,
+      "aliado": "HENRY A.",
+      "source": "TRY78H"
+    },
+    {
+      "key": "placa:GZO65I",
+      "pagos": 5,
+      "aliado": "IVAN J.",
+      "source": "GZO65I"
+    }
+  ]
+}

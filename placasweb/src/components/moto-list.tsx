@@ -8,7 +8,6 @@ import {
   CONDICION_LABELS,
   UBICACION_LABELS,
   UBICACION_ORDER,
-  motoIdentificador,
   type MotoRow,
 } from "@/lib/motos/types";
 import { cn } from "@/lib/utils";
@@ -85,7 +84,9 @@ export function MotoList() {
       ) : (
         <div className="space-y-6">
           {UBICACION_ORDER.map((ubicacion) => {
-            const grupo = motos.filter((moto) => moto.ubicacion === ubicacion);
+            const grupo = motos
+              .filter((moto) => moto.ubicacion === ubicacion)
+              .sort((a, b) => (b.pagos ?? -1) - (a.pagos ?? -1));
             if (grupo.length === 0) return null;
 
             return (
@@ -115,6 +116,9 @@ export function MotoList() {
 }
 
 function MotoCard({ moto }: { moto: MotoRow }) {
+  const placa = moto.placa?.trim().toUpperCase() || null;
+  const titulo = placa ?? moto.numero_serie?.trim() ?? "Sin identificador";
+
   return (
     <Link
       href={`/${moto.id}`}
@@ -124,15 +128,13 @@ function MotoCard({ moto }: { moto: MotoRow }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={moto.foto_url}
-          alt={motoIdentificador(moto)}
+          alt={titulo}
           className="h-full w-full object-cover"
         />
       </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-2 py-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-1">
         <div className="flex items-start justify-between gap-2">
-          <p className="truncate text-lg font-semibold">
-            {motoIdentificador(moto)}
-          </p>
+          <p className="truncate text-xl font-bold tracking-wide">{titulo}</p>
           <span
             className={cn(
               "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium",
@@ -144,11 +146,27 @@ function MotoCard({ moto }: { moto: MotoRow }) {
             {CONDICION_LABELS[moto.condicion]}
           </span>
         </div>
-        <p className="text-xs text-neutral-500">
-          {moto.placa?.trim() ? "Con placa" : "Número de serie"}
-        </p>
+        {!placa && moto.numero_serie?.trim() ? (
+          <p className="text-xs text-neutral-500">Número de serie</p>
+        ) : null}
+        {moto.aliado?.trim() ? (
+          <p className="truncate text-base font-medium text-neutral-900">
+            {moto.aliado.trim()}
+          </p>
+        ) : null}
+        {moto.pagos != null ? (
+          <p className="text-sm text-neutral-600">
+            {moto.pagos} día{moto.pagos === 1 ? "" : "s"} pagado
+            {moto.pagos === 1 ? "" : "s"}
+          </p>
+        ) : null}
+        {moto.veces_vendida != null && moto.veces_vendida > 0 ? (
+          <p className="text-sm text-neutral-600">
+            Vendida {moto.veces_vendida} vez{moto.veces_vendida === 1 ? "" : "es"}
+          </p>
+        ) : null}
         {moto.notas?.trim() ? (
-          <p className="line-clamp-4 text-sm text-neutral-600">
+          <p className="line-clamp-3 text-sm text-neutral-500">
             {moto.notas.trim()}
           </p>
         ) : null}
