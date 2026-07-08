@@ -162,7 +162,8 @@ function MotoCard({ moto }: { moto: MotoRow }) {
         ) : null}
         {moto.veces_vendida != null && moto.veces_vendida > 0 ? (
           <p className="text-sm text-neutral-600">
-            Vendida {moto.veces_vendida} vez{moto.veces_vendida === 1 ? "" : "es"}
+            Vendida {moto.veces_vendida}{" "}
+            {moto.veces_vendida === 1 ? "vez" : "veces"}
           </p>
         ) : null}
         {moto.notas?.trim() ? (
