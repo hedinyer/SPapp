@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -94,15 +94,38 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
     [pagosHistorial],
   );
 
+  /** Ventana: 10 pagadas hacia atrás + 10 pendientes/vencidas hacia adelante. */
   const visibleTarifas = useMemo(() => {
-    const pending = tarifas.filter((t) => t.estado !== "pagada");
+    const unpaid = tarifas.filter((t) => t.estado !== "pagada");
     const recentPaid = tarifas
       .filter((t) => t.estado === "pagada")
-      .slice(-3);
-    return [...pending.slice(0, 10), ...recentPaid].sort(
+      .slice(-10);
+    return [...recentPaid, ...unpaid.slice(0, 10)].sort(
       (a, b) => a.numero_periodo - b.numero_periodo,
     );
   }, [tarifas]);
+
+  const currentTarifaId = useMemo(() => {
+    const current = tarifas.find((t) => t.estado !== "pagada");
+    return current?.id ?? null;
+  }, [tarifas]);
+
+  useEffect(() => {
+    if (!currentTarifaId) return;
+    const desktop = document.getElementById(
+      `tarifa-desktop-${currentTarifaId}`,
+    );
+    const mobile = document.getElementById(`tarifa-mobile-${currentTarifaId}`);
+    const el =
+      [desktop, mobile].find((node) => node && node.offsetParent !== null) ??
+      desktop ??
+      mobile;
+    el?.scrollIntoView({
+      block: "center",
+      inline: "nearest",
+      behavior: "instant",
+    });
+  }, [currentTarifaId, visibleTarifas]);
 
   if (!compra || (compra.estado !== "entregada" && compra.estado !== "saldada")) {
     return null;
@@ -331,9 +354,9 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
             </p>
           ) : (
             <>
-              <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+              <div className="hidden max-h-[28rem] overflow-auto rounded-lg border border-neutral-200 lg:block">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgb(229_229_229)]">
                     <TableRow>
                       <TableHead>#</TableHead>
                       <TableHead>Vencimiento</TableHead>
@@ -347,7 +370,15 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                   </TableHeader>
                   <TableBody>
                     {visibleTarifas.map((tarifa) => (
-                      <TableRow key={tarifa.id}>
+                      <TableRow
+                        key={tarifa.id}
+                        id={`tarifa-desktop-${tarifa.id}`}
+                        className={
+                          tarifa.id === currentTarifaId
+                            ? "bg-amber-50/80"
+                            : undefined
+                        }
+                      >
                         <TableCell>{tarifa.numero_periodo}</TableCell>
                         <TableCell>
                           {formatDateOnly(tarifa.fecha_vencimiento)}
@@ -410,11 +441,16 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                   </TableBody>
                 </Table>
               </div>
-              <div className="space-y-3 lg:hidden">
+              <div className="max-h-[28rem] space-y-3 overflow-y-auto lg:hidden">
                 {visibleTarifas.map((tarifa) => (
                   <div
                     key={tarifa.id}
-                    className="rounded-lg border border-neutral-200 p-4 text-sm"
+                    id={`tarifa-mobile-${tarifa.id}`}
+                    className={`rounded-lg border border-neutral-200 p-4 text-sm ${
+                      tarifa.id === currentTarifaId
+                        ? "border-amber-300 bg-amber-50/80"
+                        : ""
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-medium">
