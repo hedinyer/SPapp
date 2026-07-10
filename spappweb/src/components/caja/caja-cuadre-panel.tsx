@@ -18,6 +18,16 @@ import { CajaInformePanel } from "@/components/caja/caja-informe-panel";
 import { CajaPagosPanel } from "@/components/caja/caja-pagos-panel";
 import { CajaVisitasPanel } from "@/components/caja/caja-visitas-panel";
 import { formatCop, formatDate } from "@/lib/utils/format";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,26 +107,37 @@ export function CajaCuadrePanel({
   const [movMonto, setMovMonto] = useState("");
   const [movConcepto, setMovConcepto] = useState("");
   const [informeOpen, setInformeOpen] = useState(false);
+  const [confirmAbrirOpen, setConfirmAbrirOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     setSesion(initialSesion);
   }, [initialSesion]);
 
-  const puedeAbrir = useMemo(
-    () => parseCopInput(montoApertura) != null,
+  const montoAperturaNum = useMemo(
+    () => parseCopInput(montoApertura),
     [montoApertura],
   );
+
+  const puedeAbrir = montoAperturaNum != null && montoAperturaNum > 0;
 
   const puedeCerrar = useMemo(
     () => sesion?.abierta && parseCopInput(montoCierre) != null,
     [sesion, montoCierre],
   );
 
+  function requestAbrir() {
+    if (montoAperturaNum == null || montoAperturaNum <= 0) {
+      toast.error("El efectivo inicial debe ser mayor a 0.");
+      return;
+    }
+    setConfirmAbrirOpen(true);
+  }
+
   function handleAbrir() {
     const monto = parseCopInput(montoApertura);
-    if (monto == null) {
-      toast.error("Indica el monto de apertura.");
+    if (monto == null || monto <= 0) {
+      toast.error("El efectivo inicial debe ser mayor a 0.");
       return;
     }
     startTransition(async () => {
@@ -128,6 +149,7 @@ export function CajaCuadrePanel({
         setSesion(next);
         setMontoApertura("");
         setNotasApertura("");
+        setConfirmAbrirOpen(false);
         toast.success("Caja abierta.");
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "No se pudo abrir la caja.");
@@ -234,7 +256,8 @@ export function CajaCuadrePanel({
         {!sesion ? (
           <div className="space-y-3">
             <p className="text-sm text-neutral-600">
-              Registra cuánto efectivo hay en caja al comenzar el día.
+              Registra cuánto efectivo hay en caja al comenzar el día. El monto
+              debe ser mayor a 0.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
@@ -242,7 +265,7 @@ export function CajaCuadrePanel({
                 <Input
                   id="caja-apertura-monto"
                   inputMode="numeric"
-                  placeholder="0"
+                  placeholder="Ej. 200000"
                   value={montoApertura}
                   onChange={(e) => setMontoApertura(e.target.value)}
                 />
@@ -261,7 +284,7 @@ export function CajaCuadrePanel({
               type="button"
               className="gap-2 bg-black text-white hover:bg-neutral-800"
               disabled={!puedeAbrir || pending}
-              onClick={handleAbrir}
+              onClick={requestAbrir}
             >
               <Unlock className="h-4 w-4" />
               {pending ? "Abriendo…" : "Abrir caja"}
@@ -429,6 +452,41 @@ export function CajaCuadrePanel({
           </>
         )}
       </CardContent>
+
+      <AlertDialog open={confirmAbrirOpen} onOpenChange={setConfirmAbrirOpen}>
+        <AlertDialogContent className="border-2 border-amber-400 bg-amber-50 sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center text-lg text-amber-950">
+              ¿El efectivo inicial es correcto?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-amber-900">
+              Mira bien el valor antes de abrir la caja. Si está mal, el cuadre
+              del día saldrá errado.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 text-center">
+            <p className="caja-monto-blink rounded-xl px-4 py-5 text-3xl font-black tabular-nums tracking-tight sm:text-4xl">
+              {formatCop(montoAperturaNum ?? 0)}
+            </p>
+            <p className="text-xs font-medium uppercase tracking-wide text-amber-800">
+              Confirma solo si contaste este efectivo
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Revisar monto</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={pending}
+              className="bg-amber-600 text-white hover:bg-amber-700"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAbrir();
+              }}
+            >
+              {pending ? "Abriendo…" : "Sí, es correcto — abrir caja"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={informeOpen} onOpenChange={setInformeOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto bg-white sm:max-w-lg">

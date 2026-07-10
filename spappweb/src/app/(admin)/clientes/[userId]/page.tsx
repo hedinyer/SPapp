@@ -49,7 +49,7 @@ export default async function ClientPage({
         <ClientHeaderActions pipeline={pipeline} />
       </div>
 
-      <ClientInfoSummary pipeline={pipeline} />
+      <ClientInfoSummary pipeline={pipeline} bikes={bikes} />
 
       <ClientPipelineView
         pipeline={pipeline}

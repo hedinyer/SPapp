@@ -142,4 +142,25 @@
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
   }
+  .caja-monto-blink {
+    animation: caja-monto-blink 0.7s ease-in-out infinite;
+  }
+}
+
+@keyframes caja-monto-blink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgb(245 158 11 / 0.7);
+    background-color: rgb(254 243 199);
+    color: rgb(146 64 14);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.04);
+    box-shadow: 0 0 0 10px rgb(245 158 11 / 0);
+    background-color: rgb(251 191 36);
+    color: rgb(120 53 15);
+  }
 }

@@ -1,0 +1,7 @@
+node_modules/
+.next/
+data/*.geojson
+data/*.sqlite
+data/dane/*.csv
+!data/.gitkeep
+!data/dane/.gitkeep

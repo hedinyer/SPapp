@@ -2,22 +2,26 @@
 
 import { Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import type { DigitalContractRow, UserMotoCompraRow } from "@/lib/pipeline/types";
-import { FRECUENCIA_LABELS } from "@/lib/pipeline/types";
+import type { DigitalContractRow, PagoRow, UserMotoCompraRow } from "@/lib/pipeline/types";
 import { formatCop } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FrecuenciaPagoEditor } from "@/components/pipeline/frecuencia-pago-editor";
 import { getSiteUrl } from "@/lib/utils/site-url";
 
 interface ContractSharePanelProps {
   contract: DigitalContractRow;
   compra: UserMotoCompraRow;
+  userId: number;
+  pagos?: PagoRow[];
   clienteCelular?: string | null;
 }
 
 export function ContractSharePanel({
   contract,
   compra,
+  userId,
+  pagos = [],
   clienteCelular,
 }: ContractSharePanelProps) {
   const link = `${getSiteUrl()}/contrato/${contract.id}`;
@@ -60,7 +64,14 @@ export function ContractSharePanel({
           </div>
           <div>
             <dt className="text-neutral-500">Frecuencia</dt>
-            <dd>{FRECUENCIA_LABELS[compra.frecuencia_pago]}</dd>
+            <dd>
+              <FrecuenciaPagoEditor
+                compra={compra}
+                userId={userId}
+                pagos={pagos}
+                compact
+              />
+            </dd>
           </div>
           <div className="sm:col-span-2">
             <dt className="text-neutral-500">Total primer pago</dt>

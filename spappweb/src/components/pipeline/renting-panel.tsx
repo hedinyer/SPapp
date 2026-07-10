@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { Copy, Loader2 } from "lucide-react";
+import { Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { markMotoRecogida, resolveMoroso } from "@/lib/actions/admin-actions";
 import {
@@ -23,6 +23,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -73,7 +79,8 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
   const [selectedTarifa, setSelectedTarifa] = useState<TarifaPagadaRow | null>(
     null,
   );
-  const { compra, rentingResumen, tarifas, moroso, recoger, pagosHistorial, atraso } =
+  const [comprobanteUrl, setComprobanteUrl] = useState<string | null>(null);
+  const { compra, rentingResumen, tarifas, moroso, recoger, pagosHistorial, atraso, comprobanteByTarifaId } =
     pipeline;
 
   const mora = getMoraDisplay({ atraso, moroso, recoger, rentingResumen });
@@ -365,21 +372,38 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right" data-export-hide>
-                          {!creditoSaldado && tarifa.estado !== "pagada" ? (
-                            <Button
-                              size="sm"
-                              disabled={pending}
-                              onClick={() => openConfirmDialog(tarifa)}
-                            >
-                              Confirmar pago
-                            </Button>
-                          ) : (
-                            <span className="text-xs text-neutral-500">
-                              {tarifa.pagada_at
-                                ? formatDateOnly(tarifa.pagada_at)
-                                : "—"}
-                            </span>
-                          )}
+                          <div className="flex items-center justify-end gap-1">
+                            {comprobanteByTarifaId[tarifa.id] ? (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-sm"
+                                title="Ver comprobante"
+                                onClick={() =>
+                                  setComprobanteUrl(
+                                    comprobanteByTarifaId[tarifa.id],
+                                  )
+                                }
+                              >
+                                <FileText className="h-4 w-4" />
+                              </Button>
+                            ) : null}
+                            {!creditoSaldado && tarifa.estado !== "pagada" ? (
+                              <Button
+                                size="sm"
+                                disabled={pending}
+                                onClick={() => openConfirmDialog(tarifa)}
+                              >
+                                Confirmar pago
+                              </Button>
+                            ) : (
+                              <span className="text-xs text-neutral-500">
+                                {tarifa.pagada_at
+                                  ? formatDateOnly(tarifa.pagada_at)
+                                  : "—"}
+                              </span>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -434,11 +458,33 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                       >
                         Confirmar pago
                       </Button>
-                    ) : tarifa.pagada_at ? (
-                      <p className="mt-3 text-xs text-neutral-500">
-                        Pagada el {formatDateOnly(tarifa.pagada_at)}
-                      </p>
-                    ) : null}
+                    ) : (
+                      <div
+                        className="mt-3 flex items-center justify-between gap-2"
+                        data-export-hide
+                      >
+                        {tarifa.pagada_at ? (
+                          <p className="text-xs text-neutral-500">
+                            Pagada el {formatDateOnly(tarifa.pagada_at)}
+                          </p>
+                        ) : (
+                          <span />
+                        )}
+                        {comprobanteByTarifaId[tarifa.id] ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setComprobanteUrl(comprobanteByTarifaId[tarifa.id])
+                            }
+                          >
+                            <FileText className="h-4 w-4" />
+                            Comprobante
+                          </Button>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -570,6 +616,27 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
           referenciasUsadas={referenciasUsadas}
         />
       )}
+
+      <Dialog
+        open={Boolean(comprobanteUrl)}
+        onOpenChange={(open) => {
+          if (!open) setComprobanteUrl(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Comprobante de pago</DialogTitle>
+          </DialogHeader>
+          {comprobanteUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={comprobanteUrl}
+              alt="Comprobante de pago de la cuota"
+              className="max-h-[70dvh] w-full rounded-lg object-contain"
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

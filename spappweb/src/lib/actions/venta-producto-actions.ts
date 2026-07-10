@@ -54,6 +54,15 @@ export interface VentaProductoRow {
   notas: string | null;
   createdAt: string;
   items: VentaProductoItemRow[];
+  /** Selfie del cliente renting (si se resolvió por placa/celular). */
+  clienteSelfieUrl: string | null;
+  /** Foto de catálogo de la moto asociada. */
+  motoImagenUrl: string | null;
+  motoPlaca: string | null;
+  motoModelo: string | null;
+  motoColor: string | null;
+  /** Nombre real del cliente si clienteNombre era la placa. */
+  clienteNombreReal: string | null;
 }
 
 interface ResolvedLine {
@@ -98,7 +107,171 @@ function toVentaRow(
     notas: raw.notas ? String(raw.notas) : null,
     createdAt: String(raw.created_at),
     items,
+    clienteSelfieUrl: null,
+    motoImagenUrl: null,
+    motoPlaca: null,
+    motoModelo: null,
+    motoColor: null,
+    clienteNombreReal: null,
   };
+}
+
+function normalizePlaca(value: string): string {
+  return value.replace(/[\s-]/g, "").toUpperCase();
+}
+
+function looksLikePlaca(value: string): boolean {
+  return /^[A-Z]{3}\d{2}[A-Z0-9]?$/i.test(normalizePlaca(value));
+}
+
+function normalizeCelular(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+function hojaNombre(hoja: Record<string, unknown> | null | undefined): string | null {
+  if (!hoja) return null;
+  const completo = hoja.nombre_completo;
+  if (typeof completo === "string" && completo.trim()) return completo.trim();
+  const nombres = typeof hoja.nombres === "string" ? hoja.nombres.trim() : "";
+  const apellidos = typeof hoja.apellidos === "string" ? hoja.apellidos.trim() : "";
+  const joined = `${nombres} ${apellidos}`.trim();
+  return joined || null;
+}
+
+async function enrichVentasConClienteMoto(
+  supabase: ReturnType<typeof createAdminClient>,
+  ventas: VentaProductoRow[],
+): Promise<VentaProductoRow[]> {
+  if (ventas.length === 0) return ventas;
+
+  const plates = [
+    ...new Set(
+      ventas
+        .map((v) => normalizePlaca(v.clienteNombre))
+        .filter((p) => looksLikePlaca(p)),
+    ),
+  ];
+
+  const { data: comprasRaw } = await supabase
+    .from("user_moto_compra")
+    .select("placa, modelo, color, user_id, bike_id, bike_table(imagen_url)")
+    .in("estado", ["entregada", "saldada"])
+    .not("placa", "is", null);
+
+  const compraByPlaca = new Map<
+    string,
+    {
+      placa: string;
+      modelo: string;
+      color: string;
+      userId: number;
+      motoImagenUrl: string | null;
+    }
+  >();
+
+  for (const row of comprasRaw ?? []) {
+    const placa = row.placa ? normalizePlaca(String(row.placa)) : "";
+    if (!placa) continue;
+    const bike = row.bike_table as { imagen_url?: string | null } | null;
+    compraByPlaca.set(placa, {
+      placa,
+      modelo: String(row.modelo ?? ""),
+      color: String(row.color ?? ""),
+      userId: Number(row.user_id),
+      motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
+    });
+  }
+
+  type CompraMatch = {
+    placa: string;
+    modelo: string;
+    color: string;
+    userId: number;
+    motoImagenUrl: string | null;
+  };
+
+  const compraByUserId = new Map<number, CompraMatch>();
+  for (const c of compraByPlaca.values()) {
+    if (!compraByUserId.has(c.userId)) compraByUserId.set(c.userId, c);
+  }
+
+  const userIds = new Set<number>();
+  for (const plate of plates) {
+    const c = compraByPlaca.get(plate);
+    if (c) userIds.add(c.userId);
+  }
+
+  // También por celular cuando el nombre no es placa
+  const celulares = [
+    ...new Set(
+      ventas
+        .filter((v) => !looksLikePlaca(v.clienteNombre))
+        .map((v) => normalizeCelular(v.clienteCelular))
+        .filter((c) => c.length >= 10),
+    ),
+  ];
+
+  const userIdByCelular = new Map<string, number>();
+  if (celulares.length > 0) {
+    const { data: visitas } = await supabase
+      .from("visitas")
+      .select("user_id, cliente_celular")
+      .not("cliente_celular", "is", null)
+      .limit(2000);
+    for (const v of visitas ?? []) {
+      const cel = normalizeCelular(String(v.cliente_celular ?? ""));
+      if (celulares.includes(cel) && v.user_id != null) {
+        userIdByCelular.set(cel, Number(v.user_id));
+        userIds.add(Number(v.user_id));
+      }
+    }
+  }
+
+  const selfieByUser = new Map<number, string>();
+  const nombreByUser = new Map<number, string>();
+  if (userIds.size > 0) {
+    const ids = [...userIds];
+    const [{ data: docs }, { data: contracts }] = await Promise.all([
+      supabase
+        .from("users_documents")
+        .select("user_id, selfie_url")
+        .in("user_id", ids),
+      supabase
+        .from("digital_contracts")
+        .select("user_id, hoja_vida_data")
+        .in("user_id", ids)
+        .eq("status", "firmado"),
+    ]);
+    for (const d of docs ?? []) {
+      if (d.selfie_url) selfieByUser.set(Number(d.user_id), String(d.selfie_url));
+    }
+    for (const c of contracts ?? []) {
+      const nombre = hojaNombre(c.hoja_vida_data as Record<string, unknown> | null);
+      if (nombre) nombreByUser.set(Number(c.user_id), nombre);
+    }
+  }
+
+  return ventas.map((venta) => {
+    const placaKey = normalizePlaca(venta.clienteNombre);
+    let match: CompraMatch | undefined = looksLikePlaca(placaKey)
+      ? compraByPlaca.get(placaKey)
+      : undefined;
+    if (!match) {
+      const uid = userIdByCelular.get(normalizeCelular(venta.clienteCelular));
+      if (uid != null) match = compraByUserId.get(uid);
+    }
+    if (!match) return venta;
+
+    return {
+      ...venta,
+      clienteSelfieUrl: selfieByUser.get(match.userId) ?? null,
+      motoImagenUrl: match.motoImagenUrl,
+      motoPlaca: match.placa,
+      motoModelo: match.modelo || null,
+      motoColor: match.color || null,
+      clienteNombreReal: nombreByUser.get(match.userId) ?? null,
+    };
+  });
 }
 
 export async function listVentasProductoHistorial(
@@ -117,7 +290,7 @@ export async function listVentasProductoHistorial(
 
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((raw) => {
+  const ventas = (data ?? []).map((raw) => {
     const rawItems =
       (raw.venta_producto_items as Record<string, unknown>[] | null) ?? [];
     const items = rawItems.map((item) => {
@@ -131,6 +304,8 @@ export async function listVentasProductoHistorial(
     });
     return toVentaRow(raw as Record<string, unknown>, items);
   });
+
+  return enrichVentasConClienteMoto(supabase, ventas);
 }
 
 export async function saveVentaProducto(

@@ -10,9 +10,11 @@ import { ClientesSearchResults } from "@/components/clientes/clientes-search-res
 export function ClientesSearchLive({
   initialQuery,
   initialResults,
+  creditClients,
 }: {
   initialQuery: string;
   initialResults: ClientSearchResult[];
+  creditClients: ClientSearchResult[];
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState(initialResults);
@@ -85,6 +87,14 @@ export function ClientesSearchLive({
 
       {activeQuery.trim().length >= 2 && (
         <ClientesSearchResults results={results} query={activeQuery.trim()} />
+      )}
+
+      {trimmed.length < 2 && (
+        <ClientesSearchResults
+          results={creditClients}
+          query=""
+          listTitle={`${creditClients.length} cliente${creditClients.length === 1 ? "" : "s"} con moto a crédito · mayor atraso primero`}
+        />
       )}
 
       {trimmed.length >= 2 && activeQuery.trim().length < 2 && pending && (

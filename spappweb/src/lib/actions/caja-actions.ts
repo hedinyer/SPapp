@@ -425,7 +425,7 @@ export async function getCajaSesionHoy(): Promise<CajaSesionState | null> {
 }
 
 const aperturaSchema = z.object({
-  montoApertura: z.number().int().nonnegative(),
+  montoApertura: z.number().int().positive("El efectivo inicial debe ser mayor a 0."),
   notas: z.string().trim().optional(),
 });
 

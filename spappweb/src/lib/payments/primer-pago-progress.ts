@@ -65,6 +65,23 @@ export function puedeEditarAbonoConcepto(
   return false;
 }
 
+export function puedeEditarFrecuenciaPago(
+  compra: UserMotoCompraRow,
+  pagos: PagoRow[],
+): boolean {
+  if (
+    compra.estado === "entregada" ||
+    compra.estado === "saldada" ||
+    compra.estado === "cancelada"
+  ) {
+    return false;
+  }
+  if (compra.estado !== "pendiente_pago") return false;
+  if (compra.pago_cuota_confirmado) return false;
+  if (conceptoCompleto(compra, pagos, "cuota_adelantada")) return false;
+  return true;
+}
+
 export function puedeEditarMontoVisita(
   compra: UserMotoCompraRow,
   pagos: PagoRow[],

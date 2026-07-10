@@ -340,6 +340,8 @@ export interface ClientPipeline {
   rentingResumen: RentingResumen | null;
   pagosHistorial: PagoHistorialRow[];
   pagos: PagoRow[];
+  /** tarifa_id → URL del comprobante de pago (si se subió foto). */
+  comprobanteByTarifaId: Record<string, string>;
   compraProductosCredito: CompraProductoCreditoRow[];
   steps: PipelineStep[];
   currentAdminStep: PipelineStepId | null;
@@ -398,7 +400,11 @@ export interface ClientSearchResult {
   motoLabel: string | null;
   compraEstado: MotoCompraEstado | null;
   cuotasPagadas: number;
+  diasAtraso: number;
   matchLabel: string;
+  seleccionadoAt: string | null;
+  selfieUrl: string | null;
+  motoImagenUrl: string | null;
 }
 
 export interface BikeRow {

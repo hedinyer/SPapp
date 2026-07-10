@@ -199,10 +199,26 @@ export async function getClientPipeline(
     (atrasoRow as AtrasoSnapshot | null) ?? null,
   );
 
+  const pagoRows = (pagos as PagoRow[]) ?? [];
+
   const pagosHistorial = buildPagosHistorial(
     compra as UserMotoCompraRow | null,
-    (pagos as PagoRow[]) ?? [],
+    pagoRows,
     tarifaRows,
+  );
+
+  const pagoIds = pagoRows.map((p) => p.id);
+  const { data: aplicaciones } =
+    pagoIds.length > 0
+      ? await supabase
+          .from("pago_tarifa_aplicaciones")
+          .select("pago_id, tarifa_id")
+          .in("pago_id", pagoIds)
+      : { data: [] };
+
+  const comprobanteByTarifaId = buildComprobanteByTarifa(
+    pagoRows,
+    (aplicaciones as { pago_id: string; tarifa_id: string }[]) ?? [],
   );
 
   const { data: compraProductosCredito } = compra
@@ -229,10 +245,33 @@ export async function getClientPipeline(
     congelamiento,
     rentingResumen,
     pagosHistorial,
-    pagos: (pagos as PagoRow[]) ?? [],
+    pagos: pagoRows,
+    comprobanteByTarifaId,
     compraProductosCredito:
       (compraProductosCredito as CompraProductoCreditoRow[]) ?? [],
   });
+}
+
+function buildComprobanteByTarifa(
+  pagos: PagoRow[],
+  aplicaciones: { pago_id: string; tarifa_id: string }[],
+): Record<string, string> {
+  const urlByPago = new Map<string, string>();
+  for (const pago of pagos) {
+    if (pago.comprobante_url) urlByPago.set(pago.id, pago.comprobante_url);
+  }
+
+  const out: Record<string, string> = {};
+  for (const pago of pagos) {
+    if (pago.tarifa_objetivo_id && pago.comprobante_url) {
+      out[pago.tarifa_objetivo_id] = pago.comprobante_url;
+    }
+  }
+  for (const app of aplicaciones) {
+    const url = urlByPago.get(app.pago_id);
+    if (url) out[app.tarifa_id] = url;
+  }
+  return out;
 }
 
 const MS_POR_DIA = 1000 * 60 * 60 * 24;
@@ -1039,19 +1078,24 @@ export async function searchClients(
   const userIds = [...matchLabels.keys()];
   if (userIds.length === 0) return [];
 
-  const [{ data: users }, { data: paidTarifas }] = await Promise.all([
-    supabase
-      .from("users")
-      .select(
-        "id, user, user_moto_compra(modelo, color, placa, estado), visitas(cliente_nombre), digital_contracts(hoja_vida_data, contrato_data, created_at)",
-      )
-      .in("id", userIds),
-    supabase
-      .from("tarifas_pagadas")
-      .select("user_id")
-      .in("user_id", userIds)
-      .eq("estado", "pagada"),
-  ]);
+  const [{ data: users }, { data: paidTarifas }, { data: atrasos }] =
+    await Promise.all([
+      supabase
+        .from("users")
+        .select(
+          "id, user, users_documents(selfie_url), user_moto_compra(id, modelo, color, placa, estado, bike_table(imagen_url)), visitas(cliente_nombre), digital_contracts(hoja_vida_data, contrato_data, created_at)",
+        )
+        .in("id", userIds),
+      supabase
+        .from("tarifas_pagadas")
+        .select("user_id")
+        .in("user_id", userIds)
+        .eq("estado", "pagada"),
+      supabase
+        .from("atrasos")
+        .select("user_id, dias_atraso")
+        .in("user_id", userIds),
+    ]);
 
   const paidCount = new Map<number, number>();
   for (const row of paidTarifas ?? []) {
@@ -1059,22 +1103,35 @@ export async function searchClients(
     paidCount.set(id, (paidCount.get(id) ?? 0) + 1);
   }
 
+  const diasByUser = new Map<number, number>();
+  for (const row of atrasos ?? []) {
+    diasByUser.set(row.user_id as number, Number(row.dias_atraso) || 0);
+  }
+
   const results: ClientSearchResult[] = (users ?? []).map((raw) => {
     const user = raw as {
       id: number;
       user: string;
+      users_documents:
+        | { selfie_url: string | null }
+        | { selfie_url: string | null }[]
+        | null;
       user_moto_compra:
         | {
+            id: string;
             modelo: string;
             color: string;
             placa: string | null;
             estado: ClientSearchResult["compraEstado"];
+            bike_table: { imagen_url: string | null } | { imagen_url: string | null }[] | null;
           }
         | {
+            id: string;
             modelo: string;
             color: string;
             placa: string | null;
             estado: ClientSearchResult["compraEstado"];
+            bike_table: { imagen_url: string | null } | { imagen_url: string | null }[] | null;
           }[]
         | null;
       visitas: { cliente_nombre: string | null } | { cliente_nombre: string | null }[] | null;
@@ -1094,6 +1151,11 @@ export async function searchClients(
 
     const compraRaw = user.user_moto_compra;
     const compra = Array.isArray(compraRaw) ? compraRaw[0] : compraRaw;
+    const bikeRaw = compra?.bike_table;
+    const bike = Array.isArray(bikeRaw) ? bikeRaw[0] : bikeRaw;
+
+    const docRaw = user.users_documents;
+    const doc = Array.isArray(docRaw) ? docRaw[0] : docRaw;
 
     const visitaRaw = user.visitas;
     const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
@@ -1133,13 +1195,156 @@ export async function searchClients(
       motoLabel: compra ? `${compra.modelo} · ${compra.color}` : null,
       compraEstado: compra?.estado ?? null,
       cuotasPagadas: paidCount.get(user.id) ?? 0,
+      diasAtraso: diasByUser.get(user.id) ?? 0,
       matchLabel: matchLabels.get(user.id) ?? "—",
+      seleccionadoAt: null,
+      selfieUrl: doc?.selfie_url ? String(doc.selfie_url) : null,
+      motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
     };
   });
 
   return results.sort((a, b) =>
     a.displayName.localeCompare(b.displayName, "es"),
   );
+}
+
+export async function listClientesMotoCredito(
+  limit = 200,
+): Promise<ClientSearchResult[]> {
+  const supabase = createAdminClient();
+
+  const { data: compras, error } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "id, modelo, color, placa, estado, seleccionado_at, user_id, bike_table(imagen_url), users(id, user, users_documents(selfie_url), visitas(cliente_nombre), digital_contracts(hoja_vida_data, contrato_data, created_at))",
+    )
+    .neq("estado", "cancelada")
+    .order("seleccionado_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  if (!compras?.length) return [];
+
+  const userIds = compras.map((row) => row.user_id as number);
+  const compraIds = compras.map((row) => row.id as string);
+
+  const [{ data: paidTarifas }, { data: atrasos }] = await Promise.all([
+    supabase
+      .from("tarifas_pagadas")
+      .select("user_id")
+      .in("user_id", userIds)
+      .eq("estado", "pagada"),
+    supabase
+      .from("atrasos")
+      .select("user_moto_compra_id, dias_atraso")
+      .in("user_moto_compra_id", compraIds),
+  ]);
+
+  const paidCount = new Map<number, number>();
+  for (const row of paidTarifas ?? []) {
+    const id = row.user_id as number;
+    paidCount.set(id, (paidCount.get(id) ?? 0) + 1);
+  }
+
+  const diasByCompra = new Map<string, number>();
+  for (const row of atrasos ?? []) {
+    diasByCompra.set(
+      row.user_moto_compra_id as string,
+      Number(row.dias_atraso) || 0,
+    );
+  }
+
+  const results = compras.map((raw) => {
+    const compra = raw as {
+      id: string;
+      modelo: string;
+      color: string;
+      placa: string | null;
+      estado: ClientSearchResult["compraEstado"];
+      seleccionado_at: string;
+      user_id: number;
+      bike_table: { imagen_url: string | null } | { imagen_url: string | null }[] | null;
+      users: {
+        id: number;
+        user: string;
+        users_documents:
+          | { selfie_url: string | null }
+          | { selfie_url: string | null }[]
+          | null;
+        visitas:
+          | { cliente_nombre: string | null }
+          | { cliente_nombre: string | null }[]
+          | null;
+        digital_contracts:
+          | {
+              hoja_vida_data: Record<string, unknown>;
+              contrato_data: Record<string, unknown>;
+              created_at: string;
+            }
+          | {
+              hoja_vida_data: Record<string, unknown>;
+              contrato_data: Record<string, unknown>;
+              created_at: string;
+            }[]
+          | null;
+      };
+    };
+
+    const user = compra.users;
+    const visitaRaw = user.visitas;
+    const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
+    const docRaw = user.users_documents;
+    const doc = Array.isArray(docRaw) ? docRaw[0] : docRaw;
+    const bikeRaw = compra.bike_table;
+    const bike = Array.isArray(bikeRaw) ? bikeRaw[0] : bikeRaw;
+
+    const contractsRaw = user.digital_contracts;
+    const contracts = Array.isArray(contractsRaw)
+      ? contractsRaw
+      : contractsRaw
+        ? [contractsRaw]
+        : [];
+    const latestContract = contracts.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )[0];
+
+    const hoja = latestContract?.hoja_vida_data ?? null;
+    const contrato = latestContract?.contrato_data ?? null;
+    const cedula =
+      (hoja?.numero_identificacion as string | undefined)?.trim() ||
+      (contrato?.cedula_contratante as string | undefined)?.trim() ||
+      null;
+
+    const nombreFromHoja = hoja?.nombre_completo as string | undefined;
+    const displayName =
+      nombreFromHoja?.trim() ||
+      visita?.cliente_nombre?.trim() ||
+      user.user;
+
+    return {
+      userId: user.id,
+      username: user.user,
+      displayName,
+      cedula,
+      placa: compra.placa,
+      motoLabel: `${compra.modelo} · ${compra.color}`,
+      compraEstado: compra.estado,
+      cuotasPagadas: paidCount.get(user.id) ?? 0,
+      diasAtraso: diasByCompra.get(compra.id) ?? 0,
+      matchLabel: "",
+      seleccionadoAt: compra.seleccionado_at,
+      selfieUrl: doc?.selfie_url ? String(doc.selfie_url) : null,
+      motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
+    };
+  });
+
+  return results.sort((a, b) => {
+    if (b.diasAtraso !== a.diasAtraso) return b.diasAtraso - a.diasAtraso;
+    const aAt = a.seleccionadoAt ? new Date(a.seleccionadoAt).getTime() : 0;
+    const bAt = b.seleccionadoAt ? new Date(b.seleccionadoAt).getTime() : 0;
+    return bAt - aAt;
+  });
 }
 
 export async function getClienteFacturacion(

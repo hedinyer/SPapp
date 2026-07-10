@@ -81,6 +81,8 @@ export function ClientPipelineView({
             <ContractSharePanel
               contract={pipeline.contract!}
               compra={pipeline.compra!}
+              userId={userId}
+              pagos={pipeline.pagos}
               clienteCelular={clienteCelular}
             />
           )}

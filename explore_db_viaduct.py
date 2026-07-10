@@ -10,9 +10,10 @@ load_dotenv()
 
 def get_connection():
     """Conexión por DATABASE_URL_VIADUCT o parámetros sueltos (mismo patrón que db_general)."""
+    connect_timeout = int(os.getenv("PGCONNECT_TIMEOUT", "10"))
     url = os.getenv("DATABASE_URL_VIADUCT", "").strip()
     if url:
-        return psycopg2.connect(url)
+        return psycopg2.connect(url, connect_timeout=connect_timeout)
     return psycopg2.connect(
         host=os.getenv("DB_VIADUCT_HOST", db_viaduct_defaults.DB_HOST),
         port=os.getenv("DB_VIADUCT_PORT", db_viaduct_defaults.DB_PORT),
@@ -21,6 +22,7 @@ def get_connection():
         password=os.getenv(
             "DB_VIADUCT_PASSWORD", db_viaduct_defaults.DB_PASSWORD
         ),
+        connect_timeout=connect_timeout,
     )
 
 

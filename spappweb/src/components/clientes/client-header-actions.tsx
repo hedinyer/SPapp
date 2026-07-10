@@ -173,9 +173,11 @@ function CongelarCuotasDialog({
         <DialogHeader>
           <DialogTitle>Congelar cuotas</DialogTitle>
           <DialogDescription>
-            Se posponen {diasNum > 0 ? diasNum : "X"} días los vencimientos de{" "}
-            {cuotasActivas} cuota{cuotasActivas === 1 ? "" : "s"} pendientes o
-            vencidas. No se cobra mora por ese periodo.
+            Las {cuotasActivas} cuota{cuotasActivas === 1 ? "" : "s"} pendiente
+            {cuotasActivas === 1 ? "" : "s"} o vencida
+            {cuotasActivas === 1 ? "" : "s"} se corren al día en que termina el
+            congelamiento ({diasNum > 0 ? diasNum : "X"} días). No se cobra mora
+            mientras esté congelado.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">

@@ -18,6 +18,7 @@ import {
   faltanteConcepto,
   montoEsperadoConcepto,
   puedeEditarAbonoConcepto,
+  puedeEditarFrecuenciaPago,
   puedeEditarMontoVisita,
   sumAbonos,
   type PrimerPagoConcepto,
@@ -34,6 +35,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaymentComprobanteDialog } from "@/components/pipeline/payment-comprobante-dialog";
+import { FrecuenciaPagoEditor } from "@/components/pipeline/frecuencia-pago-editor";
 
 interface PaymentConfirmPanelProps {
   compra: UserMotoCompraRow | null;
@@ -78,6 +80,7 @@ export function PaymentConfirmPanel({
   }
 
   const canEditMontoVisita = puedeEditarMontoVisita(compra, pagos);
+  const canEditFrecuencia = puedeEditarFrecuenciaPago(compra, pagos);
   const showVisitaSection =
     compra.monto_visita_monto > 0 || canEditMontoVisita;
 
@@ -110,6 +113,14 @@ export function PaymentConfirmPanel({
               )}
             </p>
           </div>
+
+          {canEditFrecuencia && (
+            <FrecuenciaPagoEditor
+              compra={compra}
+              userId={userId}
+              pagos={pagos}
+            />
+          )}
 
           {canEditMontoVisita && (
             <VisitaMontoEditor

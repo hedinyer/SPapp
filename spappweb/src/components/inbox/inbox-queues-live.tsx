@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bike, ShoppingBag, Store } from "lucide-react";
 import { refreshInboxQueues } from "@/lib/actions/inbox-actions";
@@ -83,12 +84,30 @@ export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) 
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="grid items-start gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
         <div>
           <h1 className="text-xl font-semibold sm:text-2xl">Bandeja</h1>
           <p className="mt-1 text-neutral-500">{pendingSummary(totalPending)}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center justify-center gap-3 sm:gap-4">
+          <Image
+            src="/beralogo.jpg"
+            alt="Bera"
+            width={120}
+            height={48}
+            className="h-10 w-auto object-contain sm:h-12"
+            priority
+          />
+          <Image
+            src="/logosolucionesgarrido.jpg"
+            alt="Soluciones Garrido"
+            width={160}
+            height={48}
+            className="h-10 w-auto object-contain sm:h-12"
+            priority
+          />
+        </div>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           {desktop ? (
             <Button type="button" variant="outline" className="gap-2" asChild>
               <Link href="/caja">

@@ -296,6 +296,7 @@ export function buildClientPipeline(input: {
   rentingResumen?: import("@/lib/pipeline/types").RentingResumen | null;
   pagosHistorial?: import("@/lib/pipeline/types").PagoHistorialRow[];
   pagos?: import("@/lib/pipeline/types").PagoRow[];
+  comprobanteByTarifaId?: Record<string, string>;
   compraProductosCredito?: import("@/lib/pipeline/types").CompraProductoCreditoRow[];
 }): ClientPipeline {
   const steps = buildPipelineSteps(
@@ -315,6 +316,7 @@ export function buildClientPipeline(input: {
     rentingResumen: input.rentingResumen ?? null,
     pagosHistorial: input.pagosHistorial ?? [],
     pagos: input.pagos ?? [],
+    comprobanteByTarifaId: input.comprobanteByTarifaId ?? {},
     compraProductosCredito: input.compraProductosCredito ?? [],
     steps,
     currentAdminStep: detectAdminActionStep(

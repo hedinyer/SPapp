@@ -7,9 +7,14 @@ import { requireAdminSession } from "@/lib/auth/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import {
+  cuotaDiariaFromPeriodo,
+  montoCuotaPeriodo,
+} from "@/lib/moto-payment";
+import {
   faltanteConcepto,
   type PrimerPagoConcepto,
 } from "@/lib/payments/primer-pago-progress";
+import type { FrecuenciaPago } from "@/lib/pipeline/types";
 import { getStoragePublicUrl } from "@/lib/utils/storage-urls";
 import {
   isReferenciaDuplicada,
@@ -496,6 +501,112 @@ export async function updateMontoVisitaCompra(input: {
     .eq("id", parsed.compraId);
 
   if (updateError) throw new Error(updateError.message);
+
+  revalidateClient(parsed.userId);
+  return { ok: true };
+}
+
+export async function updateFrecuenciaPagoCompra(input: {
+  userId: number;
+  compraId: string;
+  frecuencia: FrecuenciaPago;
+}): Promise<{ ok: true }> {
+  const parsed = z
+    .object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      frecuencia: z.enum(["diario", "semanal", "quincenal", "mensual"]),
+    })
+    .parse(input);
+
+  const supabase = await assertAdmin();
+
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "id, user_id, digital_contract_id, estado, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_visita_monto, pago_cuota_confirmado",
+    )
+    .eq("id", parsed.compraId)
+    .eq("user_id", parsed.userId)
+    .maybeSingle();
+
+  if (compraError) throw new Error(compraError.message);
+  if (!compra) throw new Error("Compra no encontrada.");
+  if (compra.estado !== "pendiente_pago") {
+    throw new Error("Solo se puede cambiar la frecuencia antes de confirmar pagos.");
+  }
+  if (compra.pago_cuota_confirmado) {
+    throw new Error("La cuota adelantada ya está confirmada.");
+  }
+  if (compra.frecuencia_pago === parsed.frecuencia) {
+    return { ok: true };
+  }
+
+  const { data: pagos, error: pagosError } = await supabase
+    .from("pagos")
+    .select("monto, contexto_pago, estado")
+    .eq("user_moto_compra_id", parsed.compraId)
+    .eq("contexto_pago", "cuota_adelantada")
+    .eq("estado", "confirmado");
+
+  if (pagosError) throw new Error(pagosError.message);
+
+  const recibidoCuota = (pagos ?? []).reduce((s, p) => s + Number(p.monto), 0);
+  const cuotaDiaria = cuotaDiariaFromPeriodo(
+    Number(compra.monto_cuota_periodo),
+    compra.frecuencia_pago as FrecuenciaPago,
+  );
+  const montoCuotaPeriodoNuevo = montoCuotaPeriodo(
+    cuotaDiaria,
+    parsed.frecuencia,
+  );
+
+  if (montoCuotaPeriodoNuevo < recibidoCuota) {
+    throw new Error(
+      `Ya se recibieron ${recibidoCuota.toLocaleString("es-CO")} por cuota adelantada; el nuevo monto (${montoCuotaPeriodoNuevo.toLocaleString("es-CO")}) no alcanza.`,
+    );
+  }
+
+  const montoTotal =
+    Number(compra.cuota_inicial_monto) +
+    montoCuotaPeriodoNuevo +
+    Number(compra.monto_visita_monto);
+
+  const { error: updateError } = await supabase
+    .from("user_moto_compra")
+    .update({
+      frecuencia_pago: parsed.frecuencia,
+      monto_cuota_periodo: montoCuotaPeriodoNuevo,
+      monto_total_primer_pago: montoTotal,
+    })
+    .eq("id", parsed.compraId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  const contractId = compra.digital_contract_id as string | null;
+  if (contractId) {
+    const { data: contract, error: contractError } = await supabase
+      .from("digital_contracts")
+      .select("admin_data")
+      .eq("id", contractId)
+      .maybeSingle();
+
+    if (contractError) throw new Error(contractError.message);
+
+    const adminData = {
+      ...((contract?.admin_data as Record<string, unknown>) ?? {}),
+      frecuencia_pago: parsed.frecuencia,
+      valor_cuota: montoCuotaPeriodoNuevo,
+      monto_total_primer_pago: montoTotal,
+    };
+
+    const { error: contractUpdateError } = await supabase
+      .from("digital_contracts")
+      .update({ admin_data: adminData })
+      .eq("id", contractId);
+
+    if (contractUpdateError) throw new Error(contractUpdateError.message);
+  }
 
   revalidateClient(parsed.userId);
   return { ok: true };
