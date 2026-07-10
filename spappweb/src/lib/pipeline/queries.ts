@@ -1255,7 +1255,7 @@ export async function listClientesMotoCredito(
   }
 
   const results = compras.map((raw) => {
-    const compra = raw as {
+    const compra = raw as unknown as {
       id: string;
       modelo: string;
       color: string;
@@ -1263,34 +1263,82 @@ export async function listClientesMotoCredito(
       estado: ClientSearchResult["compraEstado"];
       seleccionado_at: string;
       user_id: number;
-      bike_table: { imagen_url: string | null } | { imagen_url: string | null }[] | null;
-      users: {
-        id: number;
-        user: string;
-        users_documents:
-          | { selfie_url: string | null }
-          | { selfie_url: string | null }[]
-          | null;
-        visitas:
-          | { cliente_nombre: string | null }
-          | { cliente_nombre: string | null }[]
-          | null;
-        digital_contracts:
-          | {
-              hoja_vida_data: Record<string, unknown>;
-              contrato_data: Record<string, unknown>;
-              created_at: string;
-            }
-          | {
-              hoja_vida_data: Record<string, unknown>;
-              contrato_data: Record<string, unknown>;
-              created_at: string;
-            }[]
-          | null;
-      };
+      bike_table:
+        | { imagen_url: string | null }
+        | { imagen_url: string | null }[]
+        | null;
+      users:
+        | {
+            id: number;
+            user: string;
+            users_documents:
+              | { selfie_url: string | null }
+              | { selfie_url: string | null }[]
+              | null;
+            visitas:
+              | { cliente_nombre: string | null }
+              | { cliente_nombre: string | null }[]
+              | null;
+            digital_contracts:
+              | {
+                  hoja_vida_data: Record<string, unknown>;
+                  contrato_data: Record<string, unknown>;
+                  created_at: string;
+                }
+              | {
+                  hoja_vida_data: Record<string, unknown>;
+                  contrato_data: Record<string, unknown>;
+                  created_at: string;
+                }[]
+              | null;
+          }
+        | {
+            id: number;
+            user: string;
+            users_documents:
+              | { selfie_url: string | null }
+              | { selfie_url: string | null }[]
+              | null;
+            visitas:
+              | { cliente_nombre: string | null }
+              | { cliente_nombre: string | null }[]
+              | null;
+            digital_contracts:
+              | {
+                  hoja_vida_data: Record<string, unknown>;
+                  contrato_data: Record<string, unknown>;
+                  created_at: string;
+                }
+              | {
+                  hoja_vida_data: Record<string, unknown>;
+                  contrato_data: Record<string, unknown>;
+                  created_at: string;
+                }[]
+              | null;
+          }[]
+        | null;
     };
 
-    const user = compra.users;
+    const usersRaw = compra.users;
+    const user = Array.isArray(usersRaw) ? usersRaw[0] : usersRaw;
+    if (!user) {
+      return {
+        userId: compra.user_id,
+        username: String(compra.user_id),
+        displayName: String(compra.user_id),
+        cedula: null,
+        placa: compra.placa,
+        motoLabel: `${compra.modelo} · ${compra.color}`,
+        compraEstado: compra.estado,
+        cuotasPagadas: paidCount.get(compra.user_id) ?? 0,
+        diasAtraso: diasByCompra.get(compra.id) ?? 0,
+        matchLabel: "",
+        seleccionadoAt: compra.seleccionado_at,
+        selfieUrl: null,
+        motoImagenUrl: null,
+      };
+    }
+
     const visitaRaw = user.visitas;
     const visita = Array.isArray(visitaRaw) ? visitaRaw[0] : visitaRaw;
     const docRaw = user.users_documents;
