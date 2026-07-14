@@ -208,10 +208,10 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
       <Card
         ref={extractRef}
         data-renting-extract
-        className="border-neutral-200 shadow-none"
+       
       >
-        <CardHeader className="space-y-3">
-          <CardTitle className="text-lg">
+        <CardHeader className="flex flex-col gap-3">
+          <CardTitle>
             Cartera de renting
             {creditoSaldado && (
               <Badge className="ml-2 bg-green-700 text-white hover:bg-green-700">
@@ -236,12 +236,12 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
               Copiar extracto de pagos
             </Button>
           </CardAction>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             {compra.modelo} · {compra.color}
             {compra.placa ? ` · Placa ${compra.placa}` : ""}
           </p>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           {rentingResumen && (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Stat label="Total pagado" value={formatCop(rentingResumen.totalPagado)} />
@@ -265,16 +265,16 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
 
           <div className="grid gap-2 text-sm sm:grid-cols-2">
             <p>
-              <span className="text-neutral-500">Frecuencia: </span>
+              <span className="text-muted-foreground">Frecuencia: </span>
               {FRECUENCIA_LABELS[compra.frecuencia_pago]}
             </p>
             <p>
-              <span className="text-neutral-500">Cuota por periodo: </span>
+              <span className="text-muted-foreground">Cuota por periodo: </span>
               {formatCop(compra.monto_cuota_periodo)}
             </p>
             {rentingResumen?.proximoVencimiento && (
               <p>
-                <span className="text-neutral-500">Próximo vencimiento: </span>
+                <span className="text-muted-foreground">Próximo vencimiento: </span>
                 {formatDateOnly(rentingResumen.proximoVencimiento)}
               </p>
             )}
@@ -290,19 +290,19 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
               className={`rounded-lg border p-4 text-sm ${
                 mora.enMoraBandeja
                   ? "border-amber-200 bg-amber-50"
-                  : "border-neutral-200 bg-neutral-50"
+                  : "border-border bg-muted/50"
               }`}
             >
               <p
                 className={`font-medium ${
-                  mora.enMoraBandeja ? "text-amber-900" : "text-neutral-900"
+                  mora.enMoraBandeja ? "text-amber-900" : "text-foreground"
                 }`}
               >
                 {mora.enMoraBandeja ? "Cliente en mora" : "Saldo pendiente"}
               </p>
               <p
                 className={`mt-1 ${
-                  mora.enMoraBandeja ? "text-amber-800" : "text-neutral-700"
+                  mora.enMoraBandeja ? "text-amber-800" : "text-foreground"
                 }`}
               >
                 {mora.dias > 0 ? `${mora.dias} días de atraso · ` : ""}
@@ -348,15 +348,15 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
           )}
 
           {tarifas.length === 0 ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Aún no hay calendario de tarifas. Se genera al marcar la moto como
               entregada.
             </p>
           ) : (
             <>
-              <div className="hidden max-h-[28rem] overflow-auto rounded-lg border border-neutral-200 lg:block">
+              <div className="hidden max-h-[28rem] overflow-auto rounded-lg border border-border lg:block">
                 <Table>
-                  <TableHeader className="sticky top-0 z-10 bg-white shadow-[0_1px_0_0_rgb(229_229_229)]">
+                  <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_1px_0_0_rgb(229_229_229)]">
                     <TableRow>
                       <TableHead>#</TableHead>
                       <TableHead>Vencimiento</TableHead>
@@ -388,7 +388,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                           {tarifaTieneAbono(tarifa) ? (
                             <TarifaPagadoCell tarifa={tarifa} />
                           ) : (
-                            <span className="text-neutral-400">—</span>
+                            <span className="text-muted-foreground">—</span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -428,7 +428,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                                 Confirmar pago
                               </Button>
                             ) : (
-                              <span className="text-xs text-neutral-500">
+                              <span className="text-xs text-muted-foreground">
                                 {tarifa.pagada_at
                                   ? formatDateOnly(tarifa.pagada_at)
                                   : "—"}
@@ -441,12 +441,12 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                   </TableBody>
                 </Table>
               </div>
-              <div className="max-h-[28rem] space-y-3 overflow-y-auto lg:hidden">
+              <div className="max-h-[28rem] flex flex-col gap-3 overflow-y-auto lg:hidden">
                 {visibleTarifas.map((tarifa) => (
                   <div
                     key={tarifa.id}
                     id={`tarifa-mobile-${tarifa.id}`}
-                    className={`rounded-lg border border-neutral-200 p-4 text-sm ${
+                    className={`rounded-lg border border-border p-4 text-sm ${
                       tarifa.id === currentTarifaId
                         ? "border-amber-300 bg-amber-50/80"
                         : ""
@@ -466,18 +466,18 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                         {tarifaEstadoLabel(tarifa)}
                       </Badge>
                     </div>
-                    <dl className="mt-3 space-y-1.5">
+                    <dl className="mt-3 flex flex-col gap-1.5">
                       <div className="flex justify-between gap-2">
-                        <dt className="text-neutral-500">Vencimiento</dt>
+                        <dt className="text-muted-foreground">Vencimiento</dt>
                         <dd>{formatDateOnly(tarifa.fecha_vencimiento)}</dd>
                       </div>
                       <div className="flex justify-between gap-2">
-                        <dt className="text-neutral-500">Monto</dt>
+                        <dt className="text-muted-foreground">Monto</dt>
                         <dd>{formatCop(tarifa.monto_esperado)}</dd>
                       </div>
                       {tarifaTieneAbono(tarifa) && (
                         <div className="flex justify-between gap-2">
-                          <dt className="text-neutral-500">Pagado</dt>
+                          <dt className="text-muted-foreground">Pagado</dt>
                           <dd>
                             <TarifaPagadoCell tarifa={tarifa} />
                           </dd>
@@ -500,7 +500,7 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                         data-export-hide
                       >
                         {tarifa.pagada_at ? (
-                          <p className="text-xs text-neutral-500">
+                          <p className="text-xs text-muted-foreground">
                             Pagada el {formatDateOnly(tarifa.pagada_at)}
                           </p>
                         ) : (
@@ -528,9 +528,9 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
           )}
 
           {pagosHistorial.length > 0 && (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-3">
               <h3 className="text-sm font-medium">Historial de pagos</h3>
-              <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+              <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -579,34 +579,34 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                   </TableBody>
                 </Table>
               </div>
-              <div className="space-y-3 lg:hidden">
+              <div className="flex flex-col gap-3 lg:hidden">
                 {pagosHistorial.map((pago) => (
                   <div
                     key={pago.id}
-                    className="rounded-lg border border-neutral-200 p-4 text-sm"
+                    className="rounded-lg border border-border p-4 text-sm"
                   >
                     <p className="font-medium">{formatDate(pago.fecha)}</p>
-                    <p className="mt-1 text-neutral-500">
+                    <p className="mt-1 text-muted-foreground">
                       {pago.contexto_pago
                         ? pago.numeroPeriodo
                           ? `${CONTEXTO_PAGO_LABELS[pago.contexto_pago]} #${pago.numeroPeriodo}`
                           : CONTEXTO_PAGO_LABELS[pago.contexto_pago]
                         : "—"}
                     </p>
-                    <dl className="mt-3 space-y-1.5">
+                    <dl className="mt-3 flex flex-col gap-1.5">
                       <div className="flex justify-between gap-2">
-                        <dt className="text-neutral-500">Monto</dt>
+                        <dt className="text-muted-foreground">Monto</dt>
                         <dd className="font-medium">{formatCop(pago.monto)}</dd>
                       </div>
                       {pago.montoEsperado != null && (
                         <div className="flex justify-between gap-2">
-                          <dt className="text-neutral-500">Esperado</dt>
+                          <dt className="text-muted-foreground">Esperado</dt>
                           <dd>{formatCop(pago.montoEsperado)}</dd>
                         </div>
                       )}
                       {pago.variacionLabel !== "—" && (
                         <div className="flex justify-between gap-2">
-                          <dt className="text-neutral-500">Variación</dt>
+                          <dt className="text-muted-foreground">Variación</dt>
                           <dd>
                             <VariacionBadge
                               label={pago.variacionLabel}
@@ -617,13 +617,13 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
                       )}
                       {pago.cuotasCubiertas > 0 && (
                         <div className="flex justify-between gap-2">
-                          <dt className="text-neutral-500">Cuotas</dt>
+                          <dt className="text-muted-foreground">Cuotas</dt>
                           <dd>{formatCuotas(pago.cuotasCubiertas)}</dd>
                         </div>
                       )}
                       {pago.referencia && (
                         <div className="flex justify-between gap-2">
-                          <dt className="text-neutral-500">Referencia</dt>
+                          <dt className="text-muted-foreground">Referencia</dt>
                           <dd className="font-mono text-xs">{pago.referencia}</dd>
                         </div>
                       )}
@@ -692,7 +692,7 @@ function TarifaPagadoCell({ tarifa }: { tarifa: TarifaPagadaRow }) {
             ? "text-amber-700"
             : esMayor
               ? "text-blue-700"
-              : "text-neutral-500"
+              : "text-muted-foreground"
         }`}
       >
         {formatCuotas(fraccion)} cuota{fraccion === 1 ? "" : "s"}
@@ -710,7 +710,7 @@ function VariacionBadge({
   tone: "menor" | "mayor" | "exacto";
 }) {
   if (label === "—") {
-    return <span className="text-neutral-400">—</span>;
+    return <span className="text-muted-foreground">—</span>;
   }
 
   const className =
@@ -718,7 +718,7 @@ function VariacionBadge({
       ? "text-amber-800"
       : tone === "mayor"
         ? "text-blue-800"
-        : "text-neutral-600";
+        : "text-muted-foreground";
 
   return <span className={`text-xs ${className}`}>{label}</span>;
 }
@@ -733,10 +733,10 @@ function Stat({
   highlight?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3">
-      <p className="text-xs text-neutral-500">{label}</p>
+    <div className="rounded-lg border border-border bg-muted/50 p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
       <p
-        className={`mt-1 text-lg font-semibold ${highlight ? "text-red-700" : "text-black"}`}
+        className={`mt-1 text-lg font-semibold ${highlight ? "text-red-700" : "text-foreground"}`}
       >
         {value}
       </p>

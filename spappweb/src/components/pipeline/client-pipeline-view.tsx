@@ -14,6 +14,7 @@ import { DeliveryPanel } from "@/components/pipeline/delivery-panel";
 import { RentingPanel } from "@/components/pipeline/renting-panel";
 import { MoraSummaryBanner } from "@/components/pipeline/mora-summary-banner";
 import { TrackingPanel } from "@/components/pipeline/tracking-panel";
+import { GpsMotoPanel } from "@/components/pipeline/gps-moto-panel";
 
 interface ClientPipelineViewProps {
   pipeline: ClientPipeline;
@@ -49,7 +50,7 @@ export function ClientPipelineView({
     contractSigned && !pipeline.compra && contractId;
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <ClientStepper steps={pipeline.steps} />
       <FlowOrderPrompt
         compra={pipeline.compra}
@@ -59,7 +60,7 @@ export function ClientPipelineView({
       <MoraSummaryBanner pipeline={pipeline} />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+        <div className="flex flex-col gap-6 lg:col-span-2">
           {adminStep === "credito" && pipeline.document && (
             <CreditReviewPanel
               document={pipeline.document}
@@ -131,17 +132,17 @@ export function ClientPipelineView({
             pipeline.compra?.estado !== "entregada" &&
             !showContractShare &&
             !legacyClientMoto && (
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-10 text-center text-sm text-neutral-600">
+            <div className="rounded-lg border border-border bg-muted/50 px-6 py-10 text-center text-sm text-muted-foreground">
               No hay acciones pendientes de tu parte. El cliente continúa en
               la app.
             </div>
           )}
 
-          <details className="rounded-lg border border-neutral-200">
+          <details className="rounded-lg border border-border">
             <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
               Ver historial del proceso
             </summary>
-            <div className="space-y-4 border-t border-neutral-200 p-4">
+            <div className="flex flex-col gap-4 border-t border-border p-4">
               {pipeline.document && adminStep !== "credito" && (
                 <CreditReviewPanel
                   document={pipeline.document}
@@ -189,7 +190,7 @@ export function ClientPipelineView({
           </details>
         </div>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           <TrackingPanel
             tracking={pipeline.tracking}
             userId={userId}
@@ -197,6 +198,12 @@ export function ClientPipelineView({
             recoger={pipeline.recoger}
             atraso={pipeline.atraso}
           />
+          {pipeline.compra?.placa?.trim() ? (
+            <GpsMotoPanel
+              placa={pipeline.compra.placa}
+              userId={userId}
+            />
+          ) : null}
         </div>
       </div>
     </div>

@@ -52,9 +52,18 @@ export interface VentaMotoRow {
   montoPagado: number;
   notas: string | null;
   createdAt: string;
+  selfieUrl?: string | null;
+  motoImagenUrl?: string | null;
 }
 
 function toRow(raw: Record<string, unknown>): VentaMotoRow {
+  const bike = raw.bike_table as
+    | { imagen_url?: string | null }
+    | { imagen_url?: string | null }[]
+    | null
+    | undefined;
+  const bikeOne = Array.isArray(bike) ? bike[0] : bike;
+
   return {
     id: String(raw.id),
     bikeId: raw.bike_id != null ? Number(raw.bike_id) : null,
@@ -70,6 +79,8 @@ function toRow(raw: Record<string, unknown>): VentaMotoRow {
     montoPagado: Number(raw.monto_pagado ?? 0),
     notas: raw.notas ? String(raw.notas) : null,
     createdAt: String(raw.created_at),
+    selfieUrl: raw.selfieUrl != null ? String(raw.selfieUrl) : null,
+    motoImagenUrl: bikeOne?.imagen_url ? String(bikeOne.imagen_url) : null,
   };
 }
 
@@ -136,7 +147,7 @@ export async function saveVentaMoto(input: VentaMotoInput): Promise<VentaMotoRow
 }
 
 const VENTA_MOTO_SELECT =
-  "id, bike_id, modelo, color, placa, chasis, cliente_nombre, cliente_cedula, cliente_celular, cuota_inicial, valor_venta, monto_pagado, notas, created_at";
+  "id, bike_id, modelo, color, placa, chasis, cliente_nombre, cliente_cedula, cliente_celular, cuota_inicial, valor_venta, monto_pagado, notas, created_at, bike_table(imagen_url)";
 
 export async function getVentasContado(): Promise<VentaMotoRow[]> {
   await requireAdminSession();
@@ -148,7 +159,35 @@ export async function getVentasContado(): Promise<VentaMotoRow[]> {
     .limit(200);
 
   if (error) throw new Error(error.message);
-  return ((data ?? []) as Record<string, unknown>[]).map(toRow);
+
+  const rows = ((data ?? []) as Record<string, unknown>[]).map(toRow);
+  const cedulas = [
+    ...new Set(rows.map((r) => r.clienteCedula.trim()).filter(Boolean)),
+  ];
+  if (cedulas.length === 0) return rows;
+
+  // ponytail: users.user suele ser la cédula; basta para selfie en mostrador
+  const { data: users } = await supabase
+    .from("users")
+    .select("id, user, users_documents(selfie_url)")
+    .in("user", cedulas);
+
+  const selfieByCedula = new Map<string, string>();
+  for (const u of users ?? []) {
+    const docs = u.users_documents as
+      | { selfie_url?: string | null }
+      | { selfie_url?: string | null }[]
+      | null;
+    const doc = Array.isArray(docs) ? docs[0] : docs;
+    if (doc?.selfie_url) {
+      selfieByCedula.set(String(u.user), String(doc.selfie_url));
+    }
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    selfieUrl: selfieByCedula.get(row.clienteCedula.trim()) ?? null,
+  }));
 }
 
 const abonoSchema = z.object({

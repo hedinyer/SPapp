@@ -8,6 +8,7 @@ const checks = [
   "src/lib/contracts/hoja-vida.check.ts",
   "src/lib/contracts/contrato.check.ts",
   "src/lib/pipeline/pipeline.check.ts",
+  "src/lib/pipeline/mora-utils.check.ts",
 ];
 
 function run(file) {

@@ -38,14 +38,14 @@ function mapsUrl(direccion: string, barrio?: string | null) {
 
 function UploadProgressBar({ value }: { value: number }) {
   return (
-    <div className="space-y-1">
-      <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+    <div className="flex flex-col gap-1">
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full bg-black transition-[width] duration-200"
           style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
         />
       </div>
-      <p className="text-center text-xs text-neutral-500">Subiendo… {value}%</p>
+      <p className="text-center text-xs text-muted-foreground">Subiendo… {value}%</p>
     </div>
   );
 }
@@ -67,7 +67,7 @@ function MediaActionButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "inline-flex min-h-11 flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 text-sm font-medium transition-colors active:bg-neutral-50",
+        "inline-flex min-h-11 flex-1 touch-manipulation items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm font-medium transition-colors active:bg-muted/50",
         disabled && "pointer-events-none opacity-50",
       )}
     >
@@ -240,21 +240,21 @@ export function VisitaEjecucionForm({
 
   return (
     <>
-      <div className="space-y-6 pb-28">
-        <Card className="border-neutral-200 shadow-none">
+      <div className="flex flex-col gap-6 pb-28">
+        <Card className="border-border shadow-none">
           <CardHeader>
             <CardTitle className="text-lg">{visita.cliente_nombre}</CardTitle>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Programada: {formatDate(visita.fecha_programada)}
             </p>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="flex flex-col gap-3 text-sm">
             <div>
-              <span className="text-neutral-500">Celular: </span>
+              <span className="text-muted-foreground">Celular: </span>
               {visita.cliente_celular ? (
                 <a
                   href={`tel:${visita.cliente_celular.replace(/\s/g, "")}`}
-                  className="inline-flex min-h-11 items-center gap-1 font-medium text-black underline-offset-2 hover:underline"
+                  className="inline-flex min-h-11 items-center gap-1 font-medium text-foreground underline-offset-2 hover:underline"
                 >
                   <Phone className="h-4 w-4" />
                   {visita.cliente_celular}
@@ -264,7 +264,7 @@ export function VisitaEjecucionForm({
               )}
             </div>
             <div>
-              <span className="text-neutral-500">Dirección: </span>
+              <span className="text-muted-foreground">Dirección: </span>
               {direccionCompleta ? (
                 <a
                   href={mapsUrl(
@@ -273,7 +273,7 @@ export function VisitaEjecucionForm({
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-11 items-center gap-1 font-medium text-black underline-offset-2 hover:underline"
+                  className="inline-flex min-h-11 items-center gap-1 font-medium text-foreground underline-offset-2 hover:underline"
                 >
                   <MapPin className="h-4 w-4 shrink-0" />
                   {direccionCompleta}
@@ -285,15 +285,15 @@ export function VisitaEjecucionForm({
           </CardContent>
         </Card>
 
-        <Card className="border-neutral-200 shadow-none">
+        <Card className="border-border shadow-none">
           <CardHeader>
             <CardTitle className="text-base">Fotos de evidencia</CardTitle>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Mínimo 1 foto del domicilio o moto. Se comprimen automáticamente
               para subir más rápido.
             </p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <input
               ref={photoCameraRef}
               type="file"
@@ -342,7 +342,7 @@ export function VisitaEjecucionForm({
                     href={foto.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block overflow-hidden rounded-lg border border-neutral-200"
+                    className="block overflow-hidden rounded-lg border border-border"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -359,15 +359,15 @@ export function VisitaEjecucionForm({
           </CardContent>
         </Card>
 
-        <Card className="border-neutral-200 shadow-none">
+        <Card className="border-border shadow-none">
           <CardHeader>
             <CardTitle className="text-base">Video de evidencia</CardTitle>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Mínimo 1 video corto (máx. 50 MB). Sube directo, ideal para
               internet lento.
             </p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <input
               ref={videoCameraRef}
               type="file"
@@ -409,7 +409,7 @@ export function VisitaEjecucionForm({
               <UploadProgressBar value={videoProgress} />
             )}
             {videos.length > 0 && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {videos.map((video, i) => (
                   <video
                     key={`${video.url}-${i}`}
@@ -417,7 +417,7 @@ export function VisitaEjecucionForm({
                     controls
                     playsInline
                     preload="metadata"
-                    className="w-full rounded-lg border border-neutral-200"
+                    className="w-full rounded-lg border border-border"
                   />
                 ))}
               </div>
@@ -425,14 +425,14 @@ export function VisitaEjecucionForm({
           </CardContent>
         </Card>
 
-        <Card className="border-neutral-200 shadow-none">
+        <Card className="border-border shadow-none">
           <CardHeader>
             <CardTitle className="text-base">Ubicación exacta</CardTitle>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Necesitamos confirmar que estás en el domicilio del cliente.
             </p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="flex flex-col gap-3">
             <Button
               variant="outline"
               className="min-h-11 w-full touch-manipulation"
@@ -452,7 +452,7 @@ export function VisitaEjecucionForm({
           </CardContent>
         </Card>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="notas">Notas (opcional)</Label>
           <Textarea
             id="notas"
@@ -463,10 +463,10 @@ export function VisitaEjecucionForm({
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-neutral-200 bg-white p-4 safe-area-bottom">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background p-4 safe-area-bottom">
         <Button
           size="lg"
-          className="min-h-11 w-full touch-manipulation bg-black text-white hover:bg-neutral-800"
+          className="min-h-11 w-full touch-manipulation bg-primary text-primary-foreground hover:bg-primary/80"
           disabled={isBusy || !canComplete}
           onClick={handleComplete}
         >
@@ -478,7 +478,7 @@ export function VisitaEjecucionForm({
           {pending ? "Completando…" : "Completar visita"}
         </Button>
         {!canComplete && (
-          <p className="mt-2 text-center text-xs text-neutral-500">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             Sube al menos 1 foto, 1 video y captura la ubicación.
           </p>
         )}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { getAllBikes, getInboxListItems, getInboxQueues } from "@/lib/pipeline/queries";
 import { InboxQueueList } from "@/components/inbox/inbox-queue-list";
@@ -44,17 +44,17 @@ export default async function InboxPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-xl font-semibold sm:text-2xl">Bandeja</h1>
-        <p className="mt-1 text-neutral-500">Cola de trabajo activa.</p>
+        <h1 className="text-xl font-semibold sm:text-2xl">Hoy</h1>
+        <p className="mt-1 text-muted-foreground">Cola de trabajo activa.</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <Button variant="ghost" asChild className="gap-2 px-0">
           <Link href="/inbox">
             <ChevronLeft className="h-4 w-4" />
-            Volver a bandeja
+            Volver a Hoy
           </Link>
         </Button>
         <h2 className="text-lg font-medium">{queueTitle(queueId)}</h2>

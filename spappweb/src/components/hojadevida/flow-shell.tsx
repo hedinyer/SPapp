@@ -26,9 +26,9 @@ export function FlowPhaseBar({ active }: { active: FlowPhase }) {
               <div
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold",
-                  done && "bg-black text-white",
-                  current && "bg-black text-white ring-4 ring-black/15",
-                  !done && !current && "bg-neutral-100 text-neutral-400",
+                  done && "bg-primary text-primary-foreground",
+                  current && "bg-primary text-primary-foreground ring-4 ring-black/15",
+                  !done && !current && "bg-muted text-muted-foreground",
                 )}
                 aria-current={current ? "step" : undefined}
               >
@@ -37,7 +37,7 @@ export function FlowPhaseBar({ active }: { active: FlowPhase }) {
               <span
                 className={cn(
                   "text-center text-xs font-medium",
-                  current ? "text-black" : "text-neutral-500",
+                  current ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 {phase.label}
@@ -61,20 +61,20 @@ export function FlowProgress({
 }) {
   const pct = Math.round((step / total) * 100);
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-semibold text-black">
+        <span className="font-semibold text-foreground">
           Paso {step} de {total}
         </span>
-        <span className="text-neutral-500">{pct}%</span>
+        <span className="text-muted-foreground">{pct}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full rounded-full bg-black transition-all duration-300"
+          className="h-full rounded-full bg-primary transition-all duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="text-base font-medium text-neutral-800">{title}</p>
+      <p className="text-base font-medium text-foreground">{title}</p>
     </div>
   );
 }
@@ -91,19 +91,19 @@ export function StepCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border-2 border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="text-xl font-bold leading-snug text-black">{title}</h2>
+    <div className="rounded-2xl border-2 border-border bg-background p-5 shadow-sm">
+      <h2 className="text-xl font-bold leading-snug text-foreground">{title}</h2>
       {instruction && (
-        <p className="mt-2 text-base leading-relaxed text-neutral-700">
+        <p className="mt-2 text-base leading-relaxed text-foreground">
           {instruction}
         </p>
       )}
       {help && (
-        <div className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm leading-relaxed text-neutral-700">
+        <div className="mt-4 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm leading-relaxed text-foreground">
           {help}
         </div>
       )}
-      <div className="mt-5 space-y-4">{children}</div>
+      <div className="mt-5 flex flex-col gap-4">{children}</div>
     </div>
   );
 }
@@ -120,14 +120,14 @@ export function FieldBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2">
-      <label className="block text-base font-semibold text-black">{label}</label>
+    <div className="flex flex-col gap-2">
+      <label className="block text-base font-semibold text-foreground">{label}</label>
       {hint && (
-        <p className="text-sm leading-relaxed text-neutral-600">{hint}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{hint}</p>
       )}
       {example && (
-        <p className="text-sm text-neutral-500">
-          Ejemplo: <span className="font-medium text-neutral-700">{example}</span>
+        <p className="text-sm text-muted-foreground">
+          Ejemplo: <span className="font-medium text-foreground">{example}</span>
         </p>
       )}
       {children}
@@ -143,7 +143,7 @@ export function StickyActions({
   secondary?: React.ReactNode;
 }) {
   return (
-    <div className="sticky bottom-0 -mx-4 mt-6 space-y-3 border-t border-neutral-200 bg-white px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="sticky bottom-0 -mx-4 mt-6 flex flex-col gap-3 border-t border-border bg-background px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       {primary}
       {secondary}
     </div>
@@ -166,7 +166,7 @@ export function PrimaryAction({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className="min-h-14 w-full touch-manipulation text-base font-semibold bg-black text-white hover:bg-neutral-800 active:bg-neutral-900 disabled:opacity-50"
+      className="min-h-14 w-full touch-manipulation text-base font-semibold bg-primary text-primary-foreground hover:bg-primary/80 active:bg-neutral-900 disabled:opacity-50"
     >
       {children}
     </Button>
@@ -212,8 +212,8 @@ export function ChoiceButton({
       className={cn(
         "min-h-14 w-full touch-manipulation rounded-xl border-2 px-4 text-base font-semibold transition-colors",
         selected
-          ? "border-black bg-black text-white"
-          : "border-neutral-200 bg-white text-black active:bg-neutral-50",
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-background text-foreground active:bg-muted/50",
       )}
     >
       {children}

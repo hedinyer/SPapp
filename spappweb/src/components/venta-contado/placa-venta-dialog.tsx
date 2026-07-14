@@ -62,18 +62,18 @@ export function PlacaVentaDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-sm">
+      <DialogContent className="bg-background sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Agregar placa</DialogTitle>
           {venta ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               {venta.clienteNombre} · {venta.modelo} {venta.color}
             </p>
           ) : null}
         </DialogHeader>
 
         {venta ? (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="venta-placa">Placa</Label>
             <Input
               id="venta-placa"
@@ -97,7 +97,7 @@ export function PlacaVentaDialog({
           </Button>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             onClick={submit}
             disabled={pending || !venta}
           >

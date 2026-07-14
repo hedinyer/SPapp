@@ -10,6 +10,7 @@
     "check:hoja-vida": "node --experimental-strip-types src/lib/contracts/hoja-vida.check.ts",
     "check:contrato": "node --experimental-strip-types src/lib/contracts/contrato.check.ts",
     "check:pipeline": "node --experimental-strip-types src/lib/pipeline/pipeline.check.ts",
+    "check:mora": "node --experimental-strip-types src/lib/pipeline/mora-utils.check.ts",
     "check:all": "node scripts/check-all.mjs",
     "test:e2e": "playwright test",
     "test": "npm run check:all && npm run test:e2e"
@@ -23,6 +24,7 @@
     "date-fns": "^4.4.0",
     "html2canvas-pro": "^2.0.4",
     "iron-session": "^8.0.4",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.18.0",
     "next": "16.2.9",
     "next-themes": "^0.4.6",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/qrcode": "^1.5.6",

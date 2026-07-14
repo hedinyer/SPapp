@@ -64,7 +64,7 @@ export function CajaVisitasPanel({
   }
 
   return (
-    <Card className="border-neutral-200">
+    <Card className="border-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <MapPin className="h-4 w-4 text-amber-600" />
@@ -75,7 +75,7 @@ export function CajaVisitasPanel({
           aparecen aquí.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <div className={totalPendiente > 0 ? "grid gap-3 sm:grid-cols-2" : ""}>
           <div className="rounded-lg border border-green-200 bg-green-50/60 p-3">
             <p className="text-xs font-medium uppercase tracking-wide text-green-800">
@@ -105,11 +105,11 @@ export function CajaVisitasPanel({
         </div>
 
         {cobradas.length > 0 ? (
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-neutral-500">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-muted-foreground">
               Ingresos de visita hoy
             </p>
-            <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+            <ul className="divide-y divide-neutral-100 rounded-lg border border-border">
               {cobradas.map((row) => (
                 <li
                   key={row.pagoId}
@@ -117,7 +117,7 @@ export function CajaVisitasPanel({
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium">{row.clienteNombre}</p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted-foreground">
                       {row.medioLabel} · {formatDate(row.confirmadoAt)}
                     </p>
                   </div>
@@ -129,17 +129,17 @@ export function CajaVisitasPanel({
             </ul>
           </div>
         ) : (
-          <p className="rounded-lg border border-dashed border-neutral-200 px-3 py-4 text-sm text-neutral-600">
+          <p className="rounded-lg border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
             Aún no hay visitas registradas como ingreso hoy.
           </p>
         )}
 
         {pendientes.length > 0 ? (
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-neutral-500">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-muted-foreground">
               Visita completada · falta registrar en caja
             </p>
-            <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+            <ul className="divide-y divide-neutral-100 rounded-lg border border-border">
               {pendientes.map((row) => (
                 <li
                   key={row.compraId}
@@ -147,7 +147,7 @@ export function CajaVisitasPanel({
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium">{row.clienteNombre}</p>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-muted-foreground">
                       Visita {formatCop(row.montoEsperado)}
                     </p>
                   </div>
@@ -176,7 +176,7 @@ export function CajaVisitasPanel({
                         type="button"
                         variant="default"
                         size="sm"
-                        className="h-7 bg-black px-2 text-xs text-white hover:bg-neutral-800"
+                        className="h-7 px-2 text-xs"
                         disabled={pending}
                         onClick={() =>
                           registrarCobro(

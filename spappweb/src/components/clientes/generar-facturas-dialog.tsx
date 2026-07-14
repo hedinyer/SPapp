@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useTransition } from "react";
 import { Loader2, Printer } from "lucide-react";
@@ -96,7 +96,7 @@ export function GenerarFacturasDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-md">
+      <DialogContent className="bg-background sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Generar facturas</DialogTitle>
           <DialogDescription>
@@ -105,17 +105,17 @@ export function GenerarFacturasDialog({
         </DialogHeader>
 
         {loading ? (
-          <div className="flex items-center justify-center py-8 text-neutral-500">
+          <div className="flex items-center justify-center py-8 text-muted-foreground">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Cargando montos…
           </div>
         ) : !data?.compraId ? (
-          <p className="py-4 text-sm text-neutral-600">
+          <p className="py-4 text-sm text-muted-foreground">
             Este cliente aún no tiene moto asignada. Asigna la moto primero para
             obtener los valores de cuota inicial, adelantada y visita.
           </p>
         ) : (
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+          <ul className="divide-y divide-neutral-100 rounded-lg border border-border">
             {CONCEPTOS.map((concepto) => {
               const monto = montoConcepto(data, concepto);
               const disponible = monto != null && monto > 0;
@@ -128,7 +128,7 @@ export function GenerarFacturasDialog({
                     <p className="font-medium">
                       {CONTEXTO_PAGO_LABELS[concepto]}
                     </p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="text-sm text-muted-foreground">
                       {disponible ? formatCop(monto) : "Sin monto"}
                     </p>
                   </div>
@@ -149,7 +149,7 @@ export function GenerarFacturasDialog({
         )}
 
         {data?.totalPrimerPago != null && data.totalPrimerPago > 0 && (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-muted-foreground">
             Total primer pago:{" "}
             <span className="font-medium">
               {formatCop(data.totalPrimerPago)}

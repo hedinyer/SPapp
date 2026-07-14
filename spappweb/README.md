@@ -50,16 +50,15 @@ UPDATE public.users SET status = 'admin' WHERE "user" = 'tu_usuario_admin';
 
 Sin `SUPABASE_SERVICE_ROLE_KEY` en Vercel, crear/editar/eliminar en catálogo, inventario, garaje, visitadores y bandeja fallará en producción.
 
-## Estructura
+## Estructura (navegación por hubs)
 
-- `/inbox` — Bandeja con colas accionables
+- **Hoy** `/inbox` — Colas accionables del día (taller vía tarjeta → `/solicitudes`)
+- **Clientes** `/clientes` — Personas y pipeline; crear con `?nuevo=1` (redirect desde `/crear-cliente`)
+- **Motos** — `/garaje` (unidades), `/vendidas` (en calle), `/catalogo` (modelos), `/venta-contado` (contado)
+- **Tienda** — `/venta` (repuestos y accesorios), `/caja`, `/inventario` (stock), `/productos-credito` (extras a crédito), `/historial-ventas`
+- **Equipo** — `/visitadores`
 - `/clientes/[userId]` — Pipeline del cliente con stepper
-- `/visitadores` — CRUD visitadores
-- `/catalogo` — CRUD catálogo `bike_table`
-- `/inventario` — CRUD repuestos y categorías
-- `/garaje` — CRUD parqueaderos y motos
-- `/solicitudes` — Solicitudes de taller
-
+- `/solicitudes` — Taller (acceso desde Hoy, no en el menú principal)
 ## Integración con agentes IA (Hermes Agent)
 
 El panel expone una capa de herramientas para agentes IA en `/api/agent/tools`

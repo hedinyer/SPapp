@@ -3,9 +3,10 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, User } from "lucide-react";
 import { deleteVisitador, saveVisitador } from "@/lib/actions/admin-actions";
 import type { VisitadorRow } from "@/lib/pipeline/types";
+import { getStoragePublicUrl } from "@/lib/utils/storage-urls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -47,6 +54,29 @@ import {
   visitadorUsername,
 } from "@/components/visitadores/share-visitador-link";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
+
+function VisitadorPhoto({ visitador }: { visitador: VisitadorRow }) {
+  const src = getStoragePublicUrl(
+    STORAGE_BUCKETS.visitadorFotos,
+    visitador.foto_url,
+  );
+  return (
+    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-border bg-muted/50">
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt={visitador.nombre}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+          <User className="h-6 w-6" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function VisitadoresManager({
   visitadores,
@@ -112,14 +142,14 @@ export function VisitadoresManager({
       <div className="flex justify-end">
         <Button
           onClick={openCreate}
-          className="bg-black text-white hover:bg-neutral-800"
+          className="bg-primary text-primary-foreground hover:bg-primary/80"
         >
           <Plus className="mr-2 h-4 w-4" />
           Nuevo visitador
         </Button>
       </div>
 
-      <div className="hidden rounded-lg border border-neutral-200 lg:block">
+      <div className="hidden rounded-lg border border-border lg:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -134,7 +164,7 @@ export function VisitadoresManager({
           <TableBody>
             {visitadores.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-neutral-500">
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
                   No hay visitadores. Crea uno para asignar visitas.
                 </TableCell>
               </TableRow>
@@ -143,7 +173,12 @@ export function VisitadoresManager({
                 const username = visitadorUsername(v);
                 return (
                   <TableRow key={v.id}>
-                    <TableCell className="font-medium">{v.nombre}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <VisitadorPhoto visitador={v} />
+                        <span className="font-medium">{v.nombre}</span>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {username ? (
                         <span className="font-mono text-sm">{username}</span>
@@ -166,7 +201,7 @@ export function VisitadoresManager({
                           compact
                         />
                       ) : (
-                        <span className="text-xs text-neutral-400">Sin cuenta</span>
+                        <span className="text-xs text-muted-foreground">Sin cuenta</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -184,7 +219,7 @@ export function VisitadoresManager({
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="bg-white">
+                          <AlertDialogContent className="bg-background">
                             <AlertDialogHeader>
                               <AlertDialogTitle>
                                 ¿Eliminar visitador?
@@ -230,28 +265,36 @@ export function VisitadoresManager({
         </Table>
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="flex flex-col gap-3 lg:hidden">
         {visitadores.length === 0 ? (
-          <p className="text-center text-sm text-neutral-500">
-            No hay visitadores. Crea uno para asignar visitas.
-          </p>
+          <Empty className="border border-dashed border-border">
+            <EmptyHeader>
+              <EmptyTitle>Sin visitadores</EmptyTitle>
+              <EmptyDescription>
+                Crea uno para asignar visitas domiciliarias.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           visitadores.map((v) => {
             const username = visitadorUsername(v);
             return (
               <div
                 key={v.id}
-                className="rounded-lg border border-neutral-200 p-4 text-sm"
+                className="rounded-lg border border-border p-4 text-sm"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium">{v.nombre}</p>
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <VisitadorPhoto visitador={v} />
+                    <p className="font-medium">{v.nombre}</p>
+                  </div>
                   <Badge variant={v.activo ? "outline" : "secondary"}>
                     {v.activo ? "Activo" : "Inactivo"}
                   </Badge>
                 </div>
-                <dl className="mt-3 space-y-1.5">
+                <dl className="mt-3 flex flex-col gap-1.5">
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Usuario</dt>
+                    <dt className="text-muted-foreground">Usuario</dt>
                     <dd>
                       {username ? (
                         <span className="font-mono">{username}</span>
@@ -261,7 +304,7 @@ export function VisitadoresManager({
                     </dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Teléfono</dt>
+                    <dt className="text-muted-foreground">Teléfono</dt>
                     <dd>{v.telefono ?? "—"}</dd>
                   </div>
                 </dl>
@@ -291,7 +334,7 @@ export function VisitadoresManager({
                         Eliminar
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-white">
+                    <AlertDialogContent className="bg-background">
                       <AlertDialogHeader>
                         <AlertDialogTitle>¿Eliminar visitador?</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -384,14 +427,14 @@ function VisitadorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-background">
         <DialogHeader>
           <DialogTitle>
             {editing ? "Editar visitador" : "Nuevo visitador"}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="nombre">Nombre</Label>
             <Input
               id="nombre"
@@ -400,7 +443,7 @@ function VisitadorDialog({
               className="min-h-11 touch-manipulation text-base md:text-sm"
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="telefono">Teléfono</Label>
             <Input
               id="telefono"
@@ -410,7 +453,7 @@ function VisitadorDialog({
             />
           </div>
           {!editing && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="username">Usuario de acceso</Label>
               <Input
                 id="username"
@@ -422,12 +465,12 @@ function VisitadorDialog({
             </div>
           )}
           {editing && username && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Usuario de acceso</Label>
               <Input value={username} disabled />
             </div>
           )}
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="password">
               {editing ? "Nueva contraseña (opcional)" : "Contraseña"}
             </Label>
@@ -467,7 +510,7 @@ function VisitadorDialog({
             Cancelar
           </Button>
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={
               pending ||
               nombre.trim().length < 2 ||

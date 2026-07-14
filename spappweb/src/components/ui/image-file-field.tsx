@@ -254,7 +254,7 @@ export function ImageFileField({
         tabIndex={disabled ? undefined : 0}
         onPaste={handlePasteEvent}
       >
-        <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
+        <div className="relative size-28 shrink-0 overflow-hidden rounded-lg border border-border bg-muted/50">
           {displayUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -337,7 +337,7 @@ export function ImageFileField({
               <span className="truncate">{file.name}</span>
               <button
                 type="button"
-                className="text-neutral-400 hover:text-black"
+                className="text-muted-foreground hover:text-foreground"
                 disabled={disabled}
                 onClick={() => {
                   onFileChange(null);
@@ -351,11 +351,11 @@ export function ImageFileField({
             </div>
           )}
           {!file && existingUrl && (
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted-foreground">
               Imagen actual guardada. Elige otra para reemplazarla.
             </p>
           )}
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted-foreground">
             JPG, PNG o WebP · máx. 5 MB · también puedes pegar con Ctrl+V
           </p>
           {pasteError && (

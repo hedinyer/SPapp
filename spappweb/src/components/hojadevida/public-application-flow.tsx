@@ -213,8 +213,8 @@ export function PublicApplicationFlow() {
             instruction="No cierres esta página. Espera un momento."
           >
             <div className="flex flex-col items-center gap-4 py-8">
-              <Loader2 className="h-12 w-12 animate-spin text-black" />
-              <p className="text-center text-base text-neutral-600">
+              <Loader2 className="h-12 w-12 animate-spin text-foreground" />
+              <p className="text-center text-base text-muted-foreground">
                 Guardando fotos de tu cédula…
               </p>
             </div>
@@ -227,8 +227,8 @@ export function PublicApplicationFlow() {
             instruction="No cierres esta página. Espera un momento."
           >
             <div className="flex flex-col items-center gap-4 py-8">
-              <Loader2 className="h-12 w-12 animate-spin text-black" />
-              <p className="text-center text-base text-neutral-600">
+              <Loader2 className="h-12 w-12 animate-spin text-foreground" />
+              <p className="text-center text-base text-muted-foreground">
                 Guardando tus datos…
               </p>
             </div>
@@ -236,31 +236,31 @@ export function PublicApplicationFlow() {
         )}
 
         {step === "success" && (
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center rounded-2xl border-2 border-green-500 bg-green-50 p-8 text-center">
               <CheckCircle2 className="h-16 w-16 text-green-600" strokeWidth={1.5} />
-              <h2 className="mt-4 text-2xl font-bold text-black">
+              <h2 className="mt-4 text-2xl font-bold text-foreground">
                 ¡Solicitud enviada con éxito!
               </h2>
-              <p className="mt-3 text-base leading-relaxed text-neutral-700">
+              <p className="mt-3 text-base leading-relaxed text-foreground">
                 Recibimos tus fotos y datos. Todo quedó registrado correctamente.
               </p>
-              <div className="mt-5 flex w-full items-start gap-3 rounded-xl bg-white px-4 py-4 text-left">
+              <div className="mt-5 flex w-full items-start gap-3 rounded-xl bg-background px-4 py-4 text-left">
                 <MessageCircle className="mt-0.5 h-8 w-8 shrink-0 text-green-600" />
                 <div>
-                  <p className="text-base font-semibold text-black">
+                  <p className="text-base font-semibold text-foreground">
                     Te escribiremos por WhatsApp
                   </p>
-                  <p className="mt-1 text-base leading-relaxed text-neutral-700">
+                  <p className="mt-1 text-base leading-relaxed text-foreground">
                     En aproximadamente{" "}
-                    <span className="font-semibold text-black">2 horas</span>{" "}
+                    <span className="font-semibold text-foreground">2 horas</span>{" "}
                     recibirás la respuesta a tu solicitud de crédito al número
                     que indicaste.
                   </p>
                 </div>
               </div>
             </div>
-            <p className="text-center text-sm text-neutral-500">
+            <p className="text-center text-sm text-muted-foreground">
               Ya puedes cerrar esta página.
             </p>
             <PrimaryAction onClick={resetToWelcome}>
@@ -289,47 +289,47 @@ export function PublicApplicationFlow() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <StepCard
         title="Solicitud de crédito para moto"
         instruction="Te guiamos paso a paso. Solo necesitas tu celular y tu cédula."
       >
-        <ol className="space-y-4">
-          <li className="flex gap-4 rounded-xl border-2 border-neutral-200 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-lg font-bold text-white">
+        <ol className="flex flex-col gap-4">
+          <li className="flex gap-4 rounded-xl border-2 border-border p-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
               1
             </div>
             <div>
-              <p className="text-base font-bold text-black">Tomar 3 fotos</p>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="text-base font-bold text-foreground">Tomar 3 fotos</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Frente y reverso de la cédula, y una selfie.
               </p>
             </div>
-            <Camera className="ml-auto h-8 w-8 shrink-0 text-neutral-400" />
+            <Camera className="ml-auto h-8 w-8 shrink-0 text-muted-foreground" />
           </li>
-          <li className="flex gap-4 rounded-xl border-2 border-neutral-200 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-lg font-bold text-white">
+          <li className="flex gap-4 rounded-xl border-2 border-border p-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
               2
             </div>
             <div>
-              <p className="text-base font-bold text-black">Llenar tus datos</p>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="text-base font-bold text-foreground">Llenar tus datos</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Una pregunta a la vez, fácil de entender.
               </p>
             </div>
-            <ClipboardList className="ml-auto h-8 w-8 shrink-0 text-neutral-400" />
+            <ClipboardList className="ml-auto h-8 w-8 shrink-0 text-muted-foreground" />
           </li>
-          <li className="flex gap-4 rounded-xl border-2 border-neutral-200 p-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-black text-lg font-bold text-white">
+          <li className="flex gap-4 rounded-xl border-2 border-border p-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
               3
             </div>
             <div>
-              <p className="text-base font-bold text-black">Enviar solicitud</p>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="text-base font-bold text-foreground">Enviar solicitud</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Nosotros te avisamos por WhatsApp si eres aprobado.
               </p>
             </div>
-            <CheckCircle2 className="ml-auto h-8 w-8 shrink-0 text-neutral-400" />
+            <CheckCircle2 className="ml-auto h-8 w-8 shrink-0 text-muted-foreground" />
           </li>
         </ol>
       </StepCard>

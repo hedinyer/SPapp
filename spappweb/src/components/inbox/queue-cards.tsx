@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import type { InboxQueue, InboxQueueId } from "@/lib/pipeline/types";
 
 interface QueueCardsProps {
@@ -22,22 +28,31 @@ function QueueCard({ queue }: { queue: InboxQueue }) {
     queue.id === "solicitudes_taller"
       ? "/solicitudes"
       : `/inbox?cola=${queue.id}`;
+  const hasWork = queue.count > 0;
 
   return (
-    <Link href={href}>
-      <Card className="border-neutral-200 shadow-none transition-colors hover:border-neutral-400">
-        <CardContent className="flex items-start justify-between p-4 sm:p-6">
-          <div>
-            <p className="text-3xl font-semibold tabular-nums text-black sm:text-4xl">
+    <Link href={href} className="group block">
+      <Card className="h-full transition-colors group-hover:bg-muted/40">
+        <CardHeader className="flex flex-row items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <CardTitle className="font-heading text-3xl tabular-nums sm:text-4xl">
               {queue.count}
-            </p>
-            <p className="mt-2 text-base font-medium text-black">
-              {queue.label}
-            </p>
-            <p className="mt-1 text-sm text-neutral-500">{queue.description}</p>
+            </CardTitle>
+            <p className="text-base font-medium text-foreground">{queue.label}</p>
+            <CardDescription>{queue.description}</CardDescription>
           </div>
-          <ArrowRight className="mt-1 h-5 w-5 text-neutral-400" strokeWidth={1.5} />
-        </CardContent>
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            {hasWork ? (
+              <Badge variant="secondary">Pendiente</Badge>
+            ) : (
+              <Badge variant="outline">Al día</Badge>
+            )}
+            <ArrowRight
+              className="size-5 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+              strokeWidth={1.5}
+            />
+          </div>
+        </CardHeader>
       </Card>
     </Link>
   );

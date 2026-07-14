@@ -224,7 +224,7 @@ export function HojaVidaForm({
   if (readOnly) {
     return (
       <StepCard title="Resumen de tus datos">
-        <dl className="space-y-3 text-base">
+        <dl className="flex flex-col gap-3 text-base">
           <Row label="Nombre" value={form.nombre_completo} />
           <Row label="Celular" value={form.celular} />
         </dl>
@@ -259,7 +259,7 @@ export function HojaVidaForm({
 
         {currentId === "tipo_id" && (
           <FieldBlock label="Elige tu tipo de documento">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {(Object.entries(TIPO_IDENTIFICACION_LABELS) as [TipoIdentificacion, string][]).map(
                 ([value, label]) => (
                   <ChoiceButton
@@ -402,7 +402,7 @@ export function HojaVidaForm({
         )}
 
         {currentId === "empresa" && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <FieldBlock label="Nombre de la empresa">
               <Input
                 className={fieldInputClass}
@@ -422,7 +422,7 @@ export function HojaVidaForm({
         )}
 
         {currentId === "independiente" && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <FieldBlock label="¿Trabajas por tu cuenta (independiente)?">
               <div className="flex gap-3">
                 <ChoiceButton
@@ -456,7 +456,7 @@ export function HojaVidaForm({
 
         {currentId === "estado_civil" && (
           <FieldBlock label="Selecciona uno">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {(Object.entries(ESTADO_CIVIL_LABELS) as [EstadoCivil, string][]).map(
                 ([value, label]) => (
                   <ChoiceButton
@@ -479,7 +479,7 @@ export function HojaVidaForm({
         )}
 
         {currentId === "conyuge" && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <FieldBlock label="Nombre completo de tu pareja">
               <Input
                 className={fieldInputClass}
@@ -499,7 +499,7 @@ export function HojaVidaForm({
         )}
 
         {(currentId === "referencia_1" || currentId === "referencia_2") && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <FieldBlock
               label="Persona que te conozca"
               hint="Un familiar o amigo que confirme quién eres. No puede ser tu pareja."
@@ -558,7 +558,7 @@ function Row({ label, value }: { label: string; value: string }) {
   if (!value.trim()) return null;
   return (
     <div>
-      <dt className="text-neutral-500">{label}</dt>
+      <dt className="text-muted-foreground">{label}</dt>
       <dd className="font-medium">{value}</dd>
     </div>
   );

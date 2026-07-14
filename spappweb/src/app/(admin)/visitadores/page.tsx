@@ -1,17 +1,16 @@
-import { getAllVisitadores } from "@/lib/pipeline/queries";
+﻿import { getAllVisitadores } from "@/lib/pipeline/queries";
 import { VisitadoresManager } from "@/components/visitadores/visitadores-manager";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function VisitadoresPage() {
   const visitadores = await getAllVisitadores();
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold sm:text-2xl">Visitadores</h1>
-        <p className="mt-1 text-neutral-500">
-          Personas que realizan visitas domiciliarias.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Visitadores"
+        description="Personas que realizan visitas domiciliarias."
+      />
       <VisitadoresManager visitadores={visitadores} />
     </div>
   );

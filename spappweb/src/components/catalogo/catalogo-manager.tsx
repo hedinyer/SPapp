@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Bike, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteBike, saveBike } from "@/lib/actions/admin-actions";
 import { MONTO_VISITA_DEFAULT } from "@/lib/payments/visita-monto";
 import type { BikeRow } from "@/lib/pipeline/types";
@@ -46,6 +46,25 @@ import {
 } from "@/components/ui/image-file-field";
 import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 
+function BikePhoto({ bike }: { bike: BikeRow }) {
+  return (
+    <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-muted/50">
+      {bike.imagen_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={bike.imagen_url}
+          alt={`${bike.modelo} ${bike.color}`}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+          <Bike className="h-4 w-4" />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -60,17 +79,18 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
             setEditing(null);
             setOpen(true);
           }}
-          className="bg-black text-white hover:bg-neutral-800"
+          className="bg-primary text-primary-foreground hover:bg-primary/80"
         >
           <Plus className="mr-2 h-4 w-4" />
           Nueva moto
         </Button>
       </div>
 
-      <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+      <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[72px]">Foto</TableHead>
               <TableHead>Modelo</TableHead>
               <TableHead>Color</TableHead>
               <TableHead>Stock</TableHead>
@@ -85,6 +105,9 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
           <TableBody>
             {bikes.map((bike) => (
               <TableRow key={bike.id}>
+                <TableCell>
+                  <BikePhoto bike={bike} />
+                </TableCell>
                 <TableCell className="font-medium">{bike.modelo}</TableCell>
                 <TableCell>{bike.color}</TableCell>
                 <TableCell>{bike.stock}</TableCell>
@@ -119,7 +142,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-white">
+                      <AlertDialogContent className="bg-background">
                         <AlertDialogHeader>
                           <AlertDialogTitle>¿Eliminar moto?</AlertDialogTitle>
                           <AlertDialogDescription>
@@ -158,28 +181,31 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
         </Table>
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="flex flex-col gap-3 lg:hidden">
         {bikes.map((bike) => (
           <div
             key={bike.id}
-            className="rounded-lg border border-neutral-200 p-4 text-sm"
+            className="rounded-lg border border-border p-4 text-sm"
           >
             <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="font-medium">{bike.modelo}</p>
-                <p className="text-neutral-500">{bike.color}</p>
+              <div className="flex min-w-0 items-start gap-3">
+                <BikePhoto bike={bike} />
+                <div className="min-w-0">
+                  <p className="font-medium">{bike.modelo}</p>
+                  <p className="text-muted-foreground">{bike.color}</p>
+                </div>
               </div>
               <Badge variant={bike.activo ? "outline" : "secondary"}>
                 {bike.activo ? "Activo" : "Inactivo"}
               </Badge>
             </div>
-            <dl className="mt-3 space-y-1.5">
+            <dl className="mt-3 flex flex-col gap-1.5">
               <div className="flex justify-between gap-2">
-                <dt className="text-neutral-500">Stock</dt>
+                <dt className="text-muted-foreground">Stock</dt>
                 <dd>{bike.stock}</dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-neutral-500">Precio venta</dt>
+                <dt className="text-muted-foreground">Precio venta</dt>
                 <dd>
                   {bike.precio_venta != null
                     ? formatCop(bike.precio_venta)
@@ -187,15 +213,15 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                 </dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-neutral-500">Cuota inicial</dt>
+                <dt className="text-muted-foreground">Cuota inicial</dt>
                 <dd>{formatCop(bike.cuota_inicial)}</dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-neutral-500">Cuota diaria</dt>
+                <dt className="text-muted-foreground">Cuota diaria</dt>
                 <dd>{formatCop(bike.cuota_diaria)}</dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-neutral-500">Visita</dt>
+                <dt className="text-muted-foreground">Visita</dt>
                 <dd>{formatCop(bike.monto_visita ?? MONTO_VISITA_DEFAULT)}</dd>
               </div>
             </dl>
@@ -219,7 +245,7 @@ export function CatalogoManager({ bikes }: { bikes: BikeRow[] }) {
                     Eliminar
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-white">
+                <AlertDialogContent className="bg-background">
                   <AlertDialogHeader>
                     <AlertDialogTitle>¿Eliminar moto?</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -362,7 +388,7 @@ function BikeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-background">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar moto" : "Nueva moto"}</DialogTitle>
         </DialogHeader>
@@ -428,7 +454,7 @@ function BikeDialog({
             Cancelar
           </Button>
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || !modelo.trim() || !color.trim()}
             onClick={() =>
               onSave({
@@ -469,7 +495,7 @@ function Field({
   type?: string;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Label>{label}</Label>
       <Input
         type={type}

@@ -11,6 +11,43 @@ import type {
 export const DIAS_MORA_BANDEJA = 3;
 /** Primer día en bandeja "Motos para recoger" (exclusiva con mora). */
 export const DIAS_RECOGER_BANDEJA = 4;
+/** Días que el cliente tiene para recuperar la moto tras la recogida. */
+export const DIAS_RECUPERACION_CLIENTE = 3;
+
+/** Plazo de recuperación post-recogida (días calendario desde fecha_recogida). */
+export function getPlazoRecuperacion(fechaRecogida: string | null | undefined, now = new Date()) {
+  if (!fechaRecogida) {
+    return {
+      diasTranscurridos: 0,
+      diasRestantes: DIAS_RECUPERACION_CLIENTE,
+      plazoVencido: false,
+    };
+  }
+  const start = new Date(fechaRecogida);
+  const startUtc = Date.UTC(
+    start.getUTCFullYear(),
+    start.getUTCMonth(),
+    start.getUTCDate(),
+  );
+  const nowUtc = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+  const diasTranscurridos = Math.max(
+    0,
+    Math.floor((nowUtc - startUtc) / 86_400_000),
+  );
+  const diasRestantes = Math.max(
+    0,
+    DIAS_RECUPERACION_CLIENTE - diasTranscurridos,
+  );
+  return {
+    diasTranscurridos,
+    diasRestantes,
+    plazoVencido: diasTranscurridos >= DIAS_RECUPERACION_CLIENTE,
+  };
+}
 
 type MoraMorosoInput = Partial<
   Pick<MorosoRow, "dias_atraso" | "monto_adeudado" | "estado">
@@ -89,6 +126,16 @@ export function getMoraDisplay(input: {
     dias < DIAS_RECOGER_BANDEJA;
 
   return { dias, monto, enMoraBandeja, paraRecoger, tieneDeuda };
+}
+
+/** Guard puro: no pisar créditos liquidado/cancelado al marcar entrega. */
+export function assertPuedeMarcarEntregada(estado: string): void {
+  if (estado === "saldada") {
+    throw new Error("Este crédito ya fue liquidado.");
+  }
+  if (estado === "cancelada") {
+    throw new Error("Esta compra está cancelada.");
+  }
 }
 
 export function pipelineTieneCuentaMora(pipeline: ClientPipeline): boolean {

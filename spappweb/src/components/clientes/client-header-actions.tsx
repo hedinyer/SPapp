@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -94,7 +94,7 @@ export function ClientHeaderActions({ pipeline }: { pipeline: ClientPipeline }) 
         </Badge>
       )}
       {pipeline.currentAdminStep && (
-        <Badge className="w-fit bg-black text-white hover:bg-black">
+        <Badge className="w-fit">
           Acción requerida
         </Badge>
       )}
@@ -180,8 +180,8 @@ function CongelarCuotasDialog({
             mientras esté congelado.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="congelar-dias">Días</Label>
             <Input
               id="congelar-dias"
@@ -192,7 +192,7 @@ function CongelarCuotasDialog({
               onChange={(e) => setDias(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="congelar-notas">Observaciones (opcional)</Label>
             <Textarea
               id="congelar-notas"
@@ -340,8 +340,8 @@ function SaldarCreditoDialog({
               : "."}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="saldar-monto">Monto negociado</Label>
             <Input
               id="saldar-monto"
@@ -351,7 +351,7 @@ function SaldarCreditoDialog({
               onChange={(e) => setMonto(e.target.value)}
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label>Medio de pago</Label>
             <TouchSelect
               aria-label="Medio de pago"
@@ -365,7 +365,7 @@ function SaldarCreditoDialog({
           </div>
           {!presencial && (
             <>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="saldar-ref">Referencia</Label>
                 <Input
                   id="saldar-ref"
@@ -374,7 +374,7 @@ function SaldarCreditoDialog({
                   aria-invalid={referenciaDuplicada}
                 />
                 {referenciaDuplicada && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     Referencia ya usada por este cliente.
                   </p>
                 )}
@@ -390,7 +390,7 @@ function SaldarCreditoDialog({
             </>
           )}
           {presencial && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="saldar-ref-opc">Referencia (opcional)</Label>
               <Input
                 id="saldar-ref-opc"
@@ -400,7 +400,7 @@ function SaldarCreditoDialog({
               />
             </div>
           )}
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="saldar-notas">Notas (opcional)</Label>
             <Textarea
               id="saldar-notas"

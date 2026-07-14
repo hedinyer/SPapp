@@ -276,34 +276,50 @@ export async function markDelivered(compraId: string, userId: number) {
 
   const { data: compra } = await supabase
     .from("user_moto_compra")
-    .select("modelo, color, placa, chasis")
+    .select("modelo, color, placa, chasis, estado, garaje_moto_id")
     .eq("id", compraId)
     .maybeSingle();
+
+  if (!compra) throw new Error("Compra no encontrada.");
+  const { assertPuedeMarcarEntregada } = await import("@/lib/pipeline/mora-utils");
+  assertPuedeMarcarEntregada(String(compra.estado));
+  if (compra.estado === "entregada") {
+    return { ok: true };
+  }
 
   const { error } = await supabase
     .from("user_moto_compra")
     .update({ estado: "entregada" })
-    .eq("id", compraId);
+    .eq("id", compraId)
+    .neq("estado", "saldada")
+    .neq("estado", "cancelada");
 
   if (error) throw new Error(error.message);
+
+  if (compra.garaje_moto_id) {
+    await supabase
+      .from("garaje_motos")
+      .update({ estado: "vendida" })
+      .eq("id", compra.garaje_moto_id);
+    revalidatePath("/garaje");
+  }
 
   await emitPipelineEvent({
     userId,
     kind: "entrega_marcada",
-    payload: compra
-      ? {
-          moto: {
-            modelo: String(compra.modelo ?? ""),
-            color: String(compra.color ?? ""),
-            placa: (compra.placa as string | null) ?? null,
-            chasis: (compra.chasis as string | null) ?? null,
-          },
-        }
-      : undefined,
+    payload: {
+      moto: {
+        modelo: String(compra.modelo ?? ""),
+        color: String(compra.color ?? ""),
+        placa: (compra.placa as string | null) ?? null,
+        chasis: (compra.chasis as string | null) ?? null,
+      },
+    },
   });
 
   revalidateClient(userId);
   revalidatePath("/catalogo");
+  revalidatePath("/vendidas");
   return { ok: true };
 }
 
@@ -354,12 +370,27 @@ export async function setEntregaAntesVisita(
 
 export async function cancelCompra(compraId: string, userId: number) {
   const supabase = await assertAdmin();
+
+  const { data: compra } = await supabase
+    .from("user_moto_compra")
+    .select("garaje_moto_id")
+    .eq("id", compraId)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("user_moto_compra")
     .update({ estado: "cancelada" })
     .eq("id", compraId);
 
   if (error) throw new Error(error.message);
+
+  if (compra?.garaje_moto_id) {
+    await supabase
+      .from("garaje_motos")
+      .update({ estado: "disponible" })
+      .eq("id", compra.garaje_moto_id);
+    revalidatePath("/garaje");
+  }
 
   await emitPipelineEvent({ userId, kind: "compra_cancelada" });
 
@@ -825,12 +856,28 @@ const garajeMotoSchema = z
     color: z.string().min(1),
     origen: z.enum(["manual", "recuperacion"]),
     condicion: z.enum(["nueva", "segunda_mano", "recuperada"]),
-    estado: z.enum(["en_garaje", "disponible", "vendida", "baja"]),
+    estado: z.enum([
+      "en_garaje",
+      "retenida",
+      "en_mantenimiento",
+      "disponible",
+      "vendida",
+      "devuelta",
+      "baja",
+    ]),
+    cuotaInicial: z.number().int().nonnegative().nullable().optional(),
+    cuotaDiaria: z.number().int().nonnegative().nullable().optional(),
+    montoVisita: z.number().int().nonnegative().nullable().optional(),
     notas: z.string().optional(),
     isNewManual: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.isNewManual && !data.placaFotoUrl?.trim()) {
+    // Motos nuevas suelen no tener placa aún.
+    if (
+      data.isNewManual &&
+      data.condicion !== "nueva" &&
+      !data.placaFotoUrl?.trim()
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "La foto de placa es obligatoria para registros manuales.",
@@ -855,6 +902,9 @@ export async function saveGarajeMoto(
       origen: parsed.origen,
       condicion: parsed.condicion,
       estado: parsed.estado,
+      cuota_inicial: parsed.cuotaInicial ?? null,
+      cuota_diaria: parsed.cuotaDiaria ?? null,
+      monto_visita: parsed.montoVisita ?? null,
       notas: parsed.notas?.trim() || null,
     };
     if (parsed.id) {
@@ -883,6 +933,255 @@ export async function saveGarajeMoto(
 export async function deleteGarajeMoto(id: string) {
   const supabase = await assertAdmin();
   return adminDelete(supabase, "garaje_motos", id, "/garaje");
+}
+
+const liberarGarajeSchema = z.object({
+  garajeMotoId: z.string().uuid(),
+});
+
+/** Plazo de 3 días vencido → pasa a mantenimiento antes de reventa. */
+export async function liberarGarajeMotoParaVenta(
+  input: z.infer<typeof liberarGarajeSchema>,
+) {
+  const parsed = liberarGarajeSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { data: moto, error: fetchError } = await supabase
+    .from("garaje_motos")
+    .select("id, estado, moto_para_recoger_id")
+    .eq("id", parsed.garajeMotoId)
+    .maybeSingle();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!moto) throw new Error("Moto no encontrada en garaje.");
+  if (moto.estado !== "retenida") {
+    throw new Error("Solo se pueden liberar motos retenidas.");
+  }
+
+  if (moto.moto_para_recoger_id) {
+    const { data: recoger } = await supabase
+      .from("motos_para_recoger")
+      .select("fecha_recogida")
+      .eq("id", moto.moto_para_recoger_id)
+      .maybeSingle();
+    const { getPlazoRecuperacion } = await import("@/lib/pipeline/mora-utils");
+    const plazo = getPlazoRecuperacion(recoger?.fecha_recogida);
+    if (!plazo.plazoVencido) {
+      throw new Error(
+        `Aún quedan ${plazo.diasRestantes} día(s) de plazo para que el cliente recupere la moto.`,
+      );
+    }
+  }
+
+  const { error } = await supabase
+    .from("garaje_motos")
+    .update({ estado: "en_mantenimiento" })
+    .eq("id", parsed.garajeMotoId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/garaje");
+  return { ok: true };
+}
+
+const devolverGarajeSchema = z.object({
+  garajeMotoId: z.string().uuid(),
+});
+
+/** Cliente pagó parte de la deuda → moto vuelve al cliente. */
+export async function devolverGarajeMotoAlCliente(
+  input: z.infer<typeof devolverGarajeSchema>,
+) {
+  const parsed = devolverGarajeSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { data: moto, error: fetchError } = await supabase
+    .from("garaje_motos")
+    .select("id, estado, user_moto_compra_id, moto_para_recoger_id")
+    .eq("id", parsed.garajeMotoId)
+    .maybeSingle();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!moto) throw new Error("Moto no encontrada en garaje.");
+  if (moto.estado !== "retenida") {
+    throw new Error("Solo se pueden devolver motos retenidas.");
+  }
+
+  const { error } = await supabase
+    .from("garaje_motos")
+    .update({ estado: "devuelta" })
+    .eq("id", parsed.garajeMotoId);
+  if (error) throw new Error(error.message);
+
+  if (moto.user_moto_compra_id) {
+    await supabase
+      .from("user_moto_compra")
+      .update({ estado_fisico: "activa" })
+      .eq("id", moto.user_moto_compra_id);
+  }
+
+  if (moto.moto_para_recoger_id) {
+    await supabase
+      .from("motos_para_recoger")
+      .update({ estado: "cancelada", notas: "Moto devuelta al cliente tras pago parcial." })
+      .eq("id", moto.moto_para_recoger_id);
+  }
+
+  revalidatePath("/garaje");
+  revalidatePath("/vendidas");
+  if (moto.user_moto_compra_id) {
+    const { data: compra } = await supabase
+      .from("user_moto_compra")
+      .select("user_id")
+      .eq("id", moto.user_moto_compra_id)
+      .maybeSingle();
+    if (compra?.user_id) revalidateClient(compra.user_id as number);
+  }
+  return { ok: true };
+}
+
+const addMantenimientoSchema = z.object({
+  garajeMotoId: z.string().uuid(),
+  productoId: z.number().int().positive(),
+  cantidad: z.number().int().positive(),
+  notas: z.string().optional(),
+});
+
+export async function addGarajeMantenimientoItem(
+  input: z.infer<typeof addMantenimientoSchema>,
+) {
+  const parsed = addMantenimientoSchema.parse(input);
+  const session = await requireAdminSession();
+  const supabase = createAdminClient();
+
+  const { data: moto } = await supabase
+    .from("garaje_motos")
+    .select("id, estado")
+    .eq("id", parsed.garajeMotoId)
+    .maybeSingle();
+  if (!moto) throw new Error("Moto no encontrada.");
+  if (moto.estado !== "en_mantenimiento" && moto.estado !== "disponible") {
+    throw new Error("La moto debe estar en mantenimiento o disponible.");
+  }
+
+  const { data: producto, error: prodError } = await supabase
+    .from("inventario_productos")
+    .select("id, stock, costo, nombre")
+    .eq("id", parsed.productoId)
+    .maybeSingle();
+  if (prodError) throw new Error(prodError.message);
+  if (!producto) throw new Error("Producto no encontrado.");
+  if ((producto.stock as number) < parsed.cantidad) {
+    throw new Error(
+      `Stock insuficiente de ${producto.nombre} (hay ${producto.stock}).`,
+    );
+  }
+
+  const { error: stockError } = await supabase
+    .from("inventario_productos")
+    .update({ stock: (producto.stock as number) - parsed.cantidad })
+    .eq("id", parsed.productoId);
+  if (stockError) throw new Error(stockError.message);
+
+  const { error: insertError } = await supabase
+    .from("garaje_mantenimiento_items")
+    .insert({
+      garaje_moto_id: parsed.garajeMotoId,
+      producto_id: parsed.productoId,
+      cantidad: parsed.cantidad,
+      costo_unitario: (producto.costo as number) ?? 0,
+      notas: parsed.notas?.trim() || null,
+      created_by: session.username ?? "admin",
+    });
+  if (insertError) {
+    await supabase
+      .from("inventario_productos")
+      .update({ stock: producto.stock })
+      .eq("id", parsed.productoId);
+    throw new Error(insertError.message);
+  }
+
+  if (moto.estado === "disponible") {
+    await supabase
+      .from("garaje_motos")
+      .update({ estado: "en_mantenimiento" })
+      .eq("id", parsed.garajeMotoId);
+  }
+
+  revalidatePath("/garaje");
+  revalidatePath("/inventario");
+  return { ok: true };
+}
+
+export async function removeGarajeMantenimientoItem(itemId: string) {
+  await requireAdminSession();
+  const supabase = createAdminClient();
+
+  const { data: item, error: fetchError } = await supabase
+    .from("garaje_mantenimiento_items")
+    .select("id, producto_id, cantidad")
+    .eq("id", itemId)
+    .maybeSingle();
+  if (fetchError) throw new Error(fetchError.message);
+  if (!item) throw new Error("Ítem no encontrado.");
+
+  const { data: producto } = await supabase
+    .from("inventario_productos")
+    .select("stock")
+    .eq("id", item.producto_id)
+    .maybeSingle();
+
+  const { error: delError } = await supabase
+    .from("garaje_mantenimiento_items")
+    .delete()
+    .eq("id", itemId);
+  if (delError) throw new Error(delError.message);
+
+  if (producto) {
+    await supabase
+      .from("inventario_productos")
+      .update({ stock: (producto.stock as number) + (item.cantidad as number) })
+      .eq("id", item.producto_id);
+  }
+
+  revalidatePath("/garaje");
+  revalidatePath("/inventario");
+  return { ok: true };
+}
+
+const terminarMantenimientoSchema = z.object({
+  garajeMotoId: z.string().uuid(),
+  cuotaInicial: z.number().int().positive(),
+  cuotaDiaria: z.number().int().positive(),
+  montoVisita: z.number().int().nonnegative().optional(),
+});
+
+export async function terminarGarajeMantenimiento(
+  input: z.infer<typeof terminarMantenimientoSchema>,
+) {
+  const parsed = terminarMantenimientoSchema.parse(input);
+  const supabase = await assertAdmin();
+
+  const { data: moto } = await supabase
+    .from("garaje_motos")
+    .select("id, estado")
+    .eq("id", parsed.garajeMotoId)
+    .maybeSingle();
+  if (!moto) throw new Error("Moto no encontrada.");
+  if (moto.estado !== "en_mantenimiento") {
+    throw new Error("La moto no está en mantenimiento.");
+  }
+
+  const { error } = await supabase
+    .from("garaje_motos")
+    .update({
+      estado: "disponible",
+      cuota_inicial: parsed.cuotaInicial,
+      cuota_diaria: parsed.cuotaDiaria,
+      monto_visita: parsed.montoVisita ?? MONTO_VISITA_DEFAULT,
+    })
+    .eq("id", parsed.garajeMotoId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/garaje");
+  return { ok: true };
 }
 
 const markMotoRecogidaSchema = z.object({
@@ -939,6 +1238,15 @@ export async function updateVendidaEstadoFisico(
   const parsed = vendidaEstadoFisicoSchema.parse(input);
   const supabase = await assertAdmin();
 
+  const { data: compra, error: compraError } = await supabase
+    .from("user_moto_compra")
+    .select("id, modelo, color, placa, referencia, chasis, estado")
+    .eq("id", parsed.compraId)
+    .eq("estado", "entregada")
+    .maybeSingle();
+  if (compraError) throw new Error(compraError.message);
+  if (!compra) throw new Error("Compra entregada no encontrada.");
+
   const { error } = await supabase
     .from("user_moto_compra")
     .update({ estado_fisico: parsed.estadoFisico })
@@ -946,7 +1254,39 @@ export async function updateVendidaEstadoFisico(
     .eq("estado", "entregada");
 
   if (error) throw new Error(error.message);
+
+  // ponytail: al pasar a patio/recogida, refleja la unidad física en garaje
+  if (
+    parsed.estadoFisico === "recogida" ||
+    parsed.estadoFisico === "en_patio"
+  ) {
+    const { data: existing } = await supabase
+      .from("garaje_motos")
+      .select("id")
+      .eq("user_moto_compra_id", parsed.compraId)
+      .maybeSingle();
+
+    if (!existing) {
+      const { error: garajeError } = await supabase.from("garaje_motos").insert({
+        placa: compra.placa,
+        referencia:
+          (compra.referencia as string | null)?.trim() ||
+          (compra.chasis as string | null)?.trim() ||
+          "sin-referencia",
+        modelo: compra.modelo,
+        color: compra.color,
+        origen: "recuperacion",
+        condicion: "recuperada",
+        estado: "retenida",
+        user_moto_compra_id: parsed.compraId,
+        notas: `Creada al marcar estado físico: ${parsed.estadoFisico}.`,
+      });
+      if (garajeError) throw new Error(garajeError.message);
+    }
+  }
+
   revalidatePath("/vendidas");
+  revalidatePath("/garaje");
   revalidateClient(parsed.userId);
   return { ok: true };
 }

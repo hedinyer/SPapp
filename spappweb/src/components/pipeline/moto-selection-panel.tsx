@@ -32,8 +32,8 @@ export function MotoSelectionPanel({
 }: MotoSelectionPanelProps) {
   if (!contractSigned(contract)) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           {contract?.status === "firmado"
             ? "El cliente elige la moto desde el enlace (flujo anterior)."
             : "Asigna moto y placa desde el panel de administración."}
@@ -44,9 +44,9 @@ export function MotoSelectionPanel({
 
   if (!compra) {
     return (
-      <Card className="border-neutral-200 shadow-none">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Selección de moto</CardTitle>
+          <CardTitle>Selección de moto</CardTitle>
         </CardHeader>
         <CardContent>
           {contractId ? (
@@ -55,7 +55,7 @@ export function MotoSelectionPanel({
               celular={clienteCelular}
             />
           ) : (
-            <p className="text-center text-sm text-neutral-500">
+            <p className="text-center text-sm text-muted-foreground">
               Esperando que el cliente elija su moto.
             </p>
           )}
@@ -65,38 +65,38 @@ export function MotoSelectionPanel({
   }
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Moto seleccionada</CardTitle>
+        <CardTitle>Moto seleccionada</CardTitle>
       </CardHeader>
       <CardContent>
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-neutral-500">Modelo</dt>
+            <dt className="text-muted-foreground">Modelo</dt>
             <dd className="font-medium">{compra.modelo}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Color</dt>
+            <dt className="text-muted-foreground">Color</dt>
             <dd className="font-medium">{compra.color}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Frecuencia</dt>
+            <dt className="text-muted-foreground">Frecuencia</dt>
             <dd>{FRECUENCIA_LABELS[compra.frecuencia_pago]}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Estado</dt>
+            <dt className="text-muted-foreground">Estado</dt>
             <dd>{COMPRA_ESTADO_LABELS[compra.estado]}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Cuota inicial</dt>
+            <dt className="text-muted-foreground">Cuota inicial</dt>
             <dd>{formatCop(compra.cuota_inicial_monto)}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Cuota adelantada</dt>
+            <dt className="text-muted-foreground">Cuota adelantada</dt>
             <dd>{formatCop(compra.monto_cuota_periodo)}</dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-neutral-500">Total primer pago</dt>
+            <dt className="text-muted-foreground">Total primer pago</dt>
             <dd className="text-lg font-semibold">
               {formatCop(compra.monto_total_primer_pago)}
             </dd>
@@ -129,11 +129,11 @@ function ShareMotoLinkCard({
   const waUrl = `${waBase}?text=${encodeURIComponent(mensaje)}`;
 
   return (
-    <div className="space-y-3 rounded-lg border border-blue-300 bg-blue-50 p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-blue-300 bg-blue-50 p-4">
       <p className="text-sm font-medium text-blue-900">
         Link para que el cliente elija moto, modelo y color
       </p>
-      <p className="break-all rounded-md border border-blue-200 bg-white px-3 py-2 text-xs text-neutral-700">
+      <p className="break-all rounded-md border border-blue-200 bg-background px-3 py-2 text-xs text-foreground">
         {link}
       </p>
       <div className="flex flex-wrap gap-2">

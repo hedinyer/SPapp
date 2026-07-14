@@ -82,34 +82,34 @@ export function AbonoVentaDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-sm">
+      <DialogContent className="bg-background sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Registrar abono</DialogTitle>
           {venta ? (
-            <p className="text-sm text-neutral-500">{venta.clienteNombre}</p>
+            <p className="text-sm text-muted-foreground">{venta.clienteNombre}</p>
           ) : null}
         </DialogHeader>
 
         {venta ? (
-          <div className="space-y-4">
-            <dl className="space-y-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
+          <div className="flex flex-col gap-4">
+            <dl className="flex flex-col gap-2 rounded-lg border border-border bg-muted/50 p-3 text-sm">
               <div className="flex justify-between">
-                <dt className="text-neutral-500">Precio</dt>
+                <dt className="text-muted-foreground">Precio</dt>
                 <dd className="font-medium">
                   {venta.valorVenta != null ? formatCop(venta.valorVenta) : "—"}
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-neutral-500">Pagado</dt>
+                <dt className="text-muted-foreground">Pagado</dt>
                 <dd className="font-medium">{formatCop(venta.montoPagado)}</dd>
               </div>
-              <div className="flex justify-between border-t border-neutral-200 pt-2">
-                <dt className="font-medium text-neutral-700">Saldo</dt>
+              <div className="flex justify-between border-t border-border pt-2">
+                <dt className="font-medium text-foreground">Saldo</dt>
                 <dd className="font-semibold text-amber-700">{formatCop(saldo)}</dd>
               </div>
             </dl>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="abono-monto">Monto del abono</Label>
               <Input
                 id="abono-monto"
@@ -133,7 +133,7 @@ export function AbonoVentaDialog({
           </Button>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             onClick={submit}
             disabled={pending || !venta}
           >

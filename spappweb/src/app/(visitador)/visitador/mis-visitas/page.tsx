@@ -25,7 +25,7 @@ export default async function MisVisitasPage() {
 
   if (error) {
     return (
-      <p className="text-center text-sm text-red-600">
+      <p className="text-center text-sm text-destructive">
         No se pudieron cargar las visitas: {error.message}
       </p>
     );
@@ -37,7 +37,7 @@ export default async function MisVisitasPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold sm:text-2xl">Hola, {session.username}</h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           {visitas.length === 0
             ? "No tienes visitas asignadas por ahora."
             : `${visitas.length} visita(s) pendiente(s)`}
@@ -45,8 +45,8 @@ export default async function MisVisitasPage() {
       </div>
 
       {visitas.length === 0 ? (
-        <Card className="border-neutral-200 shadow-none">
-          <CardContent className="py-8 text-center text-sm text-neutral-500">
+        <Card className="border-border shadow-none">
+          <CardContent className="py-8 text-center text-sm text-muted-foreground">
             Cuando el administrador te asigne una visita, aparecerá aquí.
           </CardContent>
         </Card>
@@ -55,13 +55,13 @@ export default async function MisVisitasPage() {
           {visitas.map((visita) => (
             <li key={visita.id}>
               <Link href={`/visitador/visitas/${visita.id}`}>
-                <Card className="border-neutral-200 shadow-none transition-colors hover:bg-neutral-50">
+                <Card className="border-border shadow-none transition-colors hover:bg-muted/50">
                   <CardContent className="flex items-center justify-between gap-3 py-4 min-h-[4.5rem]">
                     <div className="min-w-0">
                       <p className="font-medium">
                         {visita.cliente_nombre ?? "Cliente"}
                       </p>
-                      <p className="mt-1 flex items-start gap-1 text-sm text-neutral-500">
+                      <p className="mt-1 flex items-start gap-1 text-sm text-muted-foreground">
                         <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">
                           {[visita.direccion_visita, visita.barrio]
@@ -69,11 +69,11 @@ export default async function MisVisitasPage() {
                             .join(", ") || "Sin dirección"}
                         </span>
                       </p>
-                      <p className="mt-1 text-xs text-neutral-400">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {formatDate(visita.fecha_programada)}
                       </p>
                     </div>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-neutral-400" />
+                    <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
                   </CardContent>
                 </Card>
               </Link>

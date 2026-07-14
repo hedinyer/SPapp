@@ -119,19 +119,19 @@ export function EditarVentaContadoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto bg-white sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto bg-background sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Editar venta de contado</DialogTitle>
           {venta ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               {venta.modelo} · {venta.color} · {formatDate(venta.createdAt)}
             </p>
           ) : null}
         </DialogHeader>
 
         {venta ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="edit-cliente-nombre">Nombre del cliente</Label>
               <Input
                 id="edit-cliente-nombre"
@@ -141,7 +141,7 @@ export function EditarVentaContadoDialog({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="edit-cliente-cedula">Cédula</Label>
                 <Input
                   id="edit-cliente-cedula"
@@ -150,7 +150,7 @@ export function EditarVentaContadoDialog({
                   onChange={(e) => setClienteCedula(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="edit-cliente-celular">Celular</Label>
                 <Input
                   id="edit-cliente-celular"
@@ -162,7 +162,7 @@ export function EditarVentaContadoDialog({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="edit-chasis">Chasis</Label>
                 <Input
                   id="edit-chasis"
@@ -170,7 +170,7 @@ export function EditarVentaContadoDialog({
                   onChange={(e) => setChasis(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="edit-placa">Placa</Label>
                 <Input
                   id="edit-placa"
@@ -182,10 +182,10 @@ export function EditarVentaContadoDialog({
               </div>
             </div>
 
-            <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+            <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-3">
               <p className="text-sm font-medium">Pago</p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="edit-valor-venta">Precio total</Label>
                   <Input
                     id="edit-valor-venta"
@@ -194,7 +194,7 @@ export function EditarVentaContadoDialog({
                     onChange={(e) => setValorVenta(e.target.value)}
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="edit-monto-pagado">Pagado</Label>
                   <Input
                     id="edit-monto-pagado"
@@ -205,7 +205,7 @@ export function EditarVentaContadoDialog({
                 </div>
               </div>
               {valorNum > 0 && pagadoNum >= 0 ? (
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-muted-foreground">
                   {pagadoNum >= valorNum
                     ? "Pago de contado."
                     : pagadoNum > 0
@@ -225,7 +225,7 @@ export function EditarVentaContadoDialog({
               </Button>
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="edit-notas">Notas</Label>
               <Input
                 id="edit-notas"
@@ -247,7 +247,7 @@ export function EditarVentaContadoDialog({
           </Button>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             onClick={submit}
             disabled={pending || !venta}
           >

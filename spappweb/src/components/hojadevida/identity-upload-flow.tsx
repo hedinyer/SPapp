@@ -115,11 +115,11 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
           title="¿Se ven bien las fotos?"
           instruction="Si alguna salió borrosa, pulsa «Cambiar» y repítela."
         >
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {STEPS.map((s) => (
               <div
                 key={s.key}
-                className="flex items-center gap-3 rounded-xl border-2 border-neutral-200 p-3"
+                className="flex items-center gap-3 rounded-xl border-2 border-border p-3"
               >
                 {previews[s.key] ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
@@ -132,15 +132,15 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
                     />
                   </div>
                 ) : (
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-400">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
                     ?
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-black">{s.title}</p>
+                  <p className="font-semibold text-foreground">{s.title}</p>
                   <button
                     type="button"
-                    className="mt-1 min-h-10 text-sm font-medium text-black underline"
+                    className="mt-1 min-h-10 text-sm font-medium text-foreground underline"
                     onClick={() => setStep(STEPS.findIndex((x) => x.key === s.key))}
                   >
                     Cambiar esta foto
@@ -187,7 +187,7 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
         <div
           className={cn(
             "flex flex-col items-center rounded-xl border-2 border-dashed p-6",
-            hasPhoto ? "border-green-500 bg-green-50/50" : "border-neutral-300 bg-neutral-50",
+            hasPhoto ? "border-green-500 bg-green-50/50" : "border-border bg-muted/50",
           )}
         >
           {hasPhoto && previews[current.key] ? (
@@ -207,7 +207,7 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
               </p>
             </>
           ) : (
-            <Icon className="mb-3 h-16 w-16 text-neutral-400" strokeWidth={1.25} />
+            <Icon className="mb-3 h-16 w-16 text-muted-foreground" strokeWidth={1.25} />
           )}
 
           <input
@@ -234,7 +234,7 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
             }}
           />
 
-          <div className="mt-4 w-full space-y-3">
+          <div className="mt-4 w-full flex flex-col gap-3">
             <PrimaryAction onClick={() => cameraRef.current?.click()}>
               <span className="inline-flex items-center justify-center gap-2">
                 <Camera className="h-5 w-5" />
@@ -244,7 +244,7 @@ export function IdentityUploadFlow({ onComplete }: IdentityUploadFlowProps) {
             <button
               type="button"
               onClick={() => galleryRef.current?.click()}
-              className="flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl border-2 border-neutral-200 bg-white text-base font-semibold text-black active:bg-neutral-50"
+              className="flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl border-2 border-border bg-background text-base font-semibold text-foreground active:bg-muted/50"
             >
               <ImagePlus className="h-5 w-5" />
               Elegir de la galería

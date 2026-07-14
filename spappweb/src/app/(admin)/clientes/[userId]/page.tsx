@@ -10,6 +10,7 @@ import {
 import { ClientPipelineView } from "@/components/pipeline/client-pipeline-view";
 import { ClientInfoSummary } from "@/components/clientes/client-info-summary";
 import { ClientHeaderActions } from "@/components/clientes/client-header-actions";
+import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 
 export default async function ClientPage({
@@ -31,23 +32,19 @@ export default async function ClientPage({
   if (!pipeline) notFound();
 
   return (
-    <div className="space-y-6">
-      <Button variant="ghost" asChild className="gap-2 px-0">
-        <Link href="/inbox?cola=creditos">
-          <ChevronLeft className="h-4 w-4" />
-          Volver a clientes
+    <div className="flex flex-col gap-6">
+      <Button variant="ghost" asChild className="w-fit gap-2 px-0">
+        <Link href="/clientes">
+          <ChevronLeft data-icon="inline-start" />
+          Volver a Clientes
         </Link>
       </Button>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-xl font-semibold sm:text-2xl">{pipeline.displayName}</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Usuario @{pipeline.user.user} · ID {pipeline.user.id}
-          </p>
-        </div>
-        <ClientHeaderActions pipeline={pipeline} />
-      </div>
+      <PageHeader
+        title={pipeline.displayName}
+        description={`Usuario @${pipeline.user.user} · ID ${pipeline.user.id}`}
+        action={<ClientHeaderActions pipeline={pipeline} />}
+      />
 
       <ClientInfoSummary pipeline={pipeline} bikes={bikes} />
 

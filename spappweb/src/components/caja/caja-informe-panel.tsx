@@ -21,14 +21,14 @@ function Line({
   if (value === 0 && (count == null || count === 0)) return null;
   return (
     <div
-      className={`flex items-center justify-between text-sm ${muted ? "text-neutral-500" : ""}`}
+      className={`flex items-center justify-between text-sm ${muted ? "text-muted-foreground" : ""}`}
     >
       <span>
         {label}
         {count != null && count > 0 ? ` (${count})` : ""}
       </span>
       <span
-        className={`font-medium tabular-nums ${negative ? "text-red-600" : ""}`}
+        className={`font-medium tabular-nums ${negative ? "text-destructive" : ""}`}
       >
         {sign ? `${sign} ` : ""}
         {formatCop(value)}
@@ -63,11 +63,11 @@ export function CajaInformePanel({
     nequi.pagosSalida > 0 || davivienda.pagosSalida > 0;
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {title ? <p className="text-sm font-semibold">{title}</p> : null}
 
-      <div className="space-y-2 rounded-lg border border-neutral-200 bg-white p-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+      <div className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Ingresos · efectivo en caja
         </p>
         <Line label="Apertura" value={efectivo.apertura} sign="+" muted />
@@ -100,7 +100,7 @@ export function CajaInformePanel({
         <Line label="Salidas manuales" value={efectivo.salidasManuales} sign="−" negative />
         <Line label="Pagos registrados (efectivo)" value={efectivo.pagosSalida} sign="−" negative />
         {!compact ? (
-          <div className="flex items-center justify-between border-t border-neutral-100 pt-2 text-sm font-semibold">
+          <div className="flex items-center justify-between border-t border-border pt-2 text-sm font-semibold">
             <span>Efectivo esperado</span>
             <span className="tabular-nums">{formatCop(efectivo.esperadoEnCaja)}</span>
           </div>
@@ -108,8 +108,8 @@ export function CajaInformePanel({
       </div>
 
       {tieneTransferenciasIn ? (
-        <div className="space-y-2 rounded-lg border border-neutral-200 bg-white p-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
+        <div className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Ingresos · transferencias
           </p>
           <Line label="Nequi" value={nequi.monto} count={nequi.cantidad} sign="+" />
@@ -123,7 +123,7 @@ export function CajaInformePanel({
       ) : null}
 
       {egresos.total > 0 ? (
-        <div className="space-y-2 rounded-lg border border-red-100 bg-red-50/50 p-3">
+        <div className="flex flex-col gap-2 rounded-lg border border-red-100 bg-red-50/50 p-3">
           <p className="text-xs font-medium uppercase tracking-wide text-red-700">
             Pagos / salidas del día
           </p>
@@ -148,12 +148,12 @@ export function CajaInformePanel({
       ) : null}
 
       {tieneTransferenciasOut && !compact ? (
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-muted-foreground">
           Los pagos por Nequi o Davivienda no afectan el efectivo físico en caja.
         </p>
       ) : null}
 
-      <div className="space-y-1 rounded-lg border border-neutral-300 bg-neutral-50 p-3">
+      <div className="flex flex-col gap-1 rounded-lg border border-border bg-muted/50 p-3">
         <div className="flex items-center justify-between text-sm font-semibold">
           <span>Ingresos del día</span>
           <span className="tabular-nums text-green-700">
@@ -163,22 +163,22 @@ export function CajaInformePanel({
         {egresos.total > 0 ? (
           <div className="flex items-center justify-between text-sm font-semibold">
             <span>Pagos del día</span>
-            <span className="tabular-nums text-red-600">
+            <span className="tabular-nums text-destructive">
               −{formatCop(informe.egresosDia)}
             </span>
           </div>
         ) : null}
-        <div className="flex items-center justify-between border-t border-neutral-200 pt-2 text-sm font-bold">
+        <div className="flex items-center justify-between border-t border-border pt-2 text-sm font-bold">
           <span>Neto del día</span>
           <span
-            className={`tabular-nums ${informe.netoDia >= 0 ? "text-green-700" : "text-red-600"}`}
+            className={`tabular-nums ${informe.netoDia >= 0 ? "text-green-700" : "text-destructive"}`}
           >
             {formatCop(informe.netoDia)}
           </span>
         </div>
         {!compact ? (
-          <div className="flex items-center justify-between border-t border-neutral-200 pt-2 text-sm">
-            <span className="text-neutral-600">Total con apertura</span>
+          <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
+            <span className="text-muted-foreground">Total con apertura</span>
             <span className="font-medium tabular-nums">
               {formatCop(informe.totalRecaudado)}
             </span>
@@ -187,15 +187,15 @@ export function CajaInformePanel({
       </div>
 
       {!compact && informe.pagos.length > 0 ? (
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-neutral-500">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-muted-foreground">
             Cobros crédito y visitas confirmados
           </p>
-          <ul className="max-h-32 space-y-1 overflow-y-auto text-sm">
+          <ul className="max-h-32 flex flex-col gap-1 overflow-y-auto text-sm">
             {informe.pagos.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center justify-between rounded border border-neutral-100 px-2 py-1"
+                className="flex items-center justify-between rounded border border-border px-2 py-1"
               >
                 <span className="truncate">
                   {p.clienteNombre ? `${p.clienteNombre} · ` : ""}
@@ -211,22 +211,22 @@ export function CajaInformePanel({
       ) : null}
 
       {!compact && informe.egresosDetalle.length > 0 ? (
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-neutral-500">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-medium text-muted-foreground">
             Detalle de pagos
           </p>
-          <ul className="max-h-32 space-y-1 overflow-y-auto text-sm">
+          <ul className="max-h-32 flex flex-col gap-1 overflow-y-auto text-sm">
             {informe.egresosDetalle.map((e) => (
               <li
                 key={e.id}
-                className="flex items-center justify-between rounded border border-neutral-100 px-2 py-1"
+                className="flex items-center justify-between rounded border border-border px-2 py-1"
               >
                 <span className="truncate">
                   {e.concepto}
                   {e.beneficiario ? ` · ${e.beneficiario}` : ""}
-                  <span className="text-neutral-400"> ({e.medioLabel})</span>
+                  <span className="text-muted-foreground"> ({e.medioLabel})</span>
                 </span>
-                <span className="shrink-0 tabular-nums font-medium text-red-600">
+                <span className="shrink-0 tabular-nums font-medium text-destructive">
                   −{formatCop(e.monto)}
                 </span>
               </li>

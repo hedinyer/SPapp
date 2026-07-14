@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -559,7 +559,7 @@ export function VenderProductosSheet({
           }}
         />
 
-        <SheetHeader className="border-b border-neutral-200 px-4 pb-3 pt-4">
+        <SheetHeader className="border-b border-border px-4 pb-3 pt-4">
           <SheetTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
             Venta productos
@@ -572,10 +572,10 @@ export function VenderProductosSheet({
             mobileLayout && "pb-28",
           )}
         >
-        <div className="space-y-4 px-4 py-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4 px-4 py-4">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium text-neutral-700">
+              <p className="text-sm font-medium text-foreground">
                 Escanear etiqueta
               </p>
               <Button
@@ -602,20 +602,20 @@ export function VenderProductosSheet({
             {mobileLayout && !cameraOn ? (
               <button
                 type="button"
-                className="flex min-h-[12rem] w-full flex-col items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+                className="flex min-h-[12rem] w-full flex-col items-center justify-center gap-2 rounded-xl border border-border bg-muted p-4 text-muted-foreground active:bg-neutral-200/80"
                 onClick={() => void startCamera()}
               >
                 <Camera className="h-10 w-10" />
                 <span className="text-sm font-medium">
                   Toca para activar la cámara
                 </span>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-muted-foreground">
                   Apunta al QR de la etiqueta
                 </span>
               </button>
             ) : !mobileLayout ? (
               <>
-                <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-neutral-200 bg-black">
+                <div className="relative aspect-[4/3] w-full max-h-[min(45dvh,320px)] overflow-hidden rounded-xl border border-border bg-black">
                   <div
                     id={SCANNER_ID}
                     ref={scannerContainerRef}
@@ -627,14 +627,14 @@ export function VenderProductosSheet({
                   {!cameraOn ? (
                     <button
                       type="button"
-                      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+                      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-muted p-4 text-muted-foreground active:bg-neutral-200/80"
                       onClick={() => void startCamera()}
                     >
                       <Camera className="h-10 w-10" />
                       <span className="text-sm font-medium">
                         Toca para activar la cámara
                       </span>
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-muted-foreground">
                         Apunta al QR de la etiqueta
                       </span>
                     </button>
@@ -657,7 +657,7 @@ export function VenderProductosSheet({
             ) : null}
 
             {cameraOn && !mobileLayout ? (
-              <p className="text-center text-xs text-neutral-500">
+              <p className="text-center text-xs text-muted-foreground">
                 Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
               </p>
             ) : null}
@@ -696,14 +696,14 @@ export function VenderProductosSheet({
             </div>
 
             {listaAbierta && busqueda.trim().length >= 2 ? (
-              <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg">
+              <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-border bg-background shadow-lg">
                 {searchPending && resultados.length === 0 ? (
-                  <p className="px-3 py-2 text-sm text-neutral-500">
+                  <p className="px-3 py-2 text-sm text-muted-foreground">
                     Buscando…
                   </p>
                 ) : null}
                 {!searchPending && resultados.length === 0 ? (
-                  <p className="px-3 py-2 text-sm text-neutral-500">
+                  <p className="px-3 py-2 text-sm text-muted-foreground">
                     Sin resultados
                   </p>
                 ) : null}
@@ -712,14 +712,14 @@ export function VenderProductosSheet({
                     key={p.id}
                     type="button"
                     className={cn(
-                      "flex w-full flex-col gap-0.5 border-b border-neutral-100 px-3 py-2.5 text-left last:border-0 hover:bg-neutral-50",
+                      "flex w-full flex-col gap-0.5 border-b border-border px-3 py-2.5 text-left last:border-0 hover:bg-muted/50",
                       p.stock <= 0 && "opacity-50",
                     )}
                     disabled={p.stock <= 0}
                     onClick={() => addProducto(p)}
                   >
                     <span className="text-sm font-medium">{p.nombre}</span>
-                    <span className="text-xs text-neutral-500">
+                    <span className="text-xs text-muted-foreground">
                       {p.sku} · {formatCop(Math.max(p.precio, p.costo))} · stock{" "}
                       {p.stock}
                     </span>
@@ -730,20 +730,20 @@ export function VenderProductosSheet({
           </div>
 
           {lines.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-neutral-200 py-8 text-center text-sm text-neutral-500">
+            <p className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
               Busca por nombre, escanea QR o ingresa el SKU.
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {lines.map((line) => (
                 <div
                   key={line.productoId}
-                  className="rounded-lg border border-neutral-200 p-3 text-sm"
+                  className="rounded-lg border border-border p-3 text-sm"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="font-medium">{line.nombre}</p>
-                      <p className="text-xs text-neutral-500">{line.sku}</p>
+                      <p className="text-xs text-muted-foreground">{line.sku}</p>
                     </div>
                     <Button
                       type="button"
@@ -801,9 +801,9 @@ export function VenderProductosSheet({
 
           {!mobileLayout ? (
             <>
-              <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+              <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-3">
                 <p className="text-sm font-medium">Cliente</p>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="prod-cliente-nombre">Nombre</Label>
                   <Input
                     id="prod-cliente-nombre"
@@ -813,7 +813,7 @@ export function VenderProductosSheet({
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="prod-cliente-cedula">Cédula</Label>
                     <Input
                       id="prod-cliente-cedula"
@@ -822,7 +822,7 @@ export function VenderProductosSheet({
                       onChange={(e) => setClienteCedula(e.target.value)}
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="prod-cliente-celular">Celular</Label>
                     <Input
                       id="prod-cliente-celular"
@@ -835,9 +835,9 @@ export function VenderProductosSheet({
                 </div>
               </div>
 
-              <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+              <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-3">
                 <p className="text-sm font-medium">Pago</p>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="prod-monto-pagado">Pagado hoy</Label>
                   <Input
                     id="prod-monto-pagado"
@@ -859,7 +859,7 @@ export function VenderProductosSheet({
                 </Button>
               </div>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="prod-notas">Notas</Label>
                 <Input
                   id="prod-notas"
@@ -869,12 +869,12 @@ export function VenderProductosSheet({
               </div>
             </>
           ) : lines.length > 0 ? (
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-center text-sm text-neutral-600">
+            <div className="rounded-lg border border-border bg-muted/50 p-3 text-center text-sm text-muted-foreground">
               {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
-              <span className="font-semibold text-neutral-900">
+              <span className="font-semibold text-foreground">
                 {formatCop(total)}
               </span>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Usa &quot;Enviar a PC&quot; abajo para facturar en el
                 escritorio.
               </p>
@@ -884,7 +884,7 @@ export function VenderProductosSheet({
         </div>
 
         {!mobileLayout ? (
-        <SheetFooter className="shrink-0 border-t border-neutral-200 bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+        <SheetFooter className="shrink-0 border-t border-border bg-background px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
           <div className="flex w-full flex-col gap-2">
           <Button
             type="button"
@@ -898,7 +898,7 @@ export function VenderProductosSheet({
           </Button>
           <Button
             type="button"
-            className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || publishPending || lines.length === 0}
             onClick={submit}
           >
@@ -948,7 +948,7 @@ export function VenderProductosSheet({
               type="button"
               variant="outline"
               size="sm"
-              className="border-white/30 bg-transparent text-white hover:bg-white/10"
+              className="border-white/30 bg-transparent text-white hover:bg-background/10"
               onClick={stopCamera}
             >
               <CameraOff className="mr-1.5 h-4 w-4" />
@@ -966,7 +966,7 @@ export function VenderProductosSheet({
           <div className="shrink-0 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
             <Button
               type="button"
-              className="w-full gap-2 bg-white text-black hover:bg-neutral-100"
+              className="w-full gap-2 bg-background text-foreground hover:bg-muted"
               size="lg"
               disabled={scanPending || cooldownSec > 0 || pending}
               onClick={() => void triggerScan()}
@@ -986,22 +986,22 @@ export function VenderProductosSheet({
       mobileLayout &&
       typeof document !== "undefined" &&
       createPortal(
-        <div className="fixed inset-x-0 bottom-0 z-[300] border-t border-neutral-200 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.18)]">
+        <div className="fixed inset-x-0 bottom-0 z-[300] border-t border-border bg-background px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.18)]">
           {lines.length > 0 ? (
-            <p className="mb-2 text-center text-sm text-neutral-600">
+            <p className="mb-2 text-center text-sm text-muted-foreground">
               {lines.length} producto{lines.length === 1 ? "" : "s"} ·{" "}
-              <span className="font-semibold text-neutral-900">
+              <span className="font-semibold text-foreground">
                 {formatCop(total)}
               </span>
             </p>
           ) : (
-            <p className="mb-2 text-center text-xs text-neutral-500">
+            <p className="mb-2 text-center text-xs text-muted-foreground">
               Escanea productos para habilitar el envío
             </p>
           )}
           <Button
             type="button"
-            className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={publishPending || pending || lines.length === 0}
             onClick={sendToCaja}
           >

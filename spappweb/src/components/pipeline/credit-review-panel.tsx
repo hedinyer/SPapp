@@ -108,19 +108,19 @@ export function CreditReviewPanel({
   }
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Revisar solicitud de crédito</CardTitle>
-        <p className="text-sm text-neutral-500">
+        <CardTitle>Revisar solicitud de crédito</CardTitle>
+        <p className="text-sm text-muted-foreground">
           Verifica las fotos del documento y la selfie antes de decidir.
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="flex flex-col gap-6">
         <PhotoGrid document={document} />
         <div className="flex flex-wrap gap-3">
           <Button
             size="lg"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending}
             onClick={onApprove}
           >
@@ -138,12 +138,12 @@ export function CreditReviewPanel({
       </CardContent>
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-background">
           <DialogHeader>
             <DialogTitle>Rechazar solicitud</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="motivo">Motivo (visible para el cliente)</Label>
               <Textarea
                 id="motivo"
@@ -191,11 +191,11 @@ function ReadonlyCredit({
   contractSigned?: boolean;
 }) {
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Solicitud de crédito</CardTitle>
+        <CardTitle>Solicitud de crédito</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <p className="text-sm">
           Estado:{" "}
           <span className="font-medium capitalize">
@@ -203,7 +203,7 @@ function ReadonlyCredit({
           </span>
         </p>
         {document.motivo_rechazo && (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-muted-foreground">
             Motivo: {document.motivo_rechazo}
           </p>
         )}
@@ -223,11 +223,11 @@ function PhotoGrid({ document }: { document: UserDocumentRow }) {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       {photos.map(({ label, url }) => (
-        <div key={label} className="space-y-2">
-          <p className="text-sm font-medium text-neutral-700">{label}</p>
+        <div key={label} className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-foreground">{label}</p>
           {url ? (
             <a href={url} target="_blank" rel="noopener noreferrer">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-muted/50">
                 <Image
                   src={url}
                   alt={label}
@@ -238,7 +238,7 @@ function PhotoGrid({ document }: { document: UserDocumentRow }) {
               </div>
             </a>
           ) : (
-            <div className="flex aspect-[4/3] items-center justify-center rounded-lg border border-dashed border-neutral-200 text-sm text-neutral-400">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
               Sin foto
             </div>
           )}

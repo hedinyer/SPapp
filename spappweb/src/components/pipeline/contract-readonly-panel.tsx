@@ -20,8 +20,8 @@ interface ContractReadonlyPanelProps {
 export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) {
   if (!contract) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           El contrato se generará cuando asignes moto y placa.
         </CardContent>
       </Card>
@@ -48,17 +48,17 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
       : null;
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div>
-          <CardTitle className="text-lg">Contrato digital</CardTitle>
-          <p className="mt-1 text-sm text-neutral-500">Solo lectura</p>
+          <CardTitle>Contrato digital</CardTitle>
+          <p className="mt-1 text-sm text-muted-foreground">Solo lectura</p>
         </div>
-        <Badge variant="outline" className="w-fit border-neutral-300">
+        <Badge variant="outline" className="w-fit border-border">
           {contractStatusLabel(contract.status)}
         </Badge>
       </CardHeader>
-      <CardContent className="space-y-4 text-sm">
+      <CardContent className="flex flex-col gap-4 text-sm">
         {contract.signed_at && (
           <p>Firmado: {formatDate(contract.signed_at)}</p>
         )}
@@ -71,7 +71,7 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
           )}
         </div>
         {hasHojaData && (
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+          <div className="rounded-lg border border-border bg-muted/50 p-4">
             <p className="mb-2 font-medium">Datos de hoja de vida</p>
             <dl className="grid gap-2 sm:grid-cols-2">
               {(
@@ -97,18 +97,18 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
               ).map(([key, val]) =>
                 val ? (
                   <div key={key}>
-                    <dt className="text-neutral-500">{key}</dt>
+                    <dt className="text-muted-foreground">{key}</dt>
                     <dd>{String(val)}</dd>
                   </div>
                 ) : null,
               )}
             </dl>
             {referencias.length > 0 && (
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 flex flex-col gap-2">
                 <p className="font-medium">Referencias</p>
                 {referencias.map((r, i) =>
                   r.nombre || r.celular ? (
-                    <p key={i} className="text-neutral-700">
+                    <p key={i} className="text-foreground">
                       {i + 1}. {r.nombre ?? "—"} · {r.celular ?? "—"}
                     </p>
                   ) : null,
@@ -118,7 +118,7 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
           </div>
         )}
         {contract.status !== "firmado" && !hasHojaData && (
-          <p className="text-neutral-500">
+          <p className="text-muted-foreground">
             Esperando al cliente para completar la hoja de vida.
           </p>
         )}
@@ -132,7 +132,7 @@ function PdfLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       target="_blank"
-      className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-3 hover:border-neutral-400"
+      className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-3 hover:border-foreground/30"
     >
       <ExternalLink className="h-4 w-4" strokeWidth={1.75} />
       {label}

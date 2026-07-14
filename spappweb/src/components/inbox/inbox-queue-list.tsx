@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -94,13 +94,13 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
   }
 
   if (list.length === 0) {
-    return <p className="text-sm text-neutral-500">No hay items en esta cola.</p>;
+    return <p className="text-sm text-muted-foreground">No hay items en esta cola.</p>;
   }
 
   return (
-    <div className={isCreditos ? "space-y-4" : undefined}>
+    <div className={isCreditos ? "flex flex-col gap-4" : undefined}>
       {isCreditos ? (
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <Tabs
             value={creditoFiltro}
             onValueChange={(value) =>
@@ -120,7 +120,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
             </TabsList>
           </Tabs>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -132,7 +132,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
       ) : null}
 
       {visibleList.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           {isCreditos && search.trim()
             ? `No hay clientes que coincidan con "${search.trim()}".`
             : isCreditos
@@ -144,11 +144,11 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
               : "No hay items en esta cola."}
         </p>
       ) : (
-      <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
+      <ul className="divide-y divide-border rounded-lg border border-border">
         {visibleList.map((item) => (
           <li
             key={item.userId}
-            className="flex items-stretch hover:bg-neutral-50"
+            className="flex items-stretch hover:bg-muted/50"
           >
             <Link
               href={`/clientes/${item.userId}`}
@@ -168,14 +168,14 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
                 ) : null}
                 <div className="min-w-0">
                   <p className="font-medium">{item.displayName}</p>
-                  <p className="truncate text-sm text-neutral-500">
+                  <p className="truncate text-sm text-muted-foreground">
                     {isCreditos && item.cedula
                       ? `C.C. ${item.cedula} · ${item.subtitle}`
                       : `@${item.username} · ${item.subtitle}`}
                   </p>
                 </div>
               </div>
-              <span className="text-sm font-medium text-black sm:text-neutral-400">
+              <span className="text-sm font-medium text-foreground sm:text-muted-foreground">
                 Abrir →
               </span>
             </Link>
@@ -185,7 +185,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-neutral-400 hover:text-red-600"
+                  className="text-muted-foreground hover:text-destructive"
                   aria-label={`Eliminar ${item.displayName}`}
                   disabled={pending}
                   onClick={() => setToDelete(item)}
@@ -205,7 +205,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
           if (!open && !pending) setToDelete(null);
         }}
       >
-        <AlertDialogContent className="bg-white">
+        <AlertDialogContent className="bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
             <AlertDialogDescription>

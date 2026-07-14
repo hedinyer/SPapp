@@ -294,10 +294,18 @@ intervalos.
 
 ## 8. Rutas del panel (referencia)
 
-**Admin** (`/inbox`, `/clientes`, `/clientes/[userId]`, `/crear-cliente`,
-`/visitadores`, `/catalogo`, `/inventario`, `/garaje`, `/garaje/nueva`, `/vendidas`,
-`/solicitudes`) · **Visitador** (`/visitador/login`, `/visitador/mis-visitas`,
-`/visitador/visitas/[id]`) · **Cliente** (`/hojadevida`).
+Navegación admin en **5 hubs** (mismas URLs de datos):
+
+| Hub | Rutas |
+| --- | --- |
+| **Hoy** | `/inbox` (9 colas); taller → `/solicitudes` |
+| **Clientes** | `/clientes`, `/clientes/[userId]`; alta en `/clientes?nuevo=1` (`/crear-cliente` redirige) |
+| **Motos** | `/garaje`, `/garaje/nueva`, `/vendidas` (en calle), `/catalogo` (modelos), `/venta-contado` |
+| **Tienda** | `/venta` (repuestos y accesorios), `/caja`, `/inventario` (stock), `/productos-credito` (extras a crédito), `/historial-ventas` |
+| **Equipo** | `/visitadores` |
+
+**Visitador** (`/visitador/login`, `/visitador/mis-visitas`, `/visitador/visitas/[id]`) ·
+**Cliente** (`/hojadevida`).
 
 La bandeja `/inbox` tiene 9 colas: `creditos`, `pagos`, `retiro`, `entrega`,
 `visitas_sin_asignar`, `visitas_programadas`, `morosos`, `recoger`,

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useTransition } from "react";
 import { Bike, Printer } from "lucide-react";
@@ -85,7 +85,7 @@ export function VenderMotoSheet({
 
         <form
           id="vender-moto-form"
-          className="mt-6 space-y-4"
+          className="mt-6 flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             if (!bikeId || !selected) {
@@ -124,7 +124,7 @@ export function VenderMotoSheet({
             });
           }}
         >
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label>Moto del catálogo</Label>
             <TouchSelect
               value={bikeId}
@@ -141,7 +141,7 @@ export function VenderMotoSheet({
               </p>
             ) : null}
             {selected && (
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted-foreground">
                 {selected.precio_venta != null && selected.precio_venta > 0
                   ? `Precio de la moto: ${formatCop(selected.precio_venta)}`
                   : "Sin precio de venta en catálogo — ingrésalo abajo o configúralo en Catálogo."}
@@ -149,10 +149,10 @@ export function VenderMotoSheet({
             )}
           </div>
 
-          <div className="space-y-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-3">
             <p className="text-sm font-medium">Pago</p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="valorVenta">Precio total de la moto</Label>
                 <Input
                   id="valorVenta"
@@ -162,7 +162,7 @@ export function VenderMotoSheet({
                   onChange={(e) => setValorVenta(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="montoPagado">Pagado hoy</Label>
                 <Input
                   id="montoPagado"
@@ -174,7 +174,7 @@ export function VenderMotoSheet({
               </div>
             </div>
             {saldo != null && valorNum > 0 && (
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-muted-foreground">
                 {pagadoNum >= valorNum
                   ? "Pago de contado."
                   : pagadoNum > 0
@@ -196,12 +196,12 @@ export function VenderMotoSheet({
             </Button>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="clienteNombre">Nombre del cliente</Label>
             <Input id="clienteNombre" name="clienteNombre" required />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="clienteCedula">Cédula</Label>
               <Input
                 id="clienteCedula"
@@ -210,7 +210,7 @@ export function VenderMotoSheet({
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="clienteCelular">Celular</Label>
               <Input
                 id="clienteCelular"
@@ -220,11 +220,11 @@ export function VenderMotoSheet({
               />
             </div>
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="chasis">Chasis</Label>
             <Input id="chasis" name="chasis" />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="notas">Notas</Label>
             <Input id="notas" name="notas" />
           </div>

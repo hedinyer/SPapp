@@ -35,10 +35,10 @@ import { uploadImageFromBrowser } from "@/lib/utils/upload-image-client";
 import { cn } from "@/lib/utils";
 
 const actionBtnClass =
-  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 active:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 active:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50";
 
 const outlineBtnClass =
-  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 active:bg-neutral-50";
+  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 active:bg-muted/50";
 
 const defaultDraft = (): Omit<GarajeNuevaMotoDraft, "imageDataUrl" | "imageName"> => ({
   parqueaderoId: "none",
@@ -46,7 +46,7 @@ const defaultDraft = (): Omit<GarajeNuevaMotoDraft, "imageDataUrl" | "imageName"
   referencia: "",
   modelo: "",
   color: "",
-  condicion: "recuperada",
+  condicion: "nueva",
   estado: "en_garaje",
   notas: "",
 });
@@ -66,7 +66,7 @@ export function NewMotoForm({
   const [referencia, setReferencia] = useState("");
   const [modelo, setModelo] = useState("");
   const [color, setColor] = useState("");
-  const [condicion, setCondicion] = useState<GarajeCondicion>("recuperada");
+  const [condicion, setCondicion] = useState<GarajeCondicion>("nueva");
   const [estado, setEstado] = useState<GarajeMotoEstado>("en_garaje");
   const [notas, setNotas] = useState("");
   const imageDataUrlRef = useRef<string | undefined>(undefined);
@@ -110,7 +110,7 @@ export function NewMotoForm({
     setReferencia(draft.referencia ?? "");
     setModelo(draft.modelo ?? "");
     setColor(draft.color ?? "");
-    setCondicion(draft.condicion ?? "recuperada");
+    setCondicion(draft.condicion ?? "nueva");
     setEstado(draft.estado ?? "en_garaje");
     setNotas(draft.notas ?? "");
     imageDataUrlRef.current = draft.imageDataUrl;
@@ -177,23 +177,28 @@ export function NewMotoForm({
     persistDraft({ imageDataUrl: undefined, imageName: undefined });
   }
 
+  const requiresPhoto = condicion !== "nueva";
   const canSave =
     !pending &&
     referencia.trim() &&
     modelo.trim() &&
     color.trim() &&
-    imageFile != null;
+    (!requiresPhoto || imageFile != null);
 
   function handleSubmit() {
-    if (!canSave || !imageFile) return;
+    if (!canSave) return;
+    if (requiresPhoto && !imageFile) return;
 
     startTransition(async () => {
       try {
-        const placaFotoUrl = await uploadImageFromBrowser(
-          STORAGE_BUCKETS.garajeImagenes,
-          garajeUploadFolder(placa || referencia),
-          imageFile,
-        );
+        let placaFotoUrl: string | undefined;
+        if (imageFile) {
+          placaFotoUrl = await uploadImageFromBrowser(
+            STORAGE_BUCKETS.garajeImagenes,
+            garajeUploadFolder(placa || referencia),
+            imageFile,
+          );
+        }
 
         const result = await saveGarajeMoto({
           parqueaderoId:
@@ -227,7 +232,7 @@ export function NewMotoForm({
 
   return (
     <form
-      className="space-y-6"
+      className="flex flex-col gap-6"
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit();
@@ -236,7 +241,11 @@ export function NewMotoForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <ImageFileField
-            label="Foto de placa"
+            label={
+              condicion === "nueva"
+                ? "Foto de placa (opcional)"
+                : "Foto de placa"
+            }
             file={imageFile}
             previewUrl={imagePreviewUrl}
             onFileChange={(file) => {
@@ -257,7 +266,7 @@ export function NewMotoForm({
         <Field label="Referencia moto" value={referencia} onChange={setReferencia} />
         <Field label="Modelo" value={modelo} onChange={setModelo} />
         <Field label="Color" value={color} onChange={setColor} />
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label>Parqueadero</Label>
           <TouchSelect
             aria-label="Parqueadero"
@@ -272,7 +281,7 @@ export function NewMotoForm({
             ]}
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label>Condición</Label>
           <TouchSelect
             aria-label="Condición"
@@ -286,7 +295,7 @@ export function NewMotoForm({
             }))}
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label>Estado</Label>
           <TouchSelect
             aria-label="Estado"
@@ -300,7 +309,7 @@ export function NewMotoForm({
             }))}
           />
         </div>
-        <div className="space-y-2 sm:col-span-2">
+        <div className="flex flex-col gap-2 sm:col-span-2">
           <Label>Notas</Label>
           <Textarea
             value={notas}
@@ -310,7 +319,7 @@ export function NewMotoForm({
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t border-neutral-200 bg-white p-4 safe-area-bottom sm:static sm:mx-0 sm:flex-row sm:justify-end sm:border-0 sm:bg-transparent sm:p-0">
+      <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-2 border-t border-border bg-background p-4 safe-area-bottom sm:static sm:mx-0 sm:flex-row sm:justify-end sm:border-0 sm:bg-transparent sm:p-0">
         <Link href="/garaje" className={outlineBtnClass}>
           Cancelar
         </Link>
@@ -336,7 +345,7 @@ function Field({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Label>{label}</Label>
       <Input
         value={value}

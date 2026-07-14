@@ -39,6 +39,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -83,8 +89,8 @@ export function InventarioManager({
   });
 
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-neutral-500">
+    <div className="flex flex-col gap-2">
+      <p className="text-xs text-muted-foreground">
         Stock actualizado hace {secondsAgo}s
       </p>
       <Tabs defaultValue="productos">
@@ -93,20 +99,30 @@ export function InventarioManager({
         <TabsTrigger value="categorias">Categorías</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="productos" className="space-y-4">
+      <TabsContent value="productos" className="flex flex-col gap-4">
         <div className="flex justify-end">
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
             onClick={() => {
               setEditingProd(null);
               setProdOpen(true);
             }}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus data-icon="inline-start" />
             Nuevo producto
           </Button>
         </div>
-        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+        {productos.length === 0 ? (
+          <Empty className="border border-dashed border-border">
+            <EmptyHeader>
+              <EmptyTitle>Stock vacío</EmptyTitle>
+              <EmptyDescription>
+                Aún no hay productos. Crea el primero con Nuevo producto.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          <>
+        <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -139,7 +155,7 @@ export function InventarioManager({
                             className="h-10 w-10 rounded object-cover"
                           />
                         ) : (
-                          <div className="h-10 w-10 rounded bg-neutral-100" />
+                          <div className="h-10 w-10 rounded bg-muted" />
                         )}
                         <span className="font-medium">{p.nombre}</span>
                       </div>
@@ -184,7 +200,7 @@ export function InventarioManager({
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent className="bg-white">
+                          <AlertDialogContent className="bg-background">
                             <AlertDialogHeader>
                               <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
                               <AlertDialogDescription>{p.nombre}</AlertDialogDescription>
@@ -222,7 +238,7 @@ export function InventarioManager({
           </Table>
         </div>
 
-        <div className="space-y-3 lg:hidden">
+        <div className="flex flex-col gap-3 lg:hidden">
           {productos.map((p) => {
             const img = getStoragePublicUrl(
               STORAGE_BUCKETS.inventarioImagenes,
@@ -232,7 +248,7 @@ export function InventarioManager({
             return (
               <div
                 key={p.id}
-                className="rounded-lg border border-neutral-200 p-4 text-sm"
+                className="rounded-lg border border-border p-4 text-sm"
               >
                 <div className="flex gap-3">
                   {img ? (
@@ -243,31 +259,31 @@ export function InventarioManager({
                       className="h-12 w-12 shrink-0 rounded object-cover"
                     />
                   ) : (
-                    <div className="h-12 w-12 shrink-0 rounded bg-neutral-100" />
+                    <div className="h-12 w-12 shrink-0 rounded bg-muted" />
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{p.nombre}</p>
-                    <p className="text-neutral-500">{p.sku}</p>
+                    <p className="text-muted-foreground">{p.sku}</p>
                   </div>
                   <Badge variant={p.activo ? "outline" : "secondary"}>
                     {p.activo ? "Activo" : "Inactivo"}
                   </Badge>
                 </div>
-                <dl className="mt-3 space-y-1.5">
+                <dl className="mt-3 flex flex-col gap-1.5">
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Categoría</dt>
+                    <dt className="text-muted-foreground">Categoría</dt>
                     <dd>{p.inventario_categorias?.nombre ?? "—"}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Precio</dt>
+                    <dt className="text-muted-foreground">Precio</dt>
                     <dd>{formatCop(p.precio)}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Costo</dt>
+                    <dt className="text-muted-foreground">Costo</dt>
                     <dd>{formatCop(p.costo ?? 0)}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-neutral-500">Stock</dt>
+                    <dt className="text-muted-foreground">Stock</dt>
                     <dd className={lowStock ? "font-medium text-red-700" : ""}>
                       {p.stock}
                       {lowStock && (
@@ -303,7 +319,7 @@ export function InventarioManager({
                         Eliminar
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-white">
+                    <AlertDialogContent className="bg-background">
                       <AlertDialogHeader>
                         <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
                         <AlertDialogDescription>{p.nombre}</AlertDialogDescription>
@@ -337,22 +353,23 @@ export function InventarioManager({
             );
           })}
         </div>
+          </>
+        )}
       </TabsContent>
 
-      <TabsContent value="categorias" className="space-y-4">
+      <TabsContent value="categorias" className="flex flex-col gap-4">
         <div className="flex justify-end">
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
             onClick={() => {
               setEditingCat(null);
               setCatOpen(true);
             }}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus data-icon="inline-start" />
             Nueva categoría
           </Button>
         </div>
-        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+        <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -392,7 +409,7 @@ export function InventarioManager({
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
+                        <AlertDialogContent className="bg-background">
                           <AlertDialogHeader>
                             <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
                             <AlertDialogDescription>{c.nombre}</AlertDialogDescription>
@@ -429,11 +446,11 @@ export function InventarioManager({
           </Table>
         </div>
 
-        <div className="space-y-3 lg:hidden">
+        <div className="flex flex-col gap-3 lg:hidden">
           {categorias.map((c) => (
             <div
               key={c.id}
-              className="rounded-lg border border-neutral-200 p-4 text-sm"
+              className="rounded-lg border border-border p-4 text-sm"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium">{c.nombre}</p>
@@ -441,13 +458,13 @@ export function InventarioManager({
                   {c.activo ? "Activa" : "Inactiva"}
                 </Badge>
               </div>
-              <dl className="mt-3 space-y-1.5">
+              <dl className="mt-3 flex flex-col gap-1.5">
                 <div className="flex justify-between gap-2">
-                  <dt className="text-neutral-500">Slug</dt>
+                  <dt className="text-muted-foreground">Slug</dt>
                   <dd>{c.slug}</dd>
                 </div>
                 <div className="flex justify-between gap-2">
-                  <dt className="text-neutral-500">Orden</dt>
+                  <dt className="text-muted-foreground">Orden</dt>
                   <dd>{c.orden}</dd>
                 </div>
               </dl>
@@ -471,7 +488,7 @@ export function InventarioManager({
                       Eliminar
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-white">
+                  <AlertDialogContent className="bg-background">
                     <AlertDialogHeader>
                       <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
                       <AlertDialogDescription>{c.nombre}</AlertDialogDescription>
@@ -600,7 +617,7 @@ function CategoriaDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="bg-white">
+      <DialogContent className="bg-background">
         <DialogHeader>
           <DialogTitle>
             {editing ? "Editar categoría" : "Nueva categoría"}
@@ -610,7 +627,7 @@ function CategoriaDialog({
           <Field label="Nombre" value={nombre} onChange={setNombre} />
           <Field label="Slug" value={slug} onChange={setSlug} />
           <Field label="Orden" value={orden} onChange={setOrden} type="number" />
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label>Descripción</Label>
             <Textarea
               value={descripcion}
@@ -628,7 +645,7 @@ function CategoriaDialog({
             Cancelar
           </Button>
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || !nombre.trim() || !slug.trim()}
             onClick={() =>
               onSave({
@@ -715,12 +732,12 @@ function ProductoDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-background">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar producto" : "Nuevo producto"}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2 sm:col-span-2">
+          <div className="flex flex-col gap-2 sm:col-span-2">
             <Label>Categoría</Label>
             <TouchSelect
               aria-label="Categoría"
@@ -780,7 +797,7 @@ function ProductoDialog({
             Cancelar
           </Button>
           <Button
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || !sku.trim() || !nombre.trim() || !categoriaId}
             onClick={() =>
               onSave({
@@ -823,7 +840,7 @@ function Field({
   type?: string;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Label>{label}</Label>
       <Input
         type={type}

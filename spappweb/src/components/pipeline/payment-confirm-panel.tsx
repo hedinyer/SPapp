@@ -61,8 +61,8 @@ export function PaymentConfirmPanel({
 
   if (!compra) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Aún no hay selección de moto.
         </CardContent>
       </Card>
@@ -71,8 +71,8 @@ export function PaymentConfirmPanel({
 
   if (compra.estado !== "pendiente_pago" && compra.estado !== "lista_retiro") {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-600">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Pagos confirmados. Estado: {compra.estado.replace("_", " ")}.
         </CardContent>
       </Card>
@@ -91,21 +91,21 @@ export function PaymentConfirmPanel({
 
   return (
     <>
-      <Card className="border-neutral-200 shadow-none">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Confirmar pagos</CardTitle>
-          <p className="text-sm text-neutral-500">
+          <CardTitle>Confirmar pagos</CardTitle>
+          <p className="text-sm text-muted-foreground">
             Registra abonos por concepto. Medios: Nequi, Davivienda, efectivo o
             datáfono. Efectivo y datáfono generan recibo para impresora.
           </p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-            <p className="text-sm text-neutral-500">Total esperado</p>
+        <CardContent className="flex flex-col gap-6">
+          <div className="rounded-lg border border-border bg-muted/50 p-4">
+            <p className="text-sm text-muted-foreground">Total esperado</p>
             <p className="text-2xl font-semibold">
               {formatCop(compra.monto_total_primer_pago)}
             </p>
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Inicial {formatCop(compra.cuota_inicial_monto)} + adelantada{" "}
               {formatCop(compra.monto_cuota_periodo)}
               {compra.monto_visita_monto > 0 && (
@@ -235,7 +235,7 @@ function VisitaMontoEditor({
         {formatCop(MONTO_VISITA_DEFAULT)}.
       </p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 flex flex-col gap-2">
           <Label htmlFor="monto-visita-compra">Monto acordado</Label>
           <Input
             id="monto-visita-compra"
@@ -322,11 +322,11 @@ function ConceptoAbonoSection({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-neutral-200 p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div className="min-w-0">
           <p className="font-medium">{CONTEXTO_PAGO_LABELS[contexto]}</p>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             {formatCop(recibido)} de {formatCop(esperado)}
             {!completo && faltante > 0 && ` · faltan ${formatCop(faltante)}`}
           </p>
@@ -342,7 +342,7 @@ function ConceptoAbonoSection({
         )}
       </div>
 
-      <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full bg-black transition-all"
           style={{ width: `${pct}%` }}
@@ -350,7 +350,7 @@ function ConceptoAbonoSection({
       </div>
 
       {abonos.length > 0 && (
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-100">
+        <ul className="divide-y divide-neutral-100 rounded-lg border border-border">
           {abonos.map((abono) => (
             <li
               key={abono.id}
@@ -358,7 +358,7 @@ function ConceptoAbonoSection({
             >
               <div className="min-w-0 flex-1">
                 <p className="font-medium">{formatCop(abono.monto)}</p>
-                <p className="truncate text-neutral-500">
+                <p className="truncate text-muted-foreground">
                   {abono.medio_pago_admin
                     ? MEDIO_PAGO_ADMIN_LABELS[abono.medio_pago_admin]
                     : "—"}
@@ -383,7 +383,7 @@ function ConceptoAbonoSection({
                     href={abono.comprobante_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex rounded p-1.5 text-neutral-500 hover:bg-neutral-100"
+                    className="inline-flex rounded p-1.5 text-muted-foreground hover:bg-muted"
                     title="Ver comprobante"
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -398,7 +398,7 @@ function ConceptoAbonoSection({
                     onClick={() => handleRemove(abono.id)}
                     title="Eliminar abono"
                   >
-                    <Trash2 className="h-4 w-4 text-red-600" />
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 )}
               </div>

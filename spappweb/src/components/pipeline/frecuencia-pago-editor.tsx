@@ -95,7 +95,7 @@ export function FrecuenciaPagoEditor({
 
   if (compact) {
     return (
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <TouchSelect
           aria-label="Frecuencia de pago"
           value={frecuencia}
@@ -106,7 +106,7 @@ export function FrecuenciaPagoEditor({
           }))}
         />
         {preview && (
-          <p className="text-xs text-neutral-600">
+          <p className="text-xs text-muted-foreground">
             Nueva cuota adelantada: {formatCop(preview.monto_cuota_periodo)} ·
             total primer pago: {formatCop(preview.monto_total_primer_pago)}
           </p>
@@ -131,8 +131,8 @@ export function FrecuenciaPagoEditor({
         Corrige si se registró mal. Se mantiene la cuota diaria acordada (
         {formatCop(cuotaDiaria)}/día) y se recalcula la cuota adelantada.
       </p>
-      <div className="mt-3 space-y-3">
-        <div className="space-y-2">
+      <div className="mt-3 flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="frecuencia-pago-compra">Modalidad</Label>
           <TouchSelect
             aria-label="Frecuencia de pago"

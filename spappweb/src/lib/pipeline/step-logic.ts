@@ -381,6 +381,7 @@ export function runPipelineSelfCheck(): void {
     id: "00000000-0000-0000-0000-000000000001",
     user_id: 1,
     bike_id: 1,
+    garaje_moto_id: null,
     modelo: "X",
     color: "Y",
     frecuencia_pago: "semanal",

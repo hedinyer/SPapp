@@ -1,14 +1,24 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { Bike, Printer, Search, User } from "lucide-react";
 import { toast } from "sonner";
 import type { VentaProductoRow } from "@/lib/actions/venta-producto-actions";
+import type { HistorialMotoVentaRow } from "@/lib/actions/historial-motos-actions";
 import { printVentaProductoReceipt } from "@/lib/printing/venta-producto-receipt";
 import { formatCop, formatDate } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 function normalize(value: string): string {
   return value
@@ -32,14 +42,29 @@ function searchableText(venta: VentaProductoRow): string {
   );
 }
 
+function searchableMoto(venta: HistorialMotoVentaRow): string {
+  return normalize(
+    [
+      venta.clienteNombre,
+      venta.clienteCedula ?? "",
+      venta.placa ?? "",
+      venta.modelo,
+      venta.color,
+      venta.origen,
+    ].join(" "),
+  );
+}
+
 export function HistorialVentasClient({
   ventas,
+  ventasMotos = [],
 }: {
   ventas: VentaProductoRow[];
+  ventasMotos?: HistorialMotoVentaRow[];
 }) {
   const [query, setQuery] = useState("");
 
-  const filtered = useMemo(() => {
+  const filteredProductos = useMemo(() => {
     const q = normalize(query.trim());
     if (!q) return ventas;
     const terms = q.split(/\s+/);
@@ -49,16 +74,30 @@ export function HistorialVentasClient({
     });
   }, [ventas, query]);
 
-  const totalVendido = filtered.reduce((sum, v) => sum + v.total, 0);
-  const totalUnidades = filtered.reduce(
+  const filteredMotos = useMemo(() => {
+    const q = normalize(query.trim());
+    const sorted = [...ventasMotos].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
+    );
+    if (!q) return sorted;
+    const terms = q.split(/\s+/);
+    return sorted.filter((venta) => {
+      const haystack = searchableMoto(venta);
+      return terms.every((term) => haystack.includes(term));
+    });
+  }, [ventasMotos, query]);
+
+  const totalVendido = filteredProductos.reduce((sum, v) => sum + v.total, 0);
+  const totalUnidades = filteredProductos.reduce(
     (sum, v) => sum + v.items.reduce((s, i) => s + i.cantidad, 0),
     0,
   );
+  const totalMotos = filteredMotos.reduce((sum, v) => sum + v.monto, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -68,30 +107,132 @@ export function HistorialVentasClient({
         />
       </div>
 
-      {ventas.length > 0 && (
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Stat label="Ventas" value={String(filtered.length)} />
-          <Stat label="Unidades vendidas" value={String(totalUnidades)} />
-          <Stat label="Total vendido" value={formatCop(totalVendido)} />
-        </div>
-      )}
+      <Tabs defaultValue="productos">
+        <TabsList className="h-auto w-full max-w-full gap-1 p-1">
+          <TabsTrigger
+            value="productos"
+            className="min-h-11 flex-1 touch-manipulation"
+          >
+            Productos ({filteredProductos.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="motos"
+            className="min-h-11 flex-1 touch-manipulation"
+          >
+            Motos ({filteredMotos.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {filtered.length === 0 ? (
-        <Card className="border-neutral-200 shadow-none">
-          <CardContent className="py-10 text-center text-sm text-neutral-500">
-            {ventas.length === 0
-              ? "Aún no hay ventas de productos registradas."
-              : "Ninguna venta coincide con la búsqueda."}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {filtered.map((venta) => (
-            <VentaCard key={venta.id} venta={venta} />
-          ))}
-        </div>
-      )}
+        <TabsContent value="productos" className="flex flex-col gap-4">
+          {ventas.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Stat label="Ventas" value={String(filteredProductos.length)} />
+              <Stat label="Unidades vendidas" value={String(totalUnidades)} />
+              <Stat label="Total vendido" value={formatCop(totalVendido)} />
+            </div>
+          )}
+
+          {filteredProductos.length === 0 ? (
+            <Empty className="border border-dashed border-border">
+              <EmptyHeader>
+                <EmptyTitle>
+                  {ventas.length === 0 ? "Sin ventas" : "Sin coincidencias"}
+                </EmptyTitle>
+                <EmptyDescription>
+                  {ventas.length === 0
+                    ? "Aún no hay ventas de productos registradas."
+                    : "Ninguna venta coincide con la búsqueda."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {filteredProductos.map((venta) => (
+                <VentaCard key={venta.id} venta={venta} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="motos" className="flex flex-col gap-4">
+          {ventasMotos.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Stat label="Motos" value={String(filteredMotos.length)} />
+              <Stat label="Total" value={formatCop(totalMotos)} />
+            </div>
+          )}
+
+          {filteredMotos.length === 0 ? (
+            <Empty className="border border-dashed border-border">
+              <EmptyHeader>
+                <EmptyTitle>
+                  {ventasMotos.length === 0 ? "Sin motos" : "Sin coincidencias"}
+                </EmptyTitle>
+                <EmptyDescription>
+                  {ventasMotos.length === 0
+                    ? "Aún no hay ventas de motos registradas."
+                    : "Ninguna moto coincide con la búsqueda."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {filteredMotos.map((venta) => (
+                <Card
+                  key={`${venta.origen}-${venta.id}`}
+                  className="border-border shadow-none"
+                >
+                  <CardContent className="flex flex-col gap-2 p-4 text-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        {venta.userId ? (
+                          <Link
+                            href={`/clientes/${venta.userId}`}
+                            className="font-medium hover:underline"
+                          >
+                            {venta.clienteNombre}
+                          </Link>
+                        ) : (
+                          <p className="font-medium">{venta.clienteNombre}</p>
+                        )}
+                        <p className="text-muted-foreground">
+                          {venta.modelo} · {venta.color}
+                        </p>
+                        {venta.placa ? (
+                          <p className="text-muted-foreground">Placa {venta.placa}</p>
+                        ) : null}
+                      </div>
+                      <Badge variant="outline" className="shrink-0 font-normal">
+                        {venta.origen === "contado"
+                          ? "Contado"
+                          : "Crédito liquidado"}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>{formatDate(venta.fecha)}</span>
+                      <span className="font-medium text-foreground">
+                        {formatCop(venta.monto)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <Card className="border-border shadow-none">
+      <CardContent className="p-4">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="mt-1 text-lg font-semibold">{value}</p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -115,7 +256,7 @@ function PhotoThumb({
     );
   }
   return (
-    <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-neutral-400">
+    <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
       {fallback === "user" ? (
         <User className="h-8 w-8" />
       ) : (
@@ -155,108 +296,75 @@ function VentaCard({ venta }: { venta: VentaProductoRow }) {
   }
 
   return (
-    <Card className="overflow-hidden border-neutral-200 shadow-none">
+    <Card className="overflow-hidden border-border shadow-none">
       <CardContent className="p-0">
         <div className="flex gap-0">
-          <div className="flex w-[7.5rem] shrink-0 flex-col border-r border-neutral-100 sm:w-36">
-            <div className="relative aspect-square overflow-hidden bg-neutral-50">
+          <div className="flex w-[7.5rem] shrink-0 flex-col border-r border-border sm:w-36">
+            <div className="relative aspect-square overflow-hidden bg-muted/50">
               <PhotoThumb
                 src={venta.clienteSelfieUrl}
                 alt={`Foto de ${titulo}`}
                 fallback="user"
               />
-              <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+              <span className="absolute bottom-1 left-1 rounded bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background">
                 Cliente
               </span>
             </div>
-            <div className="relative aspect-square overflow-hidden border-t border-neutral-100 bg-neutral-50">
+            <div className="relative aspect-square overflow-hidden border-t border-border bg-muted/50">
               <PhotoThumb
                 src={venta.motoImagenUrl}
                 alt={venta.motoModelo ? `Moto ${venta.motoModelo}` : "Moto"}
                 fallback="bike"
               />
-              <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+              <span className="absolute bottom-1 left-1 rounded bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background">
                 {venta.motoPlaca ?? "Moto"}
               </span>
             </div>
           </div>
-
-          <div className="min-w-0 flex-1 p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <p className="truncate text-base font-semibold">{titulo}</p>
-                {subtituloParts.length > 0 ? (
-                  <p className="mt-0.5 text-sm text-neutral-500">
-                    {subtituloParts.join(" · ")}
-                  </p>
-                ) : null}
-                <p className="mt-1 text-xs text-neutral-400">
-                  {formatDate(venta.createdAt)}
+          <div className="min-w-0 flex-1 flex flex-col gap-2 p-4">
+            <div>
+              <p className="font-medium">{titulo}</p>
+              {subtituloParts.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {subtituloParts.join(" · ")}
                 </p>
-              </div>
-              <div className="shrink-0 sm:text-right">
-                <p className="text-lg font-semibold tabular-nums">
-                  {formatCop(venta.total)}
-                </p>
-                {saldo > 0 ? (
-                  <p className="text-xs font-medium text-red-700">
-                    Saldo {formatCop(saldo)}
-                  </p>
-                ) : (
-                  <p className="text-xs font-medium text-green-700">Pagado</p>
-                )}
-              </div>
+              ) : null}
             </div>
-
-            <ul className="mt-3 space-y-1.5 border-t border-neutral-100 pt-3">
+            <ul className="flex flex-col gap-1 text-sm">
               {venta.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-baseline justify-between gap-2 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{item.nombre}</p>
-                    <p className="text-xs text-neutral-500">
-                      {item.sku} · {item.cantidad} ×{" "}
-                      {formatCop(item.precioUnitario)}
-                    </p>
-                  </div>
-                  <p className="shrink-0 tabular-nums font-medium">
-                    {formatCop(item.subtotal)}
-                  </p>
+                <li key={item.id} className="flex justify-between gap-2">
+                  <span className="truncate">
+                    {item.cantidad}× {item.nombre}
+                  </span>
+                  <span className="shrink-0">
+                    {formatCop(item.precioUnitario * item.cantidad)}
+                  </span>
                 </li>
               ))}
             </ul>
-
-            {venta.notas ? (
-              <p className="mt-3 rounded-lg bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
-                {venta.notas}
+            <div className="flex items-center justify-between border-t border-border pt-2 text-sm">
+              <span className="text-muted-foreground">{formatDate(venta.createdAt)}</span>
+              <span className="font-semibold">{formatCop(venta.total)}</span>
+            </div>
+            {saldo > 0 ? (
+              <p className="text-xs text-amber-700">
+                Saldo pendiente {formatCop(saldo)}
               </p>
             ) : null}
-
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="mt-3 w-full sm:w-auto"
+              className="min-h-10 w-full"
               disabled={printing}
               onClick={handlePrint}
             >
-              <Printer className="mr-1.5 h-4 w-4" />
-              {printing ? "Imprimiendo…" : "Imprimir factura"}
+              <Printer className="mr-2 h-4 w-4" />
+              Reimprimir
             </Button>
           </div>
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-neutral-200 p-4">
-      <p className="text-xs text-neutral-500">{label}</p>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
-    </div>
   );
 }

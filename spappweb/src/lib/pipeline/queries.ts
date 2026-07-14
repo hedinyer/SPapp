@@ -17,6 +17,7 @@ import type {
   CompraProductoCreditoRow,
   ProductoCreditoRow,
   GarajeMotoRow,
+  GarajeMantenimientoItemRow,
   GarajeParqueaderoRow,
   VendidaMotoRow,
   MorosoEstado,
@@ -901,19 +902,24 @@ export async function getAvailableBikes(): Promise<BikeRow[]> {
 
 export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
   const supabase = createAdminClient();
-  const [{ data }, { data: atrasos }] = await Promise.all([
-    supabase
-      .from("user_moto_compra")
-      .select(
-        "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, estado_fisico, seleccionado_at, users(id, user), morosos(estado, dias_atraso, monto_adeudado), motos_para_recoger(estado, dias_atraso), garaje_motos(id)",
-      )
-      .eq("estado", "entregada")
-      .order("fecha_entrega", { ascending: false, nullsFirst: false })
-      .order("seleccionado_at", { ascending: false }),
-    supabase
-      .from("atrasos")
-      .select("user_moto_compra_id, dias_atraso, monto_adeudado, estado"),
-  ]);
+  // ponytail: hint FK — user_moto_compra↔garaje_motos tiene 2 relaciones
+  const [{ data, error }, { data: atrasos, error: atrasosError }] =
+    await Promise.all([
+      supabase
+        .from("user_moto_compra")
+        .select(
+          "id, user_id, bike_id, modelo, color, frecuencia_pago, cuota_inicial_monto, monto_cuota_periodo, monto_total_primer_pago, estado, pago_inicial_confirmado, pago_cuota_confirmado, placa, chasis, referencia, fecha_entrega, estado_fisico, seleccionado_at, users(id, user, users_documents(selfie_url)), bike_table(imagen_url), morosos(estado, dias_atraso, monto_adeudado), motos_para_recoger(estado, dias_atraso), garaje_motos!garaje_motos_user_moto_compra_id_fkey(id)",
+        )
+        .in("estado", ["entregada", "saldada"])
+        .order("fecha_entrega", { ascending: false, nullsFirst: false })
+        .order("seleccionado_at", { ascending: false }),
+      supabase
+        .from("atrasos")
+        .select("user_moto_compra_id, dias_atraso, monto_adeudado, estado"),
+    ]);
+
+  if (error) throw new Error(error.message);
+  if (atrasosError) throw new Error(atrasosError.message);
 
   const atrasoMap = new Map(
     ((atrasos ?? []) as Array<
@@ -921,8 +927,38 @@ export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
     >).map((a) => [a.user_moto_compra_id, a]),
   );
 
-  return ((data ?? []) as unknown as VendidaMotoRow[]).map((row) => {
-    const users = row.users;
+  return ((data ?? []) as unknown as Array<
+    VendidaMotoRow & {
+      users?:
+        | {
+            id: number;
+            user: string;
+            users_documents?:
+              | { selfie_url: string | null }
+              | { selfie_url: string | null }[]
+              | null;
+          }
+        | {
+            id: number;
+            user: string;
+            users_documents?:
+              | { selfie_url: string | null }
+              | { selfie_url: string | null }[]
+              | null;
+          }[]
+        | null;
+      bike_table?:
+        | { imagen_url: string | null }
+        | { imagen_url: string | null }[]
+        | null;
+    }
+  >).map((row) => {
+    const usersRaw = row.users;
+    const user = Array.isArray(usersRaw) ? usersRaw[0] : usersRaw;
+    const docRaw = user?.users_documents;
+    const doc = Array.isArray(docRaw) ? docRaw[0] : docRaw;
+    const bikeRaw = row.bike_table;
+    const bike = Array.isArray(bikeRaw) ? bikeRaw[0] : bikeRaw;
     const morososRaw = row.morosos as
       | { estado: MorosoEstado; dias_atraso: number; monto_adeudado?: number }
       | { estado: MorosoEstado; dias_atraso: number; monto_adeudado?: number }[]
@@ -935,7 +971,7 @@ export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
 
     return {
       ...row,
-      users: Array.isArray(users) ? users[0] : users,
+      users: user ? { id: user.id, user: user.user } : null,
       morosos: Array.isArray(morososRaw) ? morososRaw[0] : morososRaw,
       motos_para_recoger: Array.isArray(recogerRaw)
         ? recogerRaw[0]
@@ -948,6 +984,8 @@ export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
             estado: atrasoRaw.estado as AtrasoSnapshot["estado"],
           }
         : null,
+      selfieUrl: doc?.selfie_url ? String(doc.selfie_url) : null,
+      motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
     } satisfies VendidaMotoRow;
   });
 }
@@ -964,22 +1002,38 @@ export async function getAllGarajeParqueaderos(): Promise<GarajeParqueaderoRow[]
 
 export async function getAllGarajeMotos(): Promise<GarajeMotoRow[]> {
   const supabase = createAdminClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("garaje_motos")
     .select(
-      "id, parqueadero_id, placa, placa_foto_url, referencia, modelo, color, origen, condicion, estado, moto_para_recoger_id, user_moto_compra_id, notas, created_at, updated_at, garaje_parqueaderos(nombre)",
+      "id, parqueadero_id, placa, placa_foto_url, referencia, modelo, color, origen, condicion, estado, moto_para_recoger_id, user_moto_compra_id, cuota_inicial, cuota_diaria, monto_visita, notas, created_at, updated_at, garaje_parqueaderos(nombre), motos_para_recoger(fecha_recogida, user_id), user_moto_compra!garaje_motos_user_moto_compra_id_fkey(user_id)",
     )
     .order("created_at", { ascending: false });
 
+  if (error) throw new Error(error.message);
+
   return ((data ?? []) as unknown as Array<
-    Omit<GarajeMotoRow, "parqueadero_nombre"> & {
+    Omit<GarajeMotoRow, "parqueadero_nombre" | "fecha_recogida" | "origen_user_id"> & {
       garaje_parqueaderos: { nombre: string } | { nombre: string }[] | null;
+      motos_para_recoger:
+        | { fecha_recogida: string | null; user_id: number }
+        | { fecha_recogida: string | null; user_id: number }[]
+        | null;
+      user_moto_compra:
+        | { user_id: number }
+        | { user_id: number }[]
+        | null;
     }
   >).map((row) => {
     const parq = row.garaje_parqueaderos;
     const parqueaderoNombre = Array.isArray(parq)
       ? (parq[0]?.nombre ?? null)
       : (parq?.nombre ?? null);
+    const recoger = Array.isArray(row.motos_para_recoger)
+      ? row.motos_para_recoger[0]
+      : row.motos_para_recoger;
+    const compra = Array.isArray(row.user_moto_compra)
+      ? row.user_moto_compra[0]
+      : row.user_moto_compra;
     return {
       id: row.id,
       parqueadero_id: row.parqueadero_id,
@@ -994,9 +1048,78 @@ export async function getAllGarajeMotos(): Promise<GarajeMotoRow[]> {
       estado: row.estado,
       moto_para_recoger_id: row.moto_para_recoger_id,
       user_moto_compra_id: row.user_moto_compra_id,
+      cuota_inicial: row.cuota_inicial,
+      cuota_diaria: row.cuota_diaria,
+      monto_visita: row.monto_visita,
       notas: row.notas,
       created_at: row.created_at,
       updated_at: row.updated_at,
+      fecha_recogida: recoger?.fecha_recogida ?? null,
+      origen_user_id: compra?.user_id ?? recoger?.user_id ?? null,
+    };
+  });
+}
+
+export async function getGarajeMotosDisponiblesCredito(): Promise<
+  GarajeMotoRow[]
+> {
+  const all = await getAllGarajeMotos();
+  const supabase = createAdminClient();
+  const { data: activas } = await supabase
+    .from("user_moto_compra")
+    .select("garaje_moto_id")
+    .not("garaje_moto_id", "is", null)
+    .not("estado", "in", "(cancelada,saldada)");
+
+  const ocupadas = new Set(
+    (activas ?? [])
+      .map((r) => r.garaje_moto_id as string | null)
+      .filter((id): id is string => Boolean(id)),
+  );
+
+  return all.filter(
+    (m) =>
+      m.estado === "disponible" &&
+      m.cuota_inicial != null &&
+      m.cuota_diaria != null &&
+      !ocupadas.has(m.id),
+  );
+}
+
+export async function getGarajeMantenimientoItems(
+  garajeMotoId: string,
+): Promise<GarajeMantenimientoItemRow[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("garaje_mantenimiento_items")
+    .select(
+      "id, garaje_moto_id, producto_id, cantidad, costo_unitario, notas, created_at, created_by, inventario_productos(nombre, sku)",
+    )
+    .eq("garaje_moto_id", garajeMotoId)
+    .order("created_at", { ascending: false });
+
+  return ((data ?? []) as unknown as Array<
+    GarajeMantenimientoItemRow & {
+      inventario_productos:
+        | { nombre: string; sku: string | null }
+        | { nombre: string; sku: string | null }[]
+        | null;
+    }
+  >).map((row) => {
+    const prod = Array.isArray(row.inventario_productos)
+      ? row.inventario_productos[0]
+      : row.inventario_productos;
+    return {
+      id: row.id,
+      garaje_moto_id: row.garaje_moto_id,
+      producto_id: row.producto_id,
+      cantidad: row.cantidad,
+      costo_unitario: row.costo_unitario,
+      notas: row.notas,
+      created_at: row.created_at,
+      created_by: row.created_by,
+      producto_nombre: prod?.nombre ?? null,
+      producto_sku: prod?.sku ?? null,
     };
   });
 }

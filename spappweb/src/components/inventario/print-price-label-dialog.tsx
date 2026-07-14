@@ -72,17 +72,17 @@ export function PrintPriceLabelDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-sm">
+      <DialogContent className="bg-background sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>Imprimir etiquetas</DialogTitle>
           {product ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               {product.nombre} · SKU {product.sku}
             </p>
           ) : null}
         </DialogHeader>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="label-qty">¿Cuántas etiquetas necesitas?</Label>
           <Input
             id="label-qty"
@@ -97,12 +97,12 @@ export function PrintPriceLabelDialog({
             }}
           />
           {extra > 0 ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Se imprimirán {printCount} (de a 3 por fila: {neededCount} +
               {extra} de relleno).
             </p>
           ) : (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-muted-foreground">
               Se imprimirán {printCount} etiqueta{printCount === 1 ? "" : "s"}.
             </p>
           )}
@@ -119,7 +119,7 @@ export function PrintPriceLabelDialog({
           </Button>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || !product}
             onClick={run}
           >

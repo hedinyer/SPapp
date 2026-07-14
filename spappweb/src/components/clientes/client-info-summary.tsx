@@ -1,4 +1,4 @@
-import { Bike, User } from "lucide-react";
+﻿import { Bike, User } from "lucide-react";
 import type { BikeRow, ClientPipeline } from "@/lib/pipeline/types";
 import {
   COMPRA_ESTADO_LABELS,
@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs text-neutral-500">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-0.5 text-sm font-medium">{value}</p>
     </div>
   );
@@ -29,12 +29,12 @@ function PhotoThumb({
   caption: string;
 }) {
   return (
-    <div className="relative aspect-square overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
+    <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted/50">
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="h-full w-full object-cover" />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-neutral-400">
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
           {fallback === "user" ? (
             <User className="h-8 w-8" />
           ) : (
@@ -42,7 +42,7 @@ function PhotoThumb({
           )}
         </div>
       )}
-      <span className="absolute bottom-1.5 left-1.5 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+      <span className="absolute bottom-1.5 left-1.5 rounded bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background">
         {caption}
       </span>
     </div>
@@ -90,9 +90,9 @@ export function ClientInfoSummary({
   if (!hasContent) return null;
 
   return (
-    <Card className="overflow-hidden border-neutral-200 shadow-none">
+    <Card className="overflow-hidden border-border shadow-none">
       <CardContent className="flex flex-col gap-0 p-0 sm:flex-row">
-        <div className="grid w-full shrink-0 grid-cols-2 gap-0 border-b border-neutral-100 sm:w-56 sm:grid-cols-1 sm:border-b-0 sm:border-r">
+        <div className="grid w-full shrink-0 grid-cols-2 gap-0 border-b border-border sm:w-56 sm:grid-cols-1 sm:border-b-0 sm:border-r">
           <PhotoThumb
             src={selfieUrl}
             alt={`Foto de ${pipeline.displayName}`}

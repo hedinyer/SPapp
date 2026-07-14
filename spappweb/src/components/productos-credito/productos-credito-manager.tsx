@@ -60,14 +60,14 @@ export function ProductosCreditoManager({
             setEditing(null);
             setOpen(true);
           }}
-          className="bg-black text-white hover:bg-neutral-800"
+          className="bg-primary text-primary-foreground hover:bg-primary/80"
         >
           <Plus className="mr-2 h-4 w-4" />
           Nuevo producto
         </Button>
       </div>
 
-      <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+      <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -84,7 +84,7 @@ export function ProductosCreditoManager({
                 <TableCell>
                   <p className="font-medium">{p.nombre}</p>
                   {p.descripcion && (
-                    <p className="text-sm text-neutral-500">{p.descripcion}</p>
+                    <p className="text-sm text-muted-foreground">{p.descripcion}</p>
                   )}
                 </TableCell>
                 <TableCell>{formatCop(p.cuota_inicial)}</TableCell>
@@ -112,7 +112,7 @@ export function ProductosCreditoManager({
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-white">
+                      <AlertDialogContent className="bg-background">
                         <AlertDialogHeader>
                           <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
                           <AlertDialogDescription>{p.nombre}</AlertDialogDescription>
@@ -147,7 +147,7 @@ export function ProductosCreditoManager({
             ))}
             {productos.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center text-neutral-500">
+                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                   No hay productos a crédito. Crea el primero (ej. forro de moto).
                 </TableCell>
               </TableRow>
@@ -156,17 +156,17 @@ export function ProductosCreditoManager({
         </Table>
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="flex flex-col gap-3 lg:hidden">
         {productos.map((p) => (
           <div
             key={p.id}
-            className="rounded-lg border border-neutral-200 p-4"
+            className="rounded-lg border border-border p-4"
           >
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="font-medium">{p.nombre}</p>
                 {p.descripcion && (
-                  <p className="text-sm text-neutral-500">{p.descripcion}</p>
+                  <p className="text-sm text-muted-foreground">{p.descripcion}</p>
                 )}
               </div>
               <Badge variant={p.activo ? "outline" : "secondary"}>
@@ -175,11 +175,11 @@ export function ProductosCreditoManager({
             </div>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div>
-                <dt className="text-neutral-500">Inicial</dt>
+                <dt className="text-muted-foreground">Inicial</dt>
                 <dd>{formatCop(p.cuota_inicial)}</dd>
               </div>
               <div>
-                <dt className="text-neutral-500">Cuota diaria</dt>
+                <dt className="text-muted-foreground">Cuota diaria</dt>
                 <dd>{formatCop(p.cuota_diaria)}</dd>
               </div>
             </dl>
@@ -260,14 +260,14 @@ function ProductoCreditoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-md">
+      <DialogContent className="bg-background sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             {editing ? "Editar producto" : "Nuevo producto a crédito"}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="pc-nombre">Nombre</Label>
             <Input
               id="pc-nombre"
@@ -276,7 +276,7 @@ function ProductoCreditoDialog({
               placeholder="Forro de moto"
             />
           </div>
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="pc-desc">Descripción (opcional)</Label>
             <Input
               id="pc-desc"
@@ -285,7 +285,7 @@ function ProductoCreditoDialog({
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="pc-inicial">Cuota inicial</Label>
               <Input
                 id="pc-inicial"
@@ -295,7 +295,7 @@ function ProductoCreditoDialog({
                 onChange={(e) => setCuotaInicial(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="pc-diaria">Cuota diaria</Label>
               <Input
                 id="pc-diaria"
@@ -307,7 +307,7 @@ function ProductoCreditoDialog({
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="pc-orden">Orden</Label>
               <Input
                 id="pc-orden"
@@ -326,7 +326,7 @@ function ProductoCreditoDialog({
         <DialogFooter>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={pending || !nombre.trim()}
             onClick={() =>
               onSave({

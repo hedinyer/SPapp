@@ -58,8 +58,8 @@ export function CreditProductsPanel({
 
   if (!compra) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Asigna una moto antes de agregar productos a crédito.
         </CardContent>
       </Card>
@@ -82,17 +82,17 @@ export function CreditProductsPanel({
 
   return (
     <>
-      <Card className="border-neutral-200 shadow-none">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Productos a crédito</CardTitle>
-          <p className="text-sm text-neutral-500">
+          <CardTitle>Productos a crédito</CardTitle>
+          <p className="text-sm text-muted-foreground">
             Accesorios u otros ítems que el cliente lleva a cuotas, ligados a
             esta moto.
           </p>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {items.length > 0 ? (
-            <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+            <ul className="divide-y divide-neutral-100 rounded-lg border border-border">
               {items.map((item) => (
                 <li
                   key={item.id}
@@ -103,12 +103,12 @@ export function CreditProductsPanel({
                       {item.nombre}
                       {item.cantidad > 1 ? ` × ${item.cantidad}` : ""}
                     </p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="text-sm text-muted-foreground">
                       Inicial {formatCop(item.cuota_inicial_monto * item.cantidad)}{" "}
                       · {formatCop(item.cuota_diaria_monto * item.cantidad)}/día
                     </p>
                     {item.notas && (
-                      <p className="mt-1 text-xs text-neutral-400">{item.notas}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.notas}</p>
                     )}
                   </div>
                   {canEdit && (
@@ -120,21 +120,21 @@ export function CreditProductsPanel({
                       onClick={() => handleRemove(item.id)}
                       title="Quitar producto"
                     >
-                      <Trash2 className="h-4 w-4 text-red-600" />
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   )}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="rounded-lg border border-dashed border-neutral-200 py-6 text-center text-sm text-neutral-500">
+            <p className="rounded-lg border border-dashed border-border py-6 text-center text-sm text-muted-foreground">
               Sin productos a crédito agregados.
             </p>
           )}
 
           {(items.length > 0 || !canEdit) && (
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
-              <p className="text-neutral-500">Totales productos a crédito</p>
+            <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm">
+              <p className="text-muted-foreground">Totales productos a crédito</p>
               <p>
                 Inicial {formatCop(totalInicial(items))} · Cuota diaria{" "}
                 {formatCop(totalDiario(items))}
@@ -241,18 +241,18 @@ function AddCreditProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white sm:max-w-md">
+      <DialogContent className="bg-background sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Agregar producto a crédito</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {catalogo.length > 0 && (
             <div className="flex gap-2">
               <Button
                 type="button"
                 variant={modo === "catalogo" ? "default" : "outline"}
                 size="sm"
-                className={modo === "catalogo" ? "bg-black text-white" : ""}
+                className={modo === "catalogo" ? "bg-primary text-primary-foreground" : ""}
                 onClick={() => setModo("catalogo")}
               >
                 Del catálogo
@@ -261,7 +261,7 @@ function AddCreditProductDialog({
                 type="button"
                 variant={modo === "custom" ? "default" : "outline"}
                 size="sm"
-                className={modo === "custom" ? "bg-black text-white" : ""}
+                className={modo === "custom" ? "bg-primary text-primary-foreground" : ""}
                 onClick={() => setModo("custom")}
               >
                 Personalizado
@@ -270,7 +270,7 @@ function AddCreditProductDialog({
           )}
 
           {modo === "catalogo" && catalogo.length > 0 ? (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Producto</Label>
               <TouchSelect
                 aria-label="Producto a crédito"
@@ -284,7 +284,7 @@ function AddCreditProductDialog({
               />
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="cp-nombre">Nombre</Label>
               <Input
                 id="cp-nombre"
@@ -296,7 +296,7 @@ function AddCreditProductDialog({
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="cp-inicial">Cuota inicial</Label>
               <Input
                 id="cp-inicial"
@@ -306,7 +306,7 @@ function AddCreditProductDialog({
                 onChange={(e) => setCuotaInicial(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="cp-diaria">Cuota diaria</Label>
               <Input
                 id="cp-diaria"
@@ -318,7 +318,7 @@ function AddCreditProductDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="cp-cantidad">Cantidad</Label>
             <Input
               id="cp-cantidad"
@@ -329,7 +329,7 @@ function AddCreditProductDialog({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="cp-notas">Notas (opcional)</Label>
             <Input
               id="cp-notas"
@@ -341,7 +341,7 @@ function AddCreditProductDialog({
         <DialogFooter>
           <Button
             type="button"
-            className="bg-black text-white hover:bg-neutral-800"
+            className="bg-primary text-primary-foreground hover:bg-primary/80"
             disabled={
               pending ||
               !Number.isFinite(parsedCantidad) ||

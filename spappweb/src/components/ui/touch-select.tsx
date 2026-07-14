@@ -40,7 +40,7 @@ export function TouchSelect({
       aria-label={ariaLabel}
       onChange={(e) => onChange(e.target.value)}
       className={cn(
-        "min-h-11 w-full touch-manipulation rounded-lg border border-input bg-white px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "min-h-11 w-full touch-manipulation rounded-lg border border-input bg-background px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
         className,
       )}
     >

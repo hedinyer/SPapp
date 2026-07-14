@@ -10,6 +10,7 @@ import type { BikeRow, InboxQueue } from "@/lib/pipeline/types";
 import { QueueCards } from "@/components/inbox/queue-cards";
 import { VenderMotoSheet } from "@/components/inbox/vender-moto-sheet";
 import { VenderProductosSheet } from "@/components/inbox/vender-productos-sheet";
+import { PageHeader } from "@/components/layout/page-header";
 import { isMobileTouchDevice } from "@/lib/venta/start-qr-scanner";
 import { Button } from "@/components/ui/button";
 
@@ -83,13 +84,41 @@ export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) 
   const desktop = !isMobileTouchDevice();
 
   return (
-    <div className="space-y-8">
-      <div className="grid items-start gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-        <div>
-          <h1 className="text-xl font-semibold sm:text-2xl">Bandeja</h1>
-          <p className="mt-1 text-neutral-500">{pendingSummary(totalPending)}</p>
-        </div>
-        <div className="flex items-center justify-center gap-3 sm:gap-4">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <PageHeader
+          title="Hoy"
+          description={pendingSummary(totalPending)}
+          action={
+            <div className="flex flex-wrap gap-2 sm:justify-end">
+              {desktop ? (
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/caja">
+                    <Store data-icon="inline-start" />
+                    Abrir caja
+                  </Link>
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setProductosOpen(true)}
+              >
+                <ShoppingBag data-icon="inline-start" />
+                Venta productos
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setVenderOpen(true)}
+              >
+                <Bike data-icon="inline-start" />
+                Vender moto
+              </Button>
+            </div>
+          }
+        />
+        <div className="flex items-center justify-center gap-4 rounded-xl border border-border bg-card px-4 py-3">
           <Image
             src="/beralogo.jpg"
             alt="Bera"
@@ -106,34 +135,6 @@ export function InboxQueuesLive({ initialQueues, bikes }: InboxQueuesLiveProps) 
             className="h-10 w-auto object-contain sm:h-12"
             priority
           />
-        </div>
-        <div className="flex flex-wrap gap-2 sm:justify-end">
-          {desktop ? (
-            <Button type="button" variant="outline" className="gap-2" asChild>
-              <Link href="/caja">
-                <Store className="h-4 w-4" />
-                Abrir caja
-              </Link>
-            </Button>
-          ) : null}
-          <Button
-            type="button"
-            variant="outline"
-            className="gap-2"
-            onClick={() => setProductosOpen(true)}
-          >
-            <ShoppingBag className="h-4 w-4" />
-            Venta productos
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="gap-2"
-            onClick={() => setVenderOpen(true)}
-          >
-            <Bike className="h-4 w-4" />
-            Vender moto
-          </Button>
         </div>
       </div>
       <QueueCards queues={queues} />

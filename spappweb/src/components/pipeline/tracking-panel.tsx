@@ -86,11 +86,15 @@ export function TrackingPanel({
 
   return (
     <Card
-      className={`border-neutral-200 shadow-none ${needsIntensiveTracking && !liveTracking.seguimiento ? "border-amber-300 bg-amber-50/40" : ""}`}
+      className={
+        needsIntensiveTracking && !liveTracking.seguimiento
+          ? "border-amber-300 bg-amber-50/40"
+          : undefined
+      }
     >
       <CardHeader>
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="text-base">Seguimiento GPS</CardTitle>
+          <CardTitle>Seguimiento GPS</CardTitle>
           {liveNow && (
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
               <Radio className="h-3 w-3" />
@@ -98,9 +102,9 @@ export function TrackingPanel({
             </span>
           )}
         </div>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           La ubicación la envía la app del cliente en tiempo real a{" "}
-          <span className="font-medium text-neutral-700">ubicacion_1</span>.
+          <span className="font-medium text-foreground">ubicacion_1</span>.
         </p>
         {mora.tieneDeuda && (
           <p className="text-sm font-medium text-amber-800">
@@ -121,7 +125,7 @@ export function TrackingPanel({
           </p>
         )}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <Label htmlFor="seguimiento" className="font-normal">
             Seguimiento intensivo (mora)
@@ -178,23 +182,23 @@ export function TrackingPanel({
         )}
 
         {hasLocation ? (
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
+          <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm">
             <div className="flex items-start gap-2">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-black">
+                <p className="font-medium text-foreground">
                   Última ubicación (app cliente)
                 </p>
-                <p className="mt-1 text-neutral-600">
+                <p className="mt-1 text-muted-foreground">
                   {location.lat!.toFixed(5)}, {location.lng!.toFixed(5)}
                 </p>
                 {location.accuracy != null && (
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     Precisión ±{Math.round(location.accuracy)} m
                   </p>
                 )}
                 {location.captured_at && (
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {formatDate(location.captured_at)}
                     {liveNow ? " · recibiendo en vivo" : ""}
                   </p>
@@ -204,7 +208,7 @@ export function TrackingPanel({
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-black underline-offset-2 hover:underline"
+                    className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-foreground underline-offset-2 hover:underline"
                   >
                     Ver en Google Maps
                     <ExternalLink className="h-3.5 w-3.5" />
@@ -214,7 +218,7 @@ export function TrackingPanel({
             </div>
           </div>
         ) : (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Sin ubicación aún. El cliente debe tener la app abierta (o
             seguimiento intensivo activo) y permisos de GPS concedidos.
           </p>

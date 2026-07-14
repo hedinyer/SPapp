@@ -35,8 +35,8 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
 
   if (!compra) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Aún no hay moto seleccionada.
         </CardContent>
       </Card>
@@ -45,8 +45,8 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
 
   if (compra.estado === "entregada") {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="space-y-2 py-8 text-center text-sm">
+      <Card>
+        <CardContent className="flex flex-col gap-2 py-8 text-center text-sm">
           <p className="font-medium">Moto entregada</p>
           {compra.placa && <p>Placa: {compra.placa}</p>}
           {compra.fecha_entrega && (
@@ -59,8 +59,8 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
 
   if (compra.estado === "cancelada") {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Compra cancelada.
         </CardContent>
       </Card>
@@ -69,8 +69,8 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
 
   if (compra.estado === "pendiente_pago") {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           Confirma los pagos antes de preparar el retiro.
         </CardContent>
       </Card>
@@ -89,16 +89,16 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
   }
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Retiro y entrega</CardTitle>
-        <p className="text-sm text-neutral-500">
+        <CardTitle>Retiro y entrega</CardTitle>
+        <p className="text-sm text-muted-foreground">
           Registra los datos de la moto y marca como entregada.
         </p>
       </CardHeader>
       <CardContent>
         <form
-          className="space-y-4"
+          className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             const fd = new FormData(e.currentTarget);
@@ -117,7 +117,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="placa">Placa</Label>
               <Input
                 id="placa"
@@ -127,7 +127,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
                 placeholder="ABC123"
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="chasis">Chasis</Label>
               <Input
                 id="chasis"
@@ -136,7 +136,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="referencia">Referencia (opcional)</Label>
               <Input
                 id="referencia"
@@ -144,7 +144,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
                 defaultValue={compra.referencia ?? ""}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="fechaEntrega">Fecha de entrega</Label>
               <Input
                 id="fechaEntrega"
@@ -172,7 +172,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
             <Button
               type="button"
               size="lg"
-              className="w-full bg-black text-white hover:bg-neutral-800 sm:w-auto"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/80 sm:w-auto"
               disabled={pending || !compra.placa}
               onClick={() =>
                 run(
@@ -194,7 +194,7 @@ export function DeliveryPanel({ compra, userId }: DeliveryPanelProps) {
                   Cancelar compra
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-white">
+              <AlertDialogContent className="bg-background">
                 <AlertDialogHeader>
                   <AlertDialogTitle>¿Cancelar compra?</AlertDialogTitle>
                   <AlertDialogDescription>

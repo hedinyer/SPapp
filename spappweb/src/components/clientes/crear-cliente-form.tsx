@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
@@ -33,8 +33,8 @@ export function CrearClienteForm() {
   }
 
   return (
-    <div className="max-w-md space-y-6">
-      <div className="space-y-2">
+    <div className="max-w-md flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="cedula">Cédula del cliente</Label>
         <Input
           id="cedula"
@@ -48,14 +48,14 @@ export function CrearClienteForm() {
           }}
           disabled={pending}
         />
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Se creará un usuario con esa cédula como usuario y contraseña, con
           estado normal.
         </p>
       </div>
 
       <Button
-        className="min-h-11 w-full bg-black text-white hover:bg-neutral-800 sm:w-auto"
+        className="min-h-11 w-full sm:w-auto"
         disabled={pending || cedula.trim().length < 5}
         onClick={onSubmit}
       >
@@ -63,11 +63,11 @@ export function CrearClienteForm() {
       </Button>
 
       {createdUserId && (
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-muted-foreground">
           Último cliente creado:{" "}
           <Link
             href={`/clientes/${createdUserId}`}
-            className="font-medium text-black underline-offset-2 hover:underline"
+            className="font-medium text-foreground underline-offset-2 hover:underline"
           >
             Ver ficha
           </Link>

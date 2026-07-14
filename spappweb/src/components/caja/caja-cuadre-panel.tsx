@@ -54,7 +54,7 @@ function parseCopInput(raw: string): number | undefined {
 
 function CuadreEfectivo({ sesion }: { sesion: CajaSesionState }) {
   return (
-    <div className="space-y-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-muted/50 p-3">
       <div className="flex items-center justify-between text-sm font-semibold">
         <span>Efectivo esperado en caja</span>
         <span className="tabular-nums">{formatCop(sesion.efectivoEsperado)}</span>
@@ -62,7 +62,7 @@ function CuadreEfectivo({ sesion }: { sesion: CajaSesionState }) {
       {sesion.montoCierre != null && sesion.diferencia != null ? (
         <>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-600">Efectivo contado</span>
+            <span className="text-muted-foreground">Efectivo contado</span>
             <span className="font-medium tabular-nums">
               {formatCop(sesion.montoCierre)}
             </span>
@@ -72,7 +72,7 @@ function CuadreEfectivo({ sesion }: { sesion: CajaSesionState }) {
               sesion.diferencia === 0
                 ? "text-green-700"
                 : sesion.diferencia < 0
-                  ? "text-red-600"
+                  ? "text-destructive"
                   : "text-amber-700"
             }`}
           >
@@ -220,7 +220,7 @@ export function CajaCuadrePanel({
   }
 
   return (
-    <Card className="border-neutral-200">
+    <Card className="border-border">
       <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
@@ -233,7 +233,7 @@ export function CajaCuadrePanel({
                     Abierta
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="border-neutral-300 text-neutral-600">
+                  <Badge variant="outline" className="border-border text-muted-foreground">
                     <Lock className="mr-1 h-3 w-3" />
                     Cerrada
                   </Badge>
@@ -252,15 +252,15 @@ export function CajaCuadrePanel({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         {!sesion ? (
-          <div className="space-y-3">
-            <p className="text-sm text-neutral-600">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-muted-foreground">
               Registra cuánto efectivo hay en caja al comenzar el día. El monto
               debe ser mayor a 0.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="caja-apertura-monto">Efectivo inicial</Label>
                 <Input
                   id="caja-apertura-monto"
@@ -270,7 +270,7 @@ export function CajaCuadrePanel({
                   onChange={(e) => setMontoApertura(e.target.value)}
                 />
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="caja-apertura-notas">Notas (opcional)</Label>
                 <Textarea
                   id="caja-apertura-notas"
@@ -282,7 +282,7 @@ export function CajaCuadrePanel({
             </div>
             <Button
               type="button"
-              className="gap-2 bg-black text-white hover:bg-neutral-800"
+              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
               disabled={!puedeAbrir || pending}
               onClick={requestAbrir}
             >
@@ -292,7 +292,7 @@ export function CajaCuadrePanel({
           </div>
         ) : (
           <>
-            <div className="text-xs text-neutral-500">
+            <div className="text-xs text-muted-foreground">
               Apertura: {formatDate(sesion.openedAt)}
               {sesion.closedAt ? ` · Cierre: ${formatDate(sesion.closedAt)}` : null}
             </div>
@@ -321,19 +321,19 @@ export function CajaCuadrePanel({
             ) : null}
 
             {sesion.movimientos.length > 0 ? (
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-neutral-500">Movimientos</p>
-                <ul className="max-h-32 space-y-1 overflow-y-auto text-sm">
+              <div className="flex flex-col gap-1">
+                <p className="text-xs font-medium text-muted-foreground">Movimientos</p>
+                <ul className="max-h-32 flex flex-col gap-1 overflow-y-auto text-sm">
                   {sesion.movimientos.map((m) => (
                     <li
                       key={m.id}
-                      className="flex items-center justify-between rounded border border-neutral-100 px-2 py-1"
+                      className="flex items-center justify-between rounded border border-border px-2 py-1"
                     >
                       <span className="flex items-center gap-1.5 truncate">
                         {m.tipo === "entrada" ? (
                           <ArrowDownCircle className="h-3.5 w-3.5 shrink-0 text-green-600" />
                         ) : (
-                          <ArrowUpCircle className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                          <ArrowUpCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
                         )}
                         {m.concepto}
                       </span>
@@ -349,7 +349,7 @@ export function CajaCuadrePanel({
 
             {sesion.abierta ? (
               <>
-                <div className="space-y-3 rounded-lg border border-dashed border-neutral-200 p-3">
+                <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border p-3">
                   <p className="text-sm font-medium">Movimiento manual</p>
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -370,7 +370,7 @@ export function CajaCuadrePanel({
                     </Button>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <Label htmlFor="caja-mov-monto">Monto</Label>
                       <Input
                         id="caja-mov-monto"
@@ -379,7 +379,7 @@ export function CajaCuadrePanel({
                         onChange={(e) => setMovMonto(e.target.value)}
                       />
                     </div>
-                    <div className="space-y-2 sm:col-span-2">
+                    <div className="flex flex-col gap-2 sm:col-span-2">
                       <Label htmlFor="caja-mov-concepto">Concepto</Label>
                       <Input
                         id="caja-mov-concepto"
@@ -400,10 +400,10 @@ export function CajaCuadrePanel({
                   </Button>
                 </div>
 
-                <div className="space-y-3 border-t border-neutral-200 pt-4">
+                <div className="flex flex-col gap-3 border-t border-border pt-4">
                   <p className="text-sm font-medium">Cierre del día</p>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <Label htmlFor="caja-cierre-monto">Efectivo contado</Label>
                       <Input
                         id="caja-cierre-monto"
@@ -413,7 +413,7 @@ export function CajaCuadrePanel({
                         onChange={(e) => setMontoCierre(e.target.value)}
                       />
                     </div>
-                    <div className="space-y-2 sm:col-span-2">
+                    <div className="flex flex-col gap-2 sm:col-span-2">
                       <Label htmlFor="caja-cierre-notas">Notas (opcional)</Label>
                       <Textarea
                         id="caja-cierre-notas"
@@ -434,7 +434,7 @@ export function CajaCuadrePanel({
                     </Button>
                     <Button
                       type="button"
-                      className="gap-2 bg-black text-white hover:bg-neutral-800"
+                      className="gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
                       disabled={!puedeCerrar || pending}
                       onClick={handleCerrar}
                     >
@@ -445,7 +445,7 @@ export function CajaCuadrePanel({
                 </div>
               </>
             ) : sesion.notasCierre ? (
-              <p className="text-sm text-neutral-600">
+              <p className="text-sm text-muted-foreground">
                 <span className="font-medium">Notas de cierre:</span> {sesion.notasCierre}
               </p>
             ) : null}
@@ -464,7 +464,7 @@ export function CajaCuadrePanel({
               del día saldrá errado.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="space-y-2 text-center">
+          <div className="flex flex-col gap-2 text-center">
             <p className="caja-monto-blink rounded-xl px-4 py-5 text-3xl font-black tabular-nums tracking-tight sm:text-4xl">
               {formatCop(montoAperturaNum ?? 0)}
             </p>
@@ -489,13 +489,13 @@ export function CajaCuadrePanel({
       </AlertDialog>
 
       <Dialog open={informeOpen} onOpenChange={setInformeOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white sm:max-w-lg">
+        <DialogContent className="max-h-[90vh] overflow-y-auto bg-background sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Informe de cierre</DialogTitle>
           </DialogHeader>
           {sesion ? (
             <>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted-foreground">
                 {formatDate(sesion.openedAt)}
                 {sesion.closedAt ? ` — ${formatDate(sesion.closedAt)}` : null}
               </p>

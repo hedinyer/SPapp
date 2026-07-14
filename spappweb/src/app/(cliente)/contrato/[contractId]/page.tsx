@@ -14,9 +14,9 @@ export const metadata = { title: "Firmar contrato" };
 
 function Notice({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border-2 border-neutral-200 bg-white p-6 text-center">
-      <h1 className="text-xl font-bold text-black">{title}</h1>
-      <p className="mt-2 text-base leading-relaxed text-neutral-600">{body}</p>
+    <div className="rounded-2xl border-2 border-border bg-background p-6 text-center">
+      <h1 className="text-xl font-bold text-foreground">{title}</h1>
+      <p className="mt-2 text-base leading-relaxed text-muted-foreground">{body}</p>
     </div>
   );
 }

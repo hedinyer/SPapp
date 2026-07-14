@@ -89,17 +89,17 @@ export function AdminMotoAssignPanel({
       : null;
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Asignar moto y placa</CardTitle>
-        <p className="text-sm text-neutral-500">
+        <CardTitle>Asignar moto y placa</CardTitle>
+        <p className="text-sm text-muted-foreground">
           Elige la moto, negocia cuotas si el cliente paga más inicial o acordaron
           otra cuota diaria, y registra el chasis.
         </p>
       </CardHeader>
       <CardContent>
         <form
-          className="space-y-4"
+          className="flex flex-col gap-4"
           onSubmit={(e) => {
             e.preventDefault();
             const fd = new FormData(e.currentTarget);
@@ -153,7 +153,7 @@ export function AdminMotoAssignPanel({
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2 sm:col-span-2">
+            <div className="flex flex-col gap-2 sm:col-span-2">
               <Label>Moto (modelo · color)</Label>
               <TouchSelect
                 aria-label="Moto"
@@ -166,7 +166,7 @@ export function AdminMotoAssignPanel({
                 }))}
               />
             </div>
-            <div className="space-y-2 sm:col-span-2">
+            <div className="flex flex-col gap-2 sm:col-span-2">
               <Label>Frecuencia de pago</Label>
               <TouchSelect
                 aria-label="Frecuencia"
@@ -180,12 +180,12 @@ export function AdminMotoAssignPanel({
             </div>
             {selectedBike && (
               <>
-                <div className="sm:col-span-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
+                <div className="sm:col-span-2 rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                   Catálogo: inicial {formatCop(selectedBike.cuota_inicial)} ·{" "}
                   {formatCop(selectedBike.cuota_diaria)}/día · visita{" "}
                   {formatCop(selectedBike.monto_visita ?? MONTO_VISITA_DEFAULT)}
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="cuota-inicial">Cuota inicial negociada</Label>
                   <Input
                     id="cuota-inicial"
@@ -194,12 +194,12 @@ export function AdminMotoAssignPanel({
                     onChange={(e) => setCuotaInicial(e.target.value)}
                     placeholder={String(selectedBike.cuota_inicial)}
                   />
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     Mínimo {formatCop(selectedBike.cuota_inicial)}. Puede ser
                     mayor si el cliente aporta más inicial.
                   </p>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="cuota-diaria">Cuota diaria negociada</Label>
                   <Input
                     id="cuota-diaria"
@@ -208,12 +208,12 @@ export function AdminMotoAssignPanel({
                     onChange={(e) => setCuotaDiaria(e.target.value)}
                     placeholder={String(selectedBike.cuota_diaria)}
                   />
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     Base diaria acordada en persona (afecta la cuota adelantada
                     según frecuencia).
                   </p>
                 </div>
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="monto-visita">Monto visita domiciliaria</Label>
                   <Input
                     id="monto-visita"
@@ -222,7 +222,7 @@ export function AdminMotoAssignPanel({
                     onChange={(e) => setMontoVisita(e.target.value)}
                     placeholder={String(selectedBike.monto_visita ?? MONTO_VISITA_DEFAULT)}
                   />
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     Valor de la visita al domicilio (catálogo o negociado).
                   </p>
                 </div>
@@ -247,7 +247,7 @@ export function AdminMotoAssignPanel({
                 )}
               </>
             )}
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="placa">Placa (opcional)</Label>
               <Input
                 id="placa"
@@ -257,7 +257,7 @@ export function AdminMotoAssignPanel({
                 className="uppercase"
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="chasis">Chasis</Label>
               <Input
                 id="chasis"
@@ -266,7 +266,7 @@ export function AdminMotoAssignPanel({
                 defaultValue={compra?.chasis ?? ""}
               />
             </div>
-            <div className="space-y-2 sm:col-span-2">
+            <div className="flex flex-col gap-2 sm:col-span-2">
               <Label htmlFor="referencia">Referencia (opcional)</Label>
               <Input
                 id="referencia"
@@ -278,7 +278,7 @@ export function AdminMotoAssignPanel({
           <Button
             type="submit"
             size="lg"
-            className="mt-2 w-full bg-black text-white hover:bg-neutral-800 sm:w-auto"
+            className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/80 sm:w-auto"
             disabled={pending}
           >
             Guardar moto y generar contrato

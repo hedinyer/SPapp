@@ -1,18 +1,22 @@
-import { getVentasContado } from "@/lib/actions/venta-moto-actions";
+﻿import { getVentasContado } from "@/lib/actions/venta-moto-actions";
 import { getAvailableBikes } from "@/lib/pipeline/queries";
 import { VentaContadoManager } from "@/components/venta-contado/venta-contado-manager";
+import { AdminHubSubnav } from "@/components/layout/admin-hub-subnav";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function VentaContadoPage() {
-  const [ventas, bikes] = await Promise.all([getVentasContado(), getAvailableBikes()]);
+  const [ventas, bikes] = await Promise.all([
+    getVentasContado(),
+    getAvailableBikes(),
+  ]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold sm:text-2xl">Venta contado</h1>
-        <p className="mt-1 text-neutral-500">
-          Motos vendidas al contado o con abono parcial en mostrador.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <AdminHubSubnav hubId="motos" />
+      <PageHeader
+        title="Contado"
+        description="Motos vendidas al contado o con abono parcial en mostrador."
+      />
       <VentaContadoManager ventas={ventas} bikes={bikes} />
     </div>
   );

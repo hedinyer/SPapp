@@ -45,8 +45,8 @@ export function VisitActionPanel({
 
   if (!visita) {
     return (
-      <Card className="border-neutral-200 shadow-none">
-        <CardContent className="py-8 text-center text-sm text-neutral-500">
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
           La visita se creará cuando el pago esté confirmado y la moto quede
           lista para retiro.
         </CardContent>
@@ -76,14 +76,14 @@ export function VisitActionPanel({
   const assignedUsername = visitadorUsername(assignedVisitador);
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">
+        <CardTitle>
           {visita.estado === "pendiente_asignacion"
             ? "Agendar visita domiciliaria"
             : "Visita domiciliaria"}
         </CardTitle>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           {visita.estado === "pendiente_asignacion"
             ? entregaAntesVisita(compra)
               ? "Programa la visita después de entregar la moto."
@@ -93,18 +93,18 @@ export function VisitActionPanel({
               : `Estado: ${visitaEstadoLabel(visita.estado)}`}
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-neutral-500">Cliente</dt>
+            <dt className="text-muted-foreground">Cliente</dt>
             <dd>{visita.cliente_nombre ?? "—"}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Celular</dt>
+            <dt className="text-muted-foreground">Celular</dt>
             <dd>{visita.cliente_celular ?? "—"}</dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-neutral-500">Dirección</dt>
+            <dt className="text-muted-foreground">Dirección</dt>
             <dd>
               {[visita.direccion_visita, visita.barrio]
                 .filter(Boolean)
@@ -135,14 +135,14 @@ export function VisitActionPanel({
         )}
 
         {visita.estado === "asignada" && (
-          <div className="space-y-4">
-            <div className="space-y-4 rounded-lg border border-neutral-200 p-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 rounded-lg border border-border p-4">
               <p className="text-sm">
-                <span className="text-neutral-500">Visitador: </span>
+                <span className="text-muted-foreground">Visitador: </span>
                 {visita.visitadores?.nombre ?? "—"}
               </p>
               <p className="text-sm">
-                <span className="text-neutral-500">Fecha: </span>
+                <span className="text-muted-foreground">Fecha: </span>
                 {formatDate(visita.fecha_programada)}
               </p>
               {assignedVisitador && assignedUsername ? (
@@ -152,7 +152,7 @@ export function VisitActionPanel({
                   telefono={assignedVisitador.telefono}
                 />
               ) : (
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-muted-foreground">
                   El visitador debe completar la visita desde la app o el portal
                   visitador, subiendo fotos, video y ubicación.
                 </p>
@@ -163,7 +163,7 @@ export function VisitActionPanel({
                     Cancelar visita
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="bg-white">
+                <AlertDialogContent className="bg-background">
                   <AlertDialogHeader>
                     <AlertDialogTitle>¿Cancelar visita?</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -210,8 +210,8 @@ export function VisitActionPanel({
         )}
 
         {visita.estado === "completada" && (
-          <div className="space-y-4">
-            <p className="text-sm text-neutral-600">
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground">
               Visita completada
               {visita.fecha_completada
                 ? ` el ${formatDate(visita.fecha_completada)}`
@@ -220,14 +220,14 @@ export function VisitActionPanel({
             </p>
 
             {visita.notas_visita && (
-              <div className="rounded-lg border border-neutral-200 p-3 text-sm">
-                <p className="font-medium text-neutral-700">Notas del visitador</p>
-                <p className="mt-1 text-neutral-600">{visita.notas_visita}</p>
+              <div className="rounded-lg border border-border p-3 text-sm">
+                <p className="font-medium text-foreground">Notas del visitador</p>
+                <p className="mt-1 text-muted-foreground">{visita.notas_visita}</p>
               </div>
             )}
 
             {fotos.length > 0 && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium">Fotos de evidencia</p>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {fotos.map((foto, i) => (
@@ -236,7 +236,7 @@ export function VisitActionPanel({
                       href={foto.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block overflow-hidden rounded-lg border border-neutral-200"
+                      className="block overflow-hidden rounded-lg border border-border"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -251,15 +251,15 @@ export function VisitActionPanel({
             )}
 
             {videos.length > 0 && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium">Videos de evidencia</p>
-                <div className="space-y-3">
+                <div className="flex flex-col gap-3">
                   {videos.map((video, i) => (
                     <video
                       key={`${video.url}-${i}`}
                       src={video.url}
                       controls
-                      className="w-full max-w-md rounded-lg border border-neutral-200"
+                      className="w-full max-w-md rounded-lg border border-border"
                     />
                   ))}
                 </div>
@@ -267,12 +267,12 @@ export function VisitActionPanel({
             )}
 
             {ubicacion?.lat != null && ubicacion?.lng != null && (
-              <div className="rounded-lg border border-neutral-200 p-3 text-sm">
-                <p className="flex items-center gap-2 font-medium text-neutral-700">
+              <div className="rounded-lg border border-border p-3 text-sm">
+                <p className="flex items-center gap-2 font-medium text-foreground">
                   <MapPin className="h-4 w-4" />
                   Ubicación verificada
                 </p>
-                <p className="mt-1 text-neutral-600">
+                <p className="mt-1 text-muted-foreground">
                   {ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}
                   {ubicacion.accuracy != null &&
                     ` · ±${Math.round(ubicacion.accuracy)} m`}
@@ -292,8 +292,8 @@ export function VisitActionPanel({
         )}
 
         {visita.estado === "cancelada" && (
-          <div className="space-y-4">
-            <p className="text-sm text-neutral-600">
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground">
               Visita cancelada. Puedes volver a agendarla con otro visitador o
               fecha.
             </p>
@@ -353,10 +353,10 @@ function AssignForm({
 
   return (
     <form
-      className={`space-y-4 rounded-lg border p-4 ${
+      className={`flex flex-col gap-4 rounded-lg border p-4 ${
         highlight
-          ? "border-black bg-neutral-50"
-          : "border-neutral-200"
+          ? "border-primary bg-muted/50"
+          : "border-border"
       }`}
       onSubmit={(e) => {
         e.preventDefault();
@@ -379,7 +379,7 @@ function AssignForm({
           : title}
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label>Visitador</Label>
           <TouchSelect
             aria-label="Visitador"
@@ -393,7 +393,7 @@ function AssignForm({
             }))}
           />
         </div>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="fecha">Fecha y hora</Label>
           <Input
             id="fecha"
@@ -409,13 +409,13 @@ function AssignForm({
       <Button
         type="submit"
         size="lg"
-        className="bg-black text-white hover:bg-neutral-800"
+        className="bg-primary text-primary-foreground hover:bg-primary/80"
         disabled={pending || visitadores.length === 0}
       >
         {submitLabel}
       </Button>
       {visitadores.length === 0 && (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Crea visitadores con cuenta de acceso en el menú lateral primero.
         </p>
       )}

@@ -1,5 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAvailableBikes } from "@/lib/pipeline/queries";
+import {
+  getAvailableBikes,
+  getGarajeMotosDisponiblesCredito,
+} from "@/lib/pipeline/queries";
 import { MotoSelectionFlow } from "@/components/contrato/moto-selection-flow";
 import {
   FRECUENCIA_LABELS,
@@ -13,9 +16,9 @@ export const metadata = { title: "Elegir moto" };
 
 function Notice({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border-2 border-neutral-200 bg-white p-6 text-center">
-      <h1 className="text-xl font-bold text-black">{title}</h1>
-      <p className="mt-2 text-base leading-relaxed text-neutral-600">{body}</p>
+    <div className="rounded-2xl border-2 border-border bg-background p-6 text-center">
+      <h1 className="text-xl font-bold text-foreground">{title}</h1>
+      <p className="mt-2 text-base leading-relaxed text-muted-foreground">{body}</p>
     </div>
   );
 }
@@ -71,6 +74,15 @@ export default async function MotoPage({
     );
   }
 
-  const bikes = await getAvailableBikes();
-  return <MotoSelectionFlow contractId={contract.id} bikes={bikes} />;
+  const [bikes, garajeMotos] = await Promise.all([
+    getAvailableBikes(),
+    getGarajeMotosDisponiblesCredito(),
+  ]);
+  return (
+    <MotoSelectionFlow
+      contractId={contract.id}
+      bikes={bikes}
+      garajeMotos={garajeMotos}
+    />
+  );
 }

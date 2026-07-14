@@ -139,7 +139,8 @@ export interface VisitaRow {
 export interface UserMotoCompraRow {
   id: string;
   user_id: number;
-  bike_id: number;
+  bike_id: number | null;
+  garaje_moto_id: string | null;
   modelo: string;
   color: string;
   frecuencia_pago: FrecuenciaPago;
@@ -169,6 +170,8 @@ export interface VendidaMotoRow extends UserMotoCompraRow {
   } | null;
   garaje_motos?: { id: string }[] | null;
   atraso?: AtrasoSnapshot | null;
+  selfieUrl?: string | null;
+  motoImagenUrl?: string | null;
 }
 
 export type AtrasoEstado = "al_dia" | "vencido" | "moroso";
@@ -242,7 +245,14 @@ export interface MotoParaRecogerRow {
 
 export type GarajeOrigen = "manual" | "recuperacion";
 export type GarajeCondicion = "nueva" | "segunda_mano" | "recuperada";
-export type GarajeMotoEstado = "en_garaje" | "disponible" | "vendida" | "baja";
+export type GarajeMotoEstado =
+  | "en_garaje"
+  | "retenida"
+  | "en_mantenimiento"
+  | "disponible"
+  | "vendida"
+  | "devuelta"
+  | "baja";
 
 export interface GarajeParqueaderoRow {
   id: number;
@@ -268,9 +278,29 @@ export interface GarajeMotoRow {
   estado: GarajeMotoEstado;
   moto_para_recoger_id: string | null;
   user_moto_compra_id: string | null;
+  cuota_inicial: number | null;
+  cuota_diaria: number | null;
+  monto_visita: number | null;
   notas: string | null;
   created_at: string;
   updated_at: string;
+  /** Desde join con motos_para_recoger (solo recuperadas). */
+  fecha_recogida?: string | null;
+  /** Cliente de origen (compra vinculada). */
+  origen_user_id?: number | null;
+}
+
+export interface GarajeMantenimientoItemRow {
+  id: string;
+  garaje_moto_id: string;
+  producto_id: number;
+  cantidad: number;
+  costo_unitario: number;
+  notas: string | null;
+  created_at: string;
+  created_by: string | null;
+  producto_nombre?: string | null;
+  producto_sku?: string | null;
 }
 
 export const GARAJE_CONDICION_LABELS: Record<GarajeCondicion, string> = {
@@ -286,8 +316,11 @@ export const GARAJE_ORIGEN_LABELS: Record<GarajeOrigen, string> = {
 
 export const GARAJE_ESTADO_LABELS: Record<GarajeMotoEstado, string> = {
   en_garaje: "En garaje",
+  retenida: "Retenida (plazo cliente)",
+  en_mantenimiento: "En mantenimiento",
   disponible: "Disponible",
   vendida: "Vendida",
+  devuelta: "Devuelta al cliente",
   baja: "Baja",
 };
 

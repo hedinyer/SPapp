@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { GenerarFacturasDialog } from "@/components/clientes/generar-facturas-dialog";
 
 function PhotoThumb({
@@ -40,7 +47,7 @@ function PhotoThumb({
     );
   }
   return (
-    <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-neutral-400">
+    <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
       {fallback === "user" ? (
         <User className="h-7 w-7" />
       ) : (
@@ -91,45 +98,55 @@ export function ClientesSearchResults({
 
   if (results.length === 0) {
     return (
-      <p className="text-sm text-neutral-500">
-        {query
-          ? `No se encontraron clientes para “${query}”. Prueba con placa, cédula o nombre completo.`
-          : "Aún no hay clientes con moto a crédito."}
-      </p>
+      <Empty className="border border-dashed border-border">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <User />
+          </EmptyMedia>
+          <EmptyTitle>
+            {query ? "Sin resultados" : "Sin clientes a crédito"}
+          </EmptyTitle>
+          <EmptyDescription>
+            {query
+              ? `No se encontraron clientes para “${query}”. Prueba con placa, cédula o nombre completo.`
+              : "Aún no hay clientes con moto a crédito."}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   }
 
   return (
     <>
-      <div className="space-y-3">
-        <p className="text-sm text-neutral-500">
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-muted-foreground">
           {listTitle ?? `${list.length} resultado${list.length === 1 ? "" : "s"}`}
         </p>
         <ul className="grid gap-4 lg:grid-cols-2">
           {list.map((client) => (
             <li
               key={client.userId}
-              className="overflow-hidden rounded-xl border border-neutral-200 bg-white"
+              className="overflow-hidden rounded-xl border border-border bg-background"
             >
               <div className="flex">
-                <div className="flex w-[6.5rem] shrink-0 flex-col border-r border-neutral-100 sm:w-32">
-                  <div className="relative aspect-square overflow-hidden bg-neutral-50">
+                <div className="flex w-[6.5rem] shrink-0 flex-col border-r border-border sm:w-32">
+                  <div className="relative aspect-square overflow-hidden bg-muted/50">
                     <PhotoThumb
                       src={client.selfieUrl}
                       alt={`Foto de ${client.displayName}`}
                       fallback="user"
                     />
-                    <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    <span className="absolute bottom-1 left-1 rounded bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background">
                       Cliente
                     </span>
                   </div>
-                  <div className="relative aspect-square overflow-hidden border-t border-neutral-100 bg-neutral-50">
+                  <div className="relative aspect-square overflow-hidden border-t border-border bg-muted/50">
                     <PhotoThumb
                       src={client.motoImagenUrl}
                       alt={client.motoLabel ? `Moto ${client.motoLabel}` : "Moto"}
                       fallback="bike"
                     />
-                    <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    <span className="absolute bottom-1 left-1 rounded bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background">
                       {client.placa ?? "Moto"}
                     </span>
                   </div>
@@ -138,9 +155,9 @@ export function ClientesSearchResults({
                 <div className="flex min-w-0 flex-1 flex-col">
                   <Link
                     href={`/clientes/${client.userId}`}
-                    className="min-w-0 flex-1 p-4 hover:bg-neutral-50/80"
+                    className="min-w-0 flex-1 p-4 hover:bg-muted/50"
                   >
-                    <div className="space-y-1.5">
+                    <div className="flex flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{client.displayName}</p>
                         {client.matchLabel ? (
@@ -171,19 +188,19 @@ export function ClientesSearchResults({
                             </Badge>
                           ))}
                       </div>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-sm text-muted-foreground">
                         @{client.username}
                         {client.cedula ? ` · C.C. ${client.cedula}` : ""}
                       </p>
                       {(client.placa || client.motoLabel) && (
-                        <p className="text-sm text-neutral-600">
+                        <p className="text-sm text-muted-foreground">
                           {client.placa ? `Placa ${client.placa}` : null}
                           {client.placa && client.motoLabel ? " · " : null}
                           {client.motoLabel}
                         </p>
                       )}
                       {client.cuotasPagadas > 0 && (
-                        <p className="text-sm text-neutral-600">
+                        <p className="text-sm text-muted-foreground">
                           {client.cuotasPagadas} cuota
                           {client.cuotasPagadas === 1 ? "" : "s"} pagada
                           {client.cuotasPagadas === 1 ? "" : "s"}
@@ -192,7 +209,7 @@ export function ClientesSearchResults({
                     </div>
                   </Link>
 
-                  <div className="flex flex-wrap items-center gap-2 border-t border-neutral-100 px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3">
                     <Button
                       type="button"
                       variant="outline"
@@ -209,7 +226,7 @@ export function ClientesSearchResults({
                     </Button>
                     <Link
                       href={`/clientes/${client.userId}`}
-                      className="inline-flex items-center gap-1 text-sm font-medium text-neutral-700 hover:text-black"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-foreground"
                     >
                       Ver ficha
                       <ArrowRight className="h-4 w-4" />
@@ -218,7 +235,7 @@ export function ClientesSearchResults({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="ml-auto text-neutral-400 hover:text-red-600"
+                      className="ml-auto text-muted-foreground hover:text-destructive"
                       aria-label={`Eliminar ${client.displayName}`}
                       disabled={pending}
                       onClick={() => setToDelete(client)}
@@ -250,7 +267,7 @@ export function ClientesSearchResults({
           if (!open && !pending) setToDelete(null);
         }}
       >
-        <AlertDialogContent className="bg-white">
+        <AlertDialogContent className="bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
             <AlertDialogDescription>

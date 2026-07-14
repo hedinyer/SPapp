@@ -26,7 +26,7 @@ export function MoraSummaryBanner({ pipeline }: { pipeline: ClientPipeline }) {
           ? "border-amber-200 bg-amber-50 text-amber-950"
           : paraRecoger
             ? "border-red-200 bg-red-50 text-red-950"
-            : "border-neutral-200 bg-neutral-50 text-neutral-900",
+            : "border-border bg-muted/50 text-foreground",
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -47,7 +47,7 @@ export function MoraSummaryBanner({ pipeline }: { pipeline: ClientPipeline }) {
           {enMoraBandeja ? (
             <Badge
               variant="outline"
-              className="border-amber-300 bg-white font-normal text-amber-900"
+              className="border-amber-300 bg-background font-normal text-amber-900"
             >
               Cliente en mora
             </Badge>
@@ -55,7 +55,7 @@ export function MoraSummaryBanner({ pipeline }: { pipeline: ClientPipeline }) {
           {paraRecoger ? (
             <Badge
               variant="outline"
-              className="border-red-200 bg-white font-normal text-red-800"
+              className="border-red-200 bg-background font-normal text-red-800"
             >
               Para recoger
             </Badge>

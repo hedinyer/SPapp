@@ -56,7 +56,7 @@ export function FlowOrderPrompt({
           ¿Entregar antes de la visita?
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="bg-white">
+      <AlertDialogContent className="bg-background">
         <AlertDialogHeader>
           <AlertDialogTitle>Orden visita / entrega</AlertDialogTitle>
           <AlertDialogDescription>

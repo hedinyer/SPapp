@@ -1,5 +1,7 @@
-import { getAllCategorias, getAllProductos } from "@/lib/pipeline/queries";
+﻿import { getAllCategorias, getAllProductos } from "@/lib/pipeline/queries";
 import { InventarioManager } from "@/components/inventario/inventario-manager";
+import { AdminHubSubnav } from "@/components/layout/admin-hub-subnav";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function InventarioPage() {
   const [categorias, productos] = await Promise.all([
@@ -8,13 +10,12 @@ export default async function InventarioPage() {
   ]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold sm:text-2xl">Inventario de tienda</h1>
-        <p className="mt-1 text-neutral-500">
-          Repuestos, lubricantes y accesorios para clientes con moto entregada.
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <AdminHubSubnav hubId="tienda" />
+      <PageHeader
+        title="Stock"
+        description="Repuestos, lubricantes y accesorios de la tienda."
+      />
       <InventarioManager categorias={categorias} productos={productos} />
     </div>
   );

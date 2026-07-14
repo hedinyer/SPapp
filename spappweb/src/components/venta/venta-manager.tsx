@@ -389,7 +389,7 @@ export function VentaManager() {
   return (
     <div className="flex flex-col pb-24">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-muted-foreground">
           Escanea el QR de la etiqueta, busca por nombre o ingresa el SKU.
         </p>
         <Button
@@ -413,7 +413,7 @@ export function VentaManager() {
       </div>
 
       <div className="relative mx-auto mt-4 w-full max-w-[320px]">
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-neutral-200 bg-black">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-black">
           <div
             id={SCANNER_ID}
             ref={scannerContainerRef}
@@ -422,7 +422,7 @@ export function VentaManager() {
           {!cameraOn ? (
             <button
               type="button"
-              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4 text-neutral-600 active:bg-neutral-200/80"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-muted p-4 text-muted-foreground active:bg-neutral-200/80"
               onClick={() => void startCamera()}
             >
               <Camera className="h-10 w-10" />
@@ -451,7 +451,7 @@ export function VentaManager() {
         {cameraOn && isMobileTouchDevice() ? (
           <Button
             type="button"
-            className="mt-3 w-full gap-2 bg-white text-black hover:bg-neutral-100"
+            className="mt-3 w-full gap-2 bg-background text-foreground hover:bg-muted"
             size="lg"
             disabled={scanPending || cooldownSec > 0 || pending}
             onClick={() => void triggerScan()}
@@ -461,12 +461,12 @@ export function VentaManager() {
           </Button>
         ) : null}
         {cameraOn && !isMobileTouchDevice() ? (
-          <p className="mt-2 text-center text-xs text-neutral-500">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             Apunta al QR desde cualquier ángulo o distancia; no hace falta centrarlo perfecto.
           </p>
         ) : null}
         {cameraOn && isMobileTouchDevice() ? (
-          <p className="mt-2 text-center text-xs text-neutral-500">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             Apunta al QR y pulsa Escanear.
           </p>
         ) : null}
@@ -506,26 +506,26 @@ export function VentaManager() {
         </div>
 
         {listaAbierta && busqueda.trim().length >= 2 ? (
-          <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg">
+          <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-border bg-background shadow-lg">
             {searchPending && resultados.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-neutral-500">Buscando…</p>
+              <p className="px-3 py-2 text-sm text-muted-foreground">Buscando…</p>
             ) : null}
             {!searchPending && resultados.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-neutral-500">Sin resultados</p>
+              <p className="px-3 py-2 text-sm text-muted-foreground">Sin resultados</p>
             ) : null}
             {resultados.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 className={cn(
-                  "flex w-full flex-col gap-0.5 border-b border-neutral-100 px-3 py-2.5 text-left last:border-0 hover:bg-neutral-50",
+                  "flex w-full flex-col gap-0.5 border-b border-border px-3 py-2.5 text-left last:border-0 hover:bg-muted/50",
                   p.stock <= 0 && "opacity-50",
                 )}
                 disabled={p.stock <= 0}
                 onClick={() => addProduct(p)}
               >
                 <span className="text-sm font-medium">{p.nombre}</span>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-muted-foreground">
                   {p.sku} · {formatCop(Math.max(p.precio, p.costo))} · stock{" "}
                   {p.stock}
                 </span>
@@ -535,26 +535,26 @@ export function VentaManager() {
         ) : null}
       </div>
 
-      <div className="mt-6 flex-1 space-y-2">
+      <div className="mt-6 flex-1 flex flex-col gap-2">
         {lines.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-neutral-200 px-4 py-8 text-center text-sm text-neutral-400">
+          <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
             El carrito está vacío. Busca por nombre, escanea QR o ingresa el SKU.
           </p>
         ) : (
           lines.map((line) => (
             <div
               key={line.productoId}
-              className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3"
+              className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-neutral-900">
+                <p className="truncate font-medium text-foreground">
                   {line.nombre}
                 </p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-muted-foreground">
                   {line.cantidad} × {formatCop(line.precioUnitario)}
                 </p>
               </div>
-              <p className="shrink-0 font-semibold text-neutral-900">
+              <p className="shrink-0 font-semibold text-foreground">
                 {formatCop(line.precioUnitario * line.cantidad)}
               </p>
             </div>
@@ -562,11 +562,11 @@ export function VentaManager() {
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-neutral-500">Total</p>
-            <p className="text-xl font-bold text-neutral-900">
+            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-xl font-bold text-foreground">
               {formatCop(total)}
             </p>
           </div>
@@ -594,7 +594,7 @@ export function VentaManager() {
           </SheetHeader>
 
           {lines.length === 0 ? (
-            <p className="px-4 text-sm text-neutral-500">Sin productos.</p>
+            <p className="px-4 text-sm text-muted-foreground">Sin productos.</p>
           ) : (
             <>
               <div className="hidden px-4 sm:block">
@@ -630,14 +630,14 @@ export function VentaManager() {
                 </Table>
               </div>
 
-              <div className="space-y-3 px-4 sm:hidden">
+              <div className="flex flex-col gap-3 px-4 sm:hidden">
                 {lines.map((line) => (
                   <div
                     key={line.productoId}
-                    className="rounded-lg border border-neutral-200 p-3 text-sm"
+                    className="rounded-lg border border-border p-3 text-sm"
                   >
                     <p className="font-medium">{line.nombre}</p>
-                    <p className="text-xs text-neutral-500">{line.sku}</p>
+                    <p className="text-xs text-muted-foreground">{line.sku}</p>
                     <p className="mt-1">
                       {line.cantidad} × {formatCop(line.precioUnitario)} ={" "}
                       {formatCop(line.precioUnitario * line.cantidad)}
@@ -654,7 +654,7 @@ export function VentaManager() {
 
           {isPc && lines.length > 0 ? (
             <div className="grid gap-3 px-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="venta-cliente-nombre">Nombre</Label>
                 <Input
                   id="venta-cliente-nombre"
@@ -662,7 +662,7 @@ export function VentaManager() {
                   onChange={(e) => setClienteNombre(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="venta-cliente-cedula">Cédula</Label>
                 <Input
                   id="venta-cliente-cedula"
@@ -671,7 +671,7 @@ export function VentaManager() {
                   onChange={(e) => setClienteCedula(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="venta-cliente-celular">Celular</Label>
                 <Input
                   id="venta-cliente-celular"
@@ -680,7 +680,7 @@ export function VentaManager() {
                   onChange={(e) => setClienteCelular(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="venta-monto-pagado">Pagado hoy</Label>
                 <Input
                   id="venta-monto-pagado"
@@ -690,7 +690,7 @@ export function VentaManager() {
                   onChange={(e) => setMontoPagado(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="venta-notas">Notas</Label>
                 <Input
                   id="venta-notas"
@@ -705,7 +705,7 @@ export function VentaManager() {
             {isPc ? (
               <Button
                 type="button"
-                className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+                className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
                 disabled={lines.length === 0 || facturarPending}
                 onClick={facturarEnPc}
               >
@@ -715,7 +715,7 @@ export function VentaManager() {
             ) : (
               <Button
                 type="button"
-                className="w-full gap-2 bg-black text-white hover:bg-neutral-800"
+                className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80"
                 disabled={lines.length === 0 || publishPending}
                 onClick={sendToPc}
               >

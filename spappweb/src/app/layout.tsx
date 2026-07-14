@@ -1,10 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -27,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} min-h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} min-h-full antialiased`}
     >
       <head>
         {/* Evita que extensiones crypto rotas (sin window.ethereum) tumben la app */}
@@ -38,17 +44,19 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full bg-white font-sans text-black">
-        {children}
-        <Toaster
-          position="bottom-center"
-          richColors={false}
-          toastOptions={{
-            classNames: {
-              toast: "mb-[max(0.5rem,env(safe-area-inset-bottom))]",
-            },
-          }}
-        />
+      <body className="min-h-full bg-background font-sans text-foreground">
+        <TooltipProvider>
+          {children}
+          <Toaster
+            position="bottom-center"
+            richColors={false}
+            toastOptions={{
+              classNames: {
+                toast: "mb-[max(0.5rem,env(safe-area-inset-bottom))]",
+              },
+            }}
+          />
+        </TooltipProvider>
       </body>
     </html>
   );

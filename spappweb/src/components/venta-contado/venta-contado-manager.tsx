@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircleDollarSign, Pencil, Plus, Printer, Tag } from "lucide-react";
+import { Bike, CircleDollarSign, Pencil, Plus, Printer, Tag, User } from "lucide-react";
 import type { VentaMotoRow } from "@/lib/actions/venta-moto-actions";
 import { AbonoVentaDialog } from "@/components/venta-contado/abono-venta-dialog";
 import { EditarVentaContadoDialog } from "@/components/venta-contado/editar-venta-contado-dialog";
@@ -38,6 +38,32 @@ function puedeAbonar(venta: VentaMotoRow): boolean {
   return venta.valorVenta != null && venta.montoPagado < venta.valorVenta;
 }
 
+function PhotoThumb({
+  src,
+  alt,
+  fallback,
+}: {
+  src: string | null | undefined;
+  alt: string;
+  fallback: "user" | "bike";
+}) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt={alt} className="h-full w-full object-cover" />
+    );
+  }
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+      {fallback === "user" ? (
+        <User className="h-4 w-4" />
+      ) : (
+        <Bike className="h-4 w-4" />
+      )}
+    </div>
+  );
+}
+
 function EstadoBadge({ venta }: { venta: VentaMotoRow }) {
   const label = pagoLabel(venta);
   return (
@@ -47,7 +73,7 @@ function EstadoBadge({ venta }: { venta: VentaMotoRow }) {
         label === "Contado" && "bg-green-100 text-green-800",
         label === "Abono" && "bg-amber-100 text-amber-800",
         label === "Pendiente" && "bg-red-100 text-red-800",
-        label === "—" && "bg-neutral-100 text-neutral-600",
+        label === "—" && "bg-muted text-muted-foreground",
       )}
     >
       {label}
@@ -97,7 +123,7 @@ export function VentaContadoManager({
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex-1">
-          <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+          <label className="mb-1.5 block text-sm font-medium text-foreground">
             Buscar
           </label>
           <input
@@ -105,11 +131,11 @@ export function VentaContadoManager({
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Cliente, cédula, celular, placa, modelo, chasis…"
-            className="flex h-11 w-full rounded-lg border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-neutral-400"
+            className="flex h-11 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-neutral-400"
           />
         </div>
         <Button
-          className="gap-2 bg-black text-white hover:bg-neutral-800 sm:shrink-0"
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/80 sm:shrink-0"
           onClick={() => setSheetOpen(true)}
         >
           <Plus className="h-4 w-4" />
@@ -118,16 +144,16 @@ export function VentaContadoManager({
       </div>
 
       {ventas.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-200 py-12 text-center text-neutral-500">
+        <p className="rounded-lg border border-dashed border-border py-12 text-center text-muted-foreground">
           No hay ventas de contado registradas.
         </p>
       ) : ventasFiltradas.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-200 py-12 text-center text-neutral-500">
+        <p className="rounded-lg border border-dashed border-border py-12 text-center text-muted-foreground">
           Sin resultados para &ldquo;{busqueda.trim()}&rdquo;.
         </p>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+          <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -148,23 +174,47 @@ export function VentaContadoManager({
                       {formatDate(v.createdAt)}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium">{v.clienteNombre}</div>
-                      <div className="text-xs text-neutral-500">
-                        {v.clienteCedula} · {v.clienteCelular}
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-border bg-muted/50">
+                          <PhotoThumb
+                            src={v.selfieUrl}
+                            alt={`Foto de ${v.clienteNombre}`}
+                            fallback="user"
+                          />
+                        </div>
+                        <div>
+                          <div className="font-medium">{v.clienteNombre}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {v.clienteCedula} · {v.clienteCelular}
+                          </div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      {v.modelo} · {v.color}
-                      {v.placa ? (
-                        <div className="text-xs font-medium text-neutral-700">
-                          Placa {v.placa}
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-border bg-muted/50">
+                          <PhotoThumb
+                            src={v.motoImagenUrl}
+                            alt={`Moto ${v.modelo}`}
+                            fallback="bike"
+                          />
                         </div>
-                      ) : null}
-                      {v.chasis ? (
-                        <div className="text-xs text-neutral-500">
-                          Chasis {v.chasis}
+                        <div>
+                          <div>
+                            {v.modelo} · {v.color}
+                          </div>
+                          {v.placa ? (
+                            <div className="text-xs font-medium text-foreground">
+                              Placa {v.placa}
+                            </div>
+                          ) : null}
+                          {v.chasis ? (
+                            <div className="text-xs text-muted-foreground">
+                              Chasis {v.chasis}
+                            </div>
+                          ) : null}
                         </div>
-                      ) : null}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {v.valorVenta != null ? formatCop(v.valorVenta) : "—"}
@@ -229,38 +279,56 @@ export function VentaContadoManager({
             </Table>
           </div>
 
-          <div className="space-y-3 lg:hidden">
+          <div className="flex flex-col gap-3 lg:hidden">
             {ventasFiltradas.map((v) => (
               <div
                 key={v.id}
-                className="rounded-lg border border-neutral-200 p-4 text-sm"
+                className="rounded-lg border border-border p-4 text-sm"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium">{v.clienteNombre}</p>
-                    <p className="text-neutral-500">
-                      {v.modelo} · {v.color}
-                      {v.placa ? ` · Placa ${v.placa}` : ""}
-                    </p>
+                  <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex shrink-0 gap-1.5">
+                      <div className="h-11 w-11 overflow-hidden rounded-lg border border-border bg-muted/50">
+                        <PhotoThumb
+                          src={v.selfieUrl}
+                          alt={`Foto de ${v.clienteNombre}`}
+                          fallback="user"
+                        />
+                      </div>
+                      <div className="h-11 w-11 overflow-hidden rounded-lg border border-border bg-muted/50">
+                        <PhotoThumb
+                          src={v.motoImagenUrl}
+                          alt={`Moto ${v.modelo}`}
+                          fallback="bike"
+                        />
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium">{v.clienteNombre}</p>
+                      <p className="text-muted-foreground">
+                        {v.modelo} · {v.color}
+                        {v.placa ? ` · Placa ${v.placa}` : ""}
+                      </p>
+                    </div>
                   </div>
                   <EstadoBadge venta={v} />
                 </div>
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {formatDate(v.createdAt)}
                 </p>
-                <dl className="mt-3 space-y-1">
+                <dl className="mt-3 flex flex-col gap-1">
                   <div className="flex justify-between">
-                    <dt className="text-neutral-500">Precio</dt>
+                    <dt className="text-muted-foreground">Precio</dt>
                     <dd>
                       {v.valorVenta != null ? formatCop(v.valorVenta) : "—"}
                     </dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-neutral-500">Pagado</dt>
+                    <dt className="text-muted-foreground">Pagado</dt>
                     <dd>{formatCop(v.montoPagado)}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-neutral-500">Saldo</dt>
+                    <dt className="text-muted-foreground">Saldo</dt>
                     <dd>
                       {saldo(v) != null ? formatCop(saldo(v)!) : "—"}
                     </dd>

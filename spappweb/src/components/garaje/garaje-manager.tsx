@@ -13,18 +13,31 @@ import {
   saveGarajeParqueadero,
 } from "@/lib/actions/admin-actions";
 import type {
+  BikeRow,
   GarajeCondicion,
+  GarajeMantenimientoItemRow,
   GarajeMotoEstado,
   GarajeMotoRow,
   GarajeParqueaderoRow,
+  InventarioProductoRow,
 } from "@/lib/pipeline/types";
 import {
   GARAJE_CONDICION_LABELS,
   GARAJE_ESTADO_LABELS,
   GARAJE_ORIGEN_LABELS,
 } from "@/lib/pipeline/types";
+import {
+  GarajeMotoCicloPanel,
+  plazoBadgeLabel,
+} from "@/components/garaje/garaje-moto-ciclo-panel";
 import { getStoragePublicUrl } from "@/lib/utils/storage-urls";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -60,10 +73,10 @@ import { TouchSelect } from "@/components/ui/touch-select";
 import { cn } from "@/lib/utils";
 
 const actionBtnClass =
-  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-800 active:bg-neutral-800 sm:w-auto";
+  "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80 active:bg-primary/90 sm:w-auto";
 
 const outlineBtnClass =
-  "inline-flex min-h-11 flex-1 touch-manipulation cursor-pointer items-center justify-center gap-1 rounded-lg border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50 active:bg-neutral-50";
+  "inline-flex min-h-11 flex-1 touch-manipulation cursor-pointer items-center justify-center gap-1 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 active:bg-muted/50";
 
 function slugify(value: string): string {
   return value
@@ -78,10 +91,16 @@ function slugify(value: string): string {
 export function GarajeManager({
   parqueaderos,
   motos,
+  stockNuevo = [],
+  productos = [],
+  mantenimientoByMoto = {},
   initialFotoPendiente = false,
 }: {
   parqueaderos: GarajeParqueaderoRow[];
   motos: GarajeMotoRow[];
+  stockNuevo?: BikeRow[];
+  productos?: InventarioProductoRow[];
+  mantenimientoByMoto?: Record<string, GarajeMantenimientoItemRow[]>;
   initialFotoPendiente?: boolean;
 }) {
   const router = useRouter();
@@ -162,11 +181,72 @@ export function GarajeManager({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="motos" className="space-y-4">
+      <TabsContent value="motos" className="flex flex-col gap-4">
+        {stockNuevo.length > 0 ? (
+          <section className="flex flex-col gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">
+                Motos nuevas (catálogo)
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Stock disponible para entregar a crédito. Las recuperadas
+                aparecen abajo al marcarlas como recogidas.
+              </p>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {stockNuevo.map((bike) => (
+                <li
+                  key={bike.id}
+                  className="flex gap-3 overflow-hidden rounded-xl border border-border bg-background p-3"
+                >
+                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-lg border border-border bg-muted/50">
+                    {bike.imagen_url ? (
+                      <Image
+                        src={bike.imagen_url}
+                        alt={`${bike.modelo} ${bike.color}`}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                        Sin foto
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{bike.modelo}</p>
+                    <p className="text-sm text-muted-foreground">{bike.color}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <Badge
+                        variant="outline"
+                        className="border-emerald-200 bg-emerald-50 font-normal text-emerald-800"
+                      >
+                        Nueva
+                      </Badge>
+                      <Badge variant="secondary" className="font-normal">
+                        Stock {bike.stock}
+                      </Badge>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-          <div className="grid w-full gap-3 sm:flex sm:flex-wrap">
-            <div className="space-y-1">
-              <Label className="text-xs text-neutral-500">Parqueadero</Label>
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">
+              Unidades en patio
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Motos físicas registradas o recuperadas por mora.
+            </p>
+          </div>
+          <div className="grid w-full gap-3 sm:flex sm:flex-wrap sm:items-end">
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground">Parqueadero</Label>
               <TouchSelect
                 aria-label="Filtrar por parqueadero"
                 value={filtroParqueadero}
@@ -181,8 +261,8 @@ export function GarajeManager({
                 ]}
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-neutral-500">Condición</Label>
+            <div className="flex flex-col gap-1">
+              <Label className="text-xs text-muted-foreground">Condición</Label>
               <TouchSelect
                 aria-label="Filtrar por condición"
                 value={filtroCondicion}
@@ -199,7 +279,7 @@ export function GarajeManager({
               />
             </div>
             <div className="flex min-h-11 items-center">
-              <label className="flex min-h-11 w-full cursor-pointer touch-manipulation items-center gap-3 rounded-lg border border-neutral-200 px-3 text-sm sm:w-auto sm:border-0 sm:px-0">
+              <label className="flex min-h-11 w-full cursor-pointer touch-manipulation items-center gap-3 rounded-lg border border-border px-3 text-sm sm:w-auto sm:border-0 sm:px-0">
                 <Switch
                   checked={filtroFotoPendiente}
                   onCheckedChange={setFiltroFotoPendiente}
@@ -214,7 +294,34 @@ export function GarajeManager({
           </Link>
         </div>
 
-        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+        {motosFiltradas.length === 0 ? (
+          <Empty className="border border-dashed border-border">
+            <EmptyHeader>
+              <EmptyTitle>
+                {motos.length === 0 ? "Garaje vacío" : "Sin resultados"}
+              </EmptyTitle>
+              <EmptyDescription>
+                {motos.length === 0 ? (
+                  <>
+                    Registra una unidad con{" "}
+                    <Link
+                      href="/garaje/nueva"
+                      className="font-medium text-foreground underline underline-offset-4"
+                    >
+                      Nueva moto
+                    </Link>{" "}
+                    o marca una entregada como Recogida / En patio en En calle.
+                  </>
+                ) : (
+                  "No hay motos con estos filtros."
+                )}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : null}
+
+        {motosFiltradas.length > 0 ? (
+        <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -230,14 +337,7 @@ export function GarajeManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {motosFiltradas.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center text-neutral-500">
-                    No hay motos con estos filtros.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                motosFiltradas.map((m) => {
+              {motosFiltradas.map((m) => {
                   const img = getStoragePublicUrl(
                     STORAGE_BUCKETS.garajeImagenes,
                     m.placa_foto_url,
@@ -246,7 +346,7 @@ export function GarajeManager({
                     <TableRow key={m.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded border border-neutral-200 bg-neutral-50">
+                          <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded border border-border bg-muted/50">
                             {img ? (
                               <Image
                                 src={img}
@@ -256,7 +356,7 @@ export function GarajeManager({
                                 unoptimized
                               />
                             ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
+                              <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
                                 —
                               </div>
                             )}
@@ -281,17 +381,33 @@ export function GarajeManager({
                       <TableCell>{m.color}</TableCell>
                       <TableCell>
                         {m.parqueadero_nombre ?? (
-                          <span className="text-neutral-400">Sin asignar</span>
+                          <span className="text-muted-foreground">Sin asignar</span>
                         )}
                       </TableCell>
                       <TableCell>{GARAJE_CONDICION_LABELS[m.condicion]}</TableCell>
                       <TableCell>{GARAJE_ORIGEN_LABELS[m.origen]}</TableCell>
-                      <TableCell>{GARAJE_ESTADO_LABELS[m.estado]}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span>{GARAJE_ESTADO_LABELS[m.estado]}</span>
+                          {plazoBadgeLabel(m) ? (
+                            <Badge
+                              variant="outline"
+                              className={
+                                plazoBadgeLabel(m) === "Plazo vencido"
+                                  ? "border-red-300 text-red-800"
+                                  : "border-amber-300 text-amber-800"
+                              }
+                            >
+                              {plazoBadgeLabel(m)}
+                            </Badge>
+                          ) : null}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <button
                             type="button"
-                            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-neutral-100 active:bg-neutral-100"
+                            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-muted active:bg-muted"
                             aria-label="Editar moto"
                             onClick={() => openMotoEditor(m)}
                           >
@@ -303,7 +419,7 @@ export function GarajeManager({
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-white">
+                            <AlertDialogContent className="bg-background">
                               <AlertDialogHeader>
                                 <AlertDialogTitle>¿Eliminar moto?</AlertDialogTitle>
                                 <AlertDialogDescription>
@@ -338,19 +454,15 @@ export function GarajeManager({
                       </TableCell>
                     </TableRow>
                   );
-                })
-              )}
+                })}
             </TableBody>
           </Table>
         </div>
+        ) : null}
 
-        <div className="space-y-3 lg:hidden">
-          {motosFiltradas.length === 0 ? (
-            <p className="text-center text-sm text-neutral-500">
-              No hay motos con estos filtros.
-            </p>
-          ) : (
-            motosFiltradas.map((m) => {
+        {motosFiltradas.length > 0 ? (
+        <div className="flex flex-col gap-3 lg:hidden">
+          {motosFiltradas.map((m) => {
               const img = getStoragePublicUrl(
                 STORAGE_BUCKETS.garajeImagenes,
                 m.placa_foto_url,
@@ -358,10 +470,10 @@ export function GarajeManager({
               return (
                 <div
                   key={m.id}
-                  className="rounded-lg border border-neutral-200 p-4 text-sm"
+                  className="rounded-lg border border-border p-4 text-sm"
                 >
                   <div className="flex gap-3">
-                    <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded border border-neutral-200 bg-neutral-50">
+                    <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded border border-border bg-muted/50">
                       {img ? (
                         <Image
                           src={img}
@@ -371,14 +483,14 @@ export function GarajeManager({
                           unoptimized
                         />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] text-neutral-400">
+                        <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">
                           Sin foto
                         </div>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">{m.placa ?? "Sin placa"}</p>
-                      <p className="text-neutral-500">
+                      <p className="text-muted-foreground">
                         {m.modelo} · {m.color}
                       </p>
                       {!m.placa_foto_url && (
@@ -391,22 +503,29 @@ export function GarajeManager({
                       )}
                     </div>
                   </div>
-                  <dl className="mt-3 space-y-1.5">
+                  <dl className="mt-3 flex flex-col gap-1.5">
                     <div className="flex justify-between gap-2">
-                      <dt className="text-neutral-500">Referencia</dt>
+                      <dt className="text-muted-foreground">Referencia</dt>
                       <dd>{m.referencia}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="text-neutral-500">Parqueadero</dt>
+                      <dt className="text-muted-foreground">Parqueadero</dt>
                       <dd>{m.parqueadero_nombre ?? "Sin asignar"}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="text-neutral-500">Condición</dt>
+                      <dt className="text-muted-foreground">Condición</dt>
                       <dd>{GARAJE_CONDICION_LABELS[m.condicion]}</dd>
                     </div>
                     <div className="flex justify-between gap-2">
-                      <dt className="text-neutral-500">Estado</dt>
-                      <dd>{GARAJE_ESTADO_LABELS[m.estado]}</dd>
+                      <dt className="text-muted-foreground">Estado</dt>
+                      <dd className="text-right">
+                        {GARAJE_ESTADO_LABELS[m.estado]}
+                        {plazoBadgeLabel(m) ? (
+                          <span className="mt-0.5 block text-xs text-amber-800">
+                            {plazoBadgeLabel(m)}
+                          </span>
+                        ) : null}
+                      </dd>
                     </div>
                   </dl>
                   <div className="mt-3 flex gap-2">
@@ -430,7 +549,7 @@ export function GarajeManager({
                           Eliminar
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-white">
+                      <AlertDialogContent className="bg-background">
                         <AlertDialogHeader>
                           <AlertDialogTitle>¿Eliminar moto?</AlertDialogTitle>
                           <AlertDialogDescription>
@@ -464,16 +583,16 @@ export function GarajeManager({
                   </div>
                 </div>
               );
-            })
-          )}
+            })}
         </div>
+        ) : null}
       </TabsContent>
 
-      <TabsContent value="parqueaderos" className="space-y-4">
+      <TabsContent value="parqueaderos" className="flex flex-col gap-4">
         <div className="flex justify-end">
           <Button
             type="button"
-            className="min-h-11 w-full touch-manipulation bg-black text-white hover:bg-neutral-800 sm:w-auto"
+            className="min-h-11 w-full touch-manipulation bg-primary text-primary-foreground hover:bg-primary/80 sm:w-auto"
             onClick={() => {
               setEditingParq(null);
               setParqOpen(true);
@@ -483,7 +602,7 @@ export function GarajeManager({
             Nuevo parqueadero
           </Button>
         </div>
-        <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+        <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -523,7 +642,7 @@ export function GarajeManager({
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white">
+                        <AlertDialogContent className="bg-background">
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               ¿Eliminar parqueadero?
@@ -562,11 +681,11 @@ export function GarajeManager({
           </Table>
         </div>
 
-        <div className="space-y-3 lg:hidden">
+        <div className="flex flex-col gap-3 lg:hidden">
           {parqueaderos.map((p) => (
             <div
               key={p.id}
-              className="rounded-lg border border-neutral-200 p-4 text-sm"
+              className="rounded-lg border border-border p-4 text-sm"
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="font-medium">{p.nombre}</p>
@@ -574,13 +693,13 @@ export function GarajeManager({
                   {p.activo ? "Activo" : "Inactivo"}
                 </Badge>
               </div>
-              <dl className="mt-3 space-y-1.5">
+              <dl className="mt-3 flex flex-col gap-1.5">
                 <div className="flex justify-between gap-2">
-                  <dt className="text-neutral-500">Slug</dt>
+                  <dt className="text-muted-foreground">Slug</dt>
                   <dd>{p.slug}</dd>
                 </div>
                 <div className="flex justify-between gap-2">
-                  <dt className="text-neutral-500">Orden</dt>
+                  <dt className="text-muted-foreground">Orden</dt>
                   <dd>{p.orden}</dd>
                 </div>
               </dl>
@@ -610,7 +729,7 @@ export function GarajeManager({
                       Eliminar
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-white">
+                  <AlertDialogContent className="bg-background">
                     <AlertDialogHeader>
                       <AlertDialogTitle>¿Eliminar parqueadero?</AlertDialogTitle>
                       <AlertDialogDescription>{p.nombre}</AlertDialogDescription>
@@ -652,6 +771,10 @@ export function GarajeManager({
         }}
         editing={editingMoto}
         parqueaderos={parqueaderosActivos}
+        productos={productos}
+        mantenimientoItems={
+          editingMoto ? (mantenimientoByMoto[editingMoto.id] ?? []) : []
+        }
         pending={pending}
         onSave={(form) =>
           startTransition(async () => {
@@ -724,6 +847,8 @@ function MotoDialog({
   onOpenChange,
   editing,
   parqueaderos,
+  productos,
+  mantenimientoItems,
   pending,
   onSave,
 }: {
@@ -731,6 +856,8 @@ function MotoDialog({
   onOpenChange: (v: boolean) => void;
   editing: GarajeMotoRow | null;
   parqueaderos: GarajeParqueaderoRow[];
+  productos: InventarioProductoRow[];
+  mantenimientoItems: GarajeMantenimientoItemRow[];
   pending: boolean;
   onSave: (form: {
     parqueaderoId: number | null;
@@ -777,7 +904,9 @@ function MotoDialog({
   }, [open, editing?.id]);
 
   const isNewManual = !editing;
-  const requiresPhoto = isNewManual || !placaFotoUrl;
+  const requiresPhoto =
+    (isNewManual && condicion !== "nueva") ||
+    (editing?.origen === "recuperacion" && !placaFotoUrl && !imageFile);
 
   if (!open) return null;
 
@@ -794,14 +923,14 @@ function MotoDialog({
         aria-label="Cerrar"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl safe-area-bottom sm:max-h-[90dvh] sm:max-w-lg sm:rounded-xl">
-        <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
+      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-background shadow-xl safe-area-bottom sm:max-h-[90dvh] sm:max-w-lg sm:rounded-xl">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h2 id="moto-dialog-title" className="text-base font-medium">
             {editing ? "Editar moto" : "Registrar moto"}
           </h2>
           <button
             type="button"
-            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-neutral-100 active:bg-neutral-100"
+            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-muted active:bg-muted"
             aria-label="Cerrar"
             onClick={() => onOpenChange(false)}
           >
@@ -809,6 +938,13 @@ function MotoDialog({
           </button>
         </div>
         <div className="overflow-y-auto px-4 py-4">
+          {editing ? (
+            <GarajeMotoCicloPanel
+              moto={editing}
+              productos={productos}
+              items={mantenimientoItems}
+            />
+          ) : null}
           {editing?.origen === "recuperacion" && !editing.placa_foto_url && (
             <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               Moto recuperada por mora. Completa la foto de placa y asigna
@@ -818,7 +954,11 @@ function MotoDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <ImageFileField
-                label="Foto de placa"
+                label={
+                  condicion === "nueva"
+                    ? "Foto de placa (opcional)"
+                    : "Foto de placa"
+                }
                 existingUrl={
                   placaFotoUrl
                     ? getStoragePublicUrl(
@@ -837,7 +977,7 @@ function MotoDialog({
             <Field label="Referencia moto" value={referencia} onChange={setReferencia} />
             <Field label="Modelo" value={modelo} onChange={setModelo} />
             <Field label="Color" value={color} onChange={setColor} />
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Parqueadero</Label>
               <TouchSelect
                 aria-label="Parqueadero"
@@ -852,7 +992,7 @@ function MotoDialog({
                 ]}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Condición</Label>
               <TouchSelect
                 aria-label="Condición"
@@ -866,7 +1006,7 @@ function MotoDialog({
                 )}
               />
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label>Estado</Label>
               <TouchSelect
                 aria-label="Estado"
@@ -880,7 +1020,7 @@ function MotoDialog({
                 )}
               />
             </div>
-            <div className="space-y-2 sm:col-span-2">
+            <div className="flex flex-col gap-2 sm:col-span-2">
               <Label>Notas</Label>
               <Textarea
                 value={notas}
@@ -890,7 +1030,7 @@ function MotoDialog({
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 border-t border-neutral-200 bg-neutral-50 p-4 sm:flex-row sm:justify-end">
+        <div className="flex flex-col gap-2 border-t border-border bg-muted/50 p-4 sm:flex-row sm:justify-end">
           <button
             type="button"
             className={cn(outlineBtnClass, "sm:flex-none sm:px-6")}
@@ -983,14 +1123,14 @@ function ParqueaderoDialog({
         aria-label="Cerrar"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl safe-area-bottom sm:max-h-[90dvh] sm:max-w-lg sm:rounded-xl">
-        <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
+      <div className="relative z-10 flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-background shadow-xl safe-area-bottom sm:max-h-[90dvh] sm:max-w-lg sm:rounded-xl">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h2 id="parqueadero-dialog-title" className="text-base font-medium">
             {editing ? "Editar parqueadero" : "Nuevo parqueadero"}
           </h2>
           <button
             type="button"
-            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-neutral-100 active:bg-neutral-100"
+            className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center rounded-lg hover:bg-muted active:bg-muted"
             aria-label="Cerrar"
             onClick={() => onOpenChange(false)}
           >
@@ -1015,7 +1155,7 @@ function ParqueaderoDialog({
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 border-t border-neutral-200 bg-neutral-50 p-4 sm:flex-row sm:justify-end">
+        <div className="flex flex-col gap-2 border-t border-border bg-muted/50 p-4 sm:flex-row sm:justify-end">
           <button
             type="button"
             className={cn(outlineBtnClass, "sm:flex-none sm:px-6")}
@@ -1057,7 +1197,7 @@ function Field({
   type?: string;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Label>{label}</Label>
       <Input
         type={type}

@@ -229,13 +229,13 @@ export function ContractSignFlow({
     return (
       <div className="flex flex-col items-center rounded-2xl border-2 border-green-500 bg-green-50 p-8 text-center">
         <CheckCircle2 className="h-16 w-16 text-green-600" strokeWidth={1.5} />
-        <h2 className="mt-4 text-2xl font-bold text-black">¡Contrato firmado!</h2>
-        <p className="mt-3 text-base leading-relaxed text-neutral-700">
+        <h2 className="mt-4 text-2xl font-bold text-foreground">¡Contrato firmado!</h2>
+        <p className="mt-3 text-base leading-relaxed text-foreground">
           Tus documentos fueron firmados y guardados correctamente.
         </p>
         <a
           href={`/moto/${contractId}`}
-          className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-black px-6 text-base font-semibold text-white"
+          className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-primary px-6 text-base font-semibold text-primary-foreground"
         >
           Elegir mi moto
         </a>
@@ -244,7 +244,7 @@ export function ContractSignFlow({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <FlowProgress step={step + 1} total={TOTAL_STEPS} title="Contrato de Renting" />
 
       {step === 0 && (
@@ -292,8 +292,8 @@ export function ContractSignFlow({
               aria-label="Ciudad o municipio"
             />
           </FieldBlock>
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm leading-relaxed text-neutral-800">
-            <p className="font-semibold text-black">Tu moto</p>
+          <div className="rounded-lg border border-border bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
+            <p className="font-semibold text-foreground">Tu moto</p>
             <p className="mt-1">
               {comercial.marca} {comercial.modelo} · {comercial.color}
             </p>
@@ -348,13 +348,13 @@ export function ContractSignFlow({
               `Nit: ${EMPRESA_PROPIETARIA.nit}`,
             ]}
           />
-          <label className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4">
+          <label className="flex items-start gap-3 rounded-xl border border-border p-4">
             <Checkbox
               checked={aceptaClausulas}
               onCheckedChange={(v) => setAceptaClausulas(v === true)}
               className="mt-0.5"
             />
-            <span className="text-base leading-relaxed text-black">
+            <span className="text-base leading-relaxed text-foreground">
               He leído y acepto todas las cláusulas del CONTRATO DE RENTING
             </span>
           </label>
@@ -385,20 +385,20 @@ export function ContractSignFlow({
             ]}
           />
           <div>
-            <p className="mb-2 text-base font-semibold text-black">Tu firma</p>
-            <p className="mb-3 text-sm text-neutral-600">
+            <p className="mb-2 text-base font-semibold text-foreground">Tu firma</p>
+            <p className="mb-3 text-sm text-muted-foreground">
               Dibuja tu firma con el dedo o el mouse en el recuadro blanco.
             </p>
             <SignaturePad ref={sigRef} disabled={pending} />
           </div>
-          <label className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4">
+          <label className="flex items-start gap-3 rounded-xl border border-border p-4">
             <Checkbox
               checked={aceptaFirma}
               onCheckedChange={(v) => setAceptaFirma(v === true)}
               disabled={pending}
               className="mt-0.5"
             />
-            <span className="text-base leading-relaxed text-black">
+            <span className="text-base leading-relaxed text-foreground">
               Confirmo que la información es correcta y firmo los documentos.
             </span>
           </label>
@@ -433,7 +433,7 @@ export function ContractSignFlow({
 
 function LegalBox({ title, body }: { title: string; body: string }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-300 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-slate-300 bg-background shadow-sm">
       <div className="border-b border-slate-700 bg-slate-900 px-4 py-2.5">
         <p className="text-xs font-semibold uppercase tracking-wider text-white">
           {title}
@@ -458,7 +458,7 @@ function FirmaParty({
   lines: string[];
 }) {
   return (
-    <div className="rounded-lg border border-slate-300 bg-white p-4 shadow-sm">
+    <div className="rounded-lg border border-slate-300 bg-background p-4 shadow-sm">
       <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-900">
         {title}
       </p>
@@ -483,10 +483,10 @@ function FirmaParty({
 
 function SummarySection({ title, lines }: { title: string; lines: string[] }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
-      <p className="mb-2 text-sm font-semibold text-black">{title}</p>
+    <div className="rounded-xl border border-border bg-muted/50 p-4">
+      <p className="mb-2 text-sm font-semibold text-foreground">{title}</p>
       {lines.map((line) => (
-        <p key={line} className="text-sm text-neutral-700">
+        <p key={line} className="text-sm text-foreground">
           {line}
         </p>
       ))}
@@ -567,20 +567,20 @@ const SignaturePad = forwardRef<SignaturePadHandle, { disabled?: boolean }>(
     }));
 
     return (
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <canvas
           ref={canvasRef}
           onPointerDown={start}
           onPointerMove={move}
           onPointerUp={end}
           onPointerLeave={end}
-          className="h-44 w-full touch-none rounded-xl border border-neutral-300 bg-white"
+          className="h-44 w-full touch-none rounded-xl border border-border bg-background"
         />
         <button
           type="button"
           onClick={clear}
           disabled={disabled}
-          className="text-sm font-medium text-neutral-600 underline disabled:opacity-50"
+          className="text-sm font-medium text-muted-foreground underline disabled:opacity-50"
         >
           Limpiar firma
         </button>

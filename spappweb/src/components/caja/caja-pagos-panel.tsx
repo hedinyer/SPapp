@@ -87,10 +87,10 @@ export function CajaPagosPanel({
   }
 
   return (
-    <Card className="border-neutral-200">
+    <Card className="border-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <ArrowUpCircle className="h-4 w-4 text-red-500" />
+          <ArrowUpCircle className="h-4 w-4 text-destructive" />
           Pagos (salidas)
         </CardTitle>
         <CardDescription>
@@ -98,34 +98,34 @@ export function CajaPagosPanel({
           de cierre.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         {sesion.egresos.length > 0 ? (
-          <ul className="max-h-40 space-y-1 overflow-y-auto text-sm">
+          <ul className="max-h-40 flex flex-col gap-1 overflow-y-auto text-sm">
             {sesion.egresos.map((e: CajaEgresoRow) => (
               <li
                 key={e.id}
-                className="flex items-center justify-between rounded border border-neutral-100 px-2 py-1.5"
+                className="flex items-center justify-between rounded border border-border px-2 py-1.5"
               >
                 <span className="truncate">
                   {e.concepto}
                   {e.beneficiario ? ` · ${e.beneficiario}` : ""}
-                  <span className="ml-1 text-neutral-400">({e.medioLabel})</span>
+                  <span className="ml-1 text-muted-foreground">({e.medioLabel})</span>
                 </span>
-                <span className="shrink-0 tabular-nums font-medium text-red-600">
+                <span className="shrink-0 tabular-nums font-medium text-destructive">
                   −{formatCop(e.monto)}
                 </span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-neutral-500">No hay pagos registrados hoy.</p>
+          <p className="text-sm text-muted-foreground">No hay pagos registrados hoy.</p>
         )}
 
         {sesion.abierta ? (
-          <div className="space-y-3 rounded-lg border border-dashed border-neutral-200 p-3">
+          <div className="flex flex-col gap-3 rounded-lg border border-dashed border-border p-3">
             <p className="text-sm font-medium">Registrar pago</p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="caja-pago-concepto">Concepto</Label>
                 <Input
                   id="caja-pago-concepto"
@@ -134,7 +134,7 @@ export function CajaPagosPanel({
                   onChange={(e) => setConcepto(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="caja-pago-beneficiario">Beneficiario (opcional)</Label>
                 <Input
                   id="caja-pago-beneficiario"
@@ -142,7 +142,7 @@ export function CajaPagosPanel({
                   onChange={(e) => setBeneficiario(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="caja-pago-monto">Monto</Label>
                 <Input
                   id="caja-pago-monto"
@@ -151,7 +151,7 @@ export function CajaPagosPanel({
                   onChange={(e) => setMonto(e.target.value)}
                 />
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="caja-pago-medio">Medio de pago</Label>
                 <Select
                   value={medioPago}
@@ -169,7 +169,7 @@ export function CajaPagosPanel({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="caja-pago-notas">Notas (opcional)</Label>
                 <Textarea
                   id="caja-pago-notas"

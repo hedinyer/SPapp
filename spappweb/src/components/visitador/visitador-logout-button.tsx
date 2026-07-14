@@ -6,7 +6,7 @@ export function VisitadorLogoutButton() {
     <form action={logoutVisitadorAction}>
       <button
         type="submit"
-        className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center gap-1 rounded-lg px-2 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 active:bg-neutral-100"
+        className="inline-flex min-h-11 min-w-11 touch-manipulation items-center justify-center gap-1 rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:bg-muted active:bg-muted"
         aria-label="Cerrar sesión"
       >
         <LogOut className="pointer-events-none h-4 w-4" />

@@ -57,11 +57,11 @@ export function ShareVisitadorLink({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-neutral-300 bg-neutral-50 p-4">
-      <p className="text-sm font-medium text-neutral-900">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-muted/50 p-4">
+      <p className="text-sm font-medium text-foreground">
         Link del portal para {nombre}
       </p>
-      <p className="break-all rounded-md border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-700">
+      <p className="break-all rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground">
         {link}
       </p>
       <div className="flex flex-wrap gap-2">

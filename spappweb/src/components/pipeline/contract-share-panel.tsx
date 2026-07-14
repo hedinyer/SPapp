@@ -39,31 +39,31 @@ export function ContractSharePanel({
   const waUrl = `${waBase}?text=${encodeURIComponent(mensaje)}`;
 
   return (
-    <Card className="border-neutral-200 shadow-none">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Contrato listo para firmar</CardTitle>
-        <p className="text-sm text-neutral-500">
+        <CardTitle>Contrato listo para firmar</CardTitle>
+        <p className="text-sm text-muted-foreground">
           El cliente debe firmar con los datos de la moto asignada.
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col gap-4">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-neutral-500">Moto</dt>
+            <dt className="text-muted-foreground">Moto</dt>
             <dd className="font-medium">
               {compra.modelo} · {compra.color}
             </dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Placa</dt>
+            <dt className="text-muted-foreground">Placa</dt>
             <dd className="font-medium">{compra.placa}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Chasis</dt>
+            <dt className="text-muted-foreground">Chasis</dt>
             <dd>{compra.chasis}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">Frecuencia</dt>
+            <dt className="text-muted-foreground">Frecuencia</dt>
             <dd>
               <FrecuenciaPagoEditor
                 compra={compra}
@@ -74,17 +74,17 @@ export function ContractSharePanel({
             </dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-neutral-500">Total primer pago</dt>
+            <dt className="text-muted-foreground">Total primer pago</dt>
             <dd className="text-lg font-semibold">
               {formatCop(compra.monto_total_primer_pago)}
             </dd>
           </div>
         </dl>
-        <div className="space-y-3 rounded-lg border border-green-300 bg-green-50 p-4">
+        <div className="flex flex-col gap-3 rounded-lg border border-green-300 bg-green-50 p-4">
           <p className="text-sm font-medium text-green-900">
             Link de firma del contrato
           </p>
-          <p className="break-all rounded-md border border-green-200 bg-white px-3 py-2 text-xs text-neutral-700">
+          <p className="break-all rounded-md border border-green-200 bg-background px-3 py-2 text-xs text-foreground">
             {link}
           </p>
           <div className="flex flex-wrap gap-2">

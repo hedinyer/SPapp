@@ -16,6 +16,12 @@ import { formatCop, formatDateOnly } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { TouchSelect } from "@/components/ui/touch-select";
 import {
   Table,
@@ -121,7 +127,7 @@ export function SolicitudesManager({
   return (
     <div className="grid gap-6 lg:grid-cols-5">
       <div
-        className={`space-y-4 lg:col-span-2 ${mobileShowDetail ? "hidden lg:block" : ""}`}
+        className={`flex flex-col gap-4 lg:col-span-2 ${mobileShowDetail ? "hidden lg:block" : ""}`}
       >
         <div className="grid w-full gap-2 sm:flex sm:flex-wrap">
           <TouchSelect
@@ -154,7 +160,7 @@ export function SolicitudesManager({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {filtered.map((s) => (
             <button
               key={s.id}
@@ -162,10 +168,10 @@ export function SolicitudesManager({
               onClick={() => selectSolicitud(s)}
               className={`w-full rounded-lg border px-4 py-3 text-left transition-colors ${
                 selected?.id === s.id
-                  ? "border-black bg-neutral-50"
+                  ? "border-primary bg-muted/50"
                   : highlightedIds.has(s.id)
                     ? "border-blue-400 bg-blue-50 hover:border-blue-500"
-                    : "border-neutral-200 hover:border-neutral-400"
+                    : "border-border hover:border-neutral-400"
               }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -181,14 +187,21 @@ export function SolicitudesManager({
                   <Badge variant="outline">{SOLICITUD_TIPO_LABELS[s.tipo]}</Badge>
                 </div>
               </div>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {formatDateOnly(s.created_at)} ·{" "}
                 {SOLICITUD_ESTADO_LABELS[s.estado]}
               </p>
             </button>
           ))}
           {filtered.length === 0 && (
-            <p className="text-sm text-neutral-500">No hay solicitudes con estos filtros.</p>
+            <Empty className="border border-dashed border-border py-8">
+              <EmptyHeader>
+                <EmptyTitle>Sin solicitudes</EmptyTitle>
+                <EmptyDescription>
+                  No hay solicitudes con estos filtros.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )}
         </div>
       </div>
@@ -197,7 +210,7 @@ export function SolicitudesManager({
         className={`lg:col-span-3 ${!mobileShowDetail ? "hidden lg:block" : ""}`}
       >
         {selected ? (
-          <Card className="border-neutral-200 shadow-none">
+          <Card className="border-border shadow-none">
             <CardHeader>
               <Button
                 variant="ghost"
@@ -210,7 +223,7 @@ export function SolicitudesManager({
               <CardTitle className="text-lg">
                 {SOLICITUD_TIPO_LABELS[selected.tipo]}
               </CardTitle>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-muted-foreground">
                 Cliente: {selected.users?.user ?? selected.user_id}
                 {selected.user_moto_compra?.modelo
                   ? ` · ${selected.user_moto_compra.modelo}`
@@ -220,41 +233,41 @@ export function SolicitudesManager({
                   : ""}
               </p>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               <div className="grid gap-2 text-sm sm:grid-cols-2">
                 <p>
-                  <span className="text-neutral-500">Estado: </span>
+                  <span className="text-muted-foreground">Estado: </span>
                   {SOLICITUD_ESTADO_LABELS[selected.estado]}
                 </p>
                 <p>
-                  <span className="text-neutral-500">Creada: </span>
+                  <span className="text-muted-foreground">Creada: </span>
                   {formatDateOnly(selected.created_at)}
                 </p>
                 {selected.tipo === "repuestos" && (
                   <p>
-                    <span className="text-neutral-500">Total: </span>
+                    <span className="text-muted-foreground">Total: </span>
                     {formatCop(selected.total_estimado)}
                   </p>
                 )}
                 {selected.fecha_preferida && (
                   <p>
-                    <span className="text-neutral-500">Fecha preferida: </span>
+                    <span className="text-muted-foreground">Fecha preferida: </span>
                     {formatDateOnly(selected.fecha_preferida)}
                   </p>
                 )}
               </div>
 
               {selected.notas_cliente && (
-                <div className="rounded-lg bg-neutral-50 p-3 text-sm">
+                <div className="rounded-lg bg-muted/50 p-3 text-sm">
                   <p className="font-medium">Notas del cliente</p>
-                  <p className="mt-1 text-neutral-700">{selected.notas_cliente}</p>
+                  <p className="mt-1 text-foreground">{selected.notas_cliente}</p>
                 </div>
               )}
 
               {selected.descripcion_falla && (
-                <div className="rounded-lg bg-neutral-50 p-3 text-sm">
+                <div className="rounded-lg bg-muted/50 p-3 text-sm">
                   <p className="font-medium">Descripción de la falla</p>
-                  <p className="mt-1 text-neutral-700">
+                  <p className="mt-1 text-foreground">
                     {selected.descripcion_falla}
                   </p>
                 </div>
@@ -263,7 +276,7 @@ export function SolicitudesManager({
               {selected.tipo === "repuestos" &&
                 (selected.solicitud_repuesto_items?.length ?? 0) > 0 && (
                   <>
-                    <div className="hidden overflow-x-auto rounded-lg border border-neutral-200 lg:block">
+                    <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -287,16 +300,16 @@ export function SolicitudesManager({
                         </TableBody>
                       </Table>
                     </div>
-                    <div className="space-y-2 lg:hidden">
+                    <div className="flex flex-col gap-2 lg:hidden">
                       {selected.solicitud_repuesto_items!.map((item) => (
                         <div
                           key={item.id}
-                          className="rounded-lg border border-neutral-200 p-3 text-sm"
+                          className="rounded-lg border border-border p-3 text-sm"
                         >
                           <p className="font-medium">
                             {item.inventario_productos?.nombre ?? item.producto_id}
                           </p>
-                          <p className="mt-1 text-neutral-500">
+                          <p className="mt-1 text-muted-foreground">
                             {item.cantidad} × {formatCop(item.precio_unitario)} ={" "}
                             {formatCop(item.subtotal)}
                           </p>
@@ -306,7 +319,7 @@ export function SolicitudesManager({
                   </>
                 )}
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium">Notas internas</p>
                 <Textarea
                   value={notasAdmin}
@@ -350,8 +363,8 @@ export function SolicitudesManager({
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-neutral-200 shadow-none">
-            <CardContent className="py-12 text-center text-sm text-neutral-500">
+          <Card className="border-border shadow-none">
+            <CardContent className="py-12 text-center text-sm text-muted-foreground">
               Selecciona una solicitud para ver el detalle.
             </CardContent>
           </Card>

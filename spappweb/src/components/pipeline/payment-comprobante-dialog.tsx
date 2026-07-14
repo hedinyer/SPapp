@@ -312,8 +312,8 @@ export function PaymentComprobanteDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <Label>Medio de pago</Label>
             <TouchSelect
               aria-label="Medio de pago"
@@ -345,7 +345,7 @@ export function PaymentComprobanteDialog({
                 cameraInputId="pago-comprobante-camera"
               />
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label>Banco de origen</Label>
                 <TouchSelect
                   aria-label="Banco de origen"
@@ -395,7 +395,7 @@ export function PaymentComprobanteDialog({
             </p>
           )}
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="referencia">
               {presencial ? "Referencia (opcional)" : "Referencia"}
             </Label>
@@ -425,16 +425,16 @@ export function PaymentComprobanteDialog({
               referencia.trim() &&
               !referenciaDuplicadaLocal &&
               !presencial && (
-                <p className="text-xs text-neutral-500">Verificando referencia…</p>
+                <p className="text-xs text-muted-foreground">Verificando referencia…</p>
               )}
             {referenciaDuplicada && !presencial && (
-              <p className="text-xs font-medium text-red-600">
+              <p className="text-xs font-medium text-destructive">
                 Esta referencia ya fue usada en otro pago de este cliente.
               </p>
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="monto">Monto (COP)</Label>
             <Input
               id="monto"
@@ -450,7 +450,7 @@ export function PaymentComprobanteDialog({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="fecha">
               {presencial ? "Fecha del pago" : "Fecha del comprobante"}
             </Label>

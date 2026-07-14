@@ -125,9 +125,9 @@ export function CajaProductosManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <p className="text-sm font-medium text-neutral-700">
+    <div className="flex flex-col gap-6">
+      <div className="rounded-xl border border-border bg-background p-4">
+        <p className="text-sm font-medium text-foreground">
           Cargar carrito del móvil
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -166,13 +166,13 @@ export function CajaProductosManager() {
       </div>
 
       {!draft ? (
-        <p className="rounded-lg border border-dashed border-neutral-200 py-12 text-center text-sm text-neutral-500">
+        <p className="rounded-lg border border-dashed border-border py-12 text-center text-sm text-muted-foreground">
           Ingresa el código que aparece en el móvil después de escanear
           productos.
         </p>
       ) : (
         <>
-          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
+          <div className="overflow-hidden rounded-xl border border-border bg-background">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -192,11 +192,11 @@ export function CajaProductosManager() {
                       <div>
                         <p className="font-medium">{line.nombre}</p>
                         {line.error ? (
-                          <p className="text-xs text-red-600">{line.error}</p>
+                          <p className="text-xs text-destructive">{line.error}</p>
                         ) : null}
                       </div>
                     </TableCell>
-                    <TableCell className="text-neutral-500">{line.sku}</TableCell>
+                    <TableCell className="text-muted-foreground">{line.sku}</TableCell>
                     <TableCell className="text-right">{line.cantidad}</TableCell>
                     <TableCell className="text-right">
                       {formatCop(line.subtotal)}
@@ -205,15 +205,15 @@ export function CajaProductosManager() {
                 ))}
               </TableBody>
             </Table>
-            <p className="border-t border-neutral-200 px-4 py-3 text-right text-base font-bold">
+            <p className="border-t border-border px-4 py-3 text-right text-base font-bold">
               Total: {formatCop(total)}
             </p>
           </div>
 
-          <div className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-muted/50 p-4">
             <p className="text-sm font-medium">Cliente</p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
+              <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="caja-cliente-nombre">Nombre</Label>
                 <Input
                   id="caja-cliente-nombre"
@@ -221,7 +221,7 @@ export function CajaProductosManager() {
                   onChange={(e) => setClienteNombre(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="caja-cliente-cedula">Cédula</Label>
                 <Input
                   id="caja-cliente-cedula"
@@ -230,7 +230,7 @@ export function CajaProductosManager() {
                   onChange={(e) => setClienteCedula(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="caja-cliente-celular">Celular</Label>
                 <Input
                   id="caja-cliente-celular"
@@ -242,9 +242,9 @@ export function CajaProductosManager() {
             </div>
           </div>
 
-          <div className="space-y-4 rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+          <div className="flex flex-col gap-4 rounded-xl border border-border bg-muted/50 p-4">
             <p className="text-sm font-medium">Pago</p>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="caja-monto-pagado">Pagado hoy</Label>
               <Input
                 id="caja-monto-pagado"
@@ -263,7 +263,7 @@ export function CajaProductosManager() {
             >
               Marcar pago de contado
             </Button>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="caja-notas">Notas</Label>
               <Input
                 id="caja-notas"
@@ -275,7 +275,7 @@ export function CajaProductosManager() {
 
           <Button
             type="button"
-            className="w-full gap-2 bg-black text-white hover:bg-neutral-800 sm:w-auto"
+            className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/80 sm:w-auto"
             disabled={!canFacturar || savePending}
             onClick={submit}
           >

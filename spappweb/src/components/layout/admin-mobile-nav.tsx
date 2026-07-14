@@ -5,12 +5,18 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { logoutAdminAction } from "@/lib/actions/auth-actions";
-import { adminNavLinks } from "@/components/layout/admin-nav-links";
+import {
+  adminNavGroups,
+  isChildActive,
+  isGroupActive,
+} from "@/components/layout/admin-nav-links";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const headerBtnClass =
-  "inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-lg text-neutral-900 transition-colors hover:bg-neutral-100 active:bg-neutral-100";
+  "inline-flex size-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted active:bg-muted";
 
 const MENU_TOGGLE_ID = "admin-mobile-menu-toggle";
 
@@ -56,14 +62,14 @@ export function AdminMobileNav() {
         aria-hidden="true"
       />
 
-      <header className="fixed inset-x-0 top-0 z-[100] shrink-0 border-b border-neutral-200 bg-white lg:hidden safe-area-top">
+      <header className="fixed inset-x-0 top-0 z-50 shrink-0 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 lg:hidden safe-area-top">
         <div className="relative flex h-14 items-center justify-between px-4">
           <label
             htmlFor={MENU_TOGGLE_ID}
             className={headerBtnClass}
             aria-label="Abrir menú"
           >
-            <Menu className="pointer-events-none h-5 w-5" />
+            <Menu className="pointer-events-none size-5" />
           </label>
 
           <p className="pointer-events-none text-sm font-semibold">SP Admin</p>
@@ -71,72 +77,107 @@ export function AdminMobileNav() {
           <form action={logoutAdminAction}>
             <button
               type="submit"
-              className={cn(headerBtnClass, "text-neutral-600")}
+              className={cn(headerBtnClass, "text-muted-foreground")}
               aria-label="Cerrar sesión"
             >
-              <LogOut className="pointer-events-none h-5 w-5" />
+              <LogOut className="pointer-events-none size-5" />
             </button>
           </form>
         </div>
       </header>
 
       <div
-        className="fixed inset-0 z-[110] hidden peer-checked:block lg:hidden"
+        className="fixed inset-0 z-50 hidden peer-checked:block lg:hidden"
         role="dialog"
         aria-modal="true"
         aria-label="Menú de navegación"
       >
         <label
           htmlFor={MENU_TOGGLE_ID}
-          className="absolute inset-0 cursor-pointer touch-manipulation bg-black/20"
+          className="absolute inset-0 cursor-pointer touch-manipulation bg-foreground/20"
           aria-label="Cerrar menú"
         />
-        <aside className="pointer-events-auto absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl safe-area-top">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+        <aside className="pointer-events-auto absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-sidebar text-sidebar-foreground shadow-xl safe-area-top">
+          <div className="flex items-center justify-between border-b border-sidebar-border px-5 py-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-widest text-neutral-500">
+              <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
                 SP Admin
               </p>
-              <p className="text-sm text-neutral-900">Panel interno</p>
+              <p className="text-sm text-sidebar-foreground">Panel interno</p>
             </div>
             <label
               htmlFor={MENU_TOGGLE_ID}
               className={headerBtnClass}
               aria-label="Cerrar menú"
             >
-              <X className="pointer-events-none h-5 w-5" />
+              <X className="pointer-events-none size-5" />
             </label>
           </div>
-          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-            {adminNavLinks.map(({ href, label, icon: Icon }) => {
-              const active =
-                pathname === href || pathname.startsWith(`${href}/`);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={closeMenu}
-                  className={cn(
-                    "flex min-h-11 touch-manipulation items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                    active
-                      ? "bg-neutral-100 font-medium text-black"
-                      : "text-neutral-600 hover:bg-neutral-50 hover:text-black",
-                  )}
-                >
-                  <Icon className="h-4 w-4" strokeWidth={1.75} />
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="border-t border-neutral-200 p-3 safe-area-bottom">
+          <ScrollArea className="flex-1">
+            <nav className="flex flex-col gap-4 p-3">
+              {adminNavGroups.map((group) => {
+                const Icon = group.icon;
+                const groupActive = isGroupActive(pathname, group);
+                const hasChildren = group.children.length > 0;
+
+                if (!hasChildren) {
+                  return (
+                    <Link
+                      key={group.id}
+                      href={group.href}
+                      onClick={closeMenu}
+                      className={cn(
+                        "flex min-h-11 touch-manipulation items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                        groupActive
+                          ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                          : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                      )}
+                    >
+                      <Icon className="size-4" strokeWidth={1.75} />
+                      {group.label}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div key={group.id} className="flex flex-col gap-1">
+                    <p className="flex items-center gap-2 px-3 py-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                      <Icon className="size-3.5" strokeWidth={1.75} />
+                      {group.label}
+                    </p>
+                    {group.children.map(({ href, label, icon: ChildIcon }) => {
+                      const active = isChildActive(pathname, href);
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={closeMenu}
+                          className={cn(
+                            "flex min-h-11 touch-manipulation items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                            active
+                              ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+                              : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                          )}
+                        >
+                          <ChildIcon className="size-4" strokeWidth={1.75} />
+                          {label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </nav>
+          </ScrollArea>
+          <Separator />
+          <div className="p-3 safe-area-bottom">
             <form action={logoutAdminAction}>
               <Button
                 type="submit"
                 variant="ghost"
-                className="min-h-11 w-full touch-manipulation justify-start gap-3 text-neutral-600 hover:text-black"
+                className="min-h-11 w-full touch-manipulation justify-start gap-3 text-muted-foreground"
               >
-                <LogOut className="h-4 w-4" strokeWidth={1.75} />
+                <LogOut className="size-4" strokeWidth={1.75} />
                 Salir
               </Button>
             </form>
