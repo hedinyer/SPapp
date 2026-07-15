@@ -113,8 +113,15 @@ export function ClientPipelineView({
               />
             </>
           )}
-          {adminStep === "entrega" && (
-            <DeliveryPanel compra={pipeline.compra} userId={userId} />
+          {(adminStep === "entrega" ||
+            pipeline.compra?.estado === "entregada" ||
+            pipeline.compra?.estado === "saldada") && (
+            <DeliveryPanel
+              compra={pipeline.compra}
+              userId={userId}
+              clienteCelular={clienteCelular}
+              clienteNombre={pipeline.displayName}
+            />
           )}
           {adminStep === "visita" && (
             <VisitActionPanel
@@ -130,6 +137,7 @@ export function ClientPipelineView({
 
           {!adminStep &&
             pipeline.compra?.estado !== "entregada" &&
+            pipeline.compra?.estado !== "saldada" &&
             !showContractShare &&
             !legacyClientMoto && (
             <div className="rounded-lg border border-border bg-muted/50 px-6 py-10 text-center text-sm text-muted-foreground">
@@ -175,8 +183,15 @@ export function ClientPipelineView({
                   />
                 </>
               )}
-              {adminStep !== "entrega" && (
-                <DeliveryPanel compra={pipeline.compra} userId={userId} />
+              {adminStep !== "entrega" &&
+                pipeline.compra?.estado !== "entregada" &&
+                pipeline.compra?.estado !== "saldada" && (
+                <DeliveryPanel
+                  compra={pipeline.compra}
+                  userId={userId}
+                  clienteCelular={clienteCelular}
+                  clienteNombre={pipeline.displayName}
+                />
               )}
               {adminStep !== "visita" && (
                 <VisitActionPanel

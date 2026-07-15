@@ -12,7 +12,7 @@ export const EMPRESA_PROPIETARIA = {
   razonSocialCorto: "SOLUCIONES GARRIDO SAS",
   representante: "NICOLAS FELIPE GARRIDO PINILLA",
   cedula: "1.097.496.684",
-  ciudad: "Bucaramanga",
+  ciudad: "Girardot",
   nit: "902.077.926-8",
   email: "contacto@solucionesgarrido.com",
   direccion:
@@ -144,8 +144,8 @@ export function buildContratoComercial(compra: CompraContratoInput): Omit<
   };
 }
 
-export const introTemplate = `El día [DIA] del mes de [MES] de [ANIO], en la ciudad de Bucaramanga, Santander, entre los suscritos a saber,
-NICOLAS FELIPE GARRIDO PINILLA, mayor de edad, vecino y domiciliado en la ciudad de Bucaramanga, identificado como
+export const introTemplate = `El día [DIA] del mes de [MES] de [ANIO], en la ciudad de Girardot, Cundinamarca, entre los suscritos a saber,
+NICOLAS FELIPE GARRIDO PINILLA, mayor de edad, vecino y domiciliado en la ciudad de Girardot, identificado como
 aparece al pie de su firma, quien en adelante se denominará EL PROPIETARIO, y por otro
 [NOMBRE_CONTRATANTE], mayor de edad, vecino y domiciliado en [CIUDAD_CONTRATANTE], [DEPARTAMENTO_CONTRATANTE],
 quien se identifica como aparece al pie de su firma y en adelante se denominará "EL CONTRATANTE", acuerdan celebrar un "CONTRATO DE RENTING" regido por las siguientes
@@ -188,7 +188,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "SEXTA – DESTINACIÓN",
         texto:
-          "El bien objeto del presente contrato será utilizado solamente por EL CONTRATANTE, siendo responsable por la utilización del mismo, su conservación y mantenimiento. El bien será utilizado para los fines a los cuales está destinado según su naturaleza, con el cuidado debido. Se entenderá como uso normal el derivado del uso personal o de la explotación comercial del mismo en la prestación del servicio de mensajería. El uso del bien solo se podrá realizar dentro de los límites del Área Metropolitana de Bucaramanga, Santander.\n\nEL CONTRATANTE tendrá a su cargo todos los gastos de funcionamiento y mantenimiento del bien y, en especial, los repuestos y sus costos de instalación. Los repuestos se consideran parte del bien y pasarán a ser de propiedad del PROPIETARIO, sin que EL CONTRATANTE pueda reclamar ningún derecho por compensación o indemnización derivado de este concepto.",
+          "El bien objeto del presente contrato será utilizado solamente por EL CONTRATANTE, siendo responsable por la utilización del mismo, su conservación y mantenimiento. El bien será utilizado para los fines a los cuales está destinado según su naturaleza, con el cuidado debido. Se entenderá como uso normal el derivado del uso personal o de la explotación comercial del mismo en la prestación del servicio de mensajería. El uso del bien solo se podrá realizar dentro de los límites del municipio de Girardot, Cundinamarca.\n\nEL CONTRATANTE tendrá a su cargo todos los gastos de funcionamiento y mantenimiento del bien y, en especial, los repuestos y sus costos de instalación. Los repuestos se consideran parte del bien y pasarán a ser de propiedad del PROPIETARIO, sin que EL CONTRATANTE pueda reclamar ningún derecho por compensación o indemnización derivado de este concepto.",
       },
       {
         titulo: "SÉPTIMA. OBLIGACIONES DEL PROPIETARIO",
@@ -218,7 +218,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DÉCIMA - PROHIBICIONES DEL CONTRATANTE",
         texto:
-          "EL CONTRATANTE no podrá ceder ni subarrendar el objeto del presente contrato ni subrogar a persona física o jurídica los derechos emanados de este contrato. De igual manera, le está prohibido a EL CONTRATANTE usar el bien por fuera de los límites del Área Metropolitana de Bucaramanga, so pena de incurrir en incumplimiento del presente contrato.\n\nPARÁGRAFO: Pese a lo anterior, EL CONTRATANTE podrá ceder la opción de compra derivada del presente contrato, siempre que notifique al PROPIETARIO dentro de los treinta (30) días siguientes a la expiración del presente contrato.\n\nPARÁGRAFO 2: EL CONTRATANTE no podrá manipular el GPS de la motocicleta, ya que constituye una falta grave y procede la pérdida de los derechos.",
+          "EL CONTRATANTE no podrá ceder ni subarrendar el objeto del presente contrato ni subrogar a persona física o jurídica los derechos emanados de este contrato. De igual manera, le está prohibido a EL CONTRATANTE usar el bien por fuera de los límites del municipio de Girardot, Cundinamarca, so pena de incurrir en incumplimiento del presente contrato.\n\nPARÁGRAFO: Pese a lo anterior, EL CONTRATANTE podrá ceder la opción de compra derivada del presente contrato, siempre que notifique al PROPIETARIO dentro de los treinta (30) días siguientes a la expiración del presente contrato.\n\nPARÁGRAFO 2: EL CONTRATANTE no podrá manipular el GPS de la motocicleta, ya que constituye una falta grave y procede la pérdida de los derechos.",
       },
       {
         titulo: "DÉCIMA PRIMERA: RESPONSABILIDAD POR EL USO DEL BIEN",
@@ -258,7 +258,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DÉCIMA SÉPTIMA: SOLUCIÓN DE CONFLICTOS — CLÁUSULA COMPROMISORIA",
         texto:
-          "Toda controversia o diferencia relativa a este contrato, su celebración, ejecución, desarrollo, a su terminación, a su liquidación, o al cumplimiento de cualquiera de las obligaciones señaladas en el mismo, se resolverá por un Tribunal de Arbitramento, el cual será administrado por la Cámara de Comercio de Bucaramanga, o directamente una conciliación con la empresa SOLUCIONES GARRIDO SAS.\n\nEl Tribunal de arbitramento se regirá de acuerdo con las siguientes reglas:\n\nPRIMERA: El Tribunal estará integrado por un (1) árbitro, de conformidad con la cuantía del proceso, elegido de común acuerdo por las partes, de la lista oficial que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga. En caso de no existir acuerdo, las partes delegan expresamente en el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga la designación del árbitro de conformidad con lo normado en su reglamento interno.\n\nSEGUNDA: La legislación procesal aplicable será la estipulada en la Ley 1563 de 2012 y sus normas concordantes, así como las que las sustituyan.\n\nTERCERA: El Tribunal decidirá en Derecho.\n\nCUARTA: El secretario del Tribunal de Arbitramento será elegido de la lista oficial de secretarios que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.\n\nQUINTA: El Tribunal sesionará en las instalaciones del Centro de Conciliación y Arbitraje de la Cámara de Comercio de Bucaramanga.",
+          "Toda controversia o diferencia relativa a este contrato, su celebración, ejecución, desarrollo, a su terminación, a su liquidación, o al cumplimiento de cualquiera de las obligaciones señaladas en el mismo, se resolverá por un Tribunal de Arbitramento, el cual será administrado por la Cámara de Comercio de Girardot, o directamente una conciliación con la empresa SOLUCIONES GARRIDO SAS.\n\nEl Tribunal de arbitramento se regirá de acuerdo con las siguientes reglas:\n\nPRIMERA: El Tribunal estará integrado por un (1) árbitro, de conformidad con la cuantía del proceso, elegido de común acuerdo por las partes, de la lista oficial que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Girardot. En caso de no existir acuerdo, las partes delegan expresamente en el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Girardot la designación del árbitro de conformidad con lo normado en su reglamento interno.\n\nSEGUNDA: La legislación procesal aplicable será la estipulada en la Ley 1563 de 2012 y sus normas concordantes, así como las que las sustituyan.\n\nTERCERA: El Tribunal decidirá en Derecho.\n\nCUARTA: El secretario del Tribunal de Arbitramento será elegido de la lista oficial de secretarios que para tal efecto lleva el Centro de Conciliación y Arbitraje de la Cámara de Comercio de Girardot.\n\nQUINTA: El Tribunal sesionará en las instalaciones del Centro de Conciliación y Arbitraje de la Cámara de Comercio de Girardot.",
       },
     ],
   },
@@ -292,7 +292,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "VIGÉSIMA TERCERA: DOMICILIO CONTRACTUAL",
         texto:
-          "Para todos los efectos legales del presente contrato, se tendrá como domicilio contractual la ciudad de Bucaramanga, departamento de Santander.",
+          "Para todos los efectos legales del presente contrato, se tendrá como domicilio contractual la ciudad de Girardot, departamento de Cundinamarca.",
       },
     ],
   },
@@ -302,7 +302,7 @@ export function buildClausulaMantenimientoText(): string {
   return "El cambio de aceite deberá realizarse cada quinientos (500) kilómetros y su costo será siempre asumido por EL CONTRATANTE. BERA, en calidad de concesionario, cubrirá sin costo para EL CONTRATANTE la mano de obra y la revisión del mantenimiento preventivo en los servicios correspondientes a quinientos (500), mil (1.000) y mil quinientos (1.500) kilómetros; el aceite, lubricantes y repuestos necesarios en dichos servicios serán pagados por EL CONTRATANTE. A partir de los dos mil (2.000) kilómetros en adelante, EL CONTRATANTE asumirá el valor del cambio de aceite y del mantenimiento preventivo, medio o general que corresponda, conforme a las tarifas vigentes del taller autorizado.";
 }
 
-export const firmaTemplate = `Para constancia se firma en Bucaramanga a los [DIA] (xx) día del mes de [MES] de dos mil [ANIO] ([ANIO_NUM]), por quienes en el intervinieron.
+export const firmaTemplate = `Para constancia se firma en Girardot a los [DIA] (xx) día del mes de [MES] de dos mil [ANIO] ([ANIO_NUM]), por quienes en el intervinieron.
 
 EL PROPIETARIO
 NICOLAS FELIPE GARRIDO PINILLA
@@ -418,5 +418,11 @@ export function contratoClausulasSelfCheck(): void {
   const medios = buildMediosPagoText();
   if (!medios.includes(EMPRESA_PROPIETARIA.nequi)) {
     throw new Error("buildMediosPagoText");
+  }
+  if (introTemplate.includes("Bucaramanga") || introTemplate.includes("Santander")) {
+    throw new Error("intro debe decir Girardot, Cundinamarca");
+  }
+  if (EMPRESA_PROPIETARIA.ciudad !== "Girardot") {
+    throw new Error("EMPRESA_PROPIETARIA.ciudad debe ser Girardot");
   }
 }

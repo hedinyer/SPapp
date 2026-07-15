@@ -156,6 +156,9 @@ export interface UserMotoCompraRow {
   chasis: string | null;
   referencia: string | null;
   fecha_entrega: string | null;
+  doc_tarjeta_propiedad_path: string | null;
+  doc_soat_path: string | null;
+  doc_tecno_path: string | null;
   seleccionado_at: string;
   admin_data?: { entrega_antes_visita?: boolean };
 }

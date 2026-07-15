@@ -1638,3 +1638,135 @@ export async function removeCompraProductoCredito(
   revalidateClient(userId);
   return { ok: true };
 }
+
+export type MotoDocumentoTipo = "tarjeta" | "soat" | "tecno";
+
+const MOTO_DOC_META: Record<
+  MotoDocumentoTipo,
+  { column: "doc_tarjeta_propiedad_path" | "doc_soat_path" | "doc_tecno_path"; file: string }
+> = {
+  tarjeta: { column: "doc_tarjeta_propiedad_path", file: "tarjeta.pdf" },
+  soat: { column: "doc_soat_path", file: "soat.pdf" },
+  tecno: { column: "doc_tecno_path", file: "tecno.pdf" },
+};
+
+const MOTO_DOC_MAX_BYTES = 10 * 1024 * 1024;
+
+export async function uploadMotoDocumento(formData: FormData) {
+  const supabase = await assertAdmin();
+  const compraId = String(formData.get("compraId") ?? "");
+  const userId = Number(formData.get("userId"));
+  const tipo = String(formData.get("tipo") ?? "") as MotoDocumentoTipo;
+  const file = formData.get("file");
+
+  if (!compraId || !Number.isFinite(userId)) {
+    throw new Error("Datos de compra inválidos.");
+  }
+  if (!(tipo in MOTO_DOC_META)) {
+    throw new Error("Tipo de documento no válido.");
+  }
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Selecciona un PDF.");
+  }
+  if (file.type !== "application/pdf") {
+    throw new Error("Solo se aceptan archivos PDF.");
+  }
+  if (file.size > MOTO_DOC_MAX_BYTES) {
+    throw new Error("El PDF no puede superar 10 MB.");
+  }
+
+  const { data: compra, error: fetchError } = await supabase
+    .from("user_moto_compra")
+    .select("id, user_id, estado")
+    .eq("id", compraId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (fetchError || !compra) throw new Error("Compra no encontrada.");
+  if (compra.estado !== "entregada" && compra.estado !== "saldada") {
+    throw new Error("Solo se pueden subir documentos tras la entrega.");
+  }
+
+  const meta = MOTO_DOC_META[tipo];
+  const path = `${compraId}/${meta.file}`;
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  const { error: uploadError } = await supabase.storage
+    .from(STORAGE_BUCKETS.motoDocumentos)
+    .upload(path, bytes, {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new Error(`No se pudo subir el PDF: ${uploadError.message}`);
+  }
+
+  const { error: updateError } = await supabase
+    .from("user_moto_compra")
+    .update({ [meta.column]: path })
+    .eq("id", compraId)
+    .eq("user_id", userId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  revalidateClient(userId);
+  return { ok: true as const, path };
+}
+
+export async function getMotoDocumentoDownloadUrls(compraId: string, userId: number) {
+  const supabase = await assertAdmin();
+
+  const { data: compra, error } = await supabase
+    .from("user_moto_compra")
+    .select(
+      "id, user_id, estado, placa, doc_tarjeta_propiedad_path, doc_soat_path, doc_tecno_path",
+    )
+    .eq("id", compraId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error || !compra) throw new Error("Compra no encontrada.");
+  if (compra.estado !== "entregada" && compra.estado !== "saldada") {
+    throw new Error("Solo se pueden enviar documentos tras la entrega.");
+  }
+
+  const items: { tipo: MotoDocumentoTipo; label: string; filename: string; url: string }[] =
+    [];
+  const placa = (compra.placa ?? "moto").replace(/\s+/g, "");
+
+  const candidates: { tipo: MotoDocumentoTipo; label: string; path: string | null }[] = [
+    {
+      tipo: "tarjeta",
+      label: "Tarjeta de propiedad",
+      path: compra.doc_tarjeta_propiedad_path,
+    },
+    { tipo: "soat", label: "SOAT", path: compra.doc_soat_path },
+    { tipo: "tecno", label: "Tecnomecánica", path: compra.doc_tecno_path },
+  ];
+
+  for (const c of candidates) {
+    if (!c.path) continue;
+    const { data, error: signError } = await supabase.storage
+      .from(STORAGE_BUCKETS.motoDocumentos)
+      .createSignedUrl(c.path, 120);
+    if (signError || !data?.signedUrl) {
+      throw new Error(`No se pudo preparar ${c.label}: ${signError?.message ?? "sin URL"}`);
+    }
+    items.push({
+      tipo: c.tipo,
+      label: c.label,
+      filename: `${c.tipo}-${placa}.pdf`,
+      url: data.signedUrl,
+    });
+  }
+
+  if (items.length === 0) {
+    throw new Error("No hay documentos cargados para enviar.");
+  }
+
+  return {
+    placa: compra.placa,
+    items,
+  };
+}
