@@ -927,26 +927,18 @@ export async function getAllVendidasMotos(): Promise<VendidaMotoRow[]> {
     >).map((a) => [a.user_moto_compra_id, a]),
   );
 
+  // ponytail: Omit evita intersección con VendidaMotoRow.users (sin users_documents)
+  type VendidaSelectUser = {
+    id: number;
+    user: string;
+    users_documents?:
+      | { selfie_url: string | null }
+      | { selfie_url: string | null }[]
+      | null;
+  };
   return ((data ?? []) as unknown as Array<
-    VendidaMotoRow & {
-      users?:
-        | {
-            id: number;
-            user: string;
-            users_documents?:
-              | { selfie_url: string | null }
-              | { selfie_url: string | null }[]
-              | null;
-          }
-        | {
-            id: number;
-            user: string;
-            users_documents?:
-              | { selfie_url: string | null }
-              | { selfie_url: string | null }[]
-              | null;
-          }[]
-        | null;
+    Omit<VendidaMotoRow, "users" | "bike_table"> & {
+      users?: VendidaSelectUser | VendidaSelectUser[] | null;
       bike_table?:
         | { imagen_url: string | null }
         | { imagen_url: string | null }[]
