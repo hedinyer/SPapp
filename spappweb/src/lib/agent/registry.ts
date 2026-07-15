@@ -16,6 +16,11 @@ const loadPaymentActions = () =>
   import("@/lib/actions/payment-comprobante-actions");
 const loadClientActions = () => import("@/lib/actions/client-actions");
 const loadPipelineEvents = () => import("@/lib/agent/pipeline-events");
+const loadVentaMotoActions = () => import("@/lib/actions/venta-moto-actions");
+const loadVentaProductoActions = () =>
+  import("@/lib/actions/venta-producto-actions");
+const loadHistorialMotosActions = () =>
+  import("@/lib/actions/historial-motos-actions");
 
 const INBOX_QUEUE_IDS = [
   "creditos",
@@ -180,9 +185,78 @@ export const AGENT_TOOLS = {
   }),
   list_vendidas: tool({
     category: "garaje",
-    description: "Motos entregadas (vendidas) con su estado físico y mora.",
+    description:
+      "Motos de crédito/renting entregadas (en calle) con estado físico y mora. NO son ventas de contado de mostrador — para contado usa list_ventas_contado.",
     input: empty,
     handler: async () => (await loadQueries()).getAllVendidasMotos(),
+  }),
+  list_ventas_contado: tool({
+    category: "lectura",
+    description:
+      "Ventas de motos al contado / abono en mostrador (tabla ventas_moto, ruta /venta-contado). Incluye cliente, modelo, color, placa, valorVenta, montoPagado y saldo. Distinto de list_vendidas (crédito).",
+    input: z.object({
+      query: z
+        .string()
+        .optional()
+        .describe("Filtro opcional por nombre, cédula, placa, celular o modelo"),
+      limit: z.number().int().min(1).max(200).optional(),
+    }),
+    handler: async ({ query, limit }) => {
+      const rows = await (await loadVentaMotoActions()).getVentasContado();
+      const q = query?.trim().toLowerCase();
+      const filtered = q
+        ? rows.filter((r) =>
+            [r.clienteNombre, r.clienteCedula, r.clienteCelular, r.placa, r.modelo, r.color]
+              .filter(Boolean)
+              .some((v) => String(v).toLowerCase().includes(q)),
+          )
+        : rows;
+      return filtered.slice(0, limit ?? 100).map((r) => ({
+        ...r,
+        saldo:
+          r.valorVenta != null
+            ? Math.max(0, r.valorVenta - r.montoPagado)
+            : null,
+        estadoPago:
+          r.valorVenta != null && r.montoPagado >= r.valorVenta
+            ? "contado"
+            : r.montoPagado > 0
+              ? "abono"
+              : "sin_pago",
+      }));
+    },
+  }),
+  list_ventas_producto: tool({
+    category: "lectura",
+    description:
+      "Ventas de productos/repuestos de tienda (tabla ventas_producto, rutas /venta, /caja, /historial-ventas). Incluye ítems, total y montoPagado.",
+    input: z.object({
+      query: z
+        .string()
+        .optional()
+        .describe("Filtro opcional por nombre, cédula o celular del cliente"),
+      limit: z.number().int().min(1).max(200).optional(),
+    }),
+    handler: async ({ query, limit }) => {
+      const rows = await (
+        await loadVentaProductoActions()
+      ).listVentasProductoHistorial(limit ?? 100);
+      const q = query?.trim().toLowerCase();
+      if (!q) return rows;
+      return rows.filter((r) =>
+        [r.clienteNombre, r.clienteCedula, r.clienteCelular]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q)),
+      );
+    },
+  }),
+  list_motos_credito_liquidado: tool({
+    category: "lectura",
+    description:
+      "Motos de crédito ya saldadas (historial; no son contado de mostrador). Complementa list_ventas_contado y list_vendidas.",
+    input: empty,
+    handler: async () =>
+      (await loadHistorialMotosActions()).listHistorialMotosCredito(),
   }),
 
   // ---------------------------------------------------------------- CRÉDITO

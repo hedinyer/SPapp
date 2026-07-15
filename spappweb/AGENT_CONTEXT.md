@@ -330,7 +330,13 @@ La bandeja `/inbox` tiene 9 colas: `creditos`, `pagos`, `retiro`, `entrega`,
 | `list_categorias` / `list_productos` | — | Inventario |
 | `list_solicitudes_taller` | — | Solicitudes de taller |
 | `list_visitadores` / `list_active_visitadores` | — | Visitadores |
-| `list_garaje_parqueaderos` / `list_garaje_motos` / `list_vendidas` | — | Garaje y vendidas |
+| `list_garaje_parqueaderos` / `list_garaje_motos` / `list_vendidas` | — | Garaje y vendidas (crédito en calle; **no** contado) |
+| `list_ventas_contado` | `query?`, `limit?` | Motos vendidas al contado/abono (`ventas_moto`, `/venta-contado`) |
+| `list_ventas_producto` | `query?`, `limit?` | Ventas de productos/repuestos (`ventas_producto`) |
+| `list_motos_credito_liquidado` | — | Créditos saldados (historial; no contado) |
+
+> **Contado vs crédito:** `list_vendidas` = motos de renting/crédito entregadas.
+> Contado de mostrador = `list_ventas_contado` (+ productos con `list_ventas_producto`).
 
 ### Crédito
 `approve_credit {documentId,userId}` · `reject_credit {documentId,userId,motivo,betado}`
