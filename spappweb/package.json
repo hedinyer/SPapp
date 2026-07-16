@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run check:contrato && next build",
     "start": "next start",
     "lint": "eslint",
     "check:hoja-vida": "node --experimental-strip-types src/lib/contracts/hoja-vida.check.ts",
-    "check:contrato": "node --experimental-strip-types src/lib/contracts/contrato.check.ts",
+    "check:contrato": "npx --yes tsx --import ./scripts/stub-server-only.mjs src/lib/contracts/contrato.check.ts",
     "check:pipeline": "node --experimental-strip-types src/lib/pipeline/pipeline.check.ts",
     "check:mora": "node --experimental-strip-types src/lib/pipeline/mora-utils.check.ts",
     "check:all": "node scripts/check-all.mjs",

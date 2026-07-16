@@ -1,6 +1,6 @@
 /**
  * Regenera contrato.pdf de contratos firmados (solo cambia ubicación a Girardot).
- * node --import ./scripts/stub-server-only.mjs --import tsx scripts/regenerate-contratos-girardot.ts
+ * node --import ./scripts/stub-server-only.mjs --import tsx scripts/regenerate-contratos-girardot.ts [contract-id]
  */
 import { createClient } from "@supabase/supabase-js";
 import { generateContratoPdf } from "../src/lib/contracts/contract-pdf";
@@ -22,16 +22,21 @@ type ContratoRow = {
 };
 
 async function main() {
+  const onlyId = process.argv[2]?.trim() || null;
+
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: contracts, error } = await supabase
+  let query = supabase
     .from("digital_contracts")
     .select("id, user_id, signature_path, contrato_pdf_path, contrato_data")
     .eq("status", "firmado")
     .not("contrato_pdf_path", "is", null)
     .not("signature_path", "is", null);
+  if (onlyId) query = query.eq("id", onlyId);
+
+  const { data: contracts, error } = await query;
 
   if (error) throw new Error(error.message);
   if (!contracts?.length) {
