@@ -397,6 +397,9 @@ export function runPipelineSelfCheck(): void {
     chasis: "CH1",
     referencia: null,
     fecha_entrega: null,
+    doc_tarjeta_propiedad_path: null,
+    doc_soat_path: null,
+    doc_tecno_path: null,
     seleccionado_at: "",
   };
   const visitaPendiente: VisitaRow = {
