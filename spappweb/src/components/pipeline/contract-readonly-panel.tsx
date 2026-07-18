@@ -29,8 +29,9 @@ export function ContractReadonlyPanel({ contract }: ContractReadonlyPanelProps) 
   }
 
   const hoja = contract.hoja_vida_data as Record<string, unknown>;
-  const hojaPdf = getContractPublicUrl(contract.hoja_vida_pdf_path);
-  const contratoPdf = getContractPublicUrl(contract.contrato_pdf_path);
+  const pdfV = contract.updated_at || contract.signed_at || contract.id;
+  const hojaPdf = getContractPublicUrl(contract.hoja_vida_pdf_path, pdfV);
+  const contratoPdf = getContractPublicUrl(contract.contrato_pdf_path, pdfV);
   const hasHojaData = Object.keys(hoja).length > 0;
   const referencias = Array.isArray(hoja.referencias)
     ? (hoja.referencias as { nombre?: string; celular?: string }[])
