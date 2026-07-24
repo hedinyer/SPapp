@@ -129,8 +129,8 @@ export function InventarioManager({
                 <TableHead>Producto</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Categoría</TableHead>
-                <TableHead>Costo</TableHead>
-                <TableHead>Precio</TableHead>
+                <TableHead>costo</TableHead>
+                <TableHead>venta</TableHead>
                 <TableHead>Stock</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead className="w-32" />
@@ -275,11 +275,11 @@ export function InventarioManager({
                     <dd>{p.inventario_categorias?.nombre ?? "—"}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-muted-foreground">Precio</dt>
+                    <dt className="text-muted-foreground">costo</dt>
                     <dd>{formatCop(p.precio)}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <dt className="text-muted-foreground">Costo</dt>
+                    <dt className="text-muted-foreground">venta</dt>
                     <dd>{formatCop(p.costo ?? 0)}</dd>
                   </div>
                   <div className="flex justify-between gap-2">
@@ -751,8 +751,8 @@ function ProductoDialog({
           </div>
           <Field label="SKU" value={sku} onChange={setSku} />
           <Field label="Nombre" value={nombre} onChange={setNombre} />
-          <Field label="Precio" value={precio} onChange={setPrecio} type="number" />
-          <Field label="Costo" value={costo} onChange={setCosto} type="number" />
+          <Field label="costo" value={precio} onChange={setPrecio} type="number" />
+          <Field label="venta" value={costo} onChange={setCosto} type="number" />
           <Field label="Stock" value={stock} onChange={setStock} type="number" />
           <Field
             label="Stock mínimo"
