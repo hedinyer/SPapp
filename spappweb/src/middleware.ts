@@ -33,23 +33,46 @@ const visitadorProtectedPrefixes = [
   "/visitador/visitas",
 ];
 
+function needsAdminSession(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    pathname === "/login" ||
+    adminProtectedPrefixes.some((p) => pathname.startsWith(p))
+  );
+}
+
+function needsVisitadorSession(pathname: string): boolean {
+  return (
+    pathname === "/visitador/login" ||
+    visitadorProtectedPrefixes.some((p) => pathname.startsWith(p))
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
-  const adminSession = await getIronSession<SessionData>(
-    request,
-    response,
-    sessionOptions,
-  );
-  const visitadorSession = await getIronSession<VisitadorSessionData>(
-    request,
-    response,
-    visitadorSessionOptions,
-  );
+  // ponytail: no desencriptar ambas cookies en cada hop — solo la que aplica
+  let isAdminLoggedIn = false;
+  let isVisitadorLoggedIn = false;
 
-  const isAdminLoggedIn = hasAdminAccess(adminSession);
-  const isVisitadorLoggedIn = hasVisitadorAccess(visitadorSession);
+  if (needsAdminSession(pathname)) {
+    const adminSession = await getIronSession<SessionData>(
+      request,
+      response,
+      sessionOptions,
+    );
+    isAdminLoggedIn = hasAdminAccess(adminSession);
+  }
+
+  if (needsVisitadorSession(pathname)) {
+    const visitadorSession = await getIronSession<VisitadorSessionData>(
+      request,
+      response,
+      visitadorSessionOptions,
+    );
+    isVisitadorLoggedIn = hasVisitadorAccess(visitadorSession);
+  }
 
   const isAdminProtected = adminProtectedPrefixes.some((p) =>
     pathname.startsWith(p),

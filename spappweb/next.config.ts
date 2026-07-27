@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
       // Fotos de cámara móvil pueden superar 1 MB (límite por defecto de Next.js)
       bodySizeLimit: "15mb",
     },
+    // Soft-nav: reutilizar RSC reciente en el cliente (default dynamic=0 = siempre round-trip)
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   images: {
     remotePatterns: [
