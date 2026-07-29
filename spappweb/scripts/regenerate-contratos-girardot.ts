@@ -1,13 +1,16 @@
 /**
- * Regenera contrato.pdf de contratos firmados (solo cambia ubicación a Girardot).
+ * Regenera contrato.pdf de contratos firmados.
+ * Honra overrides en contrato_data: duracion_texto, num_periodos, total_contrato.
  * node --import ./scripts/stub-server-only.mjs --import tsx scripts/regenerate-contratos-girardot.ts [contract-id]
  */
 import { createClient } from "@supabase/supabase-js";
 import { generateContratoPdf } from "../src/lib/contracts/contract-pdf";
 import {
   buildContratoComercial,
+  buildFormaPagoSaldoText,
   type ContratoData,
 } from "../src/lib/contracts/contrato-renting-clausulas";
+import { formatCop } from "../src/lib/utils/format-cop";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "../src/lib/supabase/public-env";
 import type { FrecuenciaPago } from "../src/lib/pipeline/types";
 
@@ -50,6 +53,10 @@ async function main() {
     const freq = String(cd.frecuencia_pago ?? "diario") as FrecuenciaPago;
     const cuotaInicial = Number(cd.cuota_inicial ?? 0);
     const valorCuota = Number(cd.valor_cuota ?? 0);
+    const numPeriodos =
+      cd.num_periodos != null && Number(cd.num_periodos) > 0
+        ? Number(cd.num_periodos)
+        : null;
 
     const { data: compra } = await supabase
       .from("user_moto_compra")
@@ -68,9 +75,24 @@ async function main() {
       monto_cuota_periodo: valorCuota,
     });
 
+    if (numPeriodos != null) {
+      comercial.formaPagoSaldo = buildFormaPagoSaldoText(
+        freq,
+        comercial.valorCuota,
+        numPeriodos,
+      );
+      comercial.totalContrato = formatCop(
+        cuotaInicial + valorCuota * numPeriodos,
+      );
+    }
+
     // Si había total formateado guardado, conservar el mismo texto comercial guardado
     if (typeof cd.total_contrato === "string" && cd.total_contrato.trim()) {
       comercial.totalContrato = cd.total_contrato;
+    }
+
+    if (typeof cd.duracion_texto === "string" && cd.duracion_texto.trim()) {
+      comercial.duracionTexto = cd.duracion_texto;
     }
 
     const contrato: ContratoData = {
@@ -116,6 +138,8 @@ async function main() {
       row.user_id,
       cd.nombre_contratante,
       cd.moto_placa,
+      comercial.duracionTexto,
+      comercial.totalContrato,
       pdf.length,
     );
   }

@@ -48,6 +48,8 @@ export interface ContratoData {
   totalContrato: string;
   formaPagoSaldo: string;
   mediosPago: string;
+  /** Texto legal de la cláusula de duración, p.ej. "doce (12) meses". */
+  duracionTexto: string;
 }
 
 export interface CompraContratoInput {
@@ -78,18 +80,19 @@ const PERIODOS_ANUALES: Record<FrecuenciaPago, number> = {
   mensual: 12,
 };
 
-const PERIODO_LABEL: Record<FrecuenciaPago, string> = {
-  diario: "365 cuotas diarias",
-  semanal: "52 cuotas semanales",
-  quincenal: "24 cuotas quincenales",
-  mensual: "12 cuotas mensuales",
+const CUOTA_ADJETIVO: Record<FrecuenciaPago, string> = {
+  diario: "diarias",
+  semanal: "semanales",
+  quincenal: "quincenales",
+  mensual: "mensuales",
 };
 
 export function buildFormaPagoSaldoText(
   frecuencia: FrecuenciaPago,
   valorCuota: string,
+  numPeriodos = PERIODOS_ANUALES[frecuencia],
 ): string {
-  return `El saldo restante será cancelado directamente por EL CONTRATANTE a favor de EL PROPIETARIO en ${PERIODO_LABEL[frecuencia]} de ${valorCuota} M/cte.`;
+  return `El saldo restante será cancelado directamente por EL CONTRATANTE a favor de EL PROPIETARIO en ${numPeriodos} cuotas ${CUOTA_ADJETIVO[frecuencia]} de ${valorCuota} M/cte.`;
 }
 
 export function buildMediosPagoText(): string {
@@ -141,6 +144,7 @@ export function buildContratoComercial(compra: CompraContratoInput): Omit<
     totalContrato: total,
     formaPagoSaldo: buildFormaPagoSaldoText(compra.frecuencia_pago, valorCuota),
     mediosPago: buildMediosPagoText(),
+    duracionTexto: "doce (12) meses",
   };
 }
 
@@ -168,7 +172,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "TERCERA – DURACIÓN",
         texto:
-          "El término del presente contrato es de doce (12) meses, contado a partir del día siguiente de la suscripción del presente contrato.",
+          "El término del presente contrato es de [DURACION], contado a partir del día siguiente de la suscripción del presente contrato.",
       },
       {
         titulo: "CUARTA",
@@ -345,7 +349,8 @@ function applyComercialPlaceholders(text: string, form: ContratoData): string {
     .replaceAll("[FORMA_PAGO_SALDO]", form.formaPagoSaldo)
     .replaceAll("[MEDIOS_PAGO]", form.mediosPago)
     .replaceAll("[VALOR_CUOTA]", form.valorCuota)
-    .replaceAll("[FRECUENCIA_PAGO]", form.frecuenciaPago);
+    .replaceAll("[FRECUENCIA_PAGO]", form.frecuenciaPago)
+    .replaceAll("[DURACION]", form.duracionTexto);
 }
 
 export function renderIntro(form: ContratoData): string {
@@ -410,6 +415,13 @@ export function contratoClausulasSelfCheck(): void {
   const saldo = buildFormaPagoSaldoText("semanal", "$50.000");
   if (!saldo.includes("52 cuotas semanales")) {
     throw new Error("buildFormaPagoSaldoText semanal");
+  }
+  const saldo6m = buildFormaPagoSaldoText("diario", "$30.000", 180);
+  if (!saldo6m.includes("180 cuotas diarias")) {
+    throw new Error("buildFormaPagoSaldoText 180 diarias");
+  }
+  if (!blocks.some((b) => b.clausulas.some((c) => c.texto.includes("[DURACION]")))) {
+    throw new Error("cláusula duración debe usar [DURACION]");
   }
   const mant = buildClausulaMantenimientoText();
   if (!mant.includes("500") || !mant.includes("2.000")) {
