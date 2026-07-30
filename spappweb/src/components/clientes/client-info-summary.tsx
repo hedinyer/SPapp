@@ -6,6 +6,7 @@ import {
 } from "@/lib/pipeline/types";
 import { getMoraDisplay, moraEstadoLabel } from "@/lib/pipeline/mora-utils";
 import { formatCop, formatCuotas } from "@/lib/utils/format";
+import { etiquetaDocCorta } from "@/lib/contracts/hoja-vida-schema";
 import { Card, CardContent } from "@/components/ui/card";
 
 function InfoItem({ label, value }: { label: string; value: string }) {
@@ -66,6 +67,9 @@ export function ClientInfoSummary({
     (hoja?.numero_identificacion as string | undefined)?.trim() ||
     (contrato?.cedula_contratante as string | undefined)?.trim() ||
     null;
+  const docLabel = etiquetaDocCorta(
+    (hoja?.tipo_identificacion as string | undefined) ?? null,
+  );
   const celular =
     (hoja?.celular as string | undefined)?.trim() ||
     pipeline.visita?.cliente_celular?.trim() ||
@@ -108,7 +112,7 @@ export function ClientInfoSummary({
         </div>
 
         <div className="grid flex-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cedula && <InfoItem label="Cédula" value={cedula} />}
+          {cedula && <InfoItem label={docLabel} value={cedula} />}
           {celular && <InfoItem label="Celular" value={celular} />}
           {compra && (
             <>

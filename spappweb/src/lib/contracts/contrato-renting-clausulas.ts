@@ -27,6 +27,8 @@ export const EMPRESA_PROPIETARIA = {
 export interface ContratoData {
   nombreContratante: string;
   cedulaContratante: string;
+  /** Etiqueta corta del doc del contratante: C.C., PPT, PV, CV */
+  tipoDocContratante: string;
   direccionNotificaciones: string;
   ciudadContratante: string;
   departamentoContratante: string;
@@ -112,6 +114,7 @@ export function buildContratoComercial(compra: CompraContratoInput): Omit<
   ContratoData,
   | "nombreContratante"
   | "cedulaContratante"
+  | "tipoDocContratante"
   | "direccionNotificaciones"
   | "ciudadContratante"
   | "departamentoContratante"
@@ -317,7 +320,7 @@ Nit: 902.077.926-8
 
 EL CONTRATANTE
 [NOMBRE_CONTRATANTE]
-C.C. [CEDULA_CONTRATANTE]`;
+[TIPO_DOC_CONTRATANTE] [CEDULA_CONTRATANTE]`;
 
 function applyContratantePlaceholders(text: string, form: ContratoData): string {
   return text
@@ -378,6 +381,7 @@ export function renderFirma(form: ContratoData): string {
     .replaceAll("[ANIO]", form.fechaFirmaAnio)
     .replaceAll("[ANIO_NUM]", form.fechaFirmaAnio)
     .replaceAll("[NOMBRE_CONTRATANTE]", form.nombreContratante)
+    .replaceAll("[TIPO_DOC_CONTRATANTE]", form.tipoDocContratante || "C.C.")
     .replaceAll("[CEDULA_CONTRATANTE]", form.cedulaContratante);
 }
 
@@ -436,5 +440,35 @@ export function contratoClausulasSelfCheck(): void {
   }
   if (EMPRESA_PROPIETARIA.ciudad !== "Girardot") {
     throw new Error("EMPRESA_PROPIETARIA.ciudad debe ser Girardot");
+  }
+  const firmaPpt = renderFirma({
+    nombreContratante: "Test PPT",
+    cedulaContratante: "6631197",
+    tipoDocContratante: "PPT",
+    direccionNotificaciones: "x",
+    ciudadContratante: "Girardot",
+    departamentoContratante: "Cundinamarca",
+    fechaFirmaDia: "1",
+    fechaFirmaMes: "enero",
+    fechaFirmaAnio: "2026",
+    marca: "BERA",
+    modelo: "x",
+    linea: "x",
+    estado: "Nueva",
+    chasis: "x",
+    motor: "N/A",
+    placa: "x",
+    color: "x",
+    referencia: "x",
+    cuotaInicial: "$1",
+    valorCuota: "$1",
+    frecuenciaPago: "Diario",
+    totalContrato: "$1",
+    formaPagoSaldo: "x",
+    mediosPago: "x",
+    duracionTexto: "doce (12) meses",
+  });
+  if (!firmaPpt.includes("PPT 6631197") || firmaPpt.includes("C.C. 6631197")) {
+    throw new Error("renderFirma debe usar PPT cuando tipoDocContratante=PPT");
   }
 }

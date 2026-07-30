@@ -170,7 +170,7 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
                   <p className="font-medium">{item.displayName}</p>
                   <p className="truncate text-sm text-muted-foreground">
                     {isCreditos && item.cedula
-                      ? `C.C. ${item.cedula} · ${item.subtitle}`
+                      ? `${item.docLabel ?? "C.C."} ${item.cedula} · ${item.subtitle}`
                       : `@${item.username} · ${item.subtitle}`}
                   </p>
                 </div>
@@ -210,7 +210,11 @@ export function InboxQueueList({ items, queueId }: InboxQueueListProps) {
             <AlertDialogTitle>¿Eliminar cliente?</AlertDialogTitle>
             <AlertDialogDescription>
               {toDelete?.displayName}
-              {toDelete?.cedula ? ` (C.C. ${toDelete.cedula})` : toDelete ? ` (@${toDelete.username})` : ""}.
+              {toDelete?.cedula
+                ? ` (${toDelete.docLabel ?? "C.C."} ${toDelete.cedula})`
+                : toDelete
+                  ? ` (@${toDelete.username})`
+                  : ""}.
               Se borrarán por completo su cuenta, solicitud, contrato, visitas,
               pagos, moto y archivos en Supabase. Esta acción no se puede deshacer.
             </AlertDialogDescription>

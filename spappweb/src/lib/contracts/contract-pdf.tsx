@@ -323,7 +323,10 @@ export async function generateContratoPdf(args: {
           <FirmaCol
             role="El contratante"
             sigSrc={args.signatureDataUrl}
-            lines={[contrato.nombreContratante, `C.C. ${contrato.cedulaContratante}`]}
+            lines={[
+              contrato.nombreContratante,
+              `${contrato.tipoDocContratante || "C.C."} ${contrato.cedulaContratante}`,
+            ]}
           />
         </View>
       </Page>

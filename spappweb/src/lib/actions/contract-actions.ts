@@ -14,6 +14,7 @@ import {
   generateContratoPdf,
   generateHojaVidaPdf,
 } from "@/lib/contracts/contract-pdf";
+import { etiquetaDocCorta } from "@/lib/contracts/hoja-vida-schema";
 
 const BUCKET = "contract-documents";
 
@@ -70,9 +71,16 @@ export async function signContract(input: z.infer<typeof signSchema>) {
   }
 
   const fecha = colombiaDateParts();
+  const hojaRaw = contract.hoja_vida_data as Record<string, unknown> | null;
+  const tipoDocContratante = etiquetaDocCorta(
+    typeof hojaRaw?.tipo_identificacion === "string"
+      ? hojaRaw.tipo_identificacion
+      : null,
+  );
   const contratoData: ContratoData = {
     nombreContratante: parsed.nombre,
     cedulaContratante: parsed.cedula,
+    tipoDocContratante,
     direccionNotificaciones: parsed.direccion,
     ciudadContratante: parsed.ciudad,
     departamentoContratante: parsed.departamento,
@@ -145,6 +153,7 @@ export async function signContract(input: z.infer<typeof signSchema>) {
       contrato_data: {
         nombre_contratante: parsed.nombre,
         cedula_contratante: parsed.cedula,
+        tipo_doc_contratante: tipoDocContratante,
         direccion_notificaciones: parsed.direccion,
         ciudad_contratante: parsed.ciudad,
         departamento_contratante: parsed.departamento,

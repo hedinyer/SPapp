@@ -409,6 +409,8 @@ export interface InboxListItem {
   subtitle: string;
   queueId: InboxQueueId;
   cedula?: string | null;
+  /** Etiqueta corta del documento: C.C., PPT, … */
+  docLabel?: string;
   selfieUrl?: string | null;
   createdAt?: string;
   estadoSolicitud?: string;
@@ -432,6 +434,8 @@ export interface ClientSearchResult {
   username: string;
   displayName: string;
   cedula: string | null;
+  /** Etiqueta corta del documento: C.C., PPT, PV, CV */
+  docLabel: string;
   placa: string | null;
   motoLabel: string | null;
   compraEstado: MotoCompraEstado | null;

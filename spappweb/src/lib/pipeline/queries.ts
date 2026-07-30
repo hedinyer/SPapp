@@ -2,6 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildClientPipeline } from "@/lib/pipeline/step-logic";
+import { etiquetaDocCorta } from "@/lib/contracts/hoja-vida-schema";
 import type {
   BikeRow,
   ClienteFacturacion,
@@ -578,11 +579,15 @@ export async function getInboxListItems(
         const nombreHoja = String(
           contract?.hoja_vida_data?.nombre_completo ?? "",
         ).trim();
+        const docLabel = etiquetaDocCorta(
+          contract?.hoja_vida_data?.tipo_identificacion as string | undefined,
+        );
         items.push({
           userId: uid,
           username: cedula ?? `#${uid}`,
           displayName: nombreHoja || cedula || `Cliente ${uid}`,
           cedula,
+          docLabel,
           selfieUrl: (row.selfie_url as string | null) ?? null,
           createdAt: row.created_at as string,
           estadoSolicitud: row.estado_solicitud as string,
@@ -1294,6 +1299,9 @@ export async function searchClients(
       cedulaFromHoja?.trim() ||
       cedulaFromContrato?.trim() ||
       null;
+    const docLabel = etiquetaDocCorta(
+      (hoja?.tipo_identificacion as string | undefined) ?? null,
+    );
 
     const nombreFromHoja = hoja?.nombre_completo as string | undefined;
     const displayName =
@@ -1306,6 +1314,7 @@ export async function searchClients(
       username: user.user,
       displayName,
       cedula,
+      docLabel,
       placa: compra?.placa ?? null,
       motoLabel: compra ? `${compra.modelo} · ${compra.color}` : null,
       compraEstado: compra?.estado ?? null,
@@ -1442,6 +1451,7 @@ export async function listClientesMotoCredito(
         username: String(compra.user_id),
         displayName: String(compra.user_id),
         cedula: null,
+        docLabel: "C.C.",
         placa: compra.placa,
         motoLabel: `${compra.modelo} · ${compra.color}`,
         compraEstado: compra.estado,
@@ -1478,6 +1488,9 @@ export async function listClientesMotoCredito(
       (hoja?.numero_identificacion as string | undefined)?.trim() ||
       (contrato?.cedula_contratante as string | undefined)?.trim() ||
       null;
+    const docLabel = etiquetaDocCorta(
+      (hoja?.tipo_identificacion as string | undefined) ?? null,
+    );
 
     const nombreFromHoja = hoja?.nombre_completo as string | undefined;
     const displayName =
@@ -1490,6 +1503,7 @@ export async function listClientesMotoCredito(
       username: user.user,
       displayName,
       cedula,
+      docLabel,
       placa: compra.placa,
       motoLabel: `${compra.modelo} · ${compra.color}`,
       compraEstado: compra.estado,

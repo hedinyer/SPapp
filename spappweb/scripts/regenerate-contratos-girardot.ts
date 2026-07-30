@@ -1,6 +1,7 @@
 /**
  * Regenera contrato.pdf de contratos firmados.
  * Honra overrides en contrato_data: duracion_texto, num_periodos, total_contrato.
+ * Usa tipo_identificacion de la hoja (PPT → etiqueta PPT, no C.C.).
  * node --import ./scripts/stub-server-only.mjs --import tsx scripts/regenerate-contratos-girardot.ts [contract-id]
  */
 import { createClient } from "@supabase/supabase-js";
@@ -10,6 +11,7 @@ import {
   buildFormaPagoSaldoText,
   type ContratoData,
 } from "../src/lib/contracts/contrato-renting-clausulas";
+import { etiquetaDocCorta } from "../src/lib/contracts/hoja-vida-schema";
 import { formatCop } from "../src/lib/utils/format-cop";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "../src/lib/supabase/public-env";
 import type { FrecuenciaPago } from "../src/lib/pipeline/types";
@@ -22,6 +24,7 @@ type ContratoRow = {
   signature_path: string;
   contrato_pdf_path: string;
   contrato_data: Record<string, unknown>;
+  hoja_vida_data: Record<string, unknown> | null;
 };
 
 async function main() {
@@ -33,7 +36,9 @@ async function main() {
 
   let query = supabase
     .from("digital_contracts")
-    .select("id, user_id, signature_path, contrato_pdf_path, contrato_data")
+    .select(
+      "id, user_id, signature_path, contrato_pdf_path, contrato_data, hoja_vida_data",
+    )
     .eq("status", "firmado")
     .not("contrato_pdf_path", "is", null)
     .not("signature_path", "is", null);
@@ -50,6 +55,7 @@ async function main() {
   let ok = 0;
   for (const row of contracts as ContratoRow[]) {
     const cd = row.contrato_data ?? {};
+    const hoja = row.hoja_vida_data ?? {};
     const freq = String(cd.frecuencia_pago ?? "diario") as FrecuenciaPago;
     const cuotaInicial = Number(cd.cuota_inicial ?? 0);
     const valorCuota = Number(cd.valor_cuota ?? 0);
@@ -86,7 +92,6 @@ async function main() {
       );
     }
 
-    // Si había total formateado guardado, conservar el mismo texto comercial guardado
     if (typeof cd.total_contrato === "string" && cd.total_contrato.trim()) {
       comercial.totalContrato = cd.total_contrato;
     }
@@ -95,9 +100,19 @@ async function main() {
       comercial.duracionTexto = cd.duracion_texto;
     }
 
+    const tipoDocContratante = etiquetaDocCorta(
+      (typeof hoja.tipo_identificacion === "string"
+        ? hoja.tipo_identificacion
+        : null) ??
+        (typeof cd.tipo_doc_contratante === "string"
+          ? cd.tipo_doc_contratante
+          : null),
+    );
+
     const contrato: ContratoData = {
       nombreContratante: String(cd.nombre_contratante ?? ""),
       cedulaContratante: String(cd.cedula_contratante ?? ""),
+      tipoDocContratante,
       direccionNotificaciones: String(cd.direccion_notificaciones ?? ""),
       ciudadContratante: String(cd.ciudad_contratante ?? ""),
       departamentoContratante: String(cd.departamento_contratante ?? ""),
@@ -132,11 +147,21 @@ async function main() {
       continue;
     }
 
+    if (cd.tipo_doc_contratante !== tipoDocContratante) {
+      await supabase
+        .from("digital_contracts")
+        .update({
+          contrato_data: { ...cd, tipo_doc_contratante: tipoDocContratante },
+        })
+        .eq("id", row.id);
+    }
+
     ok += 1;
     console.log(
       "OK",
       row.user_id,
       cd.nombre_contratante,
+      tipoDocContratante,
       cd.moto_placa,
       comercial.duracionTexto,
       comercial.totalContrato,

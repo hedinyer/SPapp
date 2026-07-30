@@ -6,6 +6,7 @@ import {
 } from "@/lib/contracts/contract-prefill";
 import {
   TIPO_IDENTIFICACION_LABELS,
+  etiquetaDocCorta,
 } from "@/lib/contracts/hoja-vida-schema";
 import { ContractSignFlow } from "@/components/contrato/contract-sign-flow";
 import type { FrecuenciaPago } from "@/lib/pipeline/types";
@@ -120,6 +121,7 @@ export default async function ContratoPage({
   const tipoLabel = hoja.tipo_identificacion
     ? TIPO_IDENTIFICACION_LABELS[hoja.tipo_identificacion]
     : "";
+  const tipoDocCorto = etiquetaDocCorta(hoja.tipo_identificacion);
 
   return (
     <ContractSignFlow
@@ -131,6 +133,7 @@ export default async function ContratoPage({
         celular: hoja.celular,
         correo: hoja.correo,
       }}
+      tipoDocContratante={tipoDocCorto}
       comercial={buildContratoComercial({
         modelo: compra.modelo as string,
         color: compra.color as string,

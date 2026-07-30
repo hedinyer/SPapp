@@ -62,6 +62,7 @@ interface ContractSignFlowProps {
     ContratoData,
     | "nombreContratante"
     | "cedulaContratante"
+    | "tipoDocContratante"
     | "direccionNotificaciones"
     | "ciudadContratante"
     | "departamentoContratante"
@@ -69,6 +70,8 @@ interface ContractSignFlowProps {
     | "fechaFirmaMes"
     | "fechaFirmaAnio"
   >;
+  /** Etiqueta corta del doc (C.C., PPT, …) según hoja de vida */
+  tipoDocContratante?: string;
 }
 
 // Pasos: datos, encabezado, un paso por bloque de clausulas, confirmar, firmar.
@@ -84,6 +87,7 @@ export function ContractSignFlow({
   prefill,
   resumen,
   comercial,
+  tipoDocContratante = "C.C.",
 }: ContractSignFlowProps) {
   const [step, setStep] = useState(0);
   const [nombre, setNombre] = useState(prefill.nombre);
@@ -152,6 +156,7 @@ export function ContractSignFlow({
   const formData: ContratoData = {
     nombreContratante: nombre,
     cedulaContratante: cedula,
+    tipoDocContratante,
     direccionNotificaciones: direccion,
     ciudadContratante: ciudad,
     departamentoContratante: departamento,

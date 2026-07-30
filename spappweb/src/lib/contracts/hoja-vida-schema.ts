@@ -136,6 +136,28 @@ export const TIPO_IDENTIFICACION_LABELS: Record<TipoIdentificacion, string> = {
   cv: "Cédula Venezolana (CV)",
 };
 
+/** Etiqueta corta para firmas/UI (C.C., PPT, …). */
+export const TIPO_DOC_CORTO: Record<TipoIdentificacion, string> = {
+  ppt: "PPT",
+  cc: "C.C.",
+  p: "PV",
+  cv: "CV",
+};
+
+export function etiquetaDocCorta(
+  tipo: string | null | undefined,
+): string {
+  if (!tipo) return "C.C.";
+  const t = tipo.trim();
+  if (t === "PPT" || t === "C.C." || t === "PV" || t === "CV") return t;
+  const key = t.toLowerCase().replace(/\./g, "");
+  if (key === "ppt") return "PPT";
+  if (key === "cc") return "C.C.";
+  if (key === "p" || key === "pv") return "PV";
+  if (key === "cv") return "CV";
+  return "C.C.";
+}
+
 export const ESTADO_CIVIL_LABELS: Record<EstadoCivil, string> = {
   soltero: "Soltero(a)",
   casado: "Casado(a)",

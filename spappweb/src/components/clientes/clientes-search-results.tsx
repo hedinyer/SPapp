@@ -190,7 +190,7 @@ export function ClientesSearchResults({
                       </div>
                       <p className="text-sm text-muted-foreground">
                         @{client.username}
-                        {client.cedula ? ` · C.C. ${client.cedula}` : ""}
+                        {client.cedula ? ` · ${client.docLabel} ${client.cedula}` : ""}
                       </p>
                       {(client.placa || client.motoLabel) && (
                         <p className="text-sm text-muted-foreground">
@@ -273,7 +273,7 @@ export function ClientesSearchResults({
             <AlertDialogDescription>
               {toDelete?.displayName}
               {toDelete?.cedula
-                ? ` (C.C. ${toDelete.cedula})`
+                ? ` (${toDelete.docLabel} ${toDelete.cedula})`
                 : toDelete
                   ? ` (@${toDelete.username})`
                   : ""}
