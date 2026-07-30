@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   Banknote,
   Bike,
   ClipboardList,
@@ -55,6 +56,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       { href: "/vendidas", label: "En calle", icon: ShoppingBag },
       { href: "/catalogo", label: "Modelos", icon: Bike },
       { href: "/venta-contado", label: "Contado", icon: Banknote },
+      { href: "/motos-vendidas", label: "Vendidas", icon: BadgeCheck },
     ],
   },
   {
