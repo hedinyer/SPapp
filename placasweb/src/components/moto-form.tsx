@@ -34,15 +34,26 @@ const actionBtnClass =
 const outlineBtnClass =
   "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900";
 
-export function MotoForm({ moto }: { moto?: MotoRow }) {
+export function MotoForm({
+  moto,
+  initialPlaca,
+}: {
+  moto?: MotoRow;
+  initialPlaca?: string;
+}) {
   const router = useRouter();
   const isEdit = Boolean(moto);
   const [pending, startTransition] = useTransition();
 
-  const initialModo: ModoIdentificador = moto?.placa?.trim() ? "placa" : "serie";
+  const prefillPlaca = initialPlaca?.trim().toUpperCase() ?? "";
+  const initialModo: ModoIdentificador = moto?.placa?.trim()
+    ? "placa"
+    : moto
+      ? "serie"
+      : "placa";
 
   const [modo, setModo] = useState<ModoIdentificador>(initialModo);
-  const [placa, setPlaca] = useState(moto?.placa ?? "");
+  const [placa, setPlaca] = useState(moto?.placa ?? prefillPlaca);
   const [numeroSerie, setNumeroSerie] = useState(moto?.numero_serie ?? "");
   const [condicion, setCondicion] = useState<MotoCondicion>(
     moto?.condicion ?? "nueva",
@@ -109,9 +120,10 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
           ubicacion: parsed.data.ubicacion,
           foto_url: fotoUrl,
           notas: parsed.data.notas || null,
-          pagos: parsed.data.pagos ?? null,
-          aliado: parsed.data.aliado || null,
-          veces_vendida: parsed.data.veces_vendida ?? null,
+          // ponytail: en alta se dejan null; se completan al editar
+          pagos: isEdit ? (parsed.data.pagos ?? null) : null,
+          aliado: isEdit ? parsed.data.aliado || null : null,
+          veces_vendida: isEdit ? (parsed.data.veces_vendida ?? null) : null,
         };
 
         if (isEdit && moto) {
@@ -281,42 +293,46 @@ export function MotoForm({ moto }: { moto?: MotoRow }) {
         enableCamera
       />
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <Label htmlFor="pagos">Días pagados</Label>
-          <Input
-            id="pagos"
-            type="number"
-            min={0}
-            inputMode="numeric"
-            value={pagos}
-            placeholder="0"
-            onChange={(e) => setPagos(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="veces-vendida">Veces vendida</Label>
-          <Input
-            id="veces-vendida"
-            type="number"
-            min={0}
-            inputMode="numeric"
-            value={vecesVendida}
-            placeholder="0"
-            onChange={(e) => setVecesVendida(e.target.value)}
-          />
-        </div>
-      </div>
+      {isEdit ? (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="pagos">Días pagados</Label>
+              <Input
+                id="pagos"
+                type="number"
+                min={0}
+                inputMode="numeric"
+                value={pagos}
+                placeholder="0"
+                onChange={(e) => setPagos(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="veces-vendida">Veces vendida</Label>
+              <Input
+                id="veces-vendida"
+                type="number"
+                min={0}
+                inputMode="numeric"
+                value={vecesVendida}
+                placeholder="0"
+                onChange={(e) => setVecesVendida(e.target.value)}
+              />
+            </div>
+          </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="aliado">Nombre aliado</Label>
-        <Input
-          id="aliado"
-          value={aliado}
-          placeholder="Nombre del aliado"
-          onChange={(e) => setAliado(e.target.value)}
-        />
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="aliado">Nombre aliado</Label>
+            <Input
+              id="aliado"
+              value={aliado}
+              placeholder="Nombre del aliado"
+              onChange={(e) => setAliado(e.target.value)}
+            />
+          </div>
+        </>
+      ) : null}
 
       <div className="space-y-2">
         <Label htmlFor="notas">Notas (opcional)</Label>
