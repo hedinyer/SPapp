@@ -33,6 +33,7 @@ async function main() {
   const contrato = {
     nombreContratante: "CLIENTE DE EJEMPLO",
     cedulaContratante: "1234567890",
+    tipoDocContratante: "C.C.",
     direccionNotificaciones: "Calle 1 #2-3",
     ciudadContratante: "Girardot",
     departamentoContratante: "Cundinamarca",
