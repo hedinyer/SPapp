@@ -52,6 +52,13 @@ El modelo ya puede llamar las tools por su nombre (`get_client_pipeline`,
 `approve_credit`, `inbox_queues`, ...). Recomendado dar a Hermes el contexto de
 [`AGENT_CONTEXT.md`](../../AGENT_CONTEXT.md) para que entienda el dominio.
 
+**Operación dual (Garrido + Pinilla) e informes** (inventario, ventas, clientes,
+diario/caja): ver el playbook
+[`HERMES_DUAL_PLAYBOOK.md`](HERMES_DUAL_PLAYBOOK.md).
+
+**Gerente / PDV vía Supabase (solo lectura, ambas sedes):** plugin
+[`sp-gerente/`](sp-gerente/) — tools `sp_informe_diario`, `sp_ventas`, `sp_caja`, etc.
+
 ### Endpoints
 
 | Método | Ruta | Descripción |

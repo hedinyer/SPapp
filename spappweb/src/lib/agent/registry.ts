@@ -21,6 +21,7 @@ const loadVentaProductoActions = () =>
   import("@/lib/actions/venta-producto-actions");
 const loadHistorialMotosActions = () =>
   import("@/lib/actions/historial-motos-actions");
+const loadCajaActions = () => import("@/lib/actions/caja-actions");
 
 const INBOX_QUEUE_IDS = [
   "creditos",
@@ -257,6 +258,13 @@ export const AGENT_TOOLS = {
     input: empty,
     handler: async () =>
       (await loadHistorialMotosActions()).listHistorialMotosCredito(),
+  }),
+  get_caja_hoy: tool({
+    category: "lectura",
+    description:
+      "Sesión de caja de hoy (America/Bogota): apertura/cierre, movimientos, egresos e informe de recaudos (efectivo/Nequi/Davivienda, ventas tienda, pagos crédito). Null si aún no se abrió caja.",
+    input: empty,
+    handler: async () => (await loadCajaActions()).getCajaSesionHoy(),
   }),
 
   // ---------------------------------------------------------------- CRÉDITO
