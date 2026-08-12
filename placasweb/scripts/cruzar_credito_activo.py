@@ -81,6 +81,22 @@ def buscar_vehiculo(cur, placa: str | None, numero_serie: str | None):
         if row := cur.fetchone():
             return row
 
+        # Placas a 5 chars (falta la letra final): ZPG10 -> ZPG10H
+        if len(key) == 5 and re.fullmatch(r"[A-Z0-9]+", key):
+            cur.execute(
+                """
+                SELECT id, placa, serie, marca, modelo, propietario, estado
+                FROM vehiculos_vehiculo
+                WHERE upper(placa) LIKE %s
+                ORDER BY id
+                LIMIT 2;
+                """,
+                (key + "%",),
+            )
+            rows = cur.fetchall()
+            if len(rows) == 1:
+                return rows[0]
+
         cur.execute(
             """
             SELECT id, placa, serie, marca, modelo, propietario, estado
@@ -94,7 +110,7 @@ def buscar_vehiculo(cur, placa: str | None, numero_serie: str | None):
             return row
 
         digits = re.sub(r"\D", "", key)
-        if len(digits) >= 6:
+        if len(digits) >= 5:
             cur.execute(
                 """
                 SELECT id, placa, serie, marca, modelo, propietario, estado
