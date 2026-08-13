@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useId, useMemo, useState, useTransition } from "react";
-import { Plus, Search, Trash2, X } from "lucide-react";
+import { FileSpreadsheet, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { createBrowserClient } from "@/lib/supabase/browser";
 import {
@@ -12,6 +12,7 @@ import {
   motoIdentificador,
   type MotoRow,
 } from "@/lib/motos/types";
+import { motosToCsv, sortVisibleMotos } from "@/lib/motos/csv";
 import { motoMatchesQuery, normalizeMotoQuery } from "@/lib/motos/search";
 import { cn } from "@/lib/utils";
 
@@ -56,8 +57,22 @@ export function MotoList() {
     [motos, query],
   );
 
+  const visible = useMemo(() => sortVisibleMotos(filtered), [filtered]);
   const normalizedQuery = normalizeMotoQuery(query);
   const searching = normalizedQuery.length > 0;
+
+  function downloadExcel() {
+    if (visible.length === 0) return;
+    const blob = new Blob([motosToCsv(visible)], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `inventario-${new Date().toLocaleDateString("sv-SE")}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 
   function removeMoto(moto: MotoRow) {
     const label = motoIdentificador(moto);
@@ -102,17 +117,28 @@ export function MotoList() {
               : `${motos.length} moto${motos.length === 1 ? "" : "s"}`}
           </p>
         </div>
-        <Link
-          href={
-            searching
-              ? `/nueva?placa=${encodeURIComponent(normalizedQuery)}`
-              : "/nueva"
-          }
-          className="inline-flex min-h-11 touch-manipulation items-center gap-2 rounded-lg bg-black px-4 text-sm font-medium text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Agregar
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={downloadExcel}
+            disabled={visible.length === 0}
+            className="inline-flex min-h-11 touch-manipulation items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
+            Excel
+          </button>
+          <Link
+            href={
+              searching
+                ? `/nueva?placa=${encodeURIComponent(normalizedQuery)}`
+                : "/nueva"
+            }
+            className="inline-flex min-h-11 touch-manipulation items-center gap-2 rounded-lg bg-black px-4 text-sm font-medium text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Agregar
+          </Link>
+        </div>
       </div>
 
       <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200 bg-white px-4 py-3">
@@ -179,9 +205,7 @@ export function MotoList() {
       ) : (
         <div className="space-y-6">
           {UBICACION_ORDER.map((ubicacion) => {
-            const grupo = filtered
-              .filter((moto) => moto.ubicacion === ubicacion)
-              .sort((a, b) => (b.pagos ?? -1) - (a.pagos ?? -1));
+            const grupo = visible.filter((moto) => moto.ubicacion === ubicacion);
             if (grupo.length === 0) return null;
 
             return (
