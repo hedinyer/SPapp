@@ -34,6 +34,8 @@ assert(csv.includes("Placa,Número de serie,Condición,Ubicación"), "cabeceras"
 assert(csv.includes("Usada"), "label condición");
 assert(csv.includes("Soluciones Pinilla"), "label ubicación");
 assert(csv.includes('"Falta motor, ""urgente"""'), "escapa comas y comillas");
+assert(!csv.includes("Foto"), "sin columna foto");
+assert(!csv.includes("https://example.com/foto.jpg"), "sin url de foto");
 
 const sorted = sortVisibleMotos([
   moto({ id: "lav", ubicacion: "lavadero", pagos: 99 }),

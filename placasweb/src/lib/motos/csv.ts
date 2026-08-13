@@ -14,7 +14,6 @@ const HEADERS = [
   "Días pagados",
   "Veces vendida",
   "Notas",
-  "Foto",
   "Creada",
   "Actualizada",
 ] as const;
@@ -50,7 +49,6 @@ export function motosToCsv(motos: MotoRow[]): string {
       cell(moto.pagos),
       cell(moto.veces_vendida),
       cell(moto.notas?.trim() || null),
-      cell(moto.foto_url),
       cell(moto.created_at),
       cell(moto.updated_at),
     ].join(","),
