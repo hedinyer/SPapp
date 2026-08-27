@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ImageFileField } from "@/components/ui/image-file-field";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,10 @@ import {
   CONDICION_LABELS,
   UBICACION_LABELS,
   UBICACION_ORDER,
+  hoyBogota,
+  isMotoUbicacion,
+  readLastUbicacion,
+  writeLastUbicacion,
   type MotoCondicion,
   type MotoRow,
   type MotoUbicacion,
@@ -33,6 +37,11 @@ const actionBtnClass =
 
 const outlineBtnClass =
   "inline-flex min-h-11 w-full touch-manipulation cursor-pointer items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900";
+
+function initialUbicacion(moto?: MotoRow): MotoUbicacion {
+  if (moto?.ubicacion && isMotoUbicacion(moto.ubicacion)) return moto.ubicacion;
+  return "bodega";
+}
 
 export function MotoForm({
   moto,
@@ -58,8 +67,8 @@ export function MotoForm({
   const [condicion, setCondicion] = useState<MotoCondicion>(
     moto?.condicion ?? "nueva",
   );
-  const [ubicacion, setUbicacion] = useState<MotoUbicacion>(
-    moto?.ubicacion ?? "parqueadero",
+  const [ubicacion, setUbicacion] = useState<MotoUbicacion>(() =>
+    initialUbicacion(moto),
   );
   const [notas, setNotas] = useState(moto?.notas ?? "");
   const [pagos, setPagos] = useState(
@@ -70,6 +79,11 @@ export function MotoForm({
     moto?.veces_vendida != null ? String(moto.veces_vendida) : "",
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (moto?.ubicacion && isMotoUbicacion(moto.ubicacion)) return;
+    setUbicacion(readLastUbicacion());
+  }, [moto]);
 
   function setModoIdentificador(next: ModoIdentificador) {
     if (isEdit) return;
@@ -113,6 +127,9 @@ export function MotoForm({
         }
 
         const supabase = createBrowserClient();
+        const hoy = hoyBogota();
+        const ubicacionChanged =
+          !isEdit || !moto || moto.ubicacion !== parsed.data.ubicacion;
         const payload = {
           placa: modo === "placa" ? parsed.data.placa : null,
           numero_serie: modo === "serie" ? parsed.data.numero_serie : null,
@@ -124,7 +141,10 @@ export function MotoForm({
           pagos: isEdit ? (parsed.data.pagos ?? null) : null,
           aliado: isEdit ? parsed.data.aliado || null : null,
           veces_vendida: isEdit ? (parsed.data.veces_vendida ?? null) : null,
+          inventariado_en: !isEdit || ubicacionChanged ? hoy : moto?.inventariado_en ?? null,
         };
+
+        writeLastUbicacion(parsed.data.ubicacion);
 
         if (isEdit && moto) {
           const { error } = await supabase
@@ -267,7 +287,7 @@ export function MotoForm({
 
       <div className="space-y-2">
         <Label>Ubicación</Label>
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {UBICACION_ORDER.map((value) => (
             <button
               key={value}

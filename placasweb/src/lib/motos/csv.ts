@@ -1,7 +1,8 @@
 import {
   CONDICION_LABELS,
-  UBICACION_LABELS,
   UBICACION_ORDER,
+  isMotoUbicacion,
+  ubicacionLabel,
   type MotoRow,
 } from "./types.ts";
 
@@ -28,11 +29,11 @@ function cell(value: string | number | null | undefined): string {
   return csvField(String(value));
 }
 
-/** Mismo orden que la lista: ubicación, luego días pagados desc. */
+/** Mismo orden que la lista: ubicación nueva, luego días pagados desc. */
 export function sortVisibleMotos(motos: MotoRow[]): MotoRow[] {
   return UBICACION_ORDER.flatMap((ubicacion) =>
     motos
-      .filter((moto) => moto.ubicacion === ubicacion)
+      .filter((moto) => isMotoUbicacion(moto.ubicacion) && moto.ubicacion === ubicacion)
       .sort((a, b) => (b.pagos ?? -1) - (a.pagos ?? -1)),
   );
 }
@@ -44,7 +45,7 @@ export function motosToCsv(motos: MotoRow[]): string {
       cell(moto.placa?.trim().toUpperCase() || null),
       cell(moto.numero_serie?.trim() || null),
       csvField(CONDICION_LABELS[moto.condicion]),
-      csvField(UBICACION_LABELS[moto.ubicacion]),
+      csvField(ubicacionLabel(moto.ubicacion)),
       cell(moto.aliado?.trim() || null),
       cell(moto.pagos),
       cell(moto.veces_vendida),
