@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { usePollingRefresh } from "@/hooks/use-polling-refresh";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ListFilter, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import {
   deleteCategoria,
   deleteProducto,
@@ -65,6 +65,39 @@ import { Textarea } from "@/components/ui/textarea";
 import { TouchSelect } from "@/components/ui/touch-select";
 import { PrintPriceLabelButton } from "@/components/inventario/print-price-label-button";
 
+function normalizeSearch(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+type StockPreset = "all" | "bajo" | "sin" | "con";
+
+const STOCK_PRESETS: { value: StockPreset; label: string }[] = [
+  { value: "all", label: "Todos" },
+  { value: "bajo", label: "Casi no hay" },
+  { value: "sin", label: "No hay" },
+  { value: "con", label: "Sí hay" },
+];
+
+function parseOptionalMiles(raw: string): number | null {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return null;
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : null;
+}
+
+function inInclusiveRange(
+  value: number,
+  min: number | null,
+  max: number | null,
+): boolean {
+  if (min != null && value < min) return false;
+  if (max != null && value > max) return false;
+  return true;
+}
+
 export function InventarioManager({
   categorias,
   productos,
@@ -82,6 +115,118 @@ export function InventarioManager({
     null,
   );
   const [pending, startTransition] = useTransition();
+  const [nombreQuery, setNombreQuery] = useState("");
+  const [filtrosOpen, setFiltrosOpen] = useState(false);
+  const [categoriaFiltro, setCategoriaFiltro] = useState("all");
+  const [stockPreset, setStockPreset] = useState<StockPreset>("all");
+  const [stockMin, setStockMin] = useState("");
+  const [stockMax, setStockMax] = useState("");
+  const [costoMin, setCostoMin] = useState("");
+  const [costoMax, setCostoMax] = useState("");
+  const [precioMin, setPrecioMin] = useState("");
+  const [precioMax, setPrecioMax] = useState("");
+  const [numerosOpen, setNumerosOpen] = useState(false);
+
+  const categoriasActivas = useMemo(
+    () =>
+      [...categorias]
+        .filter((c) => c.activo)
+        .sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }),
+        ),
+    [categorias],
+  );
+
+  const filtrosAvanzadosActivos = useMemo(() => {
+    let n = 0;
+    if (categoriaFiltro !== "all") n += 1;
+    if (stockPreset !== "all") n += 1;
+    if (stockMin.trim() || stockMax.trim()) n += 1;
+    if (costoMin.trim() || costoMax.trim()) n += 1;
+    if (precioMin.trim() || precioMax.trim()) n += 1;
+    return n;
+  }, [
+    categoriaFiltro,
+    stockPreset,
+    stockMin,
+    stockMax,
+    costoMin,
+    costoMax,
+    precioMin,
+    precioMax,
+  ]);
+
+  const hayFiltros =
+    Boolean(nombreQuery.trim()) || filtrosAvanzadosActivos > 0;
+
+  const productosFiltrados = useMemo(() => {
+    const q = normalizeSearch(nombreQuery.trim());
+    const terms = q ? q.split(/\s+/).filter(Boolean) : [];
+    const sMin = parseOptionalMiles(stockMin);
+    const sMax = parseOptionalMiles(stockMax);
+    const cMin = parseOptionalMiles(costoMin);
+    const cMax = parseOptionalMiles(costoMax);
+    const pMin = parseOptionalMiles(precioMin);
+    const pMax = parseOptionalMiles(precioMax);
+    const categoriaId =
+      categoriaFiltro === "all" ? null : Number(categoriaFiltro);
+
+    return productos
+      .filter((producto) => {
+        const haystack = normalizeSearch(producto.nombre);
+        if (
+          terms.length > 0 &&
+          !terms.every((term) => haystack.includes(term))
+        ) {
+          return false;
+        }
+        if (categoriaId != null && producto.categoria_id !== categoriaId) {
+          return false;
+        }
+        if (stockPreset === "sin" && producto.stock !== 0) return false;
+        if (stockPreset === "con" && producto.stock <= 0) return false;
+        if (
+          stockPreset === "bajo" &&
+          producto.stock > producto.stock_minimo
+        ) {
+          return false;
+        }
+        if (!inInclusiveRange(producto.stock, sMin, sMax)) return false;
+        if (!inInclusiveRange(producto.costo ?? 0, cMin, cMax)) return false;
+        if (!inInclusiveRange(producto.precio, pMin, pMax)) return false;
+        return true;
+      })
+      .sort((a, b) =>
+        a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }),
+      );
+  }, [
+    productos,
+    nombreQuery,
+    categoriaFiltro,
+    stockPreset,
+    stockMin,
+    stockMax,
+    costoMin,
+    costoMax,
+    precioMin,
+    precioMax,
+  ]);
+
+  function clearFiltrosAvanzados() {
+    setCategoriaFiltro("all");
+    setStockPreset("all");
+    setStockMin("");
+    setStockMax("");
+    setCostoMin("");
+    setCostoMax("");
+    setPrecioMin("");
+    setPrecioMax("");
+  }
+
+  function clearTodosLosFiltros() {
+    setNombreQuery("");
+    clearFiltrosAvanzados();
+  }
 
   const { secondsAgo } = usePollingRefresh({
     intervalMs: 30_000,
@@ -100,17 +245,236 @@ export function InventarioManager({
       </TabsList>
 
       <TabsContent value="productos" className="flex flex-col gap-4">
-        <div className="flex justify-end">
-          <Button
-            onClick={() => {
-              setEditingProd(null);
-              setProdOpen(true);
-            }}
-          >
-            <Plus data-icon="inline-start" />
-            Nuevo producto
-          </Button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative min-w-0 flex-1" role="search">
+            <label htmlFor="inventario-buscar-nombre" className="sr-only">
+              Buscar producto por nombre
+            </label>
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <Input
+              id="inventario-buscar-nombre"
+              value={nombreQuery}
+              onChange={(e) => setNombreQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && nombreQuery) {
+                  e.preventDefault();
+                  setNombreQuery("");
+                }
+              }}
+              placeholder="Buscar por nombre…"
+              className="min-h-11 pl-9 pr-9"
+              inputMode="search"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            {nombreQuery ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2"
+                aria-label="Borrar búsqueda"
+                onClick={() => setNombreQuery("")}
+              >
+                <X aria-hidden="true" />
+              </Button>
+            ) : null}
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={
+                filtrosOpen || filtrosAvanzadosActivos > 0
+                  ? "default"
+                  : "outline"
+              }
+              className="min-h-11"
+              aria-expanded={filtrosOpen}
+              aria-controls="inventario-filtros-avanzados"
+              onClick={() => setFiltrosOpen((open) => !open)}
+            >
+              <ListFilter data-icon="inline-start" aria-hidden="true" />
+              {filtrosOpen ? "Ocultar filtros" : "Filtrar"}
+              {filtrosAvanzadosActivos > 0 ? (
+                <Badge variant="secondary" className="ml-1 tabular-nums">
+                  {filtrosAvanzadosActivos}
+                  <span className="sr-only"> activos</span>
+                </Badge>
+              ) : null}
+            </Button>
+            <Button
+              className="min-h-11"
+              onClick={() => {
+                setEditingProd(null);
+                setProdOpen(true);
+              }}
+            >
+              <Plus data-icon="inline-start" aria-hidden="true" />
+              Nuevo producto
+            </Button>
+          </div>
         </div>
+
+        <div
+          id="inventario-filtros-avanzados"
+          hidden={!filtrosOpen}
+          className="flex flex-col gap-5 rounded-xl border border-border bg-background p-4"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold text-foreground">
+                Mostrar solo…
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Elige una opción. Si no sabes, deja “Todos”.
+              </p>
+            </div>
+            {filtrosAvanzadosActivos > 0 ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                onClick={clearFiltrosAvanzados}
+              >
+                Quitar filtros
+              </Button>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p
+              id="inventario-filtro-stock-label"
+              className="text-sm font-medium text-foreground"
+            >
+              1. ¿Cuántos quedan?
+            </p>
+            <div
+              role="group"
+              aria-labelledby="inventario-filtro-stock-label"
+              className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+            >
+              {STOCK_PRESETS.map((preset) => {
+                const pressed = stockPreset === preset.value;
+                return (
+                  <Button
+                    key={preset.value}
+                    type="button"
+                    variant={pressed ? "default" : "outline"}
+                    className="min-h-12 text-sm"
+                    aria-pressed={pressed}
+                    onClick={() => setStockPreset(preset.value)}
+                  >
+                    {preset.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label
+              htmlFor="inventario-filtro-categoria"
+              className="text-sm font-medium text-foreground"
+            >
+              2. ¿Qué tipo de producto?
+            </Label>
+            <TouchSelect
+              id="inventario-filtro-categoria"
+              aria-label="Qué tipo de producto"
+              value={categoriaFiltro}
+              onChange={setCategoriaFiltro}
+              options={[
+                { value: "all", label: "Todos los tipos" },
+                ...categoriasActivas.map((c) => ({
+                  value: String(c.id),
+                  label: c.nombre,
+                })),
+              ]}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="min-h-11 w-fit justify-start px-0"
+              aria-expanded={numerosOpen}
+              aria-controls="inventario-filtros-numeros"
+              onClick={() => setNumerosOpen((open) => !open)}
+            >
+              {numerosOpen
+                ? "Ocultar cantidad y precios"
+                : "También filtrar por cantidad o precios"}
+            </Button>
+            <div
+              id="inventario-filtros-numeros"
+              hidden={!numerosOpen}
+              className="grid gap-4 sm:grid-cols-3"
+            >
+              <fieldset className="rounded-lg border border-border p-3">
+                <legend className="px-1 text-sm font-medium">Cantidad</legend>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Desde"
+                    value={stockMin}
+                    onChange={(e) => setStockMin(e.target.value)}
+                  />
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Hasta"
+                    value={stockMax}
+                    onChange={(e) => setStockMax(e.target.value)}
+                  />
+                </div>
+              </fieldset>
+              <fieldset className="rounded-lg border border-border p-3">
+                <legend className="px-1 text-sm font-medium">Costo</legend>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Desde"
+                    value={costoMin}
+                    onChange={(e) => setCostoMin(e.target.value)}
+                  />
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Hasta"
+                    value={costoMax}
+                    onChange={(e) => setCostoMax(e.target.value)}
+                  />
+                </div>
+              </fieldset>
+              <fieldset className="rounded-lg border border-border p-3">
+                <legend className="px-1 text-sm font-medium">Venta</legend>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Desde"
+                    value={precioMin}
+                    onChange={(e) => setPrecioMin(e.target.value)}
+                  />
+                  <Input
+                    className="min-h-11"
+                    inputMode="numeric"
+                    placeholder="Hasta"
+                    value={precioMax}
+                    onChange={(e) => setPrecioMax(e.target.value)}
+                  />
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+
         {productos.length === 0 ? (
           <Empty className="border border-dashed border-border">
             <EmptyHeader>
@@ -120,8 +484,32 @@ export function InventarioManager({
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
+        ) : productosFiltrados.length === 0 ? (
+          <Empty className="border border-dashed border-border">
+            <EmptyHeader>
+              <EmptyTitle>Ningún producto coincide</EmptyTitle>
+              <EmptyDescription>
+                Prueba otra búsqueda o quita filtros.
+              </EmptyDescription>
+            </EmptyHeader>
+            {hayFiltros ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                onClick={clearTodosLosFiltros}
+              >
+                Quitar todos los filtros
+              </Button>
+            ) : null}
+          </Empty>
         ) : (
           <>
+        {hayFiltros ? (
+          <p className="text-sm text-muted-foreground" role="status">
+            Quedan {productosFiltrados.length} de {productos.length} productos
+          </p>
+        ) : null}
         <div className="hidden overflow-x-auto rounded-lg border border-border lg:block">
           <Table>
             <TableHeader>
@@ -137,7 +525,7 @@ export function InventarioManager({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {productos.map((p) => {
+              {productosFiltrados.map((p) => {
                 const img = getStoragePublicUrl(
                   STORAGE_BUCKETS.inventarioImagenes,
                   p.imagen_url,
@@ -239,7 +627,7 @@ export function InventarioManager({
         </div>
 
         <div className="flex flex-col gap-3 lg:hidden">
-          {productos.map((p) => {
+          {productosFiltrados.map((p) => {
             const img = getStoragePublicUrl(
               STORAGE_BUCKETS.inventarioImagenes,
               p.imagen_url,
