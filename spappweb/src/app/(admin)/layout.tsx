@@ -1,13 +1,19 @@
+import { redirect } from "next/navigation";
 import { AdminMobileNav } from "@/components/layout/admin-mobile-nav";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
+import { getSession, hasAdminAccess } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // ponytail: auth en layout, no en proxy.ts — Next 16.2 404s valid routes when src/middleware.ts is present
+  const session = await getSession();
+  if (!hasAdminAccess(session)) redirect("/login");
+
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-background text-foreground lg:h-screen lg:max-h-screen lg:flex-row">
       <AdminSidebar className="hidden lg:flex" />

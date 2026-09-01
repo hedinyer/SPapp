@@ -276,7 +276,7 @@ export async function markDelivered(compraId: string, userId: number) {
 
   const { data: compra } = await supabase
     .from("user_moto_compra")
-    .select("modelo, color, placa, chasis, estado, garaje_moto_id")
+    .select("modelo, color, placa, chasis, estado, garaje_moto_id, fecha_entrega")
     .eq("id", compraId)
     .maybeSingle();
 
@@ -287,9 +287,14 @@ export async function markDelivered(compraId: string, userId: number) {
     return { ok: true };
   }
 
+  // ponytail: same UPDATE as estado so generate_tarifas and atrasos share the ancla
+  const fechaEntrega =
+    (compra.fecha_entrega as string | null)?.slice(0, 10) ??
+    new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" });
+
   const { error } = await supabase
     .from("user_moto_compra")
-    .update({ estado: "entregada" })
+    .update({ estado: "entregada", fecha_entrega: fechaEntrega })
     .eq("id", compraId)
     .neq("estado", "saldada")
     .neq("estado", "cancelada");
