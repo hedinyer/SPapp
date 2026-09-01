@@ -5,6 +5,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { ArrowLeft, FileSpreadsheet, Search, X } from "lucide-react";
 import { createBrowserClient } from "@/lib/supabase/browser";
 import {
+  formatTarifas,
   resolveCruceDisplay,
   type CruceMotoEntry,
   type CrucePeriodoPayload,
@@ -350,9 +351,7 @@ function PeriodoMotoCard({
             {info.tarifasViaduct != null ? (
               <>
                 {" · "}
-                {info.tarifasViaduct} tarifa
-                {info.tarifasViaduct === 1 ? "" : "s"} pagada
-                {info.tarifasViaduct === 1 ? "" : "s"}
+                {`${formatTarifas(info.tarifasViaduct)} tarifa${info.tarifasViaduct === 1 ? "" : "s"} pagada${info.tarifasViaduct === 1 ? "" : "s"}`}
               </>
             ) : null}
             {info.tarifasSpapp != null && info.tarifasSpapp > 0 ? (

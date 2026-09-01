@@ -48,6 +48,12 @@ export type CrucePeriodoPayload = {
   motos: Record<string, CruceMotoEntry>;
 };
 
+export function formatTarifas(n: number): string {
+  const rounded = Math.round(n * 100) / 100;
+  const [entero, dec] = rounded.toFixed(2).split(".");
+  return dec === "00" ? entero : `${entero},${dec}`;
+}
+
 export function resolveCruceDisplay(
   moto: { pagos: number | null; aliado: string | null; veces_vendida: number | null },
   cruce: CruceMotoEntry | undefined,

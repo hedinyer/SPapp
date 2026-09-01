@@ -2,6 +2,35 @@
 from __future__ import annotations
 
 import re
+from decimal import Decimal, ROUND_HALF_UP
+
+_Q02 = Decimal("0.01")
+
+
+def cuotas_de_dias(
+    tarifa: Decimal,
+    monto_por_dia: dict,
+    prepago: Decimal = Decimal(0),
+) -> Decimal:
+    """Días cubiertos: máx. 1 cuota por fecha.
+
+    ponytail: día incompleto = 0,50 (calibrado DUR51I=48,50). Si no hay
+    día parcial, el saldo prepago sí entra exacto (DTW25I=91,21).
+    """
+    if tarifa is None or tarifa <= 0:
+        return Decimal(0)
+    total = Decimal(0)
+    hay_parcial = False
+    for monto in monto_por_dia.values():
+        q = Decimal(monto) / tarifa
+        if q >= 1:
+            total += Decimal(1)
+        elif q > 0:
+            total += Decimal("0.5")
+            hay_parcial = True
+    if not hay_parcial:
+        total += Decimal(prepago) / tarifa
+    return total
 
 
 def buscar_vehiculo_id(cur, placa: str | None, numero_serie: str | None) -> int | None:
@@ -60,6 +89,48 @@ def buscar_vehiculo_id(cur, placa: str | None, numero_serie: str | None) -> int 
     return None
 
 
+def tarifas_pagadas_vehiculo(cur, vehiculo_id: int) -> float:
+    cur.execute(
+        """
+        SELECT c.id, c.tarifa, f.fecha::date, COALESCE(SUM(i.subtotal), 0)
+        FROM arrendamientos_contrato c
+        LEFT JOIN terminal_pagos_factura f
+          ON f.contrato_id = c.id
+         AND f.estado = 'confirmada'
+         AND f.estado_pago = 'pagada'
+        LEFT JOIN terminal_pagos_itemfactura i
+          ON i.factura_id = f.id AND i.tipo_item = 'tarifa'
+        WHERE c.vehiculo_id = %s
+        GROUP BY c.id, c.tarifa, f.fecha::date;
+        """,
+        (vehiculo_id,),
+    )
+    por_contrato: dict[int, tuple[Decimal, dict]] = {}
+    for cid, tarifa, fecha, monto in cur.fetchall():
+        t = tarifa if tarifa is not None else Decimal(0)
+        if cid not in por_contrato:
+            por_contrato[cid] = (t, {})
+        if fecha is not None:
+            por_contrato[cid][1][fecha] = monto
+
+    cur.execute(
+        """
+        SELECT p.contrato_id, COALESCE(SUM(p.saldo_disponible), 0)
+        FROM terminal_pagos_prepago p
+        JOIN arrendamientos_contrato c ON c.id = p.contrato_id
+        WHERE c.vehiculo_id = %s AND p.estado = 'disponible'
+        GROUP BY p.contrato_id;
+        """,
+        (vehiculo_id,),
+    )
+    prepago = dict(cur.fetchall())
+
+    total = Decimal(0)
+    for cid, (tarifa, dias) in por_contrato.items():
+        total += cuotas_de_dias(tarifa, dias, prepago.get(cid, Decimal(0)))
+    return float(total.quantize(_Q02, rounding=ROUND_HALF_UP))
+
+
 def datos_vehiculo(cur, vehiculo_id: int) -> dict:
     cur.execute(
         """
@@ -73,18 +144,6 @@ def datos_vehiculo(cur, vehiculo_id: int) -> dict:
             (
                 SELECT COUNT(*)::int FROM arrendamientos_contrato c
                 WHERE c.vehiculo_id = v.id
-            ),
-            (
-                SELECT COUNT(*)::int
-                FROM arrendamientos_contrato c
-                JOIN terminal_pagos_factura f ON f.contrato_id = c.id
-                WHERE c.vehiculo_id = v.id
-                  AND f.estado = 'confirmada'
-                  AND f.estado_pago = 'pagada'
-                  AND EXISTS (
-                      SELECT 1 FROM terminal_pagos_itemfactura i
-                      WHERE i.factura_id = f.id AND i.tipo_item = 'tarifa'
-                  )
             )
         FROM vehiculos_vehiculo v
         WHERE v.id = %s;
@@ -95,7 +154,7 @@ def datos_vehiculo(cur, vehiculo_id: int) -> dict:
     if not row:
         return {}
 
-    placa, serie, propietario, marca, modelo, estado, veces_vendida, tarifas = row
+    placa, serie, propietario, marca, modelo, estado, veces_vendida = row
     return {
         "placa_viaduct": placa,
         "serie_viaduct": serie,
@@ -104,7 +163,7 @@ def datos_vehiculo(cur, vehiculo_id: int) -> dict:
         "modelo": modelo,
         "estado_vehiculo": estado,
         "veces_vendida": int(veces_vendida or 0),
-        "tarifas_pagadas": int(tarifas or 0),
+        "tarifas_pagadas": tarifas_pagadas_vehiculo(cur, vehiculo_id),
     }
 
 

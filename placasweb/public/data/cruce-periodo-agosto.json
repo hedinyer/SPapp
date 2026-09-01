@@ -1,5 +1,5 @@
 {
-  "generado": "2026-09-01T18:36:03.802736+00:00",
+  "generado": "2026-09-01T19:15:18.428751+00:00",
   "periodo": {
     "desde": "2026-08-23",
     "hasta": "2026-09-01"
@@ -291,7 +291,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -313,7 +313,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 138,
+        "tarifas_pagadas": 131.9,
         "contrato_activo": null
       },
       "spappweb": null
@@ -335,7 +335,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 118,
+        "tarifas_pagadas": 114.11,
         "contrato_activo": null
       },
       "spappweb": null
@@ -357,7 +357,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 134,
+        "tarifas_pagadas": 126.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -379,7 +379,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 91,
+        "tarifas_pagadas": 91.21,
         "contrato_activo": null
       },
       "spappweb": null
@@ -401,7 +401,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 61,
+        "tarifas_pagadas": 48.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -423,7 +423,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 176,
+        "tarifas_pagadas": 168.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -445,7 +445,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 34,
+        "tarifas_pagadas": 34.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -467,7 +467,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 168,
+        "tarifas_pagadas": 160.16,
         "contrato_activo": null
       },
       "spappweb": null
@@ -489,7 +489,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 247,
+        "tarifas_pagadas": 240.27,
         "contrato_activo": null
       },
       "spappweb": null
@@ -511,7 +511,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 54.64,
         "contrato_activo": null
       },
       "spappweb": null
@@ -533,7 +533,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 249,
+        "tarifas_pagadas": 249.36,
         "contrato_activo": null
       },
       "spappweb": null
@@ -555,7 +555,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 106,
+        "tarifas_pagadas": 103.55,
         "contrato_activo": null
       },
       "spappweb": null
@@ -577,7 +577,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -599,7 +599,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -621,7 +621,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -643,7 +643,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -665,7 +665,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 56.71,
         "contrato_activo": null
       },
       "spappweb": null
@@ -687,7 +687,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 208,
+        "tarifas_pagadas": 208.74,
         "contrato_activo": null
       },
       "spappweb": null
@@ -709,7 +709,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -731,7 +731,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -753,7 +753,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -775,7 +775,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -797,7 +797,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -819,7 +819,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -841,7 +841,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 365,
+        "tarifas_pagadas": 364.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -863,7 +863,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 181,
+        "tarifas_pagadas": 180.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -885,7 +885,7 @@
         "modelo": "2020",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 63,
+        "tarifas_pagadas": 53.73,
         "contrato_activo": null
       },
       "spappweb": null
@@ -907,7 +907,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 221,
+        "tarifas_pagadas": 215.07,
         "contrato_activo": null
       },
       "spappweb": null
@@ -929,7 +929,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 241,
+        "tarifas_pagadas": 237.21,
         "contrato_activo": null
       },
       "spappweb": null
@@ -951,7 +951,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -973,7 +973,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 159,
+        "tarifas_pagadas": 141.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -995,7 +995,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1017,7 +1017,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 178,
+        "tarifas_pagadas": 169.32,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1039,7 +1039,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 238,
+        "tarifas_pagadas": 238.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1061,7 +1061,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 11,
+        "tarifas_pagadas": 9.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1083,7 +1083,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 28.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1105,7 +1105,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 218,
+        "tarifas_pagadas": 218.92,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1127,7 +1127,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 312,
+        "tarifas_pagadas": 312.58,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1149,7 +1149,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 163,
+        "tarifas_pagadas": 163.65,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1171,7 +1171,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 357,
+        "tarifas_pagadas": 289.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1193,7 +1193,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 117,
+        "tarifas_pagadas": 117.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1215,7 +1215,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 62,
+        "tarifas_pagadas": 62.95,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1237,7 +1237,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 133,
+        "tarifas_pagadas": 133.47,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1259,7 +1259,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 48,
+        "tarifas_pagadas": 46.57,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1281,7 +1281,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 265,
+        "tarifas_pagadas": 255.19,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1303,7 +1303,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 127,
+        "tarifas_pagadas": 121.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1325,7 +1325,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 37.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1347,7 +1347,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 269,
+        "tarifas_pagadas": 239.84,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1369,7 +1369,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 178,
+        "tarifas_pagadas": 160.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1391,7 +1391,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 76,
+        "tarifas_pagadas": 72.93,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1413,7 +1413,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 165,
+        "tarifas_pagadas": 161.73,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1435,7 +1435,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 104,
+        "tarifas_pagadas": 69.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1457,7 +1457,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 250,
+        "tarifas_pagadas": 236.16,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1479,7 +1479,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 28.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1501,7 +1501,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 65,
+        "tarifas_pagadas": 58.68,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1523,7 +1523,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 81,
+        "tarifas_pagadas": 78.7,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1545,7 +1545,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 253,
+        "tarifas_pagadas": 228.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1567,7 +1567,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 112,
+        "tarifas_pagadas": 112.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1589,7 +1589,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 65,
+        "tarifas_pagadas": 58.71,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1611,7 +1611,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 111,
+        "tarifas_pagadas": 111.57,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1633,7 +1633,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 151,
+        "tarifas_pagadas": 145.54,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1655,7 +1655,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 196,
+        "tarifas_pagadas": 173.3,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1677,7 +1677,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 86,
+        "tarifas_pagadas": 43.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1699,7 +1699,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 165,
+        "tarifas_pagadas": 165.47,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1721,7 +1721,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 61,
+        "tarifas_pagadas": 55.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1743,7 +1743,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 25,
+        "tarifas_pagadas": 25.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1765,7 +1765,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 7,
+        "tarifas_pagadas": 7.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1787,7 +1787,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 8,
+        "tarifas_pagadas": 8.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1809,7 +1809,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 65.35,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1831,7 +1831,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 1,
+        "tarifas_pagadas": 1.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1853,7 +1853,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 24,
+        "tarifas_pagadas": 23.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1875,7 +1875,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 125,
+        "tarifas_pagadas": 118.51,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1897,7 +1897,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 202,
+        "tarifas_pagadas": 169.97,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1919,7 +1919,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 188,
+        "tarifas_pagadas": 171.44,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1941,7 +1941,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 121,
+        "tarifas_pagadas": 117.18,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1963,7 +1963,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 26,
+        "tarifas_pagadas": 26.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1985,7 +1985,7 @@
         "modelo": "2024",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 283,
+        "tarifas_pagadas": 283.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2007,7 +2007,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 270,
+        "tarifas_pagadas": 267.75,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2029,7 +2029,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 169,
+        "tarifas_pagadas": 167.03,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2051,7 +2051,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 166,
+        "tarifas_pagadas": 166.92,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2073,7 +2073,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 120,
+        "tarifas_pagadas": 113.02,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2095,7 +2095,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 199,
+        "tarifas_pagadas": 199.06,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2117,7 +2117,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 159,
+        "tarifas_pagadas": 153.71,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2139,7 +2139,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 86,
+        "tarifas_pagadas": 86.55,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2161,7 +2161,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 48,
+        "tarifas_pagadas": 47.42,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2183,7 +2183,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 177,
+        "tarifas_pagadas": 146.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2205,7 +2205,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 194,
+        "tarifas_pagadas": 178.92,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2227,7 +2227,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 23.81,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2249,7 +2249,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 268,
+        "tarifas_pagadas": 229.03,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2271,7 +2271,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 79.84,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2293,7 +2293,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 3,
+        "tarifas_pagadas": 3.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2315,7 +2315,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 3,
+        "tarifas_pagadas": 3.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2337,7 +2337,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 248,
+        "tarifas_pagadas": 220.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2359,7 +2359,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 56,
+        "tarifas_pagadas": 51.56,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2381,7 +2381,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 153,
+        "tarifas_pagadas": 151.93,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2403,7 +2403,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 46,
+        "tarifas_pagadas": 37.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2425,7 +2425,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 72,
+        "tarifas_pagadas": 68.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2447,7 +2447,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 36,
+        "tarifas_pagadas": 36.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2469,7 +2469,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 204,
+        "tarifas_pagadas": 184.86,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2491,7 +2491,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 188,
+        "tarifas_pagadas": 175.43,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2513,7 +2513,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 41,
+        "tarifas_pagadas": 41.88,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2535,7 +2535,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 90,
+        "tarifas_pagadas": 90.24,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2557,7 +2557,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 87,
+        "tarifas_pagadas": 87.81,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2579,7 +2579,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 114,
+        "tarifas_pagadas": 113.26,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2601,7 +2601,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 125,
+        "tarifas_pagadas": 123.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2623,7 +2623,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 139,
+        "tarifas_pagadas": 135.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2645,7 +2645,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 228,
+        "tarifas_pagadas": 207.97,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2667,7 +2667,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 46,
+        "tarifas_pagadas": 43.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2689,7 +2689,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 55,
+        "tarifas_pagadas": 47.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2711,7 +2711,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 43,
+        "tarifas_pagadas": 37.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2733,7 +2733,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 76.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2755,7 +2755,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 79.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2777,7 +2777,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 78,
+        "tarifas_pagadas": 76.46,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2799,7 +2799,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 72,
+        "tarifas_pagadas": 59.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2821,7 +2821,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 71,
+        "tarifas_pagadas": 67.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2843,7 +2843,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 75,
+        "tarifas_pagadas": 67.43,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2865,7 +2865,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 117,
+        "tarifas_pagadas": 113.49,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2887,7 +2887,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 20,
+        "tarifas_pagadas": 19.73,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2909,7 +2909,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 133,
+        "tarifas_pagadas": 109.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2931,7 +2931,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2953,7 +2953,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 16,
+        "tarifas_pagadas": 16.26,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2975,7 +2975,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 25,
+        "tarifas_pagadas": 25.44,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2997,7 +2997,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 111,
+        "tarifas_pagadas": 111.21,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3019,7 +3019,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 123,
+        "tarifas_pagadas": 123.14,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3041,7 +3041,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 88,
+        "tarifas_pagadas": 88.95,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3063,7 +3063,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 18,
+        "tarifas_pagadas": 18.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3085,7 +3085,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 15,
+        "tarifas_pagadas": 12.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3107,7 +3107,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 84,
+        "tarifas_pagadas": 84.8,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3129,7 +3129,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 103,
+        "tarifas_pagadas": 103.32,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3151,7 +3151,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 18,
+        "tarifas_pagadas": 18.58,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3173,7 +3173,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 39,
+        "tarifas_pagadas": 39.62,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3195,7 +3195,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 199,
+        "tarifas_pagadas": 193.31,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3217,7 +3217,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 65,
+        "tarifas_pagadas": 66.09,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3239,7 +3239,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 40,
+        "tarifas_pagadas": 40.41,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3261,7 +3261,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 61,
+        "tarifas_pagadas": 61.05,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3283,7 +3283,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 76.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3305,7 +3305,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 0,
-        "tarifas_pagadas": 0,
+        "tarifas_pagadas": 0.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3327,7 +3327,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 42,
+        "tarifas_pagadas": 42.03,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3349,7 +3349,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 47,
+        "tarifas_pagadas": 47.92,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3371,7 +3371,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 51,
+        "tarifas_pagadas": 46.29,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3393,7 +3393,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 199,
+        "tarifas_pagadas": 150.86,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3415,7 +3415,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 48.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3437,7 +3437,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 135,
+        "tarifas_pagadas": 129.22,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3459,7 +3459,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 235,
+        "tarifas_pagadas": 215.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3481,7 +3481,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 50,
+        "tarifas_pagadas": 49.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3503,7 +3503,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 297,
+        "tarifas_pagadas": 285.41,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3525,7 +3525,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 107,
+        "tarifas_pagadas": 104.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3547,7 +3547,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 79,
+        "tarifas_pagadas": 64.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3569,7 +3569,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 145,
+        "tarifas_pagadas": 143.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3591,7 +3591,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 105,
+        "tarifas_pagadas": 98.78,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3613,7 +3613,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 88,
+        "tarifas_pagadas": 77.24,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3635,7 +3635,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 102,
+        "tarifas_pagadas": 100.74,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3657,7 +3657,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 173,
+        "tarifas_pagadas": 174.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3679,7 +3679,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 116,
+        "tarifas_pagadas": 96.7,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3701,7 +3701,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 6,
-        "tarifas_pagadas": 110,
+        "tarifas_pagadas": 105.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3723,7 +3723,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 64,
+        "tarifas_pagadas": 64.57,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3745,7 +3745,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 266,
+        "tarifas_pagadas": 266.59,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3767,7 +3767,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 159,
+        "tarifas_pagadas": 155.88,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3789,7 +3789,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 182,
+        "tarifas_pagadas": 177.2,
         "contrato_activo": {
           "contrato_id": 2755,
           "estado": "Activo",
@@ -3818,7 +3818,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 105,
+        "tarifas_pagadas": 102.03,
         "contrato_activo": {
           "contrato_id": 1955,
           "estado": "Activo",
@@ -3847,7 +3847,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 403,
+        "tarifas_pagadas": 358.98,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3869,7 +3869,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 24,
+        "tarifas_pagadas": 19.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3891,7 +3891,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 70,
+        "tarifas_pagadas": 69.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3913,7 +3913,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 370,
+        "tarifas_pagadas": 370.62,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3935,7 +3935,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 128,
+        "tarifas_pagadas": 112.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3957,7 +3957,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 170,
+        "tarifas_pagadas": 150.82,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3979,7 +3979,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 73,
+        "tarifas_pagadas": 72.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4001,7 +4001,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 2,
+        "tarifas_pagadas": 2.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4023,7 +4023,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 47,
+        "tarifas_pagadas": 47.34,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4045,7 +4045,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 122,
+        "tarifas_pagadas": 120.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4067,7 +4067,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 126,
+        "tarifas_pagadas": 126.23,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4089,7 +4089,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 2,
+        "tarifas_pagadas": 2.0,
         "contrato_activo": {
           "contrato_id": 2878,
           "estado": "Activo",
@@ -4118,7 +4118,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 120,
+        "tarifas_pagadas": 115.39,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4140,7 +4140,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 13.0,
         "contrato_activo": {
           "contrato_id": 2699,
           "estado": "Activo",
@@ -4169,7 +4169,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 39,
+        "tarifas_pagadas": 38.86,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4191,7 +4191,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 219,
+        "tarifas_pagadas": 219.89,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4213,7 +4213,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 179,
+        "tarifas_pagadas": 179.45,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4235,7 +4235,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 221,
+        "tarifas_pagadas": 218.19,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4257,7 +4257,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 92,
+        "tarifas_pagadas": 86.0,
         "contrato_activo": {
           "contrato_id": 2617,
           "estado": "Activo",
@@ -4286,7 +4286,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 65,
+        "tarifas_pagadas": 59.88,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4308,7 +4308,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 76,
+        "tarifas_pagadas": 76.25,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4330,7 +4330,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 90,
+        "tarifas_pagadas": 90.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4352,7 +4352,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 69,
+        "tarifas_pagadas": 61.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4374,7 +4374,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 135,
+        "tarifas_pagadas": 125.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4396,7 +4396,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 178,
+        "tarifas_pagadas": 177.92,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4418,7 +4418,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 93,
+        "tarifas_pagadas": 91.59,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4440,7 +4440,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 129,
+        "tarifas_pagadas": 130.04,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4462,7 +4462,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 22,
+        "tarifas_pagadas": 15.75,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4484,7 +4484,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 142,
+        "tarifas_pagadas": 133.82,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4506,7 +4506,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 285,
+        "tarifas_pagadas": 286.19,
         "contrato_activo": {
           "contrato_id": 2309,
           "estado": "Activo",
@@ -4535,7 +4535,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 215,
+        "tarifas_pagadas": 198.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4557,7 +4557,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 113,
+        "tarifas_pagadas": 113.06,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4579,7 +4579,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 95,
+        "tarifas_pagadas": 93.44,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4601,7 +4601,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 226,
+        "tarifas_pagadas": 214.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4623,7 +4623,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 165,
+        "tarifas_pagadas": 164.58,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4645,7 +4645,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 115,
+        "tarifas_pagadas": 115.37,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4667,7 +4667,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 103,
+        "tarifas_pagadas": 97.87,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4689,7 +4689,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 127,
+        "tarifas_pagadas": 117.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4711,7 +4711,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 178,
+        "tarifas_pagadas": 166.25,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4733,7 +4733,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 130,
+        "tarifas_pagadas": 130.09,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4755,7 +4755,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 121,
+        "tarifas_pagadas": 102.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4777,7 +4777,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 49,
+        "tarifas_pagadas": 49.5,
         "contrato_activo": {
           "contrato_id": 2493,
           "estado": "Activo",
@@ -4806,7 +4806,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 76,
+        "tarifas_pagadas": 76.13,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4828,7 +4828,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 55,
+        "tarifas_pagadas": 54.13,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4850,7 +4850,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 226,
+        "tarifas_pagadas": 226.34,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4872,7 +4872,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 3,
-        "tarifas_pagadas": 85,
+        "tarifas_pagadas": 78.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4894,7 +4894,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 124,
+        "tarifas_pagadas": 119.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4916,7 +4916,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 164,
+        "tarifas_pagadas": 162.3,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4938,7 +4938,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 141,
+        "tarifas_pagadas": 124.41,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4960,7 +4960,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 3,
-        "tarifas_pagadas": 103,
+        "tarifas_pagadas": 101.31,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4982,7 +4982,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 142,
+        "tarifas_pagadas": 134.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5004,7 +5004,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 53,
+        "tarifas_pagadas": 50.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5026,7 +5026,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 91,
+        "tarifas_pagadas": 91.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5048,7 +5048,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 19,
+        "tarifas_pagadas": 19.6,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5070,7 +5070,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 170,
+        "tarifas_pagadas": 162.7,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5092,7 +5092,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 158,
+        "tarifas_pagadas": 158.26,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5114,7 +5114,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 142,
+        "tarifas_pagadas": 140.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5136,7 +5136,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 223,
+        "tarifas_pagadas": 223.5,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5158,7 +5158,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 131,
+        "tarifas_pagadas": 118.0,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5180,7 +5180,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 43,
+        "tarifas_pagadas": 33.5,
         "contrato_activo": null
       },
       "spappweb": null
