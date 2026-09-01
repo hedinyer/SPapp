@@ -1,5 +1,5 @@
 {
-  "generado": "2026-09-01T16:21:49.886113+00:00",
+  "generado": "2026-09-01T17:44:13.173476+00:00",
   "periodo": {
     "desde": "2026-08-23",
     "hasta": "2026-08-31"
@@ -14,7 +14,7 @@
       "placa": "ERY81I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -47,7 +47,7 @@
       "placa": "JRU72H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 64,
+        "pagos": 138,
         "aliado": "MIGUEL F.",
         "veces_vendida": 5
       },
@@ -60,7 +60,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 64,
+        "tarifas_pagadas": 138,
         "contrato_activo": null
       },
       "spappweb": null
@@ -69,7 +69,7 @@
       "placa": "RBH85H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 118,
         "aliado": null,
         "veces_vendida": null
       },
@@ -82,7 +82,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 50,
+        "tarifas_pagadas": 118,
         "contrato_activo": null
       },
       "spappweb": null
@@ -91,7 +91,7 @@
       "placa": "HLR39H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 67,
+        "pagos": 134,
         "aliado": "Omar Enrique Gomez Arevalo",
         "veces_vendida": 4
       },
@@ -104,7 +104,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 134,
         "contrato_activo": null
       },
       "spappweb": null
@@ -113,7 +113,7 @@
       "placa": "DTW25I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 91,
         "aliado": null,
         "veces_vendida": null
       },
@@ -126,7 +126,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 91,
         "contrato_activo": null
       },
       "spappweb": null
@@ -135,7 +135,7 @@
       "placa": "DUR51I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 61,
         "aliado": null,
         "veces_vendida": null
       },
@@ -148,7 +148,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 55,
+        "tarifas_pagadas": 61,
         "contrato_activo": null
       },
       "spappweb": null
@@ -157,7 +157,7 @@
       "placa": "OSQ58H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 176,
         "aliado": null,
         "veces_vendida": null
       },
@@ -170,7 +170,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 77,
+        "tarifas_pagadas": 176,
         "contrato_activo": null
       },
       "spappweb": null
@@ -179,7 +179,7 @@
       "placa": "HAE04I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 34,
         "aliado": null,
         "veces_vendida": null
       },
@@ -192,7 +192,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 9,
+        "tarifas_pagadas": 34,
         "contrato_activo": null
       },
       "spappweb": null
@@ -201,7 +201,7 @@
       "placa": "TTJ61H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 168,
         "aliado": null,
         "veces_vendida": null
       },
@@ -214,7 +214,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 74,
+        "tarifas_pagadas": 168,
         "contrato_activo": null
       },
       "spappweb": null
@@ -223,7 +223,7 @@
       "placa": "OSP39H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 247,
         "aliado": null,
         "veces_vendida": null
       },
@@ -236,7 +236,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 64,
+        "tarifas_pagadas": 247,
         "contrato_activo": null
       },
       "spappweb": null
@@ -245,7 +245,7 @@
       "placa": "DYC78H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 60,
         "aliado": null,
         "veces_vendida": null
       },
@@ -258,7 +258,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 60,
         "contrato_activo": null
       },
       "spappweb": null
@@ -267,7 +267,7 @@
       "placa": "JRP44H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 249,
         "aliado": null,
         "veces_vendida": null
       },
@@ -280,7 +280,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 249,
         "contrato_activo": null
       },
       "spappweb": null
@@ -289,7 +289,7 @@
       "placa": "TTD89H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 28,
+        "pagos": 106,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -302,7 +302,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 106,
         "contrato_activo": null
       },
       "spappweb": null
@@ -311,7 +311,7 @@
       "placa": "KGC85I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -333,7 +333,7 @@
       "placa": "KGC89I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -355,7 +355,7 @@
       "placa": "KGC95I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -377,7 +377,7 @@
       "placa": "HAM90I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -399,7 +399,7 @@
       "placa": "DUM05I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 60,
         "aliado": null,
         "veces_vendida": null
       },
@@ -412,7 +412,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 45,
+        "tarifas_pagadas": 60,
         "contrato_activo": null
       },
       "spappweb": null
@@ -421,7 +421,7 @@
       "placa": "RBH86H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 208,
         "aliado": null,
         "veces_vendida": null
       },
@@ -434,7 +434,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 38,
+        "tarifas_pagadas": 208,
         "contrato_activo": null
       },
       "spappweb": null
@@ -443,7 +443,7 @@
       "placa": "KFZ36I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -465,7 +465,7 @@
       "placa": "KGC97I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -487,7 +487,7 @@
       "placa": "KFK34I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -509,7 +509,7 @@
       "placa": "KFU13I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -531,7 +531,7 @@
       "placa": "KGB56I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -553,7 +553,7 @@
       "placa": "KGC91I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -575,7 +575,7 @@
       "placa": "GAR68H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 366,
+        "pagos": 365,
         "aliado": "GENNY",
         "veces_vendida": 1
       },
@@ -588,7 +588,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 44,
+        "tarifas_pagadas": 365,
         "contrato_activo": null
       },
       "spappweb": null
@@ -597,7 +597,7 @@
       "placa": "DXY38H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 28,
+        "pagos": 181,
         "aliado": "MIGUEL F.",
         "veces_vendida": 3
       },
@@ -610,7 +610,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 181,
         "contrato_activo": null
       },
       "spappweb": null
@@ -619,7 +619,7 @@
       "placa": "MLZ06F",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 63,
         "aliado": null,
         "veces_vendida": null
       },
@@ -632,7 +632,7 @@
         "modelo": "2020",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 63,
         "contrato_activo": null
       },
       "spappweb": null
@@ -641,7 +641,7 @@
       "placa": "MDF63H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 221,
         "aliado": null,
         "veces_vendida": null
       },
@@ -654,7 +654,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 32,
+        "tarifas_pagadas": 221,
         "contrato_activo": null
       },
       "spappweb": null
@@ -674,7 +674,7 @@
       "placa": "DXY78H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 145,
+        "pagos": 241,
         "aliado": "OMAR",
         "veces_vendida": 2
       },
@@ -687,7 +687,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 126,
+        "tarifas_pagadas": 241,
         "contrato_activo": null
       },
       "spappweb": null
@@ -696,7 +696,7 @@
       "placa": "KGC93I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -718,7 +718,7 @@
       "placa": "RBE02H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 159,
         "aliado": null,
         "veces_vendida": null
       },
@@ -731,7 +731,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 101,
+        "tarifas_pagadas": 159,
         "contrato_activo": null
       },
       "spappweb": null
@@ -740,7 +740,7 @@
       "placa": "KFF91I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 0,
         "aliado": null,
         "veces_vendida": null
       },
@@ -762,7 +762,7 @@
       "placa": "TTE30H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 178,
         "aliado": null,
         "veces_vendida": null
       },
@@ -775,7 +775,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 76,
+        "tarifas_pagadas": 178,
         "contrato_activo": null
       },
       "spappweb": null
@@ -784,7 +784,7 @@
       "placa": "TSK35H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 238,
         "aliado": null,
         "veces_vendida": null
       },
@@ -797,7 +797,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 31,
+        "tarifas_pagadas": 238,
         "contrato_activo": null
       },
       "spappweb": null
@@ -806,7 +806,7 @@
       "placa": "GZJ30I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 11,
         "aliado": null,
         "veces_vendida": null
       },
@@ -819,7 +819,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 8,
+        "tarifas_pagadas": 11,
         "contrato_activo": null
       },
       "spappweb": null
@@ -828,7 +828,7 @@
       "placa": "GZV91I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 28,
         "aliado": null,
         "veces_vendida": null
       },
@@ -841,7 +841,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 20,
+        "tarifas_pagadas": 28,
         "contrato_activo": null
       },
       "spappweb": null
@@ -850,7 +850,7 @@
       "placa": "JRI15H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 17,
+        "pagos": 218,
         "aliado": "Oscar Jairo Fletcher Prieto",
         "veces_vendida": 2
       },
@@ -863,7 +863,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 17,
+        "tarifas_pagadas": 218,
         "contrato_activo": null
       },
       "spappweb": null
@@ -872,7 +872,7 @@
       "placa": "GAR95H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 312,
         "aliado": null,
         "veces_vendida": null
       },
@@ -885,7 +885,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 41,
+        "tarifas_pagadas": 312,
         "contrato_activo": null
       },
       "spappweb": null
@@ -894,7 +894,7 @@
       "placa": "RBJ51H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 163,
         "aliado": null,
         "veces_vendida": null
       },
@@ -907,7 +907,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 51,
+        "tarifas_pagadas": 163,
         "contrato_activo": null
       },
       "spappweb": null
@@ -927,7 +927,7 @@
       "placa": null,
       "numero_serie": "JRI18H",
       "placasweb": {
-        "pagos": 211,
+        "pagos": 357,
         "aliado": "Oscar Jairo Fletcher Prieto",
         "veces_vendida": 3
       },
@@ -940,7 +940,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 211,
+        "tarifas_pagadas": 357,
         "contrato_activo": null
       },
       "spappweb": null
@@ -949,7 +949,7 @@
       "placa": "RAU98H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 117,
         "aliado": null,
         "veces_vendida": null
       },
@@ -962,7 +962,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 32,
+        "tarifas_pagadas": 117,
         "contrato_activo": null
       },
       "spappweb": null
@@ -982,7 +982,7 @@
       "placa": "DUW31I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 62,
         "aliado": null,
         "veces_vendida": null
       },
@@ -995,7 +995,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 62,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1004,7 +1004,7 @@
       "placa": "TSK29H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 133,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1017,7 +1017,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 35,
+        "tarifas_pagadas": 133,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1026,7 +1026,7 @@
       "placa": "TIK40H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 48,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1039,7 +1039,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 48,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1048,7 +1048,7 @@
       "placa": "JRP40H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 265,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1061,7 +1061,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 124,
+        "tarifas_pagadas": 265,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1070,7 +1070,7 @@
       "placa": "TIF35H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 127,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1083,7 +1083,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 47,
+        "tarifas_pagadas": 127,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1092,7 +1092,7 @@
       "placa": "DVL10I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 37,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1105,7 +1105,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 37,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1114,7 +1114,7 @@
       "placa": "MDF69H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 269,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1127,7 +1127,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 199,
+        "tarifas_pagadas": 269,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1149,7 +1149,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 112,
+        "tarifas_pagadas": 178,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1158,7 +1158,7 @@
       "placa": null,
       "numero_serie": "OSP33H",
       "placasweb": {
-        "pagos": 30,
+        "pagos": 76,
         "aliado": "HENRY",
         "veces_vendida": 4
       },
@@ -1171,7 +1171,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 30,
+        "tarifas_pagadas": 76,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1180,7 +1180,7 @@
       "placa": "ZOQ11H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 165,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1193,7 +1193,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 81,
+        "tarifas_pagadas": 165,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1202,7 +1202,7 @@
       "placa": "MDC24H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 66,
+        "pagos": 104,
         "aliado": "Gustavo Adolfo Mazenett Guerrero",
         "veces_vendida": 2
       },
@@ -1215,7 +1215,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 66,
+        "tarifas_pagadas": 104,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1224,7 +1224,7 @@
       "placa": "RBA92H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 204,
+        "pagos": 250,
         "aliado": "GABRIELA",
         "veces_vendida": 2
       },
@@ -1237,7 +1237,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 144,
+        "tarifas_pagadas": 250,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1246,7 +1246,7 @@
       "placa": "GZV95I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 28,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1259,7 +1259,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 4,
+        "tarifas_pagadas": 28,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1281,7 +1281,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 49,
+        "tarifas_pagadas": 65,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1290,7 +1290,7 @@
       "placa": "RAQ81H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 81,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1303,7 +1303,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 27,
+        "tarifas_pagadas": 81,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1312,7 +1312,7 @@
       "placa": "OSP22H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 111,
+        "pagos": 253,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -1325,7 +1325,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 111,
+        "tarifas_pagadas": 253,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1347,7 +1347,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 26,
+        "tarifas_pagadas": 112,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1356,7 +1356,7 @@
       "placa": "ZPG10H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 65,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1369,7 +1369,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 41,
+        "tarifas_pagadas": 65,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1378,7 +1378,7 @@
       "placa": "HKY80H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 10,
+        "pagos": 111,
         "aliado": "Santiago Andres Saenz Pinilla",
         "veces_vendida": 1
       },
@@ -1391,7 +1391,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 111,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1400,7 +1400,7 @@
       "placa": "TIU21H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 151,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1413,7 +1413,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 63,
+        "tarifas_pagadas": 151,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1422,7 +1422,7 @@
       "placa": "TRW48H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 196,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1435,7 +1435,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 134,
+        "tarifas_pagadas": 196,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1444,7 +1444,7 @@
       "placa": "TRS96H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 83,
+        "pagos": 86,
         "aliado": "HENRY",
         "veces_vendida": 1
       },
@@ -1457,7 +1457,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 86,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1466,7 +1466,7 @@
       "placa": "TIT43H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 65,
+        "pagos": 165,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 4
       },
@@ -1479,7 +1479,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 65,
+        "tarifas_pagadas": 165,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1488,7 +1488,7 @@
       "placa": "TTO92H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 48,
+        "pagos": 61,
         "aliado": "HENRY",
         "veces_vendida": 1
       },
@@ -1501,7 +1501,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 48,
+        "tarifas_pagadas": 61,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1523,7 +1523,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 17,
+        "tarifas_pagadas": 25,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1567,7 +1567,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 4,
+        "tarifas_pagadas": 8,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1576,7 +1576,7 @@
       "placa": "TSI08H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 67,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1589,7 +1589,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 67,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1633,7 +1633,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 9,
+        "tarifas_pagadas": 24,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1655,7 +1655,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 76,
+        "tarifas_pagadas": 125,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1664,7 +1664,7 @@
       "placa": "JRP58H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 167,
+        "pagos": 202,
         "aliado": "ESPERANZA",
         "veces_vendida": 4
       },
@@ -1677,7 +1677,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 96,
+        "tarifas_pagadas": 202,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1686,7 +1686,7 @@
       "placa": "OSE81H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 136,
+        "pagos": 188,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 3
       },
@@ -1699,7 +1699,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 136,
+        "tarifas_pagadas": 188,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1708,7 +1708,7 @@
       "placa": null,
       "numero_serie": "ZPG09H",
       "placasweb": {
-        "pagos": 67,
+        "pagos": 121,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 1
       },
@@ -1721,7 +1721,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 121,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1741,7 +1741,7 @@
       "placa": "TIL55H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 26,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1754,7 +1754,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 6,
+        "tarifas_pagadas": 26,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1763,7 +1763,7 @@
       "placa": "QFW45G",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 283,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1776,7 +1776,7 @@
         "modelo": "2024",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 7,
+        "tarifas_pagadas": 283,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1785,7 +1785,7 @@
       "placa": "DYA96H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 270,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1798,7 +1798,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 54,
+        "tarifas_pagadas": 270,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1807,7 +1807,7 @@
       "placa": "JRM96H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 169,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1820,7 +1820,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 39,
+        "tarifas_pagadas": 169,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1829,7 +1829,7 @@
       "placa": "TIQ85H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 167,
+        "pagos": 166,
         "aliado": "DANA",
         "veces_vendida": 1
       },
@@ -1842,7 +1842,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 19,
+        "tarifas_pagadas": 166,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1851,7 +1851,7 @@
       "placa": "JRM97H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 34,
+        "pagos": 120,
         "aliado": "JORGE",
         "veces_vendida": 3
       },
@@ -1864,7 +1864,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 34,
+        "tarifas_pagadas": 120,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1873,7 +1873,7 @@
       "placa": "JRQ57H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 60,
+        "pagos": 199,
         "aliado": "Jorge Alberto Riveros Calderon",
         "veces_vendida": 2
       },
@@ -1886,7 +1886,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 199,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1895,7 +1895,7 @@
       "placa": "DXZ78H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 77,
+        "pagos": 159,
         "aliado": "Omar Enrique Gomez Arevalo",
         "veces_vendida": 5
       },
@@ -1908,7 +1908,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 77,
+        "tarifas_pagadas": 159,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1930,7 +1930,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 39,
+        "tarifas_pagadas": 86,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1939,7 +1939,7 @@
       "placa": "TIF44H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 48,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1952,7 +1952,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 48,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1974,7 +1974,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 155,
+        "tarifas_pagadas": 177,
         "contrato_activo": null
       },
       "spappweb": null
@@ -1983,7 +1983,7 @@
       "placa": "JRQ59H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 194,
         "aliado": null,
         "veces_vendida": null
       },
@@ -1996,7 +1996,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 86,
+        "tarifas_pagadas": 194,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2005,7 +2005,7 @@
       "placa": null,
       "numero_serie": "TTJ70H",
       "placasweb": {
-        "pagos": 24,
+        "pagos": 23,
         "aliado": "JAIRO",
         "veces_vendida": 1
       },
@@ -2018,7 +2018,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 6,
+        "tarifas_pagadas": 23,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2027,7 +2027,7 @@
       "placa": "MCO74H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 268,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2040,7 +2040,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 157,
+        "tarifas_pagadas": 268,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2062,7 +2062,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 33,
+        "tarifas_pagadas": 83,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2084,7 +2084,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 2,
+        "tarifas_pagadas": 3,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2115,7 +2115,7 @@
       "placa": "RAZ51H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 100,
+        "pagos": 248,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -2128,7 +2128,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 196,
+        "tarifas_pagadas": 248,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2137,7 +2137,7 @@
       "placa": "OSP37H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 56,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2150,7 +2150,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 45,
+        "tarifas_pagadas": 56,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2172,7 +2172,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 153,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2181,7 +2181,7 @@
       "placa": "ZPF98H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 45,
+        "pagos": 46,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 1
       },
@@ -2194,7 +2194,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 45,
+        "tarifas_pagadas": 46,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2203,7 +2203,7 @@
       "placa": "OSP29H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 70,
+        "pagos": 72,
         "aliado": "HENRY",
         "veces_vendida": 3
       },
@@ -2216,7 +2216,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 43,
+        "tarifas_pagadas": 72,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2225,7 +2225,7 @@
       "placa": "TTO99H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 36,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2238,7 +2238,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 6,
+        "tarifas_pagadas": 36,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2247,7 +2247,7 @@
       "placa": "OSM71H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 204,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2260,7 +2260,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 147,
+        "tarifas_pagadas": 204,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2269,7 +2269,7 @@
       "placa": "TSC22H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 187,
+        "pagos": 188,
         "aliado": "HENRY",
         "veces_vendida": 1
       },
@@ -2282,7 +2282,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 90,
+        "tarifas_pagadas": 188,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2291,7 +2291,7 @@
       "placa": "TRS93H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 41,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2304,7 +2304,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 9,
+        "tarifas_pagadas": 41,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2326,7 +2326,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 12,
+        "tarifas_pagadas": 90,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2335,7 +2335,7 @@
       "placa": "RBA98H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 88,
+        "pagos": 87,
         "aliado": "MARTA S",
         "veces_vendida": 1
       },
@@ -2348,7 +2348,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 87,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2357,7 +2357,7 @@
       "placa": "TIN95H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 88,
+        "pagos": 114,
         "aliado": "HENRY",
         "veces_vendida": 3
       },
@@ -2370,7 +2370,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 63,
+        "tarifas_pagadas": 114,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2392,7 +2392,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 125,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2414,7 +2414,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 38,
+        "tarifas_pagadas": 139,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2423,7 +2423,7 @@
       "placa": "JRK24H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 228,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2436,7 +2436,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 74,
+        "tarifas_pagadas": 228,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2458,7 +2458,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 30,
+        "tarifas_pagadas": 46,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2467,7 +2467,7 @@
       "placa": "RBH88H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 54,
+        "pagos": 55,
         "aliado": "OSCAR",
         "veces_vendida": 1
       },
@@ -2480,7 +2480,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 50,
+        "tarifas_pagadas": 55,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2502,7 +2502,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 25,
+        "tarifas_pagadas": 43,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2511,7 +2511,7 @@
       "placa": "OSQ28H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 82,
+        "pagos": 83,
         "aliado": "NELSON",
         "veces_vendida": 2
       },
@@ -2524,7 +2524,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 55,
+        "tarifas_pagadas": 83,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2546,7 +2546,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 32,
+        "tarifas_pagadas": 83,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2568,7 +2568,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 42,
+        "tarifas_pagadas": 78,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2590,7 +2590,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 59,
+        "tarifas_pagadas": 72,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2612,7 +2612,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 48,
+        "tarifas_pagadas": 71,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2634,7 +2634,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 29,
+        "tarifas_pagadas": 75,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2643,7 +2643,7 @@
       "placa": "MDK81H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 40,
+        "pagos": 117,
         "aliado": "Oscar Jairo Fletcher Prieto",
         "veces_vendida": 4
       },
@@ -2656,7 +2656,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 40,
+        "tarifas_pagadas": 117,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2676,7 +2676,7 @@
       "placa": "TIL53H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 13,
+        "pagos": 20,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -2689,7 +2689,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 20,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2698,7 +2698,7 @@
       "placa": "RBJ55H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 132,
+        "pagos": 133,
         "aliado": "KRIZIA",
         "veces_vendida": 1
       },
@@ -2711,7 +2711,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 122,
+        "tarifas_pagadas": 133,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2742,7 +2742,7 @@
       "placa": "ZQC07H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 14,
+        "pagos": 16,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 1
       },
@@ -2755,7 +2755,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 14,
+        "tarifas_pagadas": 16,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2764,7 +2764,7 @@
       "placa": "TSC71H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 4,
+        "pagos": 25,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -2777,7 +2777,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 4,
+        "tarifas_pagadas": 25,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2799,7 +2799,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 16,
+        "tarifas_pagadas": 111,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2808,7 +2808,7 @@
       "placa": null,
       "numero_serie": "TIU01H",
       "placasweb": {
-        "pagos": 21,
+        "pagos": 123,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -2821,7 +2821,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 21,
+        "tarifas_pagadas": 123,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2830,7 +2830,7 @@
       "placa": "ZQC04H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 88,
         "aliado": null,
         "veces_vendida": null
       },
@@ -2843,7 +2843,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 21,
+        "tarifas_pagadas": 88,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2865,7 +2865,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 2,
+        "tarifas_pagadas": 18,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2887,7 +2887,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 12,
+        "tarifas_pagadas": 15,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2909,7 +2909,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 84,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2918,7 +2918,7 @@
       "placa": "OSQ27H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 22,
+        "pagos": 103,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -2931,7 +2931,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 22,
+        "tarifas_pagadas": 103,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2953,7 +2953,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 6,
+        "tarifas_pagadas": 18,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2975,7 +2975,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 15,
+        "tarifas_pagadas": 39,
         "contrato_activo": null
       },
       "spappweb": null
@@ -2984,7 +2984,7 @@
       "placa": "RAU96H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 114,
+        "pagos": 199,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -2997,7 +2997,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 114,
+        "tarifas_pagadas": 199,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3019,7 +3019,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 19,
+        "tarifas_pagadas": 65,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3041,7 +3041,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 40,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3063,7 +3063,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 61,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3072,7 +3072,7 @@
       "placa": "THX42H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 37,
+        "pagos": 83,
         "aliado": "HENRY",
         "veces_vendida": 1
       },
@@ -3085,7 +3085,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 37,
+        "tarifas_pagadas": 83,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3116,7 +3116,7 @@
       "placa": "TSR13H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 12,
+        "pagos": 42,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -3129,7 +3129,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 12,
+        "tarifas_pagadas": 42,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3138,7 +3138,7 @@
       "placa": "ZPL72H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 48,
+        "pagos": 47,
         "aliado": "MIGUEL",
         "veces_vendida": 1
       },
@@ -3151,7 +3151,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 5,
+        "tarifas_pagadas": 47,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3173,7 +3173,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 34,
+        "tarifas_pagadas": 51,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3182,7 +3182,7 @@
       "placa": "OSP35H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 199,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3195,7 +3195,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 191,
+        "tarifas_pagadas": 199,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3204,7 +3204,7 @@
       "placa": "ZOT02H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 28,
+        "pagos": 60,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -3217,7 +3217,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 42,
+        "tarifas_pagadas": 60,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3226,7 +3226,7 @@
       "placa": "TIF40H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 135,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3239,7 +3239,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 69,
+        "tarifas_pagadas": 135,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3248,7 +3248,7 @@
       "placa": "RAZ80H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 118,
+        "pagos": 235,
         "aliado": "Henry Albeiro Montoya Jimenez",
         "veces_vendida": 2
       },
@@ -3261,7 +3261,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 118,
+        "tarifas_pagadas": 235,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3281,7 +3281,7 @@
       "placa": "GZV96I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 50,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3294,7 +3294,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 23,
+        "tarifas_pagadas": 50,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3303,7 +3303,7 @@
       "placa": "ORZ11H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 297,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3316,7 +3316,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 160,
+        "tarifas_pagadas": 297,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3325,7 +3325,7 @@
       "placa": "OSE80H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 106,
+        "pagos": 107,
         "aliado": "HENRY",
         "veces_vendida": 1
       },
@@ -3338,7 +3338,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 26,
+        "tarifas_pagadas": 107,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3347,7 +3347,7 @@
       "placa": null,
       "numero_serie": "TTE98H",
       "placasweb": {
-        "pagos": 44,
+        "pagos": 79,
         "aliado": "HENRY",
         "veces_vendida": 2
       },
@@ -3360,7 +3360,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 44,
+        "tarifas_pagadas": 79,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3369,7 +3369,7 @@
       "placa": "MDC23H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 43,
+        "pagos": 145,
         "aliado": "OLGA",
         "veces_vendida": 1
       },
@@ -3382,7 +3382,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 43,
+        "tarifas_pagadas": 145,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3391,7 +3391,7 @@
       "placa": "OSE78H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": 104,
+        "pagos": 105,
         "aliado": "HENRY",
         "veces_vendida": 3
       },
@@ -3404,7 +3404,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 105,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3413,7 +3413,7 @@
       "placa": "TIU50H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 88,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3426,7 +3426,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 55,
+        "tarifas_pagadas": 88,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3435,7 +3435,7 @@
       "placa": "RAZ81H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 102,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3448,7 +3448,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 28,
+        "tarifas_pagadas": 102,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3457,7 +3457,7 @@
       "placa": "TSR11H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 173,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3470,7 +3470,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 31,
+        "tarifas_pagadas": 173,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3479,7 +3479,7 @@
       "placa": "RBJ54H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 116,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3492,7 +3492,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 90,
+        "tarifas_pagadas": 116,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3501,7 +3501,7 @@
       "placa": "TIB73H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 110,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3514,7 +3514,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 6,
-        "tarifas_pagadas": 72,
+        "tarifas_pagadas": 110,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3523,7 +3523,7 @@
       "placa": "OSP23H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 64,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3536,7 +3536,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 5,
-        "tarifas_pagadas": 22,
+        "tarifas_pagadas": 64,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3545,7 +3545,7 @@
       "placa": "TRW50H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 266,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3558,7 +3558,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 266,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3567,7 +3567,7 @@
       "placa": "OSR71H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 159,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3580,7 +3580,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 47,
+        "tarifas_pagadas": 159,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3589,7 +3589,7 @@
       "placa": "MDK87H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 182,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3602,7 +3602,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 82,
+        "tarifas_pagadas": 182,
         "contrato_activo": {
           "contrato_id": 2755,
           "estado": "Activo",
@@ -3618,7 +3618,7 @@
       "placa": "GZJ31I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 105,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3631,7 +3631,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 53,
+        "tarifas_pagadas": 105,
         "contrato_activo": {
           "contrato_id": 1955,
           "estado": "Activo",
@@ -3647,7 +3647,7 @@
       "placa": "GAN66H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 403,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3660,7 +3660,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 183,
+        "tarifas_pagadas": 403,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3669,7 +3669,7 @@
       "placa": "HAO83I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 24,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3682,7 +3682,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 17,
+        "tarifas_pagadas": 24,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3691,7 +3691,7 @@
       "placa": "DTV73I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 70,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3704,7 +3704,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 35,
+        "tarifas_pagadas": 70,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3713,7 +3713,7 @@
       "placa": "JRM99H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 370,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3726,7 +3726,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 137,
+        "tarifas_pagadas": 370,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3735,7 +3735,7 @@
       "placa": "DTV98I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 128,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3748,7 +3748,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 77,
+        "tarifas_pagadas": 128,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3757,7 +3757,7 @@
       "placa": "MCR31H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 170,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3770,7 +3770,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 60,
+        "tarifas_pagadas": 170,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3779,7 +3779,7 @@
       "placa": "GZM50I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 73,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3792,7 +3792,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 49,
+        "tarifas_pagadas": 73,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3801,7 +3801,7 @@
       "placa": "KFF89I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 2,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3814,7 +3814,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 1,
+        "tarifas_pagadas": 2,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3823,7 +3823,7 @@
       "placa": "ZPG15H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 47,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3836,7 +3836,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 26,
+        "tarifas_pagadas": 47,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3845,7 +3845,7 @@
       "placa": "TSI70H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 122,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3858,7 +3858,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 20,
+        "tarifas_pagadas": 122,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3867,7 +3867,7 @@
       "placa": "ZPE10H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 126,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3880,7 +3880,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 126,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3889,7 +3889,7 @@
       "placa": "KFF92I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 2,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3902,7 +3902,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 1,
+        "tarifas_pagadas": 2,
         "contrato_activo": {
           "contrato_id": 2878,
           "estado": "Activo",
@@ -3918,7 +3918,7 @@
       "placa": "DTW21I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 120,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3931,7 +3931,7 @@
         "modelo": "2027",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 41,
+        "tarifas_pagadas": 120,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3940,7 +3940,7 @@
       "placa": "HAB87I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 13,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3953,7 +3953,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 10,
+        "tarifas_pagadas": 13,
         "contrato_activo": {
           "contrato_id": 2699,
           "estado": "Activo",
@@ -3969,7 +3969,7 @@
       "placa": "TTD86H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 39,
         "aliado": null,
         "veces_vendida": null
       },
@@ -3982,7 +3982,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 29,
+        "tarifas_pagadas": 39,
         "contrato_activo": null
       },
       "spappweb": null
@@ -3991,7 +3991,7 @@
       "placa": "TSC62H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 219,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4004,7 +4004,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 52,
+        "tarifas_pagadas": 219,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4013,7 +4013,7 @@
       "placa": "TTL13H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 179,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4026,7 +4026,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 31,
+        "tarifas_pagadas": 179,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4035,7 +4035,7 @@
       "placa": "TIJ67H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 221,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4048,7 +4048,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 100,
+        "tarifas_pagadas": 221,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4057,7 +4057,7 @@
       "placa": "GZO61I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 92,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4070,7 +4070,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 92,
         "contrato_activo": {
           "contrato_id": 2617,
           "estado": "Activo",
@@ -4086,7 +4086,7 @@
       "placa": "DUP84I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 65,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4099,7 +4099,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 49,
+        "tarifas_pagadas": 65,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4119,7 +4119,7 @@
       "placa": "DTV68I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 76,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4132,7 +4132,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 12,
+        "tarifas_pagadas": 76,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4141,7 +4141,7 @@
       "placa": "TSD69H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 90,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4154,7 +4154,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 32,
+        "tarifas_pagadas": 90,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4163,7 +4163,7 @@
       "placa": "TTE33H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 69,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4176,7 +4176,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 51,
+        "tarifas_pagadas": 69,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4185,7 +4185,7 @@
       "placa": "ZOK40H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 135,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4198,7 +4198,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 67,
+        "tarifas_pagadas": 135,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4218,7 +4218,7 @@
       "placa": "TIO22H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 178,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4231,7 +4231,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 52,
+        "tarifas_pagadas": 178,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4251,7 +4251,7 @@
       "placa": "DVF05I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 93,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4264,7 +4264,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 36,
+        "tarifas_pagadas": 93,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4273,7 +4273,7 @@
       "placa": "TSQ38H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 129,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4286,7 +4286,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 22,
+        "tarifas_pagadas": 129,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4306,7 +4306,7 @@
       "placa": "ESW09I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 22,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4319,7 +4319,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 17,
+        "tarifas_pagadas": 22,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4328,7 +4328,7 @@
       "placa": "TTA02H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 142,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4341,7 +4341,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 64,
+        "tarifas_pagadas": 142,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4350,7 +4350,7 @@
       "placa": "TIJ76H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 285,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4363,7 +4363,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 3,
-        "tarifas_pagadas": 30,
+        "tarifas_pagadas": 285,
         "contrato_activo": {
           "contrato_id": 2309,
           "estado": "Activo",
@@ -4379,7 +4379,7 @@
       "placa": "ZPI34H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 215,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4392,7 +4392,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 134,
+        "tarifas_pagadas": 215,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4401,7 +4401,7 @@
       "placa": "TSD65H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 113,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4414,7 +4414,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 32,
+        "tarifas_pagadas": 113,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4423,7 +4423,7 @@
       "placa": "TTE31H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 95,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4436,7 +4436,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 46,
+        "tarifas_pagadas": 95,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4445,7 +4445,7 @@
       "placa": "TSI99H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 226,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4458,7 +4458,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 142,
+        "tarifas_pagadas": 226,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4467,7 +4467,7 @@
       "placa": "TSI74H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 165,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4480,7 +4480,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 56,
+        "tarifas_pagadas": 165,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4489,7 +4489,7 @@
       "placa": "ZPE05H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 115,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4502,7 +4502,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 26,
+        "tarifas_pagadas": 115,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4511,7 +4511,7 @@
       "placa": "TSQ37H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 103,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4524,7 +4524,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 51,
+        "tarifas_pagadas": 103,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4533,7 +4533,7 @@
       "placa": "TSI84H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 127,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4546,7 +4546,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 72,
+        "tarifas_pagadas": 127,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4555,7 +4555,7 @@
       "placa": "ZPE04H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 178,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4568,7 +4568,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 86,
+        "tarifas_pagadas": 178,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4577,7 +4577,7 @@
       "placa": "TTE17H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 130,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4590,7 +4590,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 17,
+        "tarifas_pagadas": 130,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4599,7 +4599,7 @@
       "placa": "TTE22H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 121,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4612,7 +4612,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 98,
+        "tarifas_pagadas": 121,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4621,7 +4621,7 @@
       "placa": "DUP79I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 49,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4634,7 +4634,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 5,
+        "tarifas_pagadas": 49,
         "contrato_activo": {
           "contrato_id": 2493,
           "estado": "Activo",
@@ -4683,7 +4683,7 @@
       "placa": "DTV97I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 76,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4696,7 +4696,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 76,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4705,7 +4705,7 @@
       "placa": "TIK76H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 55,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4718,7 +4718,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 20,
+        "tarifas_pagadas": 55,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4760,7 +4760,7 @@
       "placa": "TRT06H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 226,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4773,7 +4773,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Activo",
         "veces_vendida": 2,
-        "tarifas_pagadas": 27,
+        "tarifas_pagadas": 226,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4793,7 +4793,7 @@
       "placa": "TTL01H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 85,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4806,7 +4806,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 3,
-        "tarifas_pagadas": 44,
+        "tarifas_pagadas": 85,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4815,7 +4815,7 @@
       "placa": "TST02H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 124,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4828,7 +4828,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 44,
+        "tarifas_pagadas": 124,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4837,7 +4837,7 @@
       "placa": "TSI95H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 164,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4850,7 +4850,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 4,
-        "tarifas_pagadas": 54,
+        "tarifas_pagadas": 164,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4859,7 +4859,7 @@
       "placa": "TTE21H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 141,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4872,7 +4872,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 58,
+        "tarifas_pagadas": 141,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4881,7 +4881,7 @@
       "placa": "ZOK39H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 103,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4894,7 +4894,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 3,
-        "tarifas_pagadas": 42,
+        "tarifas_pagadas": 103,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4903,7 +4903,7 @@
       "placa": "TSD61H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 142,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4916,7 +4916,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 53,
+        "tarifas_pagadas": 142,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4925,7 +4925,7 @@
       "placa": "TST05H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 53,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4938,7 +4938,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 29,
+        "tarifas_pagadas": 53,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4947,7 +4947,7 @@
       "placa": "TSQ51H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 91,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4960,7 +4960,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 13,
+        "tarifas_pagadas": 91,
         "contrato_activo": null
       },
       "spappweb": null
@@ -4980,7 +4980,7 @@
       "placa": "HAQ75I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 19,
         "aliado": null,
         "veces_vendida": null
       },
@@ -4993,7 +4993,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 2,
+        "tarifas_pagadas": 19,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5015,7 +5015,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 119,
+        "tarifas_pagadas": 170,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5035,7 +5035,7 @@
       "placa": "TTO55H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 158,
         "aliado": null,
         "veces_vendida": null
       },
@@ -5048,7 +5048,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Inactivo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 44,
+        "tarifas_pagadas": 158,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5079,7 +5079,7 @@
       "placa": "DTV67I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 142,
         "aliado": null,
         "veces_vendida": null
       },
@@ -5092,7 +5092,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 29,
+        "tarifas_pagadas": 142,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5101,7 +5101,7 @@
       "placa": "TSI94H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 223,
         "aliado": null,
         "veces_vendida": null
       },
@@ -5114,7 +5114,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Activo",
         "veces_vendida": 1,
-        "tarifas_pagadas": 83,
+        "tarifas_pagadas": 223,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5134,7 +5134,7 @@
       "placa": "DTV86I",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 131,
         "aliado": null,
         "veces_vendida": null
       },
@@ -5147,7 +5147,7 @@
         "modelo": "2026",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 2,
-        "tarifas_pagadas": 62,
+        "tarifas_pagadas": 131,
         "contrato_activo": null
       },
       "spappweb": null
@@ -5167,7 +5167,7 @@
       "placa": "TTL24H",
       "numero_serie": null,
       "placasweb": {
-        "pagos": null,
+        "pagos": 43,
         "aliado": null,
         "veces_vendida": null
       },
@@ -5180,7 +5180,7 @@
         "modelo": "2025",
         "estado_vehiculo": "Vitrina",
         "veces_vendida": 1,
-        "tarifas_pagadas": 38,
+        "tarifas_pagadas": 43,
         "contrato_activo": null
       },
       "spappweb": null
