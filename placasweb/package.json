@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start --port 3001",
     "lint": "eslint",
-    "check:motos": "node --experimental-strip-types src/lib/motos/validation.check.ts && node --experimental-strip-types src/lib/motos/search.check.ts && node --experimental-strip-types src/lib/motos/csv.check.ts && node --experimental-strip-types src/lib/motos/periodo.check.ts"
+    "check:motos": "node --experimental-strip-types src/lib/motos/validation.check.ts && node --experimental-strip-types src/lib/motos/search.check.ts && node --experimental-strip-types src/lib/motos/csv.check.ts && node --experimental-strip-types src/lib/motos/periodo.check.ts && node --experimental-strip-types src/lib/motos/cruce.check.ts",
+    "cruce:agosto": "python scripts/cruzar_periodo.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

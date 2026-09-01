@@ -1,0 +1,5189 @@
+{
+  "generado": "2026-09-01T16:21:49.886113+00:00",
+  "periodo": {
+    "desde": "2026-08-23",
+    "hasta": "2026-08-31"
+  },
+  "resumen": {
+    "total": 245,
+    "sin_viaduct": 24,
+    "sin_spappweb": 245
+  },
+  "motos": {
+    "ad3d4f3f-37f5-4a3b-849e-0f8034e16b6a": {
+      "placa": "ERY81I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2624,
+        "placa_viaduct": "ERY81I",
+        "serie_viaduct": "Milan 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "796db253-6a7a-4614-9d5e-5571072b9f3f": {
+      "placa": "KGL40I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "8b34f25f-d7d1-4b26-ae20-d3618cf93c16": {
+      "placa": "JRU72H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 64,
+        "aliado": "MIGUEL F.",
+        "veces_vendida": 5
+      },
+      "viaduct": {
+        "vehiculo_id": 1361,
+        "placa_viaduct": "JRU72H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Miguel Fernando Bernal Castañeda",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 5,
+        "tarifas_pagadas": 64,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5c16c923-c67c-422d-a3bb-9b3c738d218a": {
+      "placa": "RBH85H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1709,
+        "placa_viaduct": "RBH85H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Gustavo Adolfo Mazenett Guerrero",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 50,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c1e43647-c442-44af-b5fa-8e824717f454": {
+      "placa": "HLR39H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 67,
+        "aliado": "Omar Enrique Gomez Arevalo",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1476,
+        "placa_viaduct": "HLR39H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Omar Enrique Gomez Arevalo",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 67,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "52c08983-eab5-462b-91c1-b49ee8476c2a": {
+      "placa": "DTW25I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1892,
+        "placa_viaduct": "DTW25I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 10,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e1bf7aab-0f8c-41ca-a0ee-d898d25a7846": {
+      "placa": "DUR51I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2040,
+        "placa_viaduct": "DUR51I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 55,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5dc452b4-9f3a-43be-86d3-e8146d472097": {
+      "placa": "OSQ58H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1649,
+        "placa_viaduct": "OSQ58H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 77,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "9170c046-3646-429b-aa26-dafe52d715ca": {
+      "placa": "HAE04I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2572,
+        "placa_viaduct": "HAE04I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Miguel Fernando Bernal Castañeda",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 9,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "09093b7f-2283-4708-ae19-e58d1ee4353d": {
+      "placa": "TTJ61H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1817,
+        "placa_viaduct": "TTJ61H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 74,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "265b0b3b-7251-4d92-9b47-2722465f8ee2": {
+      "placa": "OSP39H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1632,
+        "placa_viaduct": "OSP39H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 64,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "34705159-cce2-4be2-8118-c0cfb42009a2": {
+      "placa": "DYC78H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1443,
+        "placa_viaduct": "DYC78H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 37,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "bf0791fa-d665-4d20-9f50-9d03bd562521": {
+      "placa": "JRP44H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1527,
+        "placa_viaduct": "JRP44H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Arcenio Angulo Angulo",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 28,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "747c2ed9-4bc4-4e87-95da-c2f0ecc65588": {
+      "placa": "TTD89H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 28,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1870,
+        "placa_viaduct": "TTD89H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 28,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d1996cc1-66a8-407f-b78d-2dad5d1a0f76": {
+      "placa": "KGC85I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2702,
+        "placa_viaduct": "KGC85I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8eaff7a8-dbb2-4260-836b-2dca64b8e071": {
+      "placa": "KGC89I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2701,
+        "placa_viaduct": "KGC89I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "24fce883-b5dd-4f0c-80f3-00db906ed4f8": {
+      "placa": "KGC95I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2703,
+        "placa_viaduct": "KGC95I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "7980d928-79bd-4d93-82be-cf554096dd29": {
+      "placa": "HAM90I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2705,
+        "placa_viaduct": "HAM90I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Dana - Uriel",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8d82bcfc-f6e7-465f-8018-68d4a281174f": {
+      "placa": "DUM05I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1749,
+        "placa_viaduct": "DUM05I",
+        "serie_viaduct": "Flex 110",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 45,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1da821a4-b56a-4afd-abe2-ee379678d4ab": {
+      "placa": "RBH86H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1706,
+        "placa_viaduct": "RBH86H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 38,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "de4f4114-3d29-4175-ba6c-f323d62906ba": {
+      "placa": "KFZ36I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2699,
+        "placa_viaduct": "KFZ36I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d8930626-e99f-42eb-ab09-9dfdb0bc093f": {
+      "placa": "KGC97I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2694,
+        "placa_viaduct": "KGC97I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "22161b84-9fbc-4323-a186-064e867aed76": {
+      "placa": "KFK34I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2697,
+        "placa_viaduct": "KFK34I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d63a1eeb-4f60-42fa-ae90-c7eeb128b70b": {
+      "placa": "KFU13I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2695,
+        "placa_viaduct": "KFU13I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "aef87000-17f4-4795-9f25-09b7f87b5711": {
+      "placa": "KGB56I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2700,
+        "placa_viaduct": "KGB56I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e49ec3fe-e679-41d1-ba34-1164c6e47173": {
+      "placa": "KGC91I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2704,
+        "placa_viaduct": "KGC91I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cdecd510-e6b5-4b1c-9905-709c5f9e3dfd": {
+      "placa": "GAR68H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 366,
+        "aliado": "GENNY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1504,
+        "placa_viaduct": "GAR68H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jenny Angelica Angulo Soledad",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 44,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "185a2d1d-88f5-4be9-a2d8-a0da90a8ffe4": {
+      "placa": "DXY38H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 28,
+        "aliado": "MIGUEL F.",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1356,
+        "placa_viaduct": "DXY38H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Miguel Fernando Bernal Castañeda",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 28,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4e469429-6820-4363-b023-7a6817231db0": {
+      "placa": "MLZ06F",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1343,
+        "placa_viaduct": "MLZ06F",
+        "serie_viaduct": "Rockz",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Tvs",
+        "modelo": "2020",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 37,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "35d738fb-2f6a-40f9-94c6-8d364eb94340": {
+      "placa": "MDF63H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1584,
+        "placa_viaduct": "MDF63H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Leonardo Giron Torres",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 32,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "62206a2a-504d-46e5-9ff6-54c842e25de6": {
+      "placa": "0850323",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "33318556-84db-4a57-9ecf-ed4980779338": {
+      "placa": "DXY78H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 145,
+        "aliado": "OMAR",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1463,
+        "placa_viaduct": "DXY78H",
+        "serie_viaduct": "Chr 125",
+        "propietario": "Ivan Javier Soledad Pinilla",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 126,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "fa0fc9f6-e40e-4f2f-b248-bda39de5fc85": {
+      "placa": "KGC93I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2696,
+        "placa_viaduct": "KGC93I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Felix Ricardo",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "26e75b05-123a-4348-9cca-4709f247b1b9": {
+      "placa": "RBE02H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1683,
+        "placa_viaduct": "RBE02H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 101,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8b895f85-2c73-438d-b1cf-5cc7aa852c21": {
+      "placa": "KFF91I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2622,
+        "placa_viaduct": "KFF91I",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "25715d16-7e52-4a68-8256-ffd6fdf0f1e5": {
+      "placa": "TTE30H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2273,
+        "placa_viaduct": "TTE30H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 76,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "160a1970-e788-4c96-a21e-1272f72b9768": {
+      "placa": "TSK35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2198,
+        "placa_viaduct": "TSK35H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 31,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ad4494d4-c6f4-4670-93e1-e0aa3011f10e": {
+      "placa": "GZJ30I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1771,
+        "placa_viaduct": "GZJ30I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 8,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e5cf7cf2-19df-4ce0-8ba3-3f9a3cf4e738": {
+      "placa": "GZV91I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1860,
+        "placa_viaduct": "GZV91I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 20,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2387573b-2708-45fa-b35e-2d8336577773": {
+      "placa": "JRI15H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 17,
+        "aliado": "Oscar Jairo Fletcher Prieto",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1450,
+        "placa_viaduct": "JRI15H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 17,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3fd27e59-506b-4d67-aa84-60d145ba71fc": {
+      "placa": "GAR95H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1493,
+        "placa_viaduct": "GAR95H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Martha Isabel Pinilla Abaunza",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 41,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a15cdd8e-411c-426a-9aab-b1d5e3108f72": {
+      "placa": "RBJ51H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1784,
+        "placa_viaduct": "RBJ51H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 51,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4416bd36-01d2-4b16-ba0a-0556654df36a": {
+      "placa": null,
+      "numero_serie": "012524",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "77cd60cf-377d-4d11-9f24-1a5ed6ef0968": {
+      "placa": null,
+      "numero_serie": "JRI18H",
+      "placasweb": {
+        "pagos": 211,
+        "aliado": "Oscar Jairo Fletcher Prieto",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1449,
+        "placa_viaduct": "JRI18H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 211,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "932f7853-f45c-47cd-8d0c-1e40e812be0b": {
+      "placa": "RAU98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1660,
+        "placa_viaduct": "RAU98H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 5,
+        "tarifas_pagadas": 32,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "86bc3826-90a8-4dad-9f2e-c7d16ea35e77": {
+      "placa": "JTG14F",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "63ff8106-6a97-4524-8336-bb7dfdc64ff3": {
+      "placa": "DUW31I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1845,
+        "placa_viaduct": "DUW31I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 13,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2fe183f1-a31f-46fd-a7a0-47d911bc08ff": {
+      "placa": "TSK29H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2188,
+        "placa_viaduct": "TSK29H",
+        "serie_viaduct": "",
+        "propietario": "Omar Enrique Gomez Arevalo",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 35,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "b774df29-29f5-41a6-af63-bc90229999b3": {
+      "placa": "TIK40H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1895,
+        "placa_viaduct": "TIK40H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 13,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "b0fe2513-e30e-4040-99a9-c9b0716accbb": {
+      "placa": "JRP40H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1550,
+        "placa_viaduct": "JRP40H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Esperanza Abaunza Sarmiento",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 5,
+        "tarifas_pagadas": 124,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "da8c7914-e706-47f3-a748-5fde722295ec": {
+      "placa": "TIF35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1896,
+        "placa_viaduct": "TIF35H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 47,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5f000d58-f1fc-45fc-9ead-247857a577ca": {
+      "placa": "DVL10I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1841,
+        "placa_viaduct": "DVL10I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 23,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5fe9c2f8-0e0d-48ea-941c-10ad53575f30": {
+      "placa": "MDF69H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1585,
+        "placa_viaduct": "MDF69H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Leonardo Giron Torres",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 199,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8e65d2a2-35e5-4de7-9210-145a8cef22cb": {
+      "placa": "JRH78H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 178,
+        "aliado": "DANIELA BA",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1575,
+        "placa_viaduct": "JRH78H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Daniela Bateca Mogollon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 112,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3a06700f-7cd7-41c6-9da2-afdd2d70e99d": {
+      "placa": null,
+      "numero_serie": "OSP33H",
+      "placasweb": {
+        "pagos": 30,
+        "aliado": "HENRY",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1630,
+        "placa_viaduct": "OSP33H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 30,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0174bd9a-57e8-47d3-9f0b-ade78bd33da4": {
+      "placa": "ZOQ11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1730,
+        "placa_viaduct": "ZOQ11H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 81,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "893251f5-d330-4b54-bfa4-081223b24946": {
+      "placa": "MDC24H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 66,
+        "aliado": "Gustavo Adolfo Mazenett Guerrero",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1520,
+        "placa_viaduct": "MDC24H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Gustavo Adolfo Mazenett Guerrero",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 66,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cb65c174-95a7-4acf-aa04-a876dc6dfc6c": {
+      "placa": "RBA92H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 204,
+        "aliado": "GABRIELA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1679,
+        "placa_viaduct": "RBA92H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 144,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1295aa0a-700d-41cb-9d07-c9ec7ea0343c": {
+      "placa": "GZV95I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1779,
+        "placa_viaduct": "GZV95I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 4,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a0a726b5-ad80-4a4e-a08c-263d1644cde6": {
+      "placa": "ZOJ11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 65,
+        "aliado": "IVAN APTO",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 2000,
+        "placa_viaduct": "ZOJ11H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 49,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e983a95c-ca93-4e98-928d-a25ba45a9246": {
+      "placa": "RAQ81H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1670,
+        "placa_viaduct": "RAQ81H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 27,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c72bbed4-9da4-4de9-8951-234a6826a173": {
+      "placa": "OSP22H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 111,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1622,
+        "placa_viaduct": "OSP22H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 111,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "adf88ed8-ddb6-461c-9742-9b0eb22365d3": {
+      "placa": "OSM74H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 112,
+        "aliado": "KRIZIA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1620,
+        "placa_viaduct": "OSM74H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 26,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "35e9b0e0-a3d6-4a3f-9447-1daff3bff64e": {
+      "placa": "ZPG10H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1876,
+        "placa_viaduct": "ZPG10H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 41,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5b64567b-87a8-4d28-9cba-de9a31c8c67d": {
+      "placa": "HKY80H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 10,
+        "aliado": "Santiago Andres Saenz Pinilla",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1501,
+        "placa_viaduct": "HKY80H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Santiago Andres Saenz Pinilla",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 10,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f19c6fd0-1c15-4855-bfb7-a87190781867": {
+      "placa": "TIU21H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1960,
+        "placa_viaduct": "TIU21H",
+        "serie_viaduct": "Chr 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 63,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "00195db4-4148-4f44-8b8e-972c0dd0d330": {
+      "placa": "TRW48H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1959,
+        "placa_viaduct": "TRW48H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 134,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8a547a4e-5cd3-451c-86ca-ada3fe32033d": {
+      "placa": "TRS96H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 83,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1950,
+        "placa_viaduct": "TRS96H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 83,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8b2b67df-2b33-41f7-90d4-7728bb3112e7": {
+      "placa": "TIT43H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 65,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1930,
+        "placa_viaduct": "TIT43H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 65,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "84367d5a-76ba-4db8-a03d-66a885d78862": {
+      "placa": "TTO92H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 48,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1987,
+        "placa_viaduct": "TTO92H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 48,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f2822314-3686-4855-8a2f-68dca3b6773d": {
+      "placa": "TIN92H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 25,
+        "aliado": "FABIAN",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1921,
+        "placa_viaduct": "TIN92H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 17,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "351a4769-63a4-4d71-92cd-0c8a8226aab7": {
+      "placa": null,
+      "numero_serie": "ZPG03H",
+      "placasweb": {
+        "pagos": 7,
+        "aliado": "MARIA C",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1877,
+        "placa_viaduct": "ZPG03H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 7,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ac3b4413-0c91-47cd-b5d3-f0d55e18e935": {
+      "placa": "TRW41H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 8,
+        "aliado": "GUSTAVO",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1962,
+        "placa_viaduct": "TRW41H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 4,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "97ab0f71-be3c-4c43-a55b-5962808a3033": {
+      "placa": "TSI08H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1863,
+        "placa_viaduct": "TSI08H",
+        "serie_viaduct": "Chr 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 37,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "aaa70c31-3af6-4878-ada4-7768b767982b": {
+      "placa": "TTJ62H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 1,
+        "aliado": "SANDRA",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1871,
+        "placa_viaduct": "TTJ62H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 1,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "213dea29-7043-491d-a37b-026c0a90b2c0": {
+      "placa": "TTO98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 24,
+        "aliado": "SANTI",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1873,
+        "placa_viaduct": "TTO98H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 9,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1cda3a50-4f81-4a02-9a74-b8a72d58330c": {
+      "placa": "TIR36H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 125,
+        "aliado": "MIGUEL",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1936,
+        "placa_viaduct": "TIR36H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 76,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a5dd6dc5-af37-431e-a486-2755b65d6105": {
+      "placa": "JRP58H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 167,
+        "aliado": "ESPERANZA",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1549,
+        "placa_viaduct": "JRP58H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Esperanza Abaunza Sarmiento",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 96,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4bf90b83-93ea-4c44-9f17-5477d9eb87af": {
+      "placa": "OSE81H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 136,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1593,
+        "placa_viaduct": "OSE81H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 136,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "86414a33-b596-459d-aea6-ccc3b4d75988": {
+      "placa": null,
+      "numero_serie": "ZPG09H",
+      "placasweb": {
+        "pagos": 67,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1878,
+        "placa_viaduct": "ZPG09H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 67,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1a75cb70-4302-4b7e-9277-a8088d5a43f5": {
+      "placa": "BYA76H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "0b4ef68f-cc02-4238-b6d2-b59b3b5ffec3": {
+      "placa": "TIL55H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1916,
+        "placa_viaduct": "TIL55H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 6,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4c1059b2-82a6-4f4c-a2b1-27560e15c173": {
+      "placa": "QFW45G",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1336,
+        "placa_viaduct": "QFW45G",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Akt",
+        "modelo": "2024",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 7,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "7bb4376c-fbe1-4723-a39b-97385044f453": {
+      "placa": "DYA96H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1441,
+        "placa_viaduct": "DYA96H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 54,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "368979fb-1781-42d0-a647-4cebe7a5720f": {
+      "placa": "JRM96H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1537,
+        "placa_viaduct": "JRM96H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jorge Alberto Riveros Calderon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 39,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a5177eea-09af-4fb1-bdb7-cfe822ccc8c2": {
+      "placa": "TIQ85H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 167,
+        "aliado": "DANA",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1966,
+        "placa_viaduct": "TIQ85H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 19,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "02fa9840-ddda-450d-a009-5d1bb366a787": {
+      "placa": "JRM97H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 34,
+        "aliado": "JORGE",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1543,
+        "placa_viaduct": "JRM97H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jorge Alberto Riveros Calderon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 34,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "aee3d1bb-c7dc-4ad9-ba14-299075ea6a27": {
+      "placa": "JRQ57H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 60,
+        "aliado": "Jorge Alberto Riveros Calderon",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1545,
+        "placa_viaduct": "JRQ57H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jorge Alberto Riveros Calderon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 60,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0599f255-cb42-4ef2-a9b8-8b1dd0be4475": {
+      "placa": "DXZ78H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 77,
+        "aliado": "Omar Enrique Gomez Arevalo",
+        "veces_vendida": 5
+      },
+      "viaduct": {
+        "vehiculo_id": 1475,
+        "placa_viaduct": "DXZ78H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Omar Enrique Gomez Arevalo",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 5,
+        "tarifas_pagadas": 77,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2e470045-4279-4652-ad5f-3c950f892884": {
+      "placa": "OSR73H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 86,
+        "aliado": "OLGA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1641,
+        "placa_viaduct": "OSR73H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 39,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e757a07a-d5c8-442d-919a-819663ed3799": {
+      "placa": "TIF44H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1903,
+        "placa_viaduct": "TIF44H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 23,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ccdd4fb5-1b55-40ce-869e-99bbae618106": {
+      "placa": "RBH89H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 177,
+        "aliado": "DANIELA BA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1708,
+        "placa_viaduct": "RBH89H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 155,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "91c4f2ec-95fa-4c0c-8ede-0b91ec49d679": {
+      "placa": "JRQ59H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1546,
+        "placa_viaduct": "JRQ59H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jorge Alberto Riveros Calderon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 86,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cee2700d-6fa7-4207-853f-45f39b165abd": {
+      "placa": null,
+      "numero_serie": "TTJ70H",
+      "placasweb": {
+        "pagos": 24,
+        "aliado": "JAIRO",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 2001,
+        "placa_viaduct": "TTJ70H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 6,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3fbdad74-155a-4bfb-9cd1-68a4f86c20ac": {
+      "placa": "MCO74H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1559,
+        "placa_viaduct": "MCO74H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Sandra Milena Avaunza Ramirez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 157,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "6d27565c-bc62-4cde-8057-51894ba5ee92": {
+      "placa": "TIF32H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 83,
+        "aliado": "OMAR",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1801,
+        "placa_viaduct": "TIF32H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 33,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0efe8b0e-d450-4f2f-a4e6-18fe246f844e": {
+      "placa": "TTO96H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 3,
+        "aliado": "IVONNE",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1821,
+        "placa_viaduct": "TTO96H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 2,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2b1adc3d-380b-4384-adb4-6ff1e5fc283e": {
+      "placa": "ZOQ10H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 3,
+        "aliado": "YENNIFER",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1732,
+        "placa_viaduct": "ZOQ10H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 3,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a3c85353-de22-4f80-86da-a49f42d9dad7": {
+      "placa": "RAZ51H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 100,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1674,
+        "placa_viaduct": "RAZ51H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 196,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c981fe89-0e77-4046-9f13-65a2cf1ed575": {
+      "placa": "OSP37H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1635,
+        "placa_viaduct": "OSP37H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 45,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a17e0b99-e881-4692-912a-411899c66ae1": {
+      "placa": "OSQ65H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 153,
+        "aliado": "ANTONIO V",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1643,
+        "placa_viaduct": "OSQ65H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 60,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f38f185a-cf9b-4bb7-99ab-2a0df52140e9": {
+      "placa": "ZPF98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 45,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1738,
+        "placa_viaduct": "ZPF98H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 45,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0bba2970-ec4e-4f9d-ba0f-e7d8b82d6c4b": {
+      "placa": "OSP29H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 70,
+        "aliado": "HENRY",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1638,
+        "placa_viaduct": "OSP29H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 43,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a3efc6ad-f39b-4376-8001-c772f49db614": {
+      "placa": "TTO99H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1874,
+        "placa_viaduct": "TTO99H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 6,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "320fef88-b1aa-423e-8598-e19c0c524291": {
+      "placa": "OSM71H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1606,
+        "placa_viaduct": "OSM71H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 147,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4c1daf16-49ac-4621-b3bc-c1c6a1ef05c1": {
+      "placa": "TSC22H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 187,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1992,
+        "placa_viaduct": "TSC22H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 90,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "31e7917c-712e-408d-b514-839751b11c62": {
+      "placa": "TRS93H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1951,
+        "placa_viaduct": "TRS93H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 9,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2c422a18-f2a1-45f2-a34f-6618f6dd832a": {
+      "placa": null,
+      "numero_serie": "TSY81H",
+      "placasweb": {
+        "pagos": 90,
+        "aliado": "RODRIGO",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1868,
+        "placa_viaduct": "TSY81H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 12,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "bbfe068d-e645-4d0f-ad16-c2321cfb42fe": {
+      "placa": "RBA98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 88,
+        "aliado": "MARTA S",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1685,
+        "placa_viaduct": "RBA98H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 23,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "63543084-3bd2-4e57-919d-9cbebc83b800": {
+      "placa": "TIN95H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 88,
+        "aliado": "HENRY",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1922,
+        "placa_viaduct": "TIN95H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 63,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "4fd21579-e552-4b47-8b50-61e61abd61aa": {
+      "placa": "RBA93H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 125,
+        "aliado": "MARTA S",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1686,
+        "placa_viaduct": "RBA93H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 37,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e14e0f9f-c763-4696-9414-5807b7bf2d97": {
+      "placa": "HLB79H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 139,
+        "aliado": "GENNY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1503,
+        "placa_viaduct": "HLB79H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jenny Angelica Angulo Soledad",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 38,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "44e2d95e-a6c2-4837-8d87-7c8ab1001ff8": {
+      "placa": "JRK24H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1392,
+        "placa_viaduct": "JRK24H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Cristiam Andrey Cruz Guevara",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 74,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "9294fff5-bd87-4b10-8c0e-21f164738c72": {
+      "placa": "TRS92H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 46,
+        "aliado": "MARTA S",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1957,
+        "placa_viaduct": "TRS92H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 30,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d0f93cef-aa71-4c62-940d-d2e329eeadf2": {
+      "placa": "RBH88H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 54,
+        "aliado": "OSCAR",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1714,
+        "placa_viaduct": "RBH88H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 50,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e141dac2-981b-465b-9938-ddbd2655c20f": {
+      "placa": null,
+      "numero_serie": "DTW18I",
+      "placasweb": {
+        "pagos": 43,
+        "aliado": "MIGUEL F",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1831,
+        "placa_viaduct": "DTW18I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 25,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5b468870-5f80-4127-b0d3-eae9d0839e25": {
+      "placa": "OSQ28H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 82,
+        "aliado": "NELSON",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1650,
+        "placa_viaduct": "OSQ28H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 55,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "72f53dac-47ee-4627-971c-d16070a9d178": {
+      "placa": "OSQ26H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 83,
+        "aliado": "NELSON",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1653,
+        "placa_viaduct": "OSQ26H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 32,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "612c747f-b586-49de-8377-dbf3094f7fca": {
+      "placa": "RBA90H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 78,
+        "aliado": "GABRIELA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1684,
+        "placa_viaduct": "RBA90H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 42,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a50887bb-82b9-419c-8807-92325438f38a": {
+      "placa": "TTO91H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 72,
+        "aliado": "YENNIFER",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1998,
+        "placa_viaduct": "TTO91H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 59,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f06e5cd3-b539-41d2-835a-24e57f746b95": {
+      "placa": "ZPL69H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 71,
+        "aliado": "EIMMY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 2008,
+        "placa_viaduct": "ZPL69H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 48,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c596be92-e3f5-493b-9b6d-01c890a04526": {
+      "placa": "OSE14H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 75,
+        "aliado": "OSCAR",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1458,
+        "placa_viaduct": "OSE14H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 29,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "eec801de-8324-49bc-8b1b-e9c823c5ef6a": {
+      "placa": "MDK81H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 40,
+        "aliado": "Oscar Jairo Fletcher Prieto",
+        "veces_vendida": 4
+      },
+      "viaduct": {
+        "vehiculo_id": 1453,
+        "placa_viaduct": "MDK81H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Oscar Jairo Fletcher Prieto",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 40,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1b54a3d8-a768-49a5-b7db-44c7a79bc754": {
+      "placa": "TIQ48H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "27f44413-ef7a-4451-a3f0-4b1e4c4a1cd0": {
+      "placa": "TIL53H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 13,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1928,
+        "placa_viaduct": "TIL53H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 13,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "75206277-b848-4b49-9959-b8c30d6bf7b6": {
+      "placa": "RBJ55H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 132,
+        "aliado": "KRIZIA",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1782,
+        "placa_viaduct": "RBJ55H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 122,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "36e2def5-69b7-407e-895f-2ed103921548": {
+      "placa": null,
+      "numero_serie": "TSC25H",
+      "placasweb": {
+        "pagos": 0,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1979,
+        "placa_viaduct": "TSC25H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "881d47f0-15c4-47ac-b1e5-7b76f21e6c0b": {
+      "placa": "ZQC07H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 14,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1748,
+        "placa_viaduct": "ZQC07H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 14,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "71b8956a-b83c-4f27-9ffc-2bb97ff9d1ca": {
+      "placa": "TSC71H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 4,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 2030,
+        "placa_viaduct": "TSC71H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 4,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cd6420e8-5471-4467-baee-9d7decce9cbe": {
+      "placa": "ZPF94H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 111,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1737,
+        "placa_viaduct": "ZPF94H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 16,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "9ff4ba28-993d-4e84-9313-53f56cb592fe": {
+      "placa": null,
+      "numero_serie": "TIU01H",
+      "placasweb": {
+        "pagos": 21,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1932,
+        "placa_viaduct": "TIU01H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 21,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "bf2835af-45f3-4fb9-9bd4-507ba15006fe": {
+      "placa": "ZQC04H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1746,
+        "placa_viaduct": "ZQC04H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 21,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e53139fe-1f9a-4a47-8961-290cf0d6fb2f": {
+      "placa": "TIK41H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 18,
+        "aliado": "GUSTAVO",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1899,
+        "placa_viaduct": "TIK41H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 2,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "6b5c30c3-82f8-48e9-b708-d99627d68d03": {
+      "placa": "TIU83H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 15,
+        "aliado": "JAIRO",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1931,
+        "placa_viaduct": "TIU83H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 12,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c7de87f0-b2e3-4bbd-8975-4dd4aacf211c": {
+      "placa": "TIK42H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 84,
+        "aliado": "GUSTAVO",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1900,
+        "placa_viaduct": "TIK42H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 23,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0235dbe4-21b4-4bac-84d4-35b704615765": {
+      "placa": "OSQ27H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 22,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1652,
+        "placa_viaduct": "OSQ27H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 22,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "93c4df54-0f00-4a24-a9cf-d210d75f070c": {
+      "placa": null,
+      "numero_serie": "ZPZ83H",
+      "placasweb": {
+        "pagos": 18,
+        "aliado": "DANA",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1889,
+        "placa_viaduct": "ZPZ83H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 6,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "359d9a84-e578-46db-a3ca-d38de8e4dafe": {
+      "placa": "TRW46H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 39,
+        "aliado": "OMAR",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1965,
+        "placa_viaduct": "TRW46H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 15,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "375a95de-d229-4b77-9f8d-0a2e8c8c2f97": {
+      "placa": "RAU96H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 114,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1663,
+        "placa_viaduct": "RAU96H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 114,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2658bd25-7a37-4853-991b-4e958b619961": {
+      "placa": "TIR35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 65,
+        "aliado": "JAIRO",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1929,
+        "placa_viaduct": "TIR35H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 19,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c78718bc-3877-4046-9526-0859825186ef": {
+      "placa": "TRS83H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 40,
+        "aliado": "KRIZIA",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1944,
+        "placa_viaduct": "TRS83H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 10,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "40327f62-15ee-4074-9d32-13002ae268d3": {
+      "placa": "RBF35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 61,
+        "aliado": "GUSTAVO",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1701,
+        "placa_viaduct": "RBF35H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 10,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "186cf3bd-903f-4ec9-a3b4-4dc14f57ba9f": {
+      "placa": "THX42H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 37,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1793,
+        "placa_viaduct": "THX42H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 37,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0a527bba-0a1c-42b5-85ee-65e4f1d43514": {
+      "placa": "TSC35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 0,
+        "aliado": "HENRY",
+        "veces_vendida": 0
+      },
+      "viaduct": {
+        "vehiculo_id": 1972,
+        "placa_viaduct": "TSC35H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 0,
+        "tarifas_pagadas": 0,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a2490865-d81d-4877-8992-559f142aab1c": {
+      "placa": "TSR13H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 12,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1810,
+        "placa_viaduct": "TSR13H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 12,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1212c54d-8362-4a3a-af71-809a34307d38": {
+      "placa": "ZPL72H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 48,
+        "aliado": "MIGUEL",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1745,
+        "placa_viaduct": "ZPL72H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 5,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8a2e4c12-b1d8-4337-ac46-3ce4b35642bd": {
+      "placa": "RBE09H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 51,
+        "aliado": "MIGUEL",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1693,
+        "placa_viaduct": "RBE09H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 34,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f499c8d6-38a8-4451-ad2f-b3d6066ce86f": {
+      "placa": "OSP35H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1639,
+        "placa_viaduct": "OSP35H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 191,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d82cca1f-3cc6-4b8b-b222-d1680afe6dd8": {
+      "placa": "ZOT02H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 28,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1824,
+        "placa_viaduct": "ZOT02H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 42,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a58ab0a9-4c91-4929-abaa-dd0d4757ddfa": {
+      "placa": "TIF40H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1901,
+        "placa_viaduct": "TIF40H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 69,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "6babc388-138c-469c-87a3-de26bdd92909": {
+      "placa": "RAZ80H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 118,
+        "aliado": "Henry Albeiro Montoya Jimenez",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1680,
+        "placa_viaduct": "RAZ80H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 118,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "bd7d2dad-1712-4c83-ad2b-fd0276481ac3": {
+      "placa": "ORS11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "265af6f9-c5aa-4f38-b13c-f0604b435d41": {
+      "placa": "GZV96I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1859,
+        "placa_viaduct": "GZV96I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 23,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "714695c7-857c-4b3a-9ade-c2dfc6df533e": {
+      "placa": "ORZ11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1589,
+        "placa_viaduct": "ORZ11H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Eva Maria Angulo Soledad",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 160,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "33d83329-514f-4899-af22-374e4e8e6cdb": {
+      "placa": "OSE80H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 106,
+        "aliado": "HENRY",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1591,
+        "placa_viaduct": "OSE80H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 26,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e030c7cf-de5e-4396-8488-2882476b95e4": {
+      "placa": null,
+      "numero_serie": "TTE98H",
+      "placasweb": {
+        "pagos": 44,
+        "aliado": "HENRY",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 1724,
+        "placa_viaduct": "TTE98H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 44,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "70484985-8d33-4cd6-8a91-3f093c240de1": {
+      "placa": "MDC23H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 43,
+        "aliado": "OLGA",
+        "veces_vendida": 1
+      },
+      "viaduct": {
+        "vehiculo_id": 1578,
+        "placa_viaduct": "MDC23H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Olga Patricia Pinilla Abaunza",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 43,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "05845441-a9a1-4f89-ba4b-f64f1898bfa2": {
+      "placa": "OSE78H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 104,
+        "aliado": "HENRY",
+        "veces_vendida": 3
+      },
+      "viaduct": {
+        "vehiculo_id": 1599,
+        "placa_viaduct": "OSE78H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 67,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f6577a52-a2fe-4ae3-bb51-450a3d321e81": {
+      "placa": "TIU50H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1933,
+        "placa_viaduct": "TIU50H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 55,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5da312c1-f4ba-4e37-bcba-aa80a8c9480e": {
+      "placa": "RAZ81H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1682,
+        "placa_viaduct": "RAZ81H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 28,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c6c071d2-bf64-41cf-941d-a963476f5bcd": {
+      "placa": "TSR11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1716,
+        "placa_viaduct": "TSR11H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 31,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8fbd622c-4dcd-42ee-9f65-720b1b54a97b": {
+      "placa": "RBJ54H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1789,
+        "placa_viaduct": "RBJ54H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 90,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "477e61b7-fad2-4e08-8d0c-7623f86ec8c8": {
+      "placa": "TIB73H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1792,
+        "placa_viaduct": "TIB73H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 6,
+        "tarifas_pagadas": 72,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "0cc3c3b4-c3f6-43f9-9e7c-ad74ee3ed247": {
+      "placa": "OSP23H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1616,
+        "placa_viaduct": "OSP23H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 5,
+        "tarifas_pagadas": 22,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "698b633e-2abd-4aa3-8f8a-607acad0e371": {
+      "placa": "TRW50H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1976,
+        "placa_viaduct": "TRW50H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 67,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ff390dab-c355-450c-ae7c-0863f4e675fe": {
+      "placa": "OSR71H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1640,
+        "placa_viaduct": "OSR71H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 47,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "74e8beba-a6b6-46e9-a959-7205b07b67b2": {
+      "placa": "MDK87H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1588,
+        "placa_viaduct": "MDK87H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Eva Maria Angulo Soledad",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 82,
+        "contrato_activo": {
+          "contrato_id": 2755,
+          "estado": "Activo",
+          "cliente": "Nestor Mateo Martinez Mon",
+          "cedula": "1095949291",
+          "fecha_inicio": "2026-06-15",
+          "tarifa": 33000.0
+        }
+      },
+      "spappweb": null
+    },
+    "1719ffd8-f2d8-4d3a-809f-b869b40328e8": {
+      "placa": "GZJ31I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1853,
+        "placa_viaduct": "GZJ31I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 53,
+        "contrato_activo": {
+          "contrato_id": 1955,
+          "estado": "Activo",
+          "cliente": "Maria Olinda Olarte Rosas",
+          "cedula": "37748239",
+          "fecha_inicio": "2026-05-13",
+          "tarifa": 38000.0
+        }
+      },
+      "spappweb": null
+    },
+    "a89b9170-ee2a-4c38-9142-a07828eb5354": {
+      "placa": "GAN66H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1483,
+        "placa_viaduct": "GAN66H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jairo Fletcher Suarez",
+        "marca": "Akt",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 183,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e7223cc6-3b1c-470c-91ff-79900a7bb665": {
+      "placa": "HAO83I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2643,
+        "placa_viaduct": "HAO83I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Dana - Uriel",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 17,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8aea73ad-dc72-4221-a7c0-5d9a811b05ba": {
+      "placa": "DTV73I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2390,
+        "placa_viaduct": "DTV73I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 35,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "326f06db-3c9e-4337-9cb1-f8aedba135bf": {
+      "placa": "JRM99H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1541,
+        "placa_viaduct": "JRM99H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Jorge Alberto Riveros Calderon",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 137,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3209ae0c-6ef1-4689-84d5-0c1238623d94": {
+      "placa": "DTV98I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2420,
+        "placa_viaduct": "DTV98I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 77,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "329980f1-a654-442f-ba85-f635e56f8df5": {
+      "placa": "MCR31H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1499,
+        "placa_viaduct": "MCR31H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Nicolas Felipe Garrido Pinilla",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 60,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5915f9e1-c46a-4900-9fab-6ad72665c032": {
+      "placa": "GZM50I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1857,
+        "placa_viaduct": "GZM50I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 49,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a6bcddab-d26e-4739-addb-e1afa4fa7589": {
+      "placa": "KFF89I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2634,
+        "placa_viaduct": "KFF89I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Jenny Angelica Angulo Soledad",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 1,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "842f3c96-8b5f-40f0-aa0c-e4dc1e9c78f4": {
+      "placa": "ZPG15H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1827,
+        "placa_viaduct": "ZPG15H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 26,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "6365a020-bcc1-456f-868f-11d6492784ad": {
+      "placa": "TSI70H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2046,
+        "placa_viaduct": "TSI70H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 20,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "2b66fd63-0456-4ece-87b6-4ead3bb46e48": {
+      "placa": "ZPE10H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2336,
+        "placa_viaduct": "ZPE10H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 10,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "9a9232bc-a416-4bcd-8b1d-459597ab60dc": {
+      "placa": "KFF92I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2623,
+        "placa_viaduct": "KFF92I",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 1,
+        "contrato_activo": {
+          "contrato_id": 2878,
+          "estado": "Activo",
+          "cliente": "Yulian Estiven Figueroa Marquez",
+          "cedula": "1097910174",
+          "fecha_inicio": "2026-06-27",
+          "tarifa": 57000.0
+        }
+      },
+      "spappweb": null
+    },
+    "83fde723-f463-4899-8cc0-b3669b52e16b": {
+      "placa": "DTW21I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1890,
+        "placa_viaduct": "DTW21I",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2027",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 41,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e7ff03f3-2464-4a89-a067-b3f20c6ecb44": {
+      "placa": "HAB87I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2556,
+        "placa_viaduct": "HAB87I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Gabriela Castellanos",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 10,
+        "contrato_activo": {
+          "contrato_id": 2699,
+          "estado": "Activo",
+          "cliente": "Deiby José Alfonso Núñez",
+          "cedula": "1093791145",
+          "fecha_inicio": "2026-06-12",
+          "tarifa": 40000.0
+        }
+      },
+      "spappweb": null
+    },
+    "73cfde44-3c54-460b-ac3b-277f39a9d7a9": {
+      "placa": "TTD86H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 1727,
+        "placa_viaduct": "TTD86H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 29,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d09c404c-6282-4bb1-9746-784be519d15d": {
+      "placa": "TSC62H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2019,
+        "placa_viaduct": "TSC62H",
+        "serie_viaduct": "Nkd 125",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Akt",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 52,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8407aa40-6fa2-45ed-957f-163c5c732faa": {
+      "placa": "TTL13H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2284,
+        "placa_viaduct": "TTL13H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Krizia Silvana Pinilla Herrera",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 31,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "7abb5802-17e7-4816-8cd7-07e0365ea650": {
+      "placa": "TIJ67H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2066,
+        "placa_viaduct": "TIJ67H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 100,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "9fb21076-7efb-4074-94f5-c6cb6be5cb76": {
+      "placa": "GZO61I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2531,
+        "placa_viaduct": "GZO61I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 67,
+        "contrato_activo": {
+          "contrato_id": 2617,
+          "estado": "Activo",
+          "cliente": "John Edinson Diaz Lizarazo",
+          "cedula": "1098633552",
+          "fecha_inicio": "2026-05-13",
+          "tarifa": 44000.0
+        }
+      },
+      "spappweb": null
+    },
+    "7f492fb1-0d2d-4d44-9879-f6fac4882ada": {
+      "placa": "DUP84I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2454,
+        "placa_viaduct": "DUP84I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 49,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "bd928056-8e8b-4435-9755-951477304f65": {
+      "placa": "TTO23H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "0455a63f-355b-44ab-bde7-7881fa739bbc": {
+      "placa": "DTV68I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2384,
+        "placa_viaduct": "DTV68I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 12,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "398b63af-8cc1-44fb-b64a-e5939eb316b4": {
+      "placa": "TSD69H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2047,
+        "placa_viaduct": "TSD69H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 32,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "1647f248-6da9-4fc2-a9eb-c165732948c8": {
+      "placa": "TTE33H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2274,
+        "placa_viaduct": "TTE33H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 51,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8b6f9d78-6efd-46d7-90d3-737517d0ccc9": {
+      "placa": "ZOK40H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2305,
+        "placa_viaduct": "ZOK40H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 67,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8db95204-75ec-498e-8f3b-6a454aef3bd5": {
+      "placa": "TST98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "d5f16614-6f7f-4314-b692-69377bfa905f": {
+      "placa": "TIO22H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2119,
+        "placa_viaduct": "TIO22H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 52,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ed91aae6-1363-418c-a365-9bec8e6f006f": {
+      "placa": null,
+      "numero_serie": "1900846",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "5dd957b9-e3d0-4c6e-a00e-f99874bda33c": {
+      "placa": "DVF05I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2481,
+        "placa_viaduct": "DVF05I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Krizia Silvana Pinilla Herrera",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 36,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f10bb5cf-5513-4fa1-89f2-93eca696e805": {
+      "placa": "TSQ38H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2208,
+        "placa_viaduct": "TSQ38H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 22,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5d5d041c-ef27-4fb1-9f5d-98434221b687": {
+      "placa": null,
+      "numero_serie": "025982",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "d7b4ff2b-8806-4dad-a011-a99547e70a2c": {
+      "placa": "ESW09I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2474,
+        "placa_viaduct": "ESW09I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 17,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3ba834fe-b16e-45ea-9ddb-8986bf725151": {
+      "placa": "TTA02H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2244,
+        "placa_viaduct": "TTA02H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Gabriela Castellanos",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 64,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a37f4331-808b-40a6-a6c3-6e385b083bbe": {
+      "placa": "TIJ76H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2052,
+        "placa_viaduct": "TIJ76H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 30,
+        "contrato_activo": {
+          "contrato_id": 2309,
+          "estado": "Activo",
+          "cliente": "Diego Armando Rodriguez Manrique1",
+          "cedula": "10987650211",
+          "fecha_inicio": "2025-12-24",
+          "tarifa": 50000.0
+        }
+      },
+      "spappweb": null
+    },
+    "7116d4f8-ed8b-4c13-9f89-c7ef05d858ba": {
+      "placa": "ZPI34H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2359,
+        "placa_viaduct": "ZPI34H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 134,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "900a8b9b-f522-49bb-8a62-72c4dbe73ce4": {
+      "placa": "TSD65H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2132,
+        "placa_viaduct": "TSD65H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 32,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "35564dc1-e8be-40e6-8fb9-e6e60a3b9967": {
+      "placa": "TTE31H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2270,
+        "placa_viaduct": "TTE31H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 46,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "dab8fdd2-5df2-42ae-afcc-70c0a676d1de": {
+      "placa": "TSI99H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2184,
+        "placa_viaduct": "TSI99H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 142,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "199859ed-279b-4b65-98a2-1ba2df3975b0": {
+      "placa": "TSI74H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2045,
+        "placa_viaduct": "TSI74H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 56,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cb252980-11d8-4a58-a7e6-1d68c7b42c9f": {
+      "placa": "ZPE05H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2345,
+        "placa_viaduct": "ZPE05H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 26,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "cf54fe41-5ca3-421d-a2b1-48164e72d154": {
+      "placa": "TSQ37H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2207,
+        "placa_viaduct": "TSQ37H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 51,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "29074245-a5d8-437b-ac86-7f94ddae523a": {
+      "placa": "TSI84H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2103,
+        "placa_viaduct": "TSI84H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Omar Enrique Gomez Arevalo",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 72,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "e6e5aa5e-28c3-4755-9026-fc02073f6156": {
+      "placa": "ZPE04H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2344,
+        "placa_viaduct": "ZPE04H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 86,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a5379059-683d-4b24-80c4-517779b8c4d4": {
+      "placa": "TTE17H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2261,
+        "placa_viaduct": "TTE17H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 17,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "98fc69d9-44b0-4478-8677-7459ee9011d0": {
+      "placa": "TTE22H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2263,
+        "placa_viaduct": "TTE22H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 98,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "b7f24de9-1f61-4447-a764-958e6f75da37": {
+      "placa": "DUP79I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2445,
+        "placa_viaduct": "DUP79I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 5,
+        "contrato_activo": {
+          "contrato_id": 2493,
+          "estado": "Activo",
+          "cliente": "Wilner Alexander Martinez Aladejo Bogota",
+          "cedula": "2255098",
+          "fecha_inicio": "2026-03-23",
+          "tarifa": 40000.0
+        }
+      },
+      "spappweb": null
+    },
+    "251d0a23-f48a-4929-9e3d-13311ee62d39": {
+      "placa": "KGL54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1fad09fd-c005-4144-8ff2-4dad350977e8": {
+      "placa": "KGJ54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "630fbc3d-3aac-4289-9679-9640bb13a80e": {
+      "placa": "NBM32I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "9eb6266c-cf90-49ac-987e-7808a36f9c45": {
+      "placa": "DTV97I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2419,
+        "placa_viaduct": "DTV97I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 13,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "15c87e1a-f9c2-4ce1-b90d-90b8e28cfa0d": {
+      "placa": "TIK76H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2171,
+        "placa_viaduct": "TIK76H",
+        "serie_viaduct": "Milan 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 20,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "8352c1eb-47f7-4c6f-b5ae-aeedd18ef9ff": {
+      "placa": null,
+      "numero_serie": "056538",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "ea1370d1-dfdc-4aad-9da4-77e54f987e07": {
+      "placa": null,
+      "numero_serie": "058306",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1ebb2441-3825-40d4-b790-3b1ae0278806": {
+      "placa": null,
+      "numero_serie": "053954",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "231203ac-81cb-4655-b78f-e0c7e8eff3c1": {
+      "placa": "TRT06H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2117,
+        "placa_viaduct": "TRT06H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 27,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "ff972ebd-67bf-4d2e-a5a6-1aaf08d969e4": {
+      "placa": null,
+      "numero_serie": "058301",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "d2305694-9db3-423c-835f-77eb311d3fe7": {
+      "placa": "TTL01H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2275,
+        "placa_viaduct": "TTL01H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 44,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "3c60a0ad-dbf6-4f42-86d0-3bfcfc6ed722": {
+      "placa": "TST02H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2223,
+        "placa_viaduct": "TST02H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 44,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "beb0e08c-ba0b-4f72-9cc3-81d9fa065032": {
+      "placa": "TSI95H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2180,
+        "placa_viaduct": "TSI95H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 4,
+        "tarifas_pagadas": 54,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "6e34df88-1e46-4e3b-9ddb-7a42e701c120": {
+      "placa": "TTE21H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2265,
+        "placa_viaduct": "TTE21H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 58,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "c217e56b-597e-4958-a0e1-aa28df769d96": {
+      "placa": "ZOK39H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2313,
+        "placa_viaduct": "ZOK39H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 3,
+        "tarifas_pagadas": 42,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "283c6fc8-a15d-4acc-b277-0cc4948d0a2d": {
+      "placa": "TSD61H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2173,
+        "placa_viaduct": "TSD61H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 53,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "f50b48c9-c4cd-4899-8f2a-3aae314fc831": {
+      "placa": "TST05H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2225,
+        "placa_viaduct": "TST05H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 29,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "aec6703b-502b-468a-94bb-bb11f4905bc7": {
+      "placa": "TSQ51H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2220,
+        "placa_viaduct": "TSQ51H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 13,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "54e2fdc0-da07-423e-89df-68c968ba858b": {
+      "placa": null,
+      "numero_serie": "058300",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "18b8cafa-2b29-4750-9256-b7b8a7d74be8": {
+      "placa": "HAQ75I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2585,
+        "placa_viaduct": "HAQ75I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Omar Enrique Gomez Arevalo",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 2,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "666db1b1-ed15-4814-bcf4-1f95cd1c8760": {
+      "placa": "TIM88H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": 170,
+        "aliado": "CRIVON",
+        "veces_vendida": 2
+      },
+      "viaduct": {
+        "vehiculo_id": 2137,
+        "placa_viaduct": "TIM88H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Crivon",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 119,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "d1e55df1-2b7b-43af-b30a-027754dac332": {
+      "placa": null,
+      "numero_serie": "056559",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "fca42c18-0d8d-423f-81ad-232e67104471": {
+      "placa": "TTO55H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2298,
+        "placa_viaduct": "TTO55H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Inactivo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 44,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "5082b10b-f4db-4f55-9dc3-c0ad37793ba0": {
+      "placa": "KGC42I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "20f24bc4-4d9b-4cb5-810f-8de8f0a899ea": {
+      "placa": "NBM33I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "577a7422-60b7-4823-b42e-e43f596ff54b": {
+      "placa": "DTV67I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2383,
+        "placa_viaduct": "DTV67I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 29,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a523fa14-eebb-4746-8119-1e8eab1c3fa1": {
+      "placa": "TSI94H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2185,
+        "placa_viaduct": "TSI94H",
+        "serie_viaduct": "Gbr 200",
+        "propietario": "Marisol Pinilla Rueda",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Activo",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 83,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "a77f73a4-7718-43b2-b6a0-0ee2831392e1": {
+      "placa": "NBM34I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "d4cc74c5-c386-431e-a4bc-1b55455cf7bb": {
+      "placa": "DTV86I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2395,
+        "placa_viaduct": "DTV86I",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2026",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 2,
+        "tarifas_pagadas": 62,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    },
+    "57fb87d4-9c3c-47b5-a122-0c845008d56a": {
+      "placa": "KGC54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "473bd5ad-9aec-4ae0-8bc8-7114e2da099f": {
+      "placa": "TTL24H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": {
+        "vehiculo_id": 2295,
+        "placa_viaduct": "TTL24H",
+        "serie_viaduct": "Sbr 150",
+        "propietario": "Henry Albeiro Montoya Jimenez",
+        "marca": "Bera",
+        "modelo": "2025",
+        "estado_vehiculo": "Vitrina",
+        "veces_vendida": 1,
+        "tarifas_pagadas": 38,
+        "contrato_activo": null
+      },
+      "spappweb": null
+    }
+  }
+}

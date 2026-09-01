@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, FileSpreadsheet } from "lucide-react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { ArrowLeft, FileSpreadsheet, Search, X } from "lucide-react";
 import { createBrowserClient } from "@/lib/supabase/browser";
+import {
+  resolveCruceDisplay,
+  type CruceMotoEntry,
+  type CrucePeriodoPayload,
+} from "@/lib/motos/cruce";
 import { motosToCsv } from "@/lib/motos/csv";
+import {
+  motoMatchesQuery,
+  normalizeMotoQuery,
+} from "@/lib/motos/search";
 import {
   PERIODO_AGOSTO_2026,
   esSubida,
@@ -23,35 +32,63 @@ import { cn } from "@/lib/utils";
 
 const { desde, hasta, label: periodoLabel } = PERIODO_AGOSTO_2026;
 
+function matchesPeriodoSearch(
+  moto: MotoRow,
+  query: string,
+  cruce?: CruceMotoEntry,
+): boolean {
+  const needle = normalizeMotoQuery(query);
+  if (!needle) return true;
+  if (motoMatchesQuery(moto, query)) return true;
+
+  const info = resolveCruceDisplay(moto, cruce);
+  const prenda = (info.prenda ?? moto.aliado ?? "").toUpperCase().replace(/\s+/g, "");
+  if (prenda.includes(needle)) return true;
+
+  const cliente = info.contratoActivo?.cliente?.toUpperCase().replace(/\s+/g, "") ?? "";
+  return cliente.includes(needle);
+}
+
 export function MotoPeriodoList() {
   const [motos, setMotos] = useState<MotoRow[]>([]);
+  const [cruce, setCruce] = useState<CrucePeriodoPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const searchId = useId();
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       const supabase = createBrowserClient();
-      const { data, error: fetchError } = await supabase
-        .from("motos")
-        .select("*")
-        .gte("updated_at", `${desde}T00:00:00`)
-        .lt("updated_at", "2026-09-02T00:00:00")
-        .order("updated_at", { ascending: true });
+      const [motosRes, cruceRes] = await Promise.all([
+        supabase
+          .from("motos")
+          .select("*")
+          .gte("updated_at", `${desde}T00:00:00`)
+          .lt("updated_at", "2026-09-02T00:00:00")
+          .order("updated_at", { ascending: true }),
+        fetch("/data/cruce-periodo-agosto.json"),
+      ]);
 
       if (cancelled) return;
 
-      if (fetchError) {
-        setError(fetchError.message);
+      if (motosRes.error) {
+        setError(motosRes.error.message);
         setLoading(false);
         return;
       }
 
-      const filtradas = ((data as MotoRow[]) ?? []).filter((moto) =>
+      const filtradas = ((motosRes.data as MotoRow[]) ?? []).filter((moto) =>
         motoEnPeriodo(moto, desde, hasta),
       );
       setMotos(filtradas);
+
+      if (cruceRes.ok) {
+        setCruce((await cruceRes.json()) as CrucePeriodoPayload);
+      }
+
       setLoading(false);
     }
 
@@ -61,8 +98,17 @@ export function MotoPeriodoList() {
     };
   }, []);
 
-  const grupos = useMemo(() => groupByUbicacionYDia(motos), [motos]);
-  const resumen = useMemo(() => resumenPeriodo(motos), [motos]);
+  const filtered = useMemo(
+    () =>
+      motos.filter((moto) =>
+        matchesPeriodoSearch(moto, query, cruce?.motos[moto.id]),
+      ),
+    [motos, query, cruce],
+  );
+
+  const grupos = useMemo(() => groupByUbicacionYDia(filtered), [filtered]);
+  const resumen = useMemo(() => resumenPeriodo(filtered), [filtered]);
+  const buscando = query.trim().length > 0;
 
   const diasActivos = useMemo(() => {
     const set = new Set(motos.map((m) => fechaBogota(m.updated_at)));
@@ -70,8 +116,8 @@ export function MotoPeriodoList() {
   }, [motos]);
 
   function downloadCsv() {
-    if (motos.length === 0) return;
-    const blob = new Blob([motosToCsv(motos)], {
+    if (filtered.length === 0) return;
+    const blob = new Blob([motosToCsv(filtered)], {
       type: "text/csv;charset=utf-8",
     });
     const url = URL.createObjectURL(blob);
@@ -105,10 +151,19 @@ export function MotoPeriodoList() {
           <div>
             <h1 className="text-xl font-semibold">{periodoLabel}</h1>
             <p className="mt-1 text-sm text-neutral-500">
-              {resumen.total} moto{resumen.total === 1 ? "" : "s"} ·{" "}
-              {resumen.subidas} subida{resumen.subidas === 1 ? "" : "s"} ·{" "}
-              {resumen.actualizadas} actualizada
-              {resumen.actualizadas === 1 ? "" : "s"}
+              {buscando ? (
+                <>
+                  {filtered.length} de {motos.length} moto
+                  {motos.length === 1 ? "" : "s"}
+                </>
+              ) : (
+                <>
+                  {resumen.total} moto{resumen.total === 1 ? "" : "s"} ·{" "}
+                  {resumen.subidas} subida{resumen.subidas === 1 ? "" : "s"} ·{" "}
+                  {resumen.actualizadas} actualizada
+                  {resumen.actualizadas === 1 ? "" : "s"}
+                </>
+              )}
             </p>
             {diasActivos.length > 0 ? (
               <p className="mt-1 text-xs text-neutral-500">
@@ -119,11 +174,21 @@ export function MotoPeriodoList() {
                 {" ago"}
               </p>
             ) : null}
+            {cruce ? (
+              <p className="mt-1 text-xs text-neutral-500">
+                Cruce Viaduct: {cruce.resumen.total - cruce.resumen.sin_viaduct}/
+                {cruce.resumen.total} · datos de prenda, ventas y tarifas pagadas
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-amber-700">
+                Sin archivo de cruce Viaduct (ejecuta npm run cruce:agosto)
+              </p>
+            )}
           </div>
           <button
             type="button"
             onClick={downloadCsv}
-            disabled={motos.length === 0}
+            disabled={filtered.length === 0}
             className="inline-flex min-h-11 shrink-0 touch-manipulation items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FileSpreadsheet className="h-4 w-4" aria-hidden="true" />
@@ -132,9 +197,48 @@ export function MotoPeriodoList() {
         </div>
       </div>
 
+      <div className="relative">
+        <label htmlFor={searchId} className="sr-only">
+          Buscar placa, serie o prenda
+        </label>
+        <Search
+          className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400"
+          aria-hidden="true"
+        />
+        <input
+          id={searchId}
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value.toUpperCase())}
+          placeholder="Placa, serie o prenda…"
+          autoCapitalize="characters"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
+          className="h-12 w-full min-w-0 rounded-lg border border-neutral-200 bg-transparent py-1 pr-11 pl-10 text-base tracking-wide uppercase outline-none placeholder:normal-case placeholder:tracking-normal placeholder:text-neutral-400 focus-visible:border-black focus-visible:ring-3 focus-visible:ring-black/15"
+        />
+        {query ? (
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            className="absolute top-1/2 right-1 inline-flex size-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            aria-label="Borrar búsqueda"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
+
       {motos.length === 0 ? (
         <div className="rounded-lg border border-dashed border-neutral-200 p-8 text-center">
           <p className="font-medium">Sin movimientos en este período</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-neutral-200 p-8 text-center">
+          <p className="font-medium">Nada coincide con “{query.trim()}”</p>
+          <p className="mt-1 text-sm text-neutral-500">
+            Prueba otra placa, serie o nombre de prenda.
+          </p>
         </div>
       ) : (
         <div className="space-y-8">
@@ -167,7 +271,10 @@ export function MotoPeriodoList() {
                   <ul className="space-y-3">
                     {dia.motos.map((moto) => (
                       <li key={moto.id}>
-                        <PeriodoMotoCard moto={moto} />
+                        <PeriodoMotoCard
+                          moto={moto}
+                          cruce={cruce?.motos[moto.id]}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -181,9 +288,16 @@ export function MotoPeriodoList() {
   );
 }
 
-function PeriodoMotoCard({ moto }: { moto: MotoRow }) {
+function PeriodoMotoCard({
+  moto,
+  cruce,
+}: {
+  moto: MotoRow;
+  cruce?: CruceMotoEntry;
+}) {
   const titulo = motoIdentificador(moto);
   const accion = esSubida(moto) ? "Subida" : "Actualizada";
+  const info = resolveCruceDisplay(moto, cruce);
 
   return (
     <article className="flex touch-manipulation gap-3 rounded-xl border border-neutral-200 p-3">
@@ -216,8 +330,41 @@ function PeriodoMotoCard({ moto }: { moto: MotoRow }) {
           <p className="text-sm text-neutral-600">
             {accion} · {horaBogota(moto.updated_at)}
           </p>
-          {moto.aliado?.trim() ? (
-            <p className="truncate text-sm font-medium">{moto.aliado.trim()}</p>
+          {info.marcaModelo ? (
+            <p className="text-sm text-neutral-600">{info.marcaModelo}</p>
+          ) : null}
+          {info.prenda ? (
+            <p className="truncate text-sm font-medium">
+              Prenda: {info.prenda}
+            </p>
+          ) : info.sinViaduct ? (
+            <p className="text-sm text-amber-700">Sin match en Viaduct</p>
+          ) : null}
+          <p className="text-sm text-neutral-600">
+            {info.vecesVendida != null ? (
+              <>
+                Vendida {info.vecesVendida}{" "}
+                {info.vecesVendida === 1 ? "vez" : "veces"}
+              </>
+            ) : (
+              "Veces vendida: —"
+            )}
+            {info.tarifasViaduct != null ? (
+              <>
+                {" · "}
+                {info.tarifasViaduct} tarifa
+                {info.tarifasViaduct === 1 ? "" : "s"} pagada
+                {info.tarifasViaduct === 1 ? "" : "s"}
+              </>
+            ) : null}
+            {info.tarifasSpapp != null && info.tarifasSpapp > 0 ? (
+              <> · App: {info.tarifasSpapp} tarifas</>
+            ) : null}
+          </p>
+          {info.contratoActivo ? (
+            <p className="truncate text-sm text-emerald-800">
+              Crédito activo: {info.contratoActivo.cliente}
+            </p>
           ) : null}
           {moto.notas?.trim() ? (
             <p className="line-clamp-2 text-sm text-neutral-500">
