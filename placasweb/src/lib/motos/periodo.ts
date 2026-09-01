@@ -8,8 +8,8 @@ import {
 
 export const PERIODO_AGOSTO_2026 = {
   desde: "2026-08-23",
-  hasta: "2026-08-31",
-  label: "23–31 agosto 2026",
+  hasta: "2026-09-01",
+  label: "23 ago–1 sep 2026",
 } as const;
 
 export function fechaBogota(iso: string): string {
@@ -53,12 +53,18 @@ export function esSubida(
   );
 }
 
+export function fechaInventario(
+  moto: Pick<MotoRow, "inventariado_en" | "updated_at">,
+): string {
+  return moto.inventariado_en?.trim() || fechaBogota(moto.updated_at);
+}
+
 export function motoEnPeriodo(
-  moto: Pick<MotoRow, "updated_at">,
+  moto: Pick<MotoRow, "inventariado_en" | "updated_at">,
   desde: string,
   hasta: string,
 ): boolean {
-  const f = fechaBogota(moto.updated_at);
+  const f = fechaInventario(moto);
   return f >= desde && f <= hasta;
 }
 
@@ -112,7 +118,7 @@ function buildGrupo(
 ): UbicacionGrupo {
   const byDia = new Map<string, MotoRow[]>();
   for (const moto of motos) {
-    const dia = fechaBogota(moto.updated_at);
+    const dia = fechaInventario(moto);
     const list = byDia.get(dia) ?? [];
     list.push(moto);
     byDia.set(dia, list);

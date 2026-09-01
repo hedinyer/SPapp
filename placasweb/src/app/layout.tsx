@@ -42,7 +42,7 @@ export default function RootLayout({
                   href="/agosto"
                   className="text-neutral-600 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
-                  23–31 ago
+                  23 ago–1 sep
                 </Link>
               </nav>
             </div>

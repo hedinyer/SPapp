@@ -1,8 +1,8 @@
 {
-  "generado": "2026-09-01T17:44:13.173476+00:00",
+  "generado": "2026-09-01T18:36:03.802736+00:00",
   "periodo": {
     "desde": "2026-08-23",
-    "hasta": "2026-08-31"
+    "hasta": "2026-09-01"
   },
   "resumen": {
     "total": 245,
@@ -10,6 +10,270 @@
     "sin_spappweb": 245
   },
   "motos": {
+    "796db253-6a7a-4614-9d5e-5571072b9f3f": {
+      "placa": "KGL40I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "62206a2a-504d-46e5-9ff6-54c842e25de6": {
+      "placa": "0850323",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "4416bd36-01d2-4b16-ba0a-0556654df36a": {
+      "placa": null,
+      "numero_serie": "012524",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "86bc3826-90a8-4dad-9f2e-c7d16ea35e77": {
+      "placa": "JTG14F",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1a75cb70-4302-4b7e-9277-a8088d5a43f5": {
+      "placa": "BYA76H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1b54a3d8-a768-49a5-b7db-44c7a79bc754": {
+      "placa": "TIQ48H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "bd7d2dad-1712-4c83-ad2b-fd0276481ac3": {
+      "placa": "ORS11H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "bd928056-8e8b-4435-9755-951477304f65": {
+      "placa": "TTO23H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "8db95204-75ec-498e-8f3b-6a454aef3bd5": {
+      "placa": "TST98H",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "ed91aae6-1363-418c-a365-9bec8e6f006f": {
+      "placa": null,
+      "numero_serie": "1900846",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "5d5d041c-ef27-4fb1-9f5d-98434221b687": {
+      "placa": null,
+      "numero_serie": "025982",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "251d0a23-f48a-4929-9e3d-13311ee62d39": {
+      "placa": "KGL54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1fad09fd-c005-4144-8ff2-4dad350977e8": {
+      "placa": "KGJ54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "630fbc3d-3aac-4289-9679-9640bb13a80e": {
+      "placa": "NBM32I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "8352c1eb-47f7-4c6f-b5ae-aeedd18ef9ff": {
+      "placa": null,
+      "numero_serie": "056538",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "ea1370d1-dfdc-4aad-9da4-77e54f987e07": {
+      "placa": null,
+      "numero_serie": "058306",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "1ebb2441-3825-40d4-b790-3b1ae0278806": {
+      "placa": null,
+      "numero_serie": "053954",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "ff972ebd-67bf-4d2e-a5a6-1aaf08d969e4": {
+      "placa": null,
+      "numero_serie": "058301",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "54e2fdc0-da07-423e-89df-68c968ba858b": {
+      "placa": null,
+      "numero_serie": "058300",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "d1e55df1-2b7b-43af-b30a-027754dac332": {
+      "placa": null,
+      "numero_serie": "056559",
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "5082b10b-f4db-4f55-9dc3-c0ad37793ba0": {
+      "placa": "KGC42I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "20f24bc4-4d9b-4cb5-810f-8de8f0a899ea": {
+      "placa": "NBM33I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "a77f73a4-7718-43b2-b6a0-0ee2831392e1": {
+      "placa": "NBM34I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
+    "57fb87d4-9c3c-47b5-a122-0c845008d56a": {
+      "placa": "KGC54I",
+      "numero_serie": null,
+      "placasweb": {
+        "pagos": null,
+        "aliado": null,
+        "veces_vendida": null
+      },
+      "viaduct": null,
+      "spappweb": null
+    },
     "ad3d4f3f-37f5-4a3b-849e-0f8034e16b6a": {
       "placa": "ERY81I",
       "numero_serie": null,
@@ -30,17 +294,6 @@
         "tarifas_pagadas": 0,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "796db253-6a7a-4614-9d5e-5571072b9f3f": {
-      "placa": "KGL40I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "8b34f25f-d7d1-4b26-ae20-d3618cf93c16": {
@@ -659,17 +912,6 @@
       },
       "spappweb": null
     },
-    "62206a2a-504d-46e5-9ff6-54c842e25de6": {
-      "placa": "0850323",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "33318556-84db-4a57-9ecf-ed4980779338": {
       "placa": "DXY78H",
       "numero_serie": null,
@@ -912,17 +1154,6 @@
       },
       "spappweb": null
     },
-    "4416bd36-01d2-4b16-ba0a-0556654df36a": {
-      "placa": null,
-      "numero_serie": "012524",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "77cd60cf-377d-4d11-9f24-1a5ed6ef0968": {
       "placa": null,
       "numero_serie": "JRI18H",
@@ -965,17 +1196,6 @@
         "tarifas_pagadas": 117,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "86bc3826-90a8-4dad-9f2e-c7d16ea35e77": {
-      "placa": "JTG14F",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "63ff8106-6a97-4524-8336-bb7dfdc64ff3": {
@@ -1724,17 +1944,6 @@
         "tarifas_pagadas": 121,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "1a75cb70-4302-4b7e-9277-a8088d5a43f5": {
-      "placa": "BYA76H",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "0b4ef68f-cc02-4238-b6d2-b59b3b5ffec3": {
@@ -2661,17 +2870,6 @@
       },
       "spappweb": null
     },
-    "1b54a3d8-a768-49a5-b7db-44c7a79bc754": {
-      "placa": "TIQ48H",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "27f44413-ef7a-4451-a3f0-4b1e4c4a1cd0": {
       "placa": "TIL53H",
       "numero_serie": null,
@@ -3264,17 +3462,6 @@
         "tarifas_pagadas": 235,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "bd7d2dad-1712-4c83-ad2b-fd0276481ac3": {
-      "placa": "ORS11H",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "265af6f9-c5aa-4f38-b13c-f0604b435d41": {
@@ -4104,17 +4291,6 @@
       },
       "spappweb": null
     },
-    "bd928056-8e8b-4435-9755-951477304f65": {
-      "placa": "TTO23H",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "0455a63f-355b-44ab-bde7-7881fa739bbc": {
       "placa": "DTV68I",
       "numero_serie": null,
@@ -4203,17 +4379,6 @@
       },
       "spappweb": null
     },
-    "8db95204-75ec-498e-8f3b-6a454aef3bd5": {
-      "placa": "TST98H",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "d5f16614-6f7f-4314-b692-69377bfa905f": {
       "placa": "TIO22H",
       "numero_serie": null,
@@ -4234,17 +4399,6 @@
         "tarifas_pagadas": 178,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "ed91aae6-1363-418c-a365-9bec8e6f006f": {
-      "placa": null,
-      "numero_serie": "1900846",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "5dd957b9-e3d0-4c6e-a00e-f99874bda33c": {
@@ -4289,17 +4443,6 @@
         "tarifas_pagadas": 129,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "5d5d041c-ef27-4fb1-9f5d-98434221b687": {
-      "placa": null,
-      "numero_serie": "025982",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "d7b4ff2b-8806-4dad-a011-a99547e70a2c": {
@@ -4646,39 +4789,6 @@
       },
       "spappweb": null
     },
-    "251d0a23-f48a-4929-9e3d-13311ee62d39": {
-      "placa": "KGL54I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
-    "1fad09fd-c005-4144-8ff2-4dad350977e8": {
-      "placa": "KGJ54I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
-    "630fbc3d-3aac-4289-9679-9640bb13a80e": {
-      "placa": "NBM32I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "9eb6266c-cf90-49ac-987e-7808a36f9c45": {
       "placa": "DTV97I",
       "numero_serie": null,
@@ -4723,39 +4833,6 @@
       },
       "spappweb": null
     },
-    "8352c1eb-47f7-4c6f-b5ae-aeedd18ef9ff": {
-      "placa": null,
-      "numero_serie": "056538",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
-    "ea1370d1-dfdc-4aad-9da4-77e54f987e07": {
-      "placa": null,
-      "numero_serie": "058306",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
-    "1ebb2441-3825-40d4-b790-3b1ae0278806": {
-      "placa": null,
-      "numero_serie": "053954",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "231203ac-81cb-4655-b78f-e0c7e8eff3c1": {
       "placa": "TRT06H",
       "numero_serie": null,
@@ -4776,17 +4853,6 @@
         "tarifas_pagadas": 226,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "ff972ebd-67bf-4d2e-a5a6-1aaf08d969e4": {
-      "placa": null,
-      "numero_serie": "058301",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "d2305694-9db3-423c-835f-77eb311d3fe7": {
@@ -4965,17 +5031,6 @@
       },
       "spappweb": null
     },
-    "54e2fdc0-da07-423e-89df-68c968ba858b": {
-      "placa": null,
-      "numero_serie": "058300",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "18b8cafa-2b29-4750-9256-b7b8a7d74be8": {
       "placa": "HAQ75I",
       "numero_serie": null,
@@ -5020,17 +5075,6 @@
       },
       "spappweb": null
     },
-    "d1e55df1-2b7b-43af-b30a-027754dac332": {
-      "placa": null,
-      "numero_serie": "056559",
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "fca42c18-0d8d-423f-81ad-232e67104471": {
       "placa": "TTO55H",
       "numero_serie": null,
@@ -5051,28 +5095,6 @@
         "tarifas_pagadas": 158,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "5082b10b-f4db-4f55-9dc3-c0ad37793ba0": {
-      "placa": "KGC42I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
-    "20f24bc4-4d9b-4cb5-810f-8de8f0a899ea": {
-      "placa": "NBM33I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "577a7422-60b7-4823-b42e-e43f596ff54b": {
@@ -5119,17 +5141,6 @@
       },
       "spappweb": null
     },
-    "a77f73a4-7718-43b2-b6a0-0ee2831392e1": {
-      "placa": "NBM34I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
-      "spappweb": null
-    },
     "d4cc74c5-c386-431e-a4bc-1b55455cf7bb": {
       "placa": "DTV86I",
       "numero_serie": null,
@@ -5150,17 +5161,6 @@
         "tarifas_pagadas": 131,
         "contrato_activo": null
       },
-      "spappweb": null
-    },
-    "57fb87d4-9c3c-47b5-a122-0c845008d56a": {
-      "placa": "KGC54I",
-      "numero_serie": null,
-      "placasweb": {
-        "pagos": null,
-        "aliado": null,
-        "veces_vendida": null
-      },
-      "viaduct": null,
       "spappweb": null
     },
     "473bd5ad-9aec-4ae0-8bc8-7114e2da099f": {

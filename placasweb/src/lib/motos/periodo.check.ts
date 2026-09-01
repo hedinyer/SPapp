@@ -37,8 +37,25 @@ assert(
   ),
 );
 assert(
-  !motoEnPeriodo(
+  motoEnPeriodo(
     { updated_at: "2026-09-01T12:00:00.000Z" },
+    PERIODO_AGOSTO_2026.desde,
+    PERIODO_AGOSTO_2026.hasta,
+  ),
+);
+assert(
+  motoEnPeriodo(
+    {
+      inventariado_en: "2026-08-27",
+      updated_at: "2026-09-01T18:00:00.000Z",
+    },
+    PERIODO_AGOSTO_2026.desde,
+    PERIODO_AGOSTO_2026.hasta,
+  ),
+);
+assert(
+  !motoEnPeriodo(
+    { updated_at: "2026-09-02T12:00:00.000Z" },
     PERIODO_AGOSTO_2026.desde,
     PERIODO_AGOSTO_2026.hasta,
   ),

@@ -17,7 +17,8 @@ import {
 import {
   PERIODO_AGOSTO_2026,
   esSubida,
-  fechaBogota,
+  fechaInventario,
+  fechaLabel,
   groupByUbicacionYDia,
   horaBogota,
   motoEnPeriodo,
@@ -67,7 +68,7 @@ export function MotoPeriodoList() {
           .from("motos")
           .select("*")
           .gte("updated_at", `${desde}T00:00:00`)
-          .lt("updated_at", "2026-09-02T00:00:00")
+          .lt("updated_at", "2026-09-03T00:00:00")
           .order("updated_at", { ascending: true }),
         fetch("/data/cruce-periodo-agosto.json"),
       ]);
@@ -111,7 +112,7 @@ export function MotoPeriodoList() {
   const buscando = query.trim().length > 0;
 
   const diasActivos = useMemo(() => {
-    const set = new Set(motos.map((m) => fechaBogota(m.updated_at)));
+    const set = new Set(motos.map((m) => fechaInventario(m)));
     return [...set].sort();
   }, [motos]);
 
@@ -168,10 +169,7 @@ export function MotoPeriodoList() {
             {diasActivos.length > 0 ? (
               <p className="mt-1 text-xs text-neutral-500">
                 Actividad:{" "}
-                {diasActivos
-                  .map((d) => d.replace(/^2026-08-0/, "").replace("-", "/"))
-                  .join(" y ")}
-                {" ago"}
+                {diasActivos.map((d) => fechaLabel(d)).join(" · ")}
               </p>
             ) : null}
             {cruce ? (

@@ -8,7 +8,7 @@ import os
 import sys
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -60,7 +60,7 @@ def fetch_motos_periodo(desde: str, hasta: str) -> list[dict]:
             f"{PLACAS_URL}/rest/v1/motos"
             "?select=id,placa,numero_serie,condicion,ubicacion,pagos,aliado,veces_vendida,updated_at"
             f"&updated_at=gte.{desde}T00:00:00"
-            f"&updated_at=lt.2026-09-02T00:00:00"
+            f"&updated_at=lt.{(date.fromisoformat(hasta) + timedelta(days=2)).isoformat()}T00:00:00"
             f"&order=updated_at.asc&limit={page}&offset={offset}"
         )
         req = urllib.request.Request(url, headers=headers)
@@ -129,7 +129,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--desde", default="2026-08-23")
-    parser.add_argument("--hasta", default="2026-08-31")
+    parser.add_argument("--hasta", default="2026-09-01")
     parser.add_argument(
         "--out",
         default=str(
