@@ -172,11 +172,6 @@ export async function assignMotoByAdminOp(
   const cuotaDiaria = parsed.cuotaDiaria ?? (bike.cuota_diaria as number);
   const montoVisita = parsed.montoVisita ?? (bike.monto_visita as number);
 
-  if (cuotaInicial < (bike.cuota_inicial as number)) {
-    throw new Error(
-      `La cuota inicial no puede ser menor a ${bike.cuota_inicial} (catálogo).`,
-    );
-  }
   if (cuotaDiaria <= 0) {
     throw new Error("La cuota diaria debe ser mayor a cero.");
   }

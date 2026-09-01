@@ -93,8 +93,8 @@ export function AdminMotoAssignPanel({
       <CardHeader>
         <CardTitle>Asignar moto y placa</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Elige la moto, negocia cuotas si el cliente paga más inicial o acordaron
-          otra cuota diaria, y registra el chasis.
+          Elige la moto, ajusta la cuota inicial (puede ser menor o mayor que el
+          catálogo), negocia la cuota diaria si aplica, y registra el chasis.
         </p>
       </CardHeader>
       <CardContent>
@@ -110,15 +110,6 @@ export function AdminMotoAssignPanel({
             }
             if (!Number.isFinite(parsedInicial) || parsedInicial < 0) {
               toast.error("Indica una cuota inicial válida.");
-              return;
-            }
-            if (
-              selectedBike &&
-              parsedInicial < selectedBike.cuota_inicial
-            ) {
-              toast.error(
-                `La cuota inicial no puede ser menor a ${formatCop(selectedBike.cuota_inicial)} (catálogo).`,
-              );
               return;
             }
             if (!Number.isFinite(parsedDiaria) || parsedDiaria <= 0) {
@@ -195,8 +186,8 @@ export function AdminMotoAssignPanel({
                     placeholder={String(selectedBike.cuota_inicial)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Mínimo {formatCop(selectedBike.cuota_inicial)}. Puede ser
-                    mayor si el cliente aporta más inicial.
+                    Catálogo {formatCop(selectedBike.cuota_inicial)} — puedes
+                    bajarla si cierras la venta con menos inicial.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
@@ -231,6 +222,13 @@ export function AdminMotoAssignPanel({
                     <p className="font-medium text-emerald-900">
                       Primer pago acordado
                     </p>
+                    {parsedInicial < selectedBike.cuota_inicial && (
+                      <p className="mt-1 text-amber-800">
+                        Inicial negociada{" "}
+                        {formatCop(selectedBike.cuota_inicial - parsedInicial)}{" "}
+                        por debajo del catálogo.
+                      </p>
+                    )}
                     <p className="mt-1 text-emerald-800">
                       Inicial {formatCop(paymentPreview.cuota_inicial_monto)} +{" "}
                       adelantada {formatCop(paymentPreview.monto_cuota_periodo)}
