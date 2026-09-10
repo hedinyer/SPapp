@@ -161,6 +161,8 @@ export interface UserMotoCompraRow {
   doc_tecno_path: string | null;
   seleccionado_at: string;
   admin_data?: { entrega_antes_visita?: boolean };
+  /** Presente en entregadas/vendidas; opcional en selects parciales. */
+  estado_fisico?: VendidaEstadoFisico;
 }
 
 export interface VendidaMotoRow extends UserMotoCompraRow {
@@ -379,6 +381,7 @@ export interface ClientPipeline {
   /** tarifa_id → URL del comprobante de pago (si se subió foto). */
   comprobanteByTarifaId: Record<string, string>;
   compraProductosCredito: CompraProductoCreditoRow[];
+  recuperacion: ClientRecuperacionMarker | null;
   steps: PipelineStep[];
   currentAdminStep: PipelineStepId | null;
   displayName: string;
@@ -412,6 +415,11 @@ export interface InboxListItem {
   /** Etiqueta corta del documento: C.C., PPT, … */
   docLabel?: string;
   selfieUrl?: string | null;
+  motoImagenUrl?: string | null;
+  placa?: string | null;
+  motoLabel?: string | null;
+  diasAtraso?: number;
+  montoAdeudado?: number;
   createdAt?: string;
   estadoSolicitud?: string;
 }
@@ -429,6 +437,11 @@ export interface ClienteFacturacion {
   totalPrimerPago: number | null;
 }
 
+/** Marcador de recuperación por mora (listado/ficha clientes). */
+export type ClientRecuperacionMarker =
+  | { kind: "retenida" }
+  | { kind: "devuelta"; veces: number };
+
 export interface ClientSearchResult {
   userId: number;
   username: string;
@@ -441,6 +454,7 @@ export interface ClientSearchResult {
   compraEstado: MotoCompraEstado | null;
   cuotasPagadas: number;
   diasAtraso: number;
+  recuperacion: ClientRecuperacionMarker | null;
   matchLabel: string;
   seleccionadoAt: string | null;
   selfieUrl: string | null;

@@ -109,10 +109,15 @@ async function main() {
           : null),
     );
 
+    const celularContratante = String(
+      cd.celular_contratante ?? hoja.celular ?? "",
+    ).trim();
+
     const contrato: ContratoData = {
       nombreContratante: String(cd.nombre_contratante ?? ""),
       cedulaContratante: String(cd.cedula_contratante ?? ""),
       tipoDocContratante,
+      celularContratante,
       direccionNotificaciones: String(cd.direccion_notificaciones ?? ""),
       ciudadContratante: String(cd.ciudad_contratante ?? ""),
       departamentoContratante: String(cd.departamento_contratante ?? ""),
@@ -147,11 +152,15 @@ async function main() {
       continue;
     }
 
-    if (cd.tipo_doc_contratante !== tipoDocContratante) {
+    if (cd.tipo_doc_contratante !== tipoDocContratante || cd.celular_contratante !== celularContratante) {
       await supabase
         .from("digital_contracts")
         .update({
-          contrato_data: { ...cd, tipo_doc_contratante: tipoDocContratante },
+          contrato_data: {
+            ...cd,
+            tipo_doc_contratante: tipoDocContratante,
+            celular_contratante: celularContratante,
+          },
         })
         .eq("id", row.id);
     }

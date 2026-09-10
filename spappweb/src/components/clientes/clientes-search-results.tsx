@@ -30,6 +30,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { GenerarFacturasDialog } from "@/components/clientes/generar-facturas-dialog";
+import { recuperacionMarkerLabel } from "@/lib/pipeline/recuperacion-display";
 
 function PhotoThumb({
   src,
@@ -170,6 +171,15 @@ export function ClientesSearchResults({
                             {COMPRA_ESTADO_LABELS[client.compraEstado]}
                           </Badge>
                         )}
+                        {client.recuperacion?.kind === "retenida" ? (
+                          <span className="text-xs font-bold text-red-600">
+                            RECUPERADA
+                          </span>
+                        ) : client.recuperacion?.kind === "devuelta" ? (
+                          <span className="text-xs text-muted-foreground">
+                            {recuperacionMarkerLabel(client.recuperacion)}
+                          </span>
+                        ) : null}
                         {client.compraEstado &&
                           (client.diasAtraso > 0 ? (
                             <Badge

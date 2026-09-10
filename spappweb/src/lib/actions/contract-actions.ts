@@ -77,10 +77,12 @@ export async function signContract(input: z.infer<typeof signSchema>) {
       ? hojaRaw.tipo_identificacion
       : null,
   );
+  const celularContratante = String(hojaRaw?.celular ?? "").trim();
   const contratoData: ContratoData = {
     nombreContratante: parsed.nombre,
     cedulaContratante: parsed.cedula,
     tipoDocContratante,
+    celularContratante,
     direccionNotificaciones: parsed.direccion,
     ciudadContratante: parsed.ciudad,
     departamentoContratante: parsed.departamento,
@@ -154,6 +156,7 @@ export async function signContract(input: z.infer<typeof signSchema>) {
         nombre_contratante: parsed.nombre,
         cedula_contratante: parsed.cedula,
         tipo_doc_contratante: tipoDocContratante,
+        celular_contratante: celularContratante,
         direccion_notificaciones: parsed.direccion,
         ciudad_contratante: parsed.ciudad,
         departamento_contratante: parsed.departamento,
@@ -195,6 +198,7 @@ export async function signContract(input: z.infer<typeof signSchema>) {
   });
 
   revalidatePath("/inbox");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${userId}`);
   return { ok: true };
 }

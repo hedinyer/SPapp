@@ -70,7 +70,7 @@ export function MotoSelectionFlow({
 }: MotoSelectionFlowProps) {
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<CatalogPick | null>(null);
-  const [frecuencia, setFrecuencia] = useState<FrecuenciaPago>("semanal");
+  const [frecuencia, setFrecuencia] = useState<FrecuenciaPago>("diario");
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
 

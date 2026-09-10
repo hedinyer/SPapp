@@ -29,6 +29,8 @@ export interface ContratoData {
   cedulaContratante: string;
   /** Etiqueta corta del doc del contratante: C.C., PPT, PV, CV */
   tipoDocContratante: string;
+  /** Celular del contratante (hoja de vida). */
+  celularContratante: string;
   direccionNotificaciones: string;
   ciudadContratante: string;
   departamentoContratante: string;
@@ -115,6 +117,7 @@ export function buildContratoComercial(compra: CompraContratoInput): Omit<
   | "nombreContratante"
   | "cedulaContratante"
   | "tipoDocContratante"
+  | "celularContratante"
   | "direccionNotificaciones"
   | "ciudadContratante"
   | "departamentoContratante"
@@ -280,7 +283,7 @@ export const blocks: ClausulaBlock[] = [
       {
         titulo: "DÉCIMA NOVENA",
         texto:
-          "Para efectos de notificaciones, EL PROPIETARIO las recibirá en la dirección electrónica contacto@solucionesgarrido.com o en [DIRECCION_EMPRESA], y EL CONTRATANTE en la dirección [DIRECCION_NOTIFICACIONES], ciudad de [CIUDAD_CONTRATANTE], departamento de [DEPARTAMENTO_CONTRATANTE].",
+          "Para efectos de notificaciones, EL PROPIETARIO las recibirá en la dirección electrónica contacto@solucionesgarrido.com o en [DIRECCION_EMPRESA], y EL CONTRATANTE en la dirección [DIRECCION_NOTIFICACIONES], teléfono [CELULAR_CONTRATANTE], ciudad de [CIUDAD_CONTRATANTE], departamento de [DEPARTAMENTO_CONTRATANTE].",
       },
       {
         titulo: "VIGÉSIMA",
@@ -332,6 +335,10 @@ function applyContratantePlaceholders(text: string, form: ContratoData): string 
     .replaceAll(
       "[DIRECCION_NOTIFICACIONES]",
       form.direccionNotificaciones || "_________________________",
+    )
+    .replaceAll(
+      "[CELULAR_CONTRATANTE]",
+      form.celularContratante.trim() || "________________",
     )
     .replaceAll("[DIRECCION_EMPRESA]", EMPRESA_PROPIETARIA.direccion);
 }
@@ -441,11 +448,12 @@ export function contratoClausulasSelfCheck(): void {
   if (EMPRESA_PROPIETARIA.ciudad !== "Girardot") {
     throw new Error("EMPRESA_PROPIETARIA.ciudad debe ser Girardot");
   }
-  const firmaPpt = renderFirma({
+  const sample: ContratoData = {
     nombreContratante: "Test PPT",
     cedulaContratante: "6631197",
     tipoDocContratante: "PPT",
-    direccionNotificaciones: "x",
+    celularContratante: "3001234567",
+    direccionNotificaciones: "Calle 10 #20-30",
     ciudadContratante: "Girardot",
     departamentoContratante: "Cundinamarca",
     fechaFirmaDia: "1",
@@ -467,8 +475,20 @@ export function contratoClausulasSelfCheck(): void {
     formaPagoSaldo: "x",
     mediosPago: "x",
     duracionTexto: "doce (12) meses",
-  });
+  };
+  const firmaPpt = renderFirma(sample);
   if (!firmaPpt.includes("PPT 6631197") || firmaPpt.includes("C.C. 6631197")) {
     throw new Error("renderFirma debe usar PPT cuando tipoDocContratante=PPT");
+  }
+  const novena = blocks
+    .flatMap((b) => b.clausulas)
+    .find((c) => /D[EÉ]CIMA NOVENA/.test(c.titulo));
+  if (!novena) throw new Error("cláusula décima novena");
+  const novenaTxt = renderClausulaTexto(novena.texto, sample);
+  if (
+    !novenaTxt.includes("Calle 10 #20-30") ||
+    !novenaTxt.includes("teléfono 3001234567")
+  ) {
+    throw new Error("cláusula 19 dirección + celular");
   }
 }

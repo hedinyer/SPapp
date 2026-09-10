@@ -149,6 +149,7 @@ export async function submitPublicApplication(
     });
 
     revalidatePath("/inbox");
+    revalidatePath("/clientes");
     revalidatePath(`/clientes/${userId}`);
     return { ok: true, userId, updated: true };
   }
@@ -195,6 +196,7 @@ export async function submitPublicApplication(
   });
 
   revalidatePath("/inbox");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${userId}`);
   return { ok: true, userId };
 }

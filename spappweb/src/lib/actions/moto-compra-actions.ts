@@ -97,6 +97,7 @@ export async function selectMotoFromContract(
     if (insertError) throw new Error(insertError.message);
 
     revalidatePath("/inbox");
+    revalidatePath("/clientes");
     revalidatePath(`/clientes/${userId}`);
     revalidatePath(`/moto/${parsed.contractId}`);
     revalidatePath("/garaje");
@@ -130,6 +131,7 @@ export async function selectMotoFromContract(
   if (insertError) throw new Error(insertError.message);
 
   revalidatePath("/inbox");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${userId}`);
   revalidatePath(`/moto/${parsed.contractId}`);
   return { ok: true };

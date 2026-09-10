@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
 
     if (result.ok) {
       revalidatePath("/inbox");
+      revalidatePath("/clientes");
       revalidatePath(`/clientes/${parsed.data.userId}`);
     }
 

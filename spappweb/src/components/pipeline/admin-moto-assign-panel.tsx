@@ -42,7 +42,7 @@ export function AdminMotoAssignPanel({
     compra?.bike_id ? String(compra.bike_id) : "",
   );
   const [frecuencia, setFrecuencia] = useState<FrecuenciaPago>(
-    compra?.frecuencia_pago ?? "semanal",
+    compra?.frecuencia_pago ?? "diario",
   );
   const [cuotaInicial, setCuotaInicial] = useState("");
   const [cuotaDiaria, setCuotaDiaria] = useState("");

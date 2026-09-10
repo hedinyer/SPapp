@@ -5,6 +5,7 @@ import {
   FRECUENCIA_LABELS,
 } from "@/lib/pipeline/types";
 import { getMoraDisplay, moraEstadoLabel } from "@/lib/pipeline/mora-utils";
+import { recuperacionMarkerLabel } from "@/lib/pipeline/recuperacion-display";
 import { formatCop, formatCuotas } from "@/lib/utils/format";
 import { etiquetaDocCorta } from "@/lib/contracts/hoja-vida-schema";
 import { Card, CardContent } from "@/components/ui/card";
@@ -125,6 +126,19 @@ export function ClientInfoSummary({
                 label="Estado compra"
                 value={COMPRA_ESTADO_LABELS[compra.estado]}
               />
+              {pipeline.recuperacion?.kind === "retenida" ? (
+                <div>
+                  <p className="text-xs text-muted-foreground">Recuperación</p>
+                  <p className="mt-0.5 text-sm font-bold text-red-600">
+                    RECUPERADA
+                  </p>
+                </div>
+              ) : pipeline.recuperacion?.kind === "devuelta" ? (
+                <InfoItem
+                  label="Recuperación"
+                  value={recuperacionMarkerLabel(pipeline.recuperacion)}
+                />
+              ) : null}
               {compra.estado !== "cancelada" && (
                 <InfoItem
                   label="Frecuencia de pago"

@@ -63,6 +63,7 @@ interface ContractSignFlowProps {
     | "nombreContratante"
     | "cedulaContratante"
     | "tipoDocContratante"
+    | "celularContratante"
     | "direccionNotificaciones"
     | "ciudadContratante"
     | "departamentoContratante"
@@ -157,6 +158,7 @@ export function ContractSignFlow({
     nombreContratante: nombre,
     cedulaContratante: cedula,
     tipoDocContratante,
+    celularContratante: resumen.celular,
     direccionNotificaciones: direccion,
     ciudadContratante: ciudad,
     departamentoContratante: departamento,

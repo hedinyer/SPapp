@@ -695,6 +695,7 @@ export async function registrarCobroVisitaDesdeCaja(
   if (insertError) throw new Error(insertError.message);
 
   revalidatePath("/caja");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${parsed.userId}`);
   revalidatePath("/inbox");
   return getCajaSesionHoy();

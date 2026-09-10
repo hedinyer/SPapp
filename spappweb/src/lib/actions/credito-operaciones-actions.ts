@@ -25,6 +25,7 @@ const MEDIO_PAGO_ADMIN_VALUES = [
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
   revalidatePath("/caja");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${userId}`);
 }
 

@@ -56,6 +56,7 @@ function resolveReferenciaPresencial(
 function revalidateClient(userId: number) {
   revalidatePath("/inbox");
   revalidatePath("/caja");
+  revalidatePath("/clientes");
   revalidatePath(`/clientes/${userId}`);
 }
 
