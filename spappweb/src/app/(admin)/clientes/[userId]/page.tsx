@@ -41,7 +41,16 @@ export default async function ClientPage({
       </Button>
 
       <PageHeader
-        title={pipeline.displayName}
+        title={
+          <>
+            {pipeline.displayName}
+            {pipeline.esRenovacion ? (
+              <span className="text-base font-bold tracking-wide text-red-600 sm:text-lg">
+                RENOVACION
+              </span>
+            ) : null}
+          </>
+        }
         description={`Usuario @${pipeline.user.user} · ID ${pipeline.user.id}`}
         action={<ClientHeaderActions pipeline={pipeline} />}
       />

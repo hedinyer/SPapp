@@ -339,7 +339,20 @@ La bandeja `/inbox` tiene 9 colas: `creditos`, `pagos`, `retiro`, `entrega`,
 > Contado de mostrador = `list_ventas_contado` (+ productos con `list_ventas_producto`).
 
 ### Crédito
-`approve_credit {documentId,userId}` · `reject_credit {documentId,userId,motivo,betado}`
+`approve_credit {documentId,userId}` · `reject_credit {documentId,userId,motivo,betado}` ·
+`congelar_cuotas {userId,compraId,dias,observaciones?}` · `saldar_credito
+{userId,compraId,monto,medioPagoAdmin,referencia?,…}` · `add_compra_producto_credito` /
+`remove_compra_producto_credito`
+
+### Contratos / PDF
+`get_contract_detail {contractId}` · `update_contract_terms {contractId,userId,
+duracionTexto?,numPeriodos?,totalContrato?,motoPlaca?,…,regeneratePdf?}` ·
+`sync_contract_from_compra {contractId,userId,regeneratePdf?}` ·
+`regenerate_contract_pdf {contractId,userId?}`
+
+Overrides en `contrato_data`: `duracion_texto`, `num_periodos`, `total_contrato`.
+Tras cambiar crédito/placa/cuotas: `sync_contract_from_compra` + `regenerate_contract_pdf`
+(o `update_contract_terms` con `regeneratePdf: true`).
 
 ### Visitas
 `assign_visit {visitaId,userId,visitadorId,fechaProgramada}` · `complete_visit
@@ -350,13 +363,14 @@ La bandeja `/inbox` tiene 9 colas: `creditos`, `pagos`, `retiro`, `entrega`,
 `confirm_payment_flag {compraId,userId,field,value}` · `confirm_tarifa_pago
 {tarifaId,userId,notas?}` · `register_payment {userId,compraId,contexto,monto,
 medioPagoAdmin,bancoOrigen,...}` · `check_referencia_usada {userId,referencia}` ·
-`remove_pago_abono {pagoId,userId}`
+`remove_pago_abono {pagoId,userId}` · `update_frecuencia_pago` · `update_monto_visita` ·
+`update_compra_montos` · `update_tarifa {tarifaId,userId,montoEsperado?,fechaVencimiento?}`
 
 ### Entrega
+`assign_moto {userId,documentId,bikeId,frecuencia,chasis,placa?,…}` ·
 `update_delivery {compraId,userId,placa,chasis,fechaEntrega,referencia?}` ·
 `mark_delivered {compraId,userId}` · `cancel_compra {compraId,userId}` ·
-`update_vendida_estado_fisico {compraId,userId,estadoFisico}` · `delete_vendida_moto
-{compraId,userId}`
+`set_entrega_antes_visita` · `update_vendida_estado_fisico` · `delete_vendida_moto`
 
 ### Mora / tracking
 `set_tracking {userId,seguimiento}` · `resolve_moroso {morosoId,userId}` ·
@@ -367,9 +381,24 @@ medioPagoAdmin,bancoOrigen,...}` · `check_referencia_usada {userId,referencia}`
 {documentFrontUrl,documentBackUrl,selfieUrl,hojaVida}`
 
 ### Catálogo / inventario / garaje / taller
-`save_bike` / `delete_bike` · `save_categoria` / `delete_categoria` · `save_producto`
-/ `delete_producto` · `update_solicitud_estado` · `save_garaje_parqueadero` /
-`delete_garaje_parqueadero` · `save_garaje_moto` / `delete_garaje_moto`
+`save_bike` / `delete_bike` · `list_productos_credito` / `save_producto_credito` /
+`delete_producto_credito` · `save_categoria` / `delete_categoria` · `save_producto`
+/ `delete_producto` · `lookup_producto_sku` · `update_solicitud_estado` ·
+`save_garaje_parqueadero` / `delete_garaje_parqueadero` · `save_garaje_moto` /
+`delete_garaje_moto` · `liberar_garaje_moto` / `devolver_garaje_moto` ·
+`list_garaje_mantenimiento` / `add_garaje_mantenimiento` /
+`remove_garaje_mantenimiento` / `terminar_garaje_mantenimiento`
+
+### Caja
+`get_caja_hoy` · `abrir_caja` · `cerrar_caja` · `registrar_movimiento_caja` ·
+`registrar_egreso_caja`
+
+### Ventas contado
+`save_venta_moto` · `set_placa_venta_moto` · `add_abono_venta_moto` ·
+`save_venta_producto` · (listados: `list_ventas_contado`, `list_ventas_producto`)
+
+### GPS
+`get_gps_live {userId,placa,…}` · `gps_comando_motor {userId,placa,accion,…}`
 
 > Cada tool valida sus argumentos con Zod y delega en la server action/query real, así
 > que se respetan todas las guardas de negocio y triggers de Supabase. Los errores se

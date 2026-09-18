@@ -258,6 +258,19 @@ export function buildPipelineSteps(
   });
 }
 
+/** Periodos >= este valor son historial pre-renovación (no cuentan en el ciclo actual). */
+export const RENOVACION_HISTORIAL_PERIODO_MIN = 10000;
+
+export function contractEsRenovacion(
+  contract: DigitalContractRow | null | undefined,
+): boolean {
+  return contract?.contrato_data?.es_renovacion === true;
+}
+
+export function isCicloActualTarifa(numeroPeriodo: number): boolean {
+  return numeroPeriodo < RENOVACION_HISTORIAL_PERIODO_MIN;
+}
+
 export function resolveDisplayName(
   user: UserRow,
   contract: DigitalContractRow | null,
@@ -332,6 +345,7 @@ export function buildClientPipeline(input: {
       input.contract,
       input.visita,
     ),
+    esRenovacion: contractEsRenovacion(input.contract),
   };
 }
 

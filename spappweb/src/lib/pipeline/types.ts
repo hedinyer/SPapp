@@ -385,6 +385,8 @@ export interface ClientPipeline {
   steps: PipelineStep[];
   currentAdminStep: PipelineStepId | null;
   displayName: string;
+  /** Ciclo de renovación (contrato_data.es_renovacion). */
+  esRenovacion: boolean;
 }
 
 export type InboxQueueId =
@@ -459,6 +461,7 @@ export interface ClientSearchResult {
   seleccionadoAt: string | null;
   selfieUrl: string | null;
   motoImagenUrl: string | null;
+  esRenovacion: boolean;
 }
 
 export interface BikeRow {

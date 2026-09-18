@@ -1,31 +1,14 @@
 /**
  * Regenera contrato.pdf de contratos firmados.
  * Honra overrides en contrato_data: duracion_texto, num_periodos, total_contrato.
- * Usa tipo_identificacion de la hoja (PPT → etiqueta PPT, no C.C.).
  * node --import ./scripts/stub-server-only.mjs --import tsx scripts/regenerate-contratos-girardot.ts [contract-id]
  */
 import { createClient } from "@supabase/supabase-js";
-import { generateContratoPdf } from "../src/lib/contracts/contract-pdf";
 import {
-  buildContratoComercial,
-  buildFormaPagoSaldoText,
-  type ContratoData,
-} from "../src/lib/contracts/contrato-renting-clausulas";
-import { etiquetaDocCorta } from "../src/lib/contracts/hoja-vida-schema";
-import { formatCop } from "../src/lib/utils/format-cop";
+  regenerateContratoPdfForRow,
+  type FirmadoContratoRow,
+} from "../src/lib/contracts/regenerate-contrato-pdf";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "../src/lib/supabase/public-env";
-import type { FrecuenciaPago } from "../src/lib/pipeline/types";
-
-const BUCKET = "contract-documents";
-
-type ContratoRow = {
-  id: string;
-  user_id: number;
-  signature_path: string;
-  contrato_pdf_path: string;
-  contrato_data: Record<string, unknown>;
-  hoja_vida_data: Record<string, unknown> | null;
-};
 
 async function main() {
   const onlyId = process.argv[2]?.trim() || null;
@@ -53,129 +36,21 @@ async function main() {
   }
 
   let ok = 0;
-  for (const row of contracts as ContratoRow[]) {
-    const cd = row.contrato_data ?? {};
-    const hoja = row.hoja_vida_data ?? {};
-    const freq = String(cd.frecuencia_pago ?? "diario") as FrecuenciaPago;
-    const cuotaInicial = Number(cd.cuota_inicial ?? 0);
-    const valorCuota = Number(cd.valor_cuota ?? 0);
-    const numPeriodos =
-      cd.num_periodos != null && Number(cd.num_periodos) > 0
-        ? Number(cd.num_periodos)
-        : null;
-
-    const { data: compra } = await supabase
-      .from("user_moto_compra")
-      .select("referencia")
-      .eq("user_id", row.user_id)
-      .maybeSingle();
-
-    const comercial = buildContratoComercial({
-      modelo: String(cd.moto_modelo ?? ""),
-      color: String(cd.moto_color ?? ""),
-      placa: String(cd.moto_placa ?? ""),
-      chasis: String(cd.moto_chasis ?? ""),
-      referencia: (compra?.referencia as string | null) ?? null,
-      frecuencia_pago: freq,
-      cuota_inicial_monto: cuotaInicial,
-      monto_cuota_periodo: valorCuota,
-    });
-
-    if (numPeriodos != null) {
-      comercial.formaPagoSaldo = buildFormaPagoSaldoText(
-        freq,
-        comercial.valorCuota,
-        numPeriodos,
+  for (const row of contracts as FirmadoContratoRow[]) {
+    try {
+      const result = await regenerateContratoPdfForRow(supabase, row);
+      ok += 1;
+      console.log(
+        "OK",
+        result.userId,
+        result.contractId,
+        result.duracionTexto,
+        result.totalContrato,
+        result.pdfBytes,
       );
-      comercial.totalContrato = formatCop(
-        cuotaInicial + valorCuota * numPeriodos,
-      );
+    } catch (e) {
+      console.error("FAIL", row.id, e instanceof Error ? e.message : e);
     }
-
-    if (typeof cd.total_contrato === "string" && cd.total_contrato.trim()) {
-      comercial.totalContrato = cd.total_contrato;
-    }
-
-    if (typeof cd.duracion_texto === "string" && cd.duracion_texto.trim()) {
-      comercial.duracionTexto = cd.duracion_texto;
-    }
-
-    const tipoDocContratante = etiquetaDocCorta(
-      (typeof hoja.tipo_identificacion === "string"
-        ? hoja.tipo_identificacion
-        : null) ??
-        (typeof cd.tipo_doc_contratante === "string"
-          ? cd.tipo_doc_contratante
-          : null),
-    );
-
-    const celularContratante = String(
-      cd.celular_contratante ?? hoja.celular ?? "",
-    ).trim();
-
-    const contrato: ContratoData = {
-      nombreContratante: String(cd.nombre_contratante ?? ""),
-      cedulaContratante: String(cd.cedula_contratante ?? ""),
-      tipoDocContratante,
-      celularContratante,
-      direccionNotificaciones: String(cd.direccion_notificaciones ?? ""),
-      ciudadContratante: String(cd.ciudad_contratante ?? ""),
-      departamentoContratante: String(cd.departamento_contratante ?? ""),
-      fechaFirmaDia: String(cd.fecha_firma_dia ?? ""),
-      fechaFirmaMes: String(cd.fecha_firma_mes ?? ""),
-      fechaFirmaAnio: String(cd.fecha_firma_anio ?? ""),
-      ...comercial,
-    };
-
-    const { data: sigBlob, error: sigErr } = await supabase.storage
-      .from(BUCKET)
-      .download(row.signature_path);
-    if (sigErr || !sigBlob) {
-      console.error("FAIL signature", row.id, sigErr?.message);
-      continue;
-    }
-    const sigBuf = Buffer.from(await sigBlob.arrayBuffer());
-    const signatureDataUrl = `data:image/png;base64,${sigBuf.toString("base64")}`;
-
-    const pdf = Buffer.from(
-      await generateContratoPdf({ contrato, signatureDataUrl }),
-    );
-
-    const { error: upErr } = await supabase.storage
-      .from(BUCKET)
-      .upload(row.contrato_pdf_path, pdf, {
-        contentType: "application/pdf",
-        upsert: true,
-      });
-    if (upErr) {
-      console.error("FAIL upload", row.id, upErr.message);
-      continue;
-    }
-
-    if (cd.tipo_doc_contratante !== tipoDocContratante || cd.celular_contratante !== celularContratante) {
-      await supabase
-        .from("digital_contracts")
-        .update({
-          contrato_data: {
-            ...cd,
-            tipo_doc_contratante: tipoDocContratante,
-            celular_contratante: celularContratante,
-          },
-        })
-        .eq("id", row.id);
-    }
-
-    ok += 1;
-    console.log(
-      "OK",
-      row.user_id,
-      cd.nombre_contratante,
-      tipoDocContratante,
-      cd.moto_placa,
-      comercial.duracionTexto,
-      comercial.totalContrato,
-      pdf.length,
-    );
   }
 
   console.log(`Hecho: ${ok}/${contracts.length}`);

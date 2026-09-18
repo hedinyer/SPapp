@@ -13,7 +13,8 @@
     "check:mora": "node --experimental-strip-types src/lib/pipeline/mora-utils.check.ts",
     "check:all": "node scripts/check-all.mjs",
     "test:e2e": "playwright test",
-    "test": "npm run check:all && npm run test:e2e"
+    "test": "npm run check:all && npm run test:e2e",
+    "check:regenerate": "npx --yes tsx src/lib/contracts/regenerate-contrato-pdf.check.ts"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",

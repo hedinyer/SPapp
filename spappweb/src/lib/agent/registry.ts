@@ -22,6 +22,8 @@ const loadVentaProductoActions = () =>
 const loadHistorialMotosActions = () =>
   import("@/lib/actions/historial-motos-actions");
 const loadCajaActions = () => import("@/lib/actions/caja-actions");
+const loadCreditoOps = () => import("@/lib/actions/credito-operaciones-actions");
+const loadContractAdmin = () => import("@/lib/actions/contract-admin-actions");
 
 const INBOX_QUEUE_IDS = [
   "creditos",
@@ -35,10 +37,18 @@ const INBOX_QUEUE_IDS = [
   "solicitudes_taller",
 ] as const;
 
+const MEDIO_PAGO_ADMIN = [
+  "nequi_nicolas",
+  "davivienda",
+  "efectivo",
+  "datafono",
+] as const;
+
 export type AgentToolCategory =
   | "lectura"
   | "notificaciones"
   | "credito"
+  | "contratos"
   | "visitas"
   | "pagos"
   | "entrega"
@@ -47,7 +57,10 @@ export type AgentToolCategory =
   | "catalogo"
   | "inventario"
   | "garaje"
-  | "taller";
+  | "taller"
+  | "caja"
+  | "ventas"
+  | "gps";
 
 interface ToolDef<S extends z.ZodTypeAny = z.ZodTypeAny> {
   category: AgentToolCategory;
@@ -260,7 +273,7 @@ export const AGENT_TOOLS = {
       (await loadHistorialMotosActions()).listHistorialMotosCredito(),
   }),
   get_caja_hoy: tool({
-    category: "lectura",
+    category: "caja",
     description:
       "Sesión de caja de hoy (America/Bogota): apertura/cierre, movimientos, egresos e informe de recaudos (efectivo/Nequi/Davivienda, ventas tienda, pagos crédito). Null si aún no se abrió caja.",
     input: empty,
@@ -695,6 +708,489 @@ export const AGENT_TOOLS = {
     description: "Elimina una moto del garaje.",
     input: z.object({ id: z.string().uuid() }),
     handler: async ({ id }) => (await loadAdminActions()).deleteGarajeMoto(id),
+  }),
+  liberar_garaje_moto: tool({
+    category: "garaje",
+    description:
+      "Libera una moto retenida en garaje para reventa (plazo de recuperación vencido).",
+    input: z.object({ garajeMotoId: z.string().uuid() }),
+    handler: async (args) =>
+      (await loadAdminActions()).liberarGarajeMotoParaVenta(args),
+  }),
+  devolver_garaje_moto: tool({
+    category: "garaje",
+    description:
+      "Devuelve al cliente una moto retenida en garaje (p.ej. tras pagar parte de la deuda).",
+    input: z.object({ garajeMotoId: z.string().uuid() }),
+    handler: async (args) =>
+      (await loadAdminActions()).devolverGarajeMotoAlCliente(args),
+  }),
+  list_garaje_mantenimiento: tool({
+    category: "garaje",
+    description: "Lista ítems de mantenimiento (repuestos) de una moto en garaje.",
+    input: z.object({ garajeMotoId: z.string().uuid() }),
+    handler: async ({ garajeMotoId }) =>
+      (await loadQueries()).getGarajeMantenimientoItems(garajeMotoId),
+  }),
+  add_garaje_mantenimiento: tool({
+    category: "garaje",
+    description:
+      "Agrega un repuesto de inventario al mantenimiento de una moto (descuenta stock).",
+    input: z.object({
+      garajeMotoId: z.string().uuid(),
+      productoId: z.number().int().positive(),
+      cantidad: z.number().int().positive(),
+      notas: z.string().optional(),
+    }),
+    handler: async (args) =>
+      (await loadAdminActions()).addGarajeMantenimientoItem(args),
+  }),
+  remove_garaje_mantenimiento: tool({
+    category: "garaje",
+    description: "Quita un ítem de mantenimiento y devuelve stock al inventario.",
+    input: z.object({ itemId: z.string().uuid() }),
+    handler: async ({ itemId }) =>
+      (await loadAdminActions()).removeGarajeMantenimientoItem(itemId),
+  }),
+  terminar_garaje_mantenimiento: tool({
+    category: "garaje",
+    description:
+      "Termina mantenimiento: moto pasa a disponible con cuotas de reventa.",
+    input: z.object({
+      garajeMotoId: z.string().uuid(),
+      cuotaInicial: z.number().int().positive(),
+      cuotaDiaria: z.number().int().positive(),
+      montoVisita: z.number().int().nonnegative().optional(),
+    }),
+    handler: async (args) =>
+      (await loadAdminActions()).terminarGarajeMantenimiento(args),
+  }),
+
+  // ---------------------------------------------------------------- ASIGNACIÓN MOTO / ENTREGA EXTRA
+  assign_moto: tool({
+    category: "entrega",
+    description:
+      "Asigna moto del catálogo a un cliente con crédito aprobado (crea/actualiza user_moto_compra; con placa+chasis prepara contrato).",
+    input: z.object({
+      userId: z.number().int().positive(),
+      documentId: z.number().int().positive(),
+      bikeId: z.number().int().positive(),
+      frecuencia: z.enum(["diario", "semanal", "quincenal", "mensual"]),
+      chasis: z.string().trim().min(1),
+      placa: z.string().trim().optional(),
+      referencia: z.string().trim().optional(),
+      cuotaInicial: z.number().int().min(0).optional(),
+      cuotaDiaria: z.number().int().positive().optional(),
+      montoVisita: z.number().int().min(0).optional(),
+    }),
+    handler: async (args) => (await loadAdminActions()).assignMotoByAdmin(args),
+  }),
+  set_entrega_antes_visita: tool({
+    category: "entrega",
+    description:
+      "Define si la entrega de moto puede ir antes de la visita domiciliaria.",
+    input: z.object({
+      compraId: z.string().uuid(),
+      userId: z.number().int().positive(),
+      entregaAntesVisita: z.boolean(),
+    }),
+    handler: async ({ compraId, userId, entregaAntesVisita }) =>
+      (await loadAdminActions()).setEntregaAntesVisita(
+        compraId,
+        userId,
+        entregaAntesVisita,
+      ),
+  }),
+  update_frecuencia_pago: tool({
+    category: "pagos",
+    description:
+      "Cambia la frecuencia de pago de la compra (solo antes de haber pagos / pendiente). Actualiza montos de cuota; no regenera PDF.",
+    input: z.object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      frecuencia: z.enum(["diario", "semanal", "quincenal", "mensual"]),
+    }),
+    handler: async (args) =>
+      (await loadPaymentActions()).updateFrecuenciaPagoCompra(args),
+  }),
+  update_monto_visita: tool({
+    category: "pagos",
+    description: "Actualiza el monto de visita de la compra (pre-entrega).",
+    input: z.object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      montoVisita: z.number().int().min(0),
+    }),
+    handler: async (args) =>
+      (await loadPaymentActions()).updateMontoVisitaCompra(args),
+  }),
+  update_compra_montos: tool({
+    category: "pagos",
+    description:
+      "Ajusta cuota inicial y/o monto de cuota periodo en compra pendiente_pago; sincroniza contrato_data/admin_data.",
+    input: z.object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      cuotaInicial: z.number().int().min(0).optional(),
+      montoCuotaPeriodo: z.number().int().positive().optional(),
+    }),
+    handler: async (args) =>
+      (await loadContractAdmin()).updateCompraMontos(args),
+  }),
+  update_tarifa: tool({
+    category: "pagos",
+    description:
+      "Edita monto_esperado y/o fecha_vencimiento de una tarifa pendiente/vencida (no pagada).",
+    input: z.object({
+      tarifaId: z.string().uuid(),
+      userId: z.number().int().positive(),
+      montoEsperado: z.number().int().positive().optional(),
+      fechaVencimiento: z.string().min(1).optional(),
+    }),
+    handler: async (args) => (await loadContractAdmin()).updateTarifa(args),
+  }),
+
+  // ---------------------------------------------------------------- CRÉDITO OPS
+  congelar_cuotas: tool({
+    category: "credito",
+    description:
+      "Congela cuotas de una compra entregada: corre fechas de vencimiento N días (RPC congelar_cuotas_compra).",
+    input: z.object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      dias: z.number().int().min(1).max(365),
+      observaciones: z.string().max(2000).optional(),
+    }),
+    handler: async (args) => (await loadCreditoOps()).congelarCuotas(args),
+  }),
+  saldar_credito: tool({
+    category: "credito",
+    description:
+      "Liquida el crédito: marca tarifas pendientes como pagadas y compra saldada. Sin foto: usa medio efectivo/datafono. Con Nequi/Davivienda el agente no puede adjuntar imagen (usa presencial o UI).",
+    input: z.object({
+      userId: z.number().int().positive(),
+      compraId: z.string().uuid(),
+      monto: z.number().int().positive(),
+      medioPagoAdmin: z.enum(MEDIO_PAGO_ADMIN),
+      referencia: z.string().optional(),
+      notas: z.string().optional(),
+      fechaComprobante: z.string().optional(),
+    }),
+    handler: async (args) => {
+      const fd = new FormData();
+      fd.set("userId", String(args.userId));
+      fd.set("compraId", args.compraId);
+      fd.set("monto", String(args.monto));
+      fd.set("medioPagoAdmin", args.medioPagoAdmin);
+      if (args.referencia) fd.set("referencia", args.referencia);
+      if (args.notas) fd.set("notas", args.notas);
+      if (args.fechaComprobante) fd.set("fechaComprobante", args.fechaComprobante);
+      return (await loadCreditoOps()).saldarCredito(fd);
+    },
+  }),
+
+  // ---------------------------------------------------------------- PRODUCTOS A CRÉDITO
+  list_productos_credito: tool({
+    category: "catalogo",
+    description: "Lista el catálogo de productos/accesorios a crédito.",
+    input: empty,
+    handler: async () => (await loadQueries()).getAllProductosCredito(),
+  }),
+  save_producto_credito: tool({
+    category: "catalogo",
+    description: "Crea o edita un producto del catálogo a crédito (accesorios).",
+    input: z.object({
+      id: z.number().int().positive().optional(),
+      nombre: z.string().min(1),
+      descripcion: z.string().optional(),
+      cuotaInicial: z.number().int().min(0),
+      cuotaDiaria: z.number().int().positive(),
+      imagenUrl: z.string().optional(),
+      activo: z.boolean(),
+      orden: z.number().int().min(0),
+    }),
+    handler: async (args) =>
+      (await loadAdminActions()).saveProductoCredito(args),
+  }),
+  delete_producto_credito: tool({
+    category: "catalogo",
+    description: "Elimina un producto del catálogo a crédito.",
+    input: z.object({ id: z.number().int().positive() }),
+    handler: async ({ id }) =>
+      (await loadAdminActions()).deleteProductoCredito(id),
+  }),
+  add_compra_producto_credito: tool({
+    category: "credito",
+    description:
+      "Agrega un accesorio a crédito a una compra en pendiente_pago (por catálogo o montos manuales).",
+    input: z.object({
+      compraId: z.string().uuid(),
+      userId: z.number().int().positive(),
+      productoCreditoId: z.number().int().positive().optional(),
+      nombre: z.string().trim().min(1).optional(),
+      cuotaInicial: z.number().int().min(0).optional(),
+      cuotaDiaria: z.number().int().positive().optional(),
+      cantidad: z.number().int().positive().default(1),
+      notas: z.string().trim().optional(),
+    }),
+    handler: async (args) =>
+      (await loadAdminActions()).addCompraProductoCredito(args),
+  }),
+  remove_compra_producto_credito: tool({
+    category: "credito",
+    description: "Quita un ítem de producto a crédito de una compra.",
+    input: z.object({
+      itemId: z.string().uuid(),
+      userId: z.number().int().positive(),
+    }),
+    handler: async ({ itemId, userId }) =>
+      (await loadAdminActions()).removeCompraProductoCredito(itemId, userId),
+  }),
+
+  // ---------------------------------------------------------------- CONTRATOS / PDF
+  get_contract_detail: tool({
+    category: "contratos",
+    description:
+      "Detalle de un digital_contract: datos, overrides de duración/periodos/total, URLs públicas de PDF/firma.",
+    input: z.object({ contractId: z.string().uuid() }),
+    handler: async ({ contractId }) =>
+      (await loadContractAdmin()).getContractDetail(contractId),
+  }),
+  update_contract_terms: tool({
+    category: "contratos",
+    description:
+      "Modifica términos del contrato (duración texto, num_periodos, total, placa/chasis/cuotas/frecuencia). Opcional regeneratePdf=true si ya está firmado.",
+    input: z.object({
+      contractId: z.string().uuid(),
+      userId: z.number().int().positive(),
+      duracionTexto: z.string().trim().min(1).optional(),
+      numPeriodos: z.number().int().positive().max(2000).optional(),
+      totalContrato: z.string().trim().min(1).optional(),
+      motoPlaca: z.string().trim().optional(),
+      motoChasis: z.string().trim().optional(),
+      motoModelo: z.string().trim().optional(),
+      motoColor: z.string().trim().optional(),
+      frecuenciaPago: z
+        .enum(["diario", "semanal", "quincenal", "mensual"])
+        .optional(),
+      cuotaInicial: z.number().int().min(0).optional(),
+      valorCuota: z.number().int().positive().optional(),
+      regeneratePdf: z.boolean().optional(),
+    }),
+    handler: async (args) =>
+      (await loadContractAdmin()).updateContractTerms(args),
+  }),
+  sync_contract_from_compra: tool({
+    category: "contratos",
+    description:
+      "Copia placa, montos y frecuencia desde user_moto_compra hacia contrato_data/admin_data. regeneratePdf opcional.",
+    input: z.object({
+      contractId: z.string().uuid(),
+      userId: z.number().int().positive(),
+      regeneratePdf: z.boolean().optional(),
+    }),
+    handler: async (args) =>
+      (await loadContractAdmin()).syncContractFromCompra(args),
+  }),
+  regenerate_contract_pdf: tool({
+    category: "contratos",
+    description:
+      "Regenera el PDF del contrato firmado en Storage (misma firma). Honra overrides duracion_texto, num_periodos, total_contrato.",
+    input: z.object({
+      contractId: z.string().uuid(),
+      userId: z.number().int().positive().optional(),
+    }),
+    handler: async (args) =>
+      (await loadContractAdmin()).regenerateContractPdf(args),
+  }),
+
+  // ---------------------------------------------------------------- CAJA
+  abrir_caja: tool({
+    category: "caja",
+    description: "Abre la sesión de caja del día (America/Bogota) con efectivo inicial.",
+    input: z.object({
+      montoApertura: z.number().int().positive(),
+      notas: z.string().trim().optional(),
+    }),
+    handler: async (args) => (await loadCajaActions()).abrirCaja(args),
+  }),
+  cerrar_caja: tool({
+    category: "caja",
+    description: "Cierra la sesión de caja con el conteo de efectivo.",
+    input: z.object({
+      sesionId: z.string().uuid(),
+      montoCierre: z.number().int().nonnegative(),
+      notas: z.string().trim().optional(),
+    }),
+    handler: async (args) => (await loadCajaActions()).cerrarCaja(args),
+  }),
+  registrar_movimiento_caja: tool({
+    category: "caja",
+    description: "Registra entrada o salida manual en la caja abierta.",
+    input: z.object({
+      sesionId: z.string().uuid(),
+      tipo: z.enum(["entrada", "salida"]),
+      monto: z.number().int().positive(),
+      concepto: z.string().trim().min(1),
+    }),
+    handler: async (args) =>
+      (await loadCajaActions()).registrarMovimientoCaja(args),
+  }),
+  registrar_egreso_caja: tool({
+    category: "caja",
+    description: "Registra un egreso/pago desde la caja abierta (efectivo/Nequi/Davivienda).",
+    input: z.object({
+      sesionId: z.string().uuid(),
+      concepto: z.string().trim().min(1),
+      monto: z.number().int().positive(),
+      medioPago: z.enum(["efectivo", "nequi", "davivienda"]),
+      beneficiario: z.string().trim().optional(),
+      notas: z.string().trim().optional(),
+    }),
+    handler: async (args) =>
+      (await loadCajaActions()).registrarEgresoCaja(args),
+  }),
+
+  // ---------------------------------------------------------------- VENTAS CONTADO
+  save_venta_moto: tool({
+    category: "ventas",
+    description: "Registra una venta de moto al contado/abono desde catálogo.",
+    input: z.object({
+      bikeId: z.number().int().positive(),
+      modelo: z.string().trim().min(1),
+      color: z.string().trim().min(1),
+      clienteNombre: z.string().trim().min(1),
+      clienteCedula: z.string().trim().min(5),
+      clienteCelular: z.string().trim().min(10),
+      chasis: z.string().trim().optional(),
+      cuotaInicial: z.number().int().nonnegative().optional(),
+      valorVenta: z.number().int().positive().optional(),
+      montoPagado: z.number().int().nonnegative().optional(),
+      notas: z.string().trim().optional(),
+    }),
+    handler: async (args) => (await loadVentaMotoActions()).saveVentaMoto(args),
+  }),
+  set_placa_venta_moto: tool({
+    category: "ventas",
+    description: "Asigna/actualiza la placa de una venta de moto al contado.",
+    input: z.object({
+      id: z.string().uuid(),
+      placa: z.string().trim().min(1),
+    }),
+    handler: async ({ id, placa }) =>
+      (await loadVentaMotoActions()).setPlacaVentaMoto(id, placa),
+  }),
+  add_abono_venta_moto: tool({
+    category: "ventas",
+    description: "Registra un abono adicional sobre una venta de moto al contado.",
+    input: z.object({
+      id: z.string().uuid(),
+      monto: z.number().int().positive(),
+    }),
+    handler: async ({ id, monto }) =>
+      (await loadVentaMotoActions()).addAbonoVentaMoto(id, monto),
+  }),
+  save_venta_producto: tool({
+    category: "ventas",
+    description:
+      "Registra una venta de productos/repuestos de inventario (descuento de stock).",
+    input: z.object({
+      clienteNombre: z.string().trim().min(1),
+      clienteCelular: z.string().trim().min(10),
+      clienteCedula: z.string().trim().optional(),
+      montoPagado: z.number().int().nonnegative().optional(),
+      notas: z.string().trim().optional(),
+      items: z
+        .array(
+          z.object({
+            productoId: z.number().int().positive(),
+            cantidad: z.number().int().positive(),
+          }),
+        )
+        .min(1),
+    }),
+    handler: async (args) =>
+      (await loadVentaProductoActions()).saveVentaProducto(args),
+  }),
+  lookup_producto_sku: tool({
+    category: "inventario",
+    description: "Busca un producto activo de inventario por SKU exacto.",
+    input: z.object({ sku: z.string().trim().min(1) }),
+    handler: async ({ sku }) => (await loadQueries()).getProductoBySku(sku),
+  }),
+
+  // ---------------------------------------------------------------- GPS
+  get_gps_live: tool({
+    category: "gps",
+    description:
+      "Ubicación GPS en vivo de la moto del cliente. Valida que la placa pertenezca al userId.",
+    input: z.object({
+      userId: z.number().int().positive(),
+      placa: z.string().trim().min(1),
+      gpsMoto: z.string().optional(),
+      deviceId: z.number().int().positive().optional(),
+      imei: z.string().trim().optional(),
+    }),
+    handler: async (args) => {
+      await (await import("@/lib/auth/session")).requireAdminSession();
+      const { placaPerteneceAlCliente } = await import(
+        "@/lib/gps/placaDelCliente"
+      );
+      if (!(await placaPerteneceAlCliente(args.userId, args.placa))) {
+        throw new Error("La placa no pertenece a este cliente.");
+      }
+      const { buscarUbicacionGpsEnVivo, mensajeGpsNoDisponible } = await import(
+        "@/lib/gps/gpsMoto"
+      );
+      const resultado = await buscarUbicacionGpsEnVivo(args.placa, {
+        gpsMoto: args.gpsMoto,
+        deviceId: args.deviceId,
+        imei: args.imei,
+      });
+      if (!resultado.ok) {
+        return {
+          gps: null,
+          mensaje: mensajeGpsNoDisponible(
+            args.placa,
+            resultado.motivo,
+            args.gpsMoto,
+          ),
+        };
+      }
+      return { gps: resultado.gps, actualizadoEn: new Date().toISOString() };
+    },
+  }),
+  gps_comando_motor: tool({
+    category: "gps",
+    description:
+      "Envía comando de motor GPS (bloquear/desbloquear). Valida placa↔cliente.",
+    input: z.object({
+      userId: z.number().int().positive(),
+      placa: z.string().trim().min(1),
+      accion: z.enum(["bloquear", "desbloquear", "apagar", "prender", "encender"]),
+      gpsMoto: z.string().optional(),
+    }),
+    handler: async (args) => {
+      await (await import("@/lib/auth/session")).requireAdminSession();
+      const { placaPerteneceAlCliente } = await import(
+        "@/lib/gps/placaDelCliente"
+      );
+      if (!(await placaPerteneceAlCliente(args.userId, args.placa))) {
+        throw new Error("La placa no pertenece a este cliente.");
+      }
+      const accion =
+        args.accion === "bloquear" || args.accion === "apagar"
+          ? ("bloquear" as const)
+          : ("desbloquear" as const);
+      const { enviarComandoMotor } = await import("@/lib/gps/gpsMoto");
+      const resultado = await enviarComandoMotor(
+        args.placa,
+        accion,
+        args.gpsMoto,
+      );
+      if (!resultado.ok) throw new Error(resultado.error);
+      return { ok: true, mensaje: resultado.mensaje };
+    },
   }),
 } satisfies Record<string, ToolDef>;
 

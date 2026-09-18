@@ -1,7 +1,11 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { buildClientPipeline } from "@/lib/pipeline/step-logic";
+import {
+  buildClientPipeline,
+  contractEsRenovacion,
+  RENOVACION_HISTORIAL_PERIODO_MIN,
+} from "@/lib/pipeline/step-logic";
 import { getRecuperacionMarker } from "@/lib/pipeline/recuperacion-display";
 import { etiquetaDocCorta } from "@/lib/contracts/hoja-vida-schema";
 import type {
@@ -325,6 +329,9 @@ export async function getClientPipeline(
   );
 
   const tarifaRows = (tarifas as TarifaPagadaRow[]) ?? [];
+  const esRenovacion = contractEsRenovacion(
+    (contract as DigitalContractRow | null) ?? null,
+  );
 
   const { data: pagos } = compra
     ? await supabase
@@ -340,6 +347,7 @@ export async function getClientPipeline(
   const rentingResumenFromTarifas = buildRentingResumen(
     compra as UserMotoCompraRow | null,
     tarifaRows,
+    { esRenovacion },
   );
   const rentingResumen = mergeRentingResumenWithAtraso(
     compra as UserMotoCompraRow | null,
@@ -477,11 +485,17 @@ function buildRecuperacionMarker(input: {
 function buildRentingResumen(
   compra: UserMotoCompraRow | null,
   tarifas: TarifaPagadaRow[],
+  opts?: { esRenovacion?: boolean },
 ): RentingResumen | null {
   if (!compra || compra.estado !== "entregada") return null;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  // ponytail: historial pre-renovación vive en periodos >= 10000; el ciclo actual parte de 0
+  const cycleTarifas = opts?.esRenovacion
+    ? tarifas.filter((t) => t.numero_periodo < RENOVACION_HISTORIAL_PERIODO_MIN)
+    : tarifas;
 
   let totalPagado = 0;
   let totalAdeudado = 0;
@@ -491,7 +505,7 @@ function buildRentingResumen(
   let diasAtraso: number | null = null;
   let proximoVencimiento: string | null = null;
 
-  for (const tarifa of tarifas) {
+  for (const tarifa of cycleTarifas) {
     const pagadoParcial = tarifa.monto_pagado ?? 0;
 
     if (tarifa.estado === "pagada") {
@@ -1575,13 +1589,15 @@ export async function searchClients(
       placa: compra?.placa ?? null,
       motoLabel: compra ? `${compra.modelo} · ${compra.color}` : null,
       compraEstado: compra?.estado ?? null,
-      cuotasPagadas: paidCount.get(user.id) ?? 0,
+      cuotasPagadas:
+        contrato?.es_renovacion === true ? 0 : (paidCount.get(user.id) ?? 0),
       diasAtraso: diasByUser.get(user.id) ?? 0,
       recuperacion,
       matchLabel: matchLabels.get(user.id) ?? "—",
       seleccionadoAt: null,
       selfieUrl: doc?.selfie_url ? String(doc.selfie_url) : null,
       motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
+      esRenovacion: contrato?.es_renovacion === true,
     };
   });
 
@@ -1762,6 +1778,7 @@ export async function listClientesMotoCredito(
         seleccionadoAt: compra.seleccionado_at,
         selfieUrl: null,
         motoImagenUrl: null,
+        esRenovacion: false,
       };
     }
 
@@ -1808,13 +1825,15 @@ export async function listClientesMotoCredito(
       placa: compra.placa,
       motoLabel: `${compra.modelo} · ${compra.color}`,
       compraEstado: compra.estado,
-      cuotasPagadas: paidCount.get(user.id) ?? 0,
+      cuotasPagadas:
+        contrato?.es_renovacion === true ? 0 : (paidCount.get(user.id) ?? 0),
       diasAtraso: diasByCompra.get(compra.id) ?? 0,
       recuperacion,
       matchLabel: "",
       seleccionadoAt: compra.seleccionado_at,
       selfieUrl: doc?.selfie_url ? String(doc.selfie_url) : null,
       motoImagenUrl: bike?.imagen_url ? String(bike.imagen_url) : null,
+      esRenovacion: contrato?.es_renovacion === true,
     };
   });
 

@@ -96,19 +96,26 @@ export function RentingPanel({ pipeline, userId }: RentingPanelProps) {
 
   /** Ventana: 10 pagadas hacia atrás + 10 pendientes/vencidas hacia adelante. */
   const visibleTarifas = useMemo(() => {
-    const unpaid = tarifas.filter((t) => t.estado !== "pagada");
-    const recentPaid = tarifas
+    // ponytail: en renovación el historial vive en periodos >= 10000
+    const cycle = pipeline.esRenovacion
+      ? tarifas.filter((t) => t.numero_periodo < 10000)
+      : tarifas;
+    const unpaid = cycle.filter((t) => t.estado !== "pagada");
+    const recentPaid = cycle
       .filter((t) => t.estado === "pagada")
       .slice(-10);
     return [...recentPaid, ...unpaid.slice(0, 10)].sort(
       (a, b) => a.numero_periodo - b.numero_periodo,
     );
-  }, [tarifas]);
+  }, [tarifas, pipeline.esRenovacion]);
 
   const currentTarifaId = useMemo(() => {
-    const current = tarifas.find((t) => t.estado !== "pagada");
+    const cycle = pipeline.esRenovacion
+      ? tarifas.filter((t) => t.numero_periodo < 10000)
+      : tarifas;
+    const current = cycle.find((t) => t.estado !== "pagada");
     return current?.id ?? null;
-  }, [tarifas]);
+  }, [tarifas, pipeline.esRenovacion]);
 
   useEffect(() => {
     if (!currentTarifaId) return;

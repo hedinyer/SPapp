@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 export function PageHeader({
@@ -6,9 +7,9 @@ export function PageHeader({
   action,
   className,
 }: {
-  title: string;
+  title: ReactNode;
   description?: string;
-  action?: React.ReactNode;
+  action?: ReactNode;
   className?: string;
 }) {
   return (
@@ -19,7 +20,7 @@ export function PageHeader({
       )}
     >
       <div className="min-w-0 flex flex-col gap-1">
-        <h1 className="font-heading text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+        <h1 className="font-heading flex flex-wrap items-center gap-2 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
           {title}
         </h1>
         {description ? (

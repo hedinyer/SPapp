@@ -161,6 +161,11 @@ export function ClientesSearchResults({
                     <div className="flex flex-col gap-1.5">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{client.displayName}</p>
+                        {client.esRenovacion ? (
+                          <span className="text-xs font-bold tracking-wide text-red-600">
+                            RENOVACION
+                          </span>
+                        ) : null}
                         {client.matchLabel ? (
                           <Badge variant="secondary" className="text-xs">
                             {client.matchLabel}
