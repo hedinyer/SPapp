@@ -9,6 +9,7 @@ const stripChecks = [
   "src/lib/contracts/hoja-vida.check.ts",
   "src/lib/pipeline/pipeline.check.ts",
   "src/lib/pipeline/mora-utils.check.ts",
+  "src/lib/printing/inventario-export.check.ts",
 ];
 
 /** Checks que necesitan tsx (+ stub server-only cuando aplica). */

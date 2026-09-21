@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "colombia-territorial": "^1.1.0",
     "date-fns": "^4.4.0",
+    "exceljs": "^4.4.0",
     "html2canvas-pro": "^2.0.4",
     "iron-session": "^8.0.4",
     "leaflet": "^1.9.4",

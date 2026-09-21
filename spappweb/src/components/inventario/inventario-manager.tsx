@@ -4,7 +4,17 @@ import { useState, useTransition, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { usePollingRefresh } from "@/hooks/use-polling-refresh";
-import { ListFilter, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  Download,
+  FileSpreadsheet,
+  FileText,
+  ListFilter,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import {
   deleteCategoria,
   deleteProducto,
@@ -64,6 +74,10 @@ import { STORAGE_BUCKETS } from "@/lib/supabase/storage-buckets";
 import { Textarea } from "@/components/ui/textarea";
 import { TouchSelect } from "@/components/ui/touch-select";
 import { PrintPriceLabelButton } from "@/components/inventario/print-price-label-button";
+import {
+  downloadInventarioPdf,
+  downloadInventarioXlsx,
+} from "@/lib/printing/inventario-export-client";
 
 function normalizeSearch(value: string): string {
   return value
@@ -115,6 +129,8 @@ export function InventarioManager({
     null,
   );
   const [pending, startTransition] = useTransition();
+  const [exporting, setExporting] = useState<"pdf" | "xlsx" | null>(null);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [nombreQuery, setNombreQuery] = useState("");
   const [filtrosOpen, setFiltrosOpen] = useState(false);
   const [categoriaFiltro, setCategoriaFiltro] = useState("all");
@@ -228,9 +244,29 @@ export function InventarioManager({
     clearFiltrosAvanzados();
   }
 
+  async function handleExport(kind: "pdf" | "xlsx") {
+    setExporting(kind);
+    try {
+      if (kind === "pdf") await downloadInventarioPdf(productos);
+      else await downloadInventarioXlsx(productos);
+      setDownloadOpen(false);
+      toast.success(
+        kind === "pdf"
+          ? "PDF del inventario listo."
+          : "Excel del inventario listo.",
+      );
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "No se pudo generar la descarga.",
+      );
+    } finally {
+      setExporting(null);
+    }
+  }
+
   const { secondsAgo } = usePollingRefresh({
     intervalMs: 30_000,
-    enabled: !catOpen && !prodOpen && !pending,
+    enabled: !catOpen && !prodOpen && !downloadOpen && !pending && exporting == null,
   });
 
   return (
@@ -304,6 +340,20 @@ export function InventarioManager({
                   <span className="sr-only"> activos</span>
                 </Badge>
               ) : null}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              disabled={exporting != null || productos.length === 0}
+              onClick={() => setDownloadOpen(true)}
+            >
+              <Download data-icon="inline-start" aria-hidden="true" />
+              {exporting === "pdf"
+                ? "Generando PDF…"
+                : exporting === "xlsx"
+                  ? "Generando Excel…"
+                  : "Descargar inventario"}
             </Button>
             <Button
               className="min-h-11"
@@ -910,6 +960,56 @@ export function InventarioManager({
           ))}
         </div>
       </TabsContent>
+
+      <Dialog
+        open={downloadOpen}
+        onOpenChange={(open) => {
+          if (exporting != null) return;
+          setDownloadOpen(open);
+        }}
+      >
+        <DialogContent className="bg-background sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Descargar inventario</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Incluye todos los productos ({productos.length}), con logos y fotos.
+            La búsqueda y los filtros de la pantalla no cambian el archivo.
+          </p>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-12 justify-start"
+              disabled={exporting != null}
+              onClick={() => void handleExport("pdf")}
+            >
+              <FileText data-icon="inline-start" aria-hidden="true" />
+              {exporting === "pdf" ? "Generando PDF…" : "Descargar PDF"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-12 justify-start"
+              disabled={exporting != null}
+              onClick={() => void handleExport("xlsx")}
+            >
+              <FileSpreadsheet data-icon="inline-start" aria-hidden="true" />
+              {exporting === "xlsx" ? "Generando Excel…" : "Descargar Excel"}
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={exporting != null}
+              onClick={() => setDownloadOpen(false)}
+            >
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <CategoriaDialog
         open={catOpen}
