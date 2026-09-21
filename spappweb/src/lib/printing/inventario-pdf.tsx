@@ -239,7 +239,7 @@ export function InventarioPdfDoc({
         <View style={styles.tableHeader} fixed>
           <Text style={[styles.th, styles.colFoto]}>Foto</Text>
           <Text style={[styles.th, styles.colNombre]}>Producto</Text>
-          <Text style={[styles.th, styles.colSku]}>SKU</Text>
+          <Text style={[styles.th, styles.colSku]}>Código</Text>
           <Text style={[styles.th, styles.colCat]}>Categoría</Text>
           <Text style={[styles.th, styles.colMoney]}>Costo</Text>
           <Text style={[styles.th, styles.colMoney]}>Venta</Text>

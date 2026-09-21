@@ -222,7 +222,7 @@ export async function downloadInventarioXlsx(
   const headers = [
     "Foto",
     "Producto",
-    "SKU",
+    "Código",
     "Categoría",
     "Costo",
     "Venta",
